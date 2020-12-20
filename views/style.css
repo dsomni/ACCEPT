@@ -1,0 +1,42 @@
+textarea::-webkit-scrollbar{
+    width: 0px;
+}
+#submit{
+    margin-top: 600px;
+    margin-left: 430px;
+    width:100px;
+}
+#code{
+    position: fixed;
+    top: 140px;
+    left: 102px;
+    border: none;
+    width: 368px;
+    height: 380px;
+    resize: none;
+    padding: 10px;
+}
+#code:focus{
+    border: none;
+    outline: none;
+}
+#tests{
+    position: fixed;
+    top: 140px;
+    left: 493px;
+    border: none;
+    width: 360px;
+    height: 380px;
+    resize: none;
+    padding: 10px;
+}
+#tests:focus{
+    border: none;
+    outline: none;
+}
+body{
+    background-image: url("Icon.svg");
+    background-repeat: no-repeat;
+    background-color: #097daeff;
+    background-position: 100px 100px;
+}
