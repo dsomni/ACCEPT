@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Task <%= ID %></title>
+
+        <meta charset="utf-8">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0,
+              maximum-scale=1.0, minimum-scale=1.0,
+              user-scalable=no, minimal-ui">
+        <meta name="full-screen" content="yes">
+
+        <link rel="stylesheet" href="/public/css/style.css" type="text/css">
+        </head>
+    <body>
+
+        <%- include ('blocks/navigation.ejs') -%>
+
+        <form action='/task/<%= ID %>'  method="POST">
+            <div class="container">
+                <div>
+                    <textarea type="code" id="code" name = "code" required cols=30 rows=30 placeholder="Place code here"></textarea>
+                </div>
+                <button id="submit">Send</button>
+                <div>
+                    <textarea  id="result" name="result" readonly>
+                        <%= RESULT %>
+                    </textarea>
+                </div>
+            </div>
+        </form>
+
+    </body>
+</html>

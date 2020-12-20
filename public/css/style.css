@@ -20,7 +20,7 @@ textarea::-webkit-scrollbar{
     border: none;
     outline: none;
 }
-#tests{
+#result{
     position: fixed;
     top: 140px;
     left: 493px;
@@ -30,12 +30,12 @@ textarea::-webkit-scrollbar{
     resize: none;
     padding: 10px;
 }
-#tests:focus{
+#result:focus{
     border: none;
     outline: none;
 }
 body{
-    background-image: url("Icon.svg");
+    background-image: url("../media/Icon.svg");
     background-repeat: no-repeat;
     background-color: #097daeff;
     background-position: 100px 100px;
