@@ -11,8 +11,8 @@ textarea::-webkit-scrollbar{
     top: 140px;
     left: 102px;
     border: none;
-    width: 368px;
-    height: 380px;
+    width: 340px;
+    height: 360px;
     resize: none;
     padding: 10px;
 }
@@ -25,8 +25,8 @@ textarea::-webkit-scrollbar{
     top: 140px;
     left: 493px;
     border: none;
-    width: 360px;
-    height: 380px;
+    width: 340px;
+    height: 360px;
     resize: none;
     padding: 10px;
 }
