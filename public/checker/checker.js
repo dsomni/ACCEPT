@@ -34,7 +34,12 @@ function compiler(taskID){
 
         fs.writeFileSync(__dirname+'\\input.txt', fs.readFileSync(taskDir +"\\inputs\\" + i +".txt", "utf8"));
 
-        childProcess.execSync('start ' + __dirname + '\\program.exe');
+        childProcess.execSync('start ' + __dirname + '\\tlchecker.bat');
+        if (fs.readFileSync(__dirname +"\\TLlog.txt").length != 0){
+            // Time Limit
+            result.push(["Test #" + i.toString() + " ", "Time Limit Exceeded", "er"]);
+            return result;
+        }
     
         let fileContent = fs.readFileSync(__dirname +"\\output.txt", "utf8").trim();
 
