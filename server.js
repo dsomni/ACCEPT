@@ -11,13 +11,13 @@ app.use('/public',express.static('public')); //where search for static files
 
 // Task Page
 app.get('/task/:id', (req, res) => {
-    res.render('task.ejs',{RESULT: '', ID: req.params.id});
+    res.render('task.ejs',{RESULT: [], ID: req.params.id});
 })
 
 // Task Page listener
 app.post('/task/:id', async (req, res) => {
-    var result = checker.checker(req.body.code, req.params.id);
-    res.render('task.ejs', {RESULT: result.trim(), ID: req.params.id})
+    var result = checker.parser(req.body.code, req.params.id);
+    res.render('task.ejs', {RESULT: result, ID: req.params.id})
 })
 
 // Main Page

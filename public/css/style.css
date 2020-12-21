@@ -29,6 +29,8 @@ textarea::-webkit-scrollbar{
     height: 360px;
     resize: none;
     padding: 10px;
+    font-size: large;
+    font-weight: bold;
 }
 #result:focus{
     border: none;
@@ -39,4 +41,16 @@ body{
     background-repeat: no-repeat;
     background-color: #097daeff;
     background-position: 100px 100px;
+}
+
+#ok{
+    color: green;
+}
+
+#er{
+    color: red;
+}
+
+ul{
+    list-style: none;
 }
