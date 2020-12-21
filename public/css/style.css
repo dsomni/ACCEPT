@@ -7,7 +7,7 @@ textarea::-webkit-scrollbar{
     width:100px;
 }
 #code{
-    position: fixed;
+    position: absolute;
     top: 140px;
     left: 102px;
     border: none;
@@ -21,7 +21,7 @@ textarea::-webkit-scrollbar{
     outline: none;
 }
 #result{
-    position: fixed;
+    position: absolute;
     top: 140px;
     left: 493px;
     border: none;

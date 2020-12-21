@@ -1,5 +1,5 @@
 var a,b:integer;
 Begin
-read(a,b);
-writeln(a-b);
+readln(a,b);
+writeln(a+b);
 End.
