@@ -16,6 +16,11 @@ app.use(express.urlencoded({ extended: false }))
 app.use('/public',express.static('public')); //where search for static files
 app.use(cors());
 app.use(bodyParser.json())
+app.use(passport.initialize())
+app.use(passport.session())
+
+require('./config/passport')(passport);
+
 
 //MongoDB connecting  
 mongoose.connect(config.db,{
