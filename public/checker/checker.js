@@ -5,7 +5,7 @@ exports.parser = function (programText, taskID){
     let idx = programText.toUpperCase().indexOf('BEGIN')
     if (idx == -1){
         // Parsing Error
-        return [["Test #1 ", "Presentation Error","er"]]// send log to HTML
+        return [["Test #1 ", "Presentation Error" ,"er"]]// send log to HTML
     }
     // Parsing is OK
     var assignText='\nassign (input,\'public\\checker\\input.txt\'); reset(input);' +
@@ -26,7 +26,7 @@ function compiler(taskID){
         childProcess.execSync(__dirname + '/pascalCompiler/pabcnetcclear.exe '+ __dirname +'/program.pas');
     }catch{
         // Compilation Error
-        return [["Test #1 ", "Compilation Error","er"]]
+        return [["Test #1 ", "Compilation Error", "er"]]
     }
     // Starting Checking tests
     var result = [];
@@ -40,6 +40,7 @@ function compiler(taskID){
             result.push(["Test #" + i.toString() + " ", "Time Limit Exceeded", "er"]);
             return result;
         }
+
     
         let fileContent = fs.readFileSync(__dirname +"\\output.txt", "utf8").trim();
 
