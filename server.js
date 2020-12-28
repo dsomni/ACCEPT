@@ -3,24 +3,12 @@ const express = require('express')
 const app = express()
 const checker = require(__dirname + '\\public\\checker\\checker.js');
 const mongoose = require('mongoose');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const passport = require('passport');
-const path = require('path');
+const bcrypt = require('bcrypt')
+const passport = require('passport')
+const flash = require('express-flash')
+const session = require('express-session')
+const methodOverride = require('method-override')
 const config = require('./config/db');
-const account = require('./routes/account');
-
-// Settings
-app.set('view-engine', 'ejs')
-app.use(express.urlencoded({ extended: false }))
-app.use('/public',express.static('public')); //where search for static files
-app.use(cors());
-app.use(bodyParser.json())
-app.use(passport.initialize())
-app.use(passport.session())
-
-require('./config/passport')(passport);
-
 
 //MongoDB connecting  
 mongoose.connect(config.db,{
@@ -35,9 +23,50 @@ mongoose.connection.on('error', (err) => {
 });
 
 
+var UserSchema = new mongoose.Schema({
+    login: String,
+    password: String
+});
+
+// Компилируем модель из схемы
+var User = mongoose.model('User', UserSchema );
+
+const addUser = async function (login,password){
+    const hashedPassword = await bcrypt.hash(password, 10)
+    User.insertMany([{
+        login: login,
+        password: hashedPassword
+    }])
+}
+//addUser('96','1')
+//addUser('97','2')
+
+const initializePassport = require('./config/passport')
+initializePassport(
+  passport,
+  User
+)
+
+
+// Settings
+app.set('view-engine', 'ejs')
+app.use(express.urlencoded({ extended: false }))
+app.use('/public',express.static('public')); //where search for static files
+
+app.use(flash())
+app.use(session({
+  secret: config.secret,
+  resave: false,
+  saveUninitialized: false
+}))
+app.use(passport.initialize())
+app.use(passport.session())
+app.use(methodOverride('_method'))
+
+
 // Main Page
-app.get('/', (req, res) => {
-    res.render('main.ejs');
+app.get('/', checkAuthenticated, (req, res) => {
+    res.render('main.ejs',{login : req.user.login});
 })
 
 // Task Page
@@ -51,8 +80,36 @@ app.post('/task/:id', async (req, res) => {
     res.render('task.ejs', {RESULT: result, ID: req.params.id})
 })
 
-app.use('/account', account);
+// Log In
+app.get('/login', checkNotAuthenticated, (req, res) => {
+    res.render('login.ejs')
+})
+  
+app.post('/login', passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/login',
+    failureFlash: true
+}), checkAuthenticated)
 
+// Log Out
+app.delete('/logout', (req, res) => {
+    req.logOut()
+    res.redirect('/login')
+})
+
+function checkNotAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+      return res.redirect('/')
+    }
+    next()
+}
+
+function checkAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next()
+    }
+    res.redirect('/login')
+}
 // Starting Server
 app.listen(3000) // port
 console.log("Server started at port 3000")

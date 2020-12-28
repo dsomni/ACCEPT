@@ -14,6 +14,10 @@
         </head>
     <body>
         <%- include ('blocks/navigation.ejs') -%>
+        <%= login%>
 
+        <form action = '/logout?_method=DELETE' method = 'POST'>
+            <button type = 'submit'>Log Out</button>
+        </form>
     </body>
 </html>

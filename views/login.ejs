@@ -16,10 +16,20 @@
 
         <%- include ('blocks/navigation.ejs') -%>
 
-        <form action = '/account/auth' method="POST">
-            <input id = 'login' name = 'login' placeholder="Login">
-            <input id = 'password' name = 'password' placeholder="Password">
-            <button id="submit">Sign in</button>
+        <h1>Login</h1>
+        <% if (messages.error) { %>
+          <%= messages.error %>
+        <% } %>
+        <form action="/login" method="POST">
+          <div>
+            <label for="login">login</label>
+            <input type="login" id="login" name="login" required>
+          </div>
+          <div>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+          </div>
+          <button type="submit">Login</button>
         </form>
 
     </body>
