@@ -3,7 +3,6 @@ const express = require('express')
 const app = express()
 const checker = require(__dirname + '\\public\\checker\\checker.js');
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt')
 const passport = require('passport')
 const flash = require('express-flash')
 const session = require('express-session')
@@ -28,25 +27,14 @@ var UserSchema = new mongoose.Schema({
     password: String
 });
 
-// Компилируем модель из схемы
+// Create model from schema
 var User = mongoose.model('User', UserSchema );
-
-const addUser = async function (login,password){
-    const hashedPassword = await bcrypt.hash(password, 10)
-    User.insertMany([{
-        login: login,
-        password: hashedPassword
-    }])
-}
-//addUser('96','1')
-//addUser('97','2')
 
 const initializePassport = require('./config/passport')
 initializePassport(
   passport,
   User
 )
-
 
 // Settings
 app.set('view-engine', 'ejs')
