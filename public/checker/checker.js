@@ -23,7 +23,7 @@ function compiler(taskID){
 
     // Try to compile
     try{
-        childProcess.execSync(__dirname + '/pascalCompiler/pabcnetcclear.exe '+ __dirname +'/program.pas');
+        childProcess.execSync(__dirname + '\\pascalCompiler\\pabcnetcclear.exe '+ __dirname +'\\program.pas');
     }catch{
         // Compilation Error
         return [["Test #1 ", "Compilation Error", "er"]]

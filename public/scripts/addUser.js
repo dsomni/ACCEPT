@@ -26,7 +26,7 @@ var UserSchema = new mongoose.Schema({
     name : String,
 
     grade: String,
-    attempts: Object,
+    attempts: Array,
 
     isTeacher: Boolean,
     hasClasses: Array
@@ -42,7 +42,7 @@ function addStudent (login, password, name, grade){
         name: name,
 
         grade: grade,
-        attempts: {},
+        attempts: [],
 
         isTeacher : false
     }]);
@@ -59,9 +59,17 @@ async function addTeacher (login, password, name, hasClasses){
     }]);
 }
 function toDo(){
-    addStudent('96','1', 'Dima', '12A')
-    addStudent('96','1', 'LzheDima', '12B')
-    addTeacher('0','0', 'admin', ['12A', '12B'])
+    //addStudent('96','1', 'Dima', '12A')
+    //addStudent('96','1', 'LzheDima', '12B')
+    //addTeacher('0','0', 'admin', ['12A', '12B'])
 }
 
 toDo()
+
+async function addAttempt(){
+    var user = await User.findOne({login:'96'}).exec()
+    console.log(user)
+    user.attempts.push({taskID: 0, text:"fsdfsdfsfsd"})
+    user.save()
+}
+//addAttempt()

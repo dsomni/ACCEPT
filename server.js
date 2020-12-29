@@ -21,16 +21,30 @@ mongoose.connection.on('error', (err) => {
     console.log("Error while connecting to DB: "+ err);
 });
 
+mongoose.set('useCreateIndex', true);
 
 var UserSchema = new mongoose.Schema({
-    login: String,
-    password: String
+    login: { 
+        type: String, 
+        unique: true,
+        index: true
+    },
+    password: String,
+    name : String,
+
+    grade: String,
+    attempts: Array,
+
+    isTeacher: Boolean,
+    hasClasses: Array
 });
+
 
 // Create model from schema
 var User = mongoose.model('User', UserSchema );
 
-const initializePassport = require('./config/passport')
+const initializePassport = require('./config/passport');
+const e = require('express');
 initializePassport(
   passport,
   User
@@ -51,21 +65,32 @@ app.use(passport.initialize())
 app.use(passport.session())
 app.use(methodOverride('_method'))
 
-
 // Main Page
 app.get('/', checkAuthenticated, (req, res) => {
-    res.render('main.ejs',{login : req.user.login});
+    res.render('main.ejs',{name : req.user.name});
 })
 
 // Task Page
 app.get('/task/:id', (req, res) => {
-    res.render('task.ejs',{RESULT: [], ID: req.params.id});
+    if(req.user.attempts.length == 0){
+        res.render('task.ejs',{RESULT: [], ID: req.params.id, name: req.user.name});  
+    }else{
+        res.render('task.ejs',{RESULT: req.user.attempts[0].result, ID: req.params.id, name: req.user.name});  
+    }
+
 })
 
 // Task Page listener
 app.post('/task/:id', async (req, res) => {
-    var result = checker.parser(req.body.code, req.params.id);
-    res.render('task.ejs', {RESULT: result, ID: req.params.id})
+    if(req.user.attempts.length == 0 || req.user.attempts[0].programText!=req.body.code){
+        var result = checker.parser(req.body.code, req.params.id);
+        req.user.attempts.unshift({taskID: req.params.id, date: Date.now().toString(),
+            programText: req.body.code, result: result})
+        req.user.save()
+    }else{
+        var result = req.user.attempts[0].result
+    }
+    res.render('task.ejs', {RESULT: result, ID: req.params.id, name: req.user.name})
 })
 
 // Log In
@@ -98,6 +123,7 @@ function checkAuthenticated(req, res, next) {
     }
     res.redirect('/login')
 }
+
 // Starting Server
 app.listen(3000) // port
 console.log("Server started at port 3000")
