@@ -1,6 +1,9 @@
 <header>
 <button onClick='location.href="/"'>to main</button>
 <button onClick='location.href="/task/0"'>to task</button>
+<% if (isTeacher){ %>
+    <button onClick='location.href="/addtask"'>to task adder</button>
+<% } %>  
 <div class = 'loginInterface'>
 <% if (name==""){ %>
 <form action="/" method="POST" class = "loging">

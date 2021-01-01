@@ -1,6 +1,5 @@
 // Connecting Modules
 const express = require('express')
-const app = express()
 const checker = require(__dirname + '\\public\\checker\\checker.js');
 const mongoose = require('mongoose');
 const passport = require('passport')
@@ -8,7 +7,9 @@ const flash = require('express-flash')
 const session = require('express-session')
 const methodOverride = require('method-override')
 const config = require('./config/db');
-var expressLayouts = require('express-ejs-layouts');
+const expressLayouts = require('express-ejs-layouts');
+const taskAdder = require(__dirname + '\\public\\scripts\\addTask.js');
+const app = express()
 
 //MongoDB connecting  
 mongoose.connect(config.db,{
@@ -38,8 +39,25 @@ var UserSchema = new mongoose.Schema({
 
     isTeacher: Boolean,
     hasClasses: Array
-});
+}, {collection: 'users'});
 
+var TaskSchema = new mongoose.Schema({
+    identificator: { 
+        type: Number, 
+        unique: true,
+        index: true
+    },
+    title : String,
+    statement: String,
+    examples: Array,
+    tests: Array,
+    topic: String,
+    author: String
+
+}, {collection: 'tasks'});
+
+// Create model from schema
+var Task = mongoose.model('Task', TaskSchema );
 
 // Create model from schema
 var User = mongoose.model('User', UserSchema );
@@ -72,10 +90,13 @@ app.use(methodOverride('_method'))
 app.get('/', (req, res) => {
     if(req.user){
          res.render('main.ejs',{name : req.user.name,
-        title: "Main Page"});
+        title: "Main Page",
+        isTeacher: req.user.isTeacher});
     }else{
         res.render('main.ejs',{name : "",
-            title: "Main Page"});
+            title: "Main Page",
+            isTeacher: false
+        });
     }
 })
 
@@ -92,20 +113,30 @@ app.get('/task/:id', checkAuthenticated, (req, res) => {
         res.render('task.ejs',{RESULT: [],
             ID: req.params.id, 
             name: req.user.name, 
-            title: "Task " + req.params.id});  
+            title: "Task " + req.params.id,
+            isTeacher: req.user.isTeacher});  
     }else{
         res.render('task.ejs',{RESULT: req.user.attempts[0].result,
             ID: req.params.id,
             name: req.user.name, 
-            title: "Task " + req.params.id});  
+            title: "Task " + req.params.id,
+            isTeacher: req.user.isTeacher});  
     }
 
 })
 
 // Task Page listener
 app.post('/task/:id',checkAuthenticated, async (req, res) => {
-    if(req.user.attempts.length == 0 || req.user.attempts[0].programText!=req.body.code){
-        var result = checker.parser(req.body.code, req.params.id);
+    var prevCode = ""
+    var attempts = req.user.attempts;
+    for(var i = 0; i < attempts.length; i++){
+        if( attempts[i].taskID == req.params.id){
+            prevCode = attempts[i].programText;
+            break;
+        }
+    }
+    if(prevCode == "" || prevCode != req.body.code ){
+        var result = await checker.parser(Task, req.body.code, req.params.id);
         req.user.attempts.unshift({taskID: req.params.id, date: Date.now().toString(),
             programText: req.body.code, result: result})
         req.user.save()
@@ -115,12 +146,57 @@ app.post('/task/:id',checkAuthenticated, async (req, res) => {
     res.render('task.ejs', {RESULT: result, 
         ID: req.params.id, 
         name: req.user.name,
-        title: "Task " + req.params.id})
+        title: "Task " + req.params.id,
+        isTeacher: req.user.isTeacher})
 })
 
 // Account Page
 app.get('/account',checkAuthenticated, async (req, res) => {
-    res.render('account.ejs',{RESULT: req.user.attempts[0].result})
+    var user = req.user;
+    res.render('account.ejs',{name: user.name,
+        title : "Account",
+        isTeacher: req.user.isTeacher
+    })
+})
+
+
+// Add Task Page
+app.get('/addtask',checkPermission, async (req, res) => {
+    var user = req.user;
+    res.render('addtask.ejs',{name: user.name,
+        title : "Add Task",
+        isTeacher: req.user.isTeacher
+    })
+})
+
+app.post('/addtask',checkPermission, async (req, res) => {
+    var user = req.user;
+    var body = req.body;
+
+    var examples = [];
+    var exI, exO ;
+    for(var i =0; i < 5; i++){
+        eval("exI = body.exampleIn" + i)
+        eval("exO = body.exampleOut" + i)
+        if(exI=="" || exO == "") break;
+        examples.push([exI, exO]);
+    }
+
+    var tests = [];
+    var tI, tO ;
+    for(var i =0; i < 20; i++){
+        eval("tI = body.testIn" + i)
+        eval("tO = body.testOut" + i)
+        if(tI=="" || tO == "") break;
+        tests.push([tI, tO]);
+    }
+
+    taskAdder.addTask(Task, body.title, body.statement, examples, tests, body.topic, user.name);
+
+    res.render('addtask.ejs',{name: user.name,
+        title : "Add Task",
+        isTeacher: req.user.isTeacher
+    })
 })
 
 
@@ -132,6 +208,13 @@ app.delete('/logout', (req, res) => {
 
 function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
+        return next()
+    }
+    res.redirect('/')
+}
+
+function checkPermission(req, res, next) {
+    if (req.user && req.user.isTeacher) {
         return next()
     }
     res.redirect('/')

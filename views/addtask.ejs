@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Add Task</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0,
+              maximum-scale=1.0, minimum-scale=1.0,
+              user-scalable=no, minimal-ui">
+        <meta name="full-screen" content="yes">
+
+        <!-- <link rel="stylesheet" href="/public/css/style.css" type="text/css"> -->
+        </head>
+    <body>
+        <main>
+
+        <form action='/addtask'  method="POST">
+            <div class="taskAdderForm">
+                Title
+                <textarea id="title" name = "title" required cols=2 placeholder="Place title here"></textarea>
+                <br>
+                Topic
+                <textarea id="topic" name = "topic"  cols=2 placeholder="Place topic here"></textarea>
+                <br>
+                Statement
+                <textarea id="statement" name = "statement" required cols=2 rows=10 placeholder="Place statement here"></textarea>
+                <br>
+                Examples
+                <%for (var i =0; i < 5; i++){  %>
+                    <textarea id=<%= "exampleIn" +i %> name = <%= "exampleIn" +i %>  cols=1 rows=3 placeholder="Place example <%=i+1%> input here"></textarea>
+                    <textarea id=<%= "exampleOut" +i %> name = <%= "exampleOut" +i %>  cols=1 rows=3 placeholder="Place example <%=i+1%> output here"></textarea>
+                    <br> 
+                <% } %>
+                Tests
+                <%for (var i =0; i < 20; i++){  %>
+                    <textarea id=<%= "testIn" +i %> name = <%= "testIn" + i %>  cols=1 rows=3 placeholder="Place test <%=i+1%> input here"></textarea>
+                    <textarea id=<%= "testOut" +i %> name = <%= "testOut" + i %>  cols=1 rows=3 placeholder="Place test <%=i+1%> output here"></textarea>
+                    <br> 
+                <% } %>
+                <button id="submit2">Send</button>
+            </div>
+
+        </form>
+    </main>
+    </body>
+</html>

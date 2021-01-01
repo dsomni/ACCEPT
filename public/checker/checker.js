@@ -1,7 +1,7 @@
 const childProcess = require('child_process');
 const fs = require('fs');
 
-exports.parser = function (programText, taskID){
+exports.parser = function (Task, programText, taskID){
     let idx = programText.toUpperCase().indexOf('BEGIN')
     if (idx == -1){
         // Parsing Error
@@ -12,14 +12,10 @@ exports.parser = function (programText, taskID){
     '\nassign (output,\'public\\checker\\output.txt\'); rewrite(output);'
     programText = programText.slice(0, idx+5) + assignText + programText.slice(idx+5)
     fs.writeFileSync(__dirname+'\\program.pas', programText, "utf8");
-    return compiler(taskID);
+    return compiler(Task, taskID);
 }
 
-function compiler(taskID){
-    // Getting neccessary information
-    var taskDir = 'public\\tasks\\task' + taskID
-    var infoStrings = fs.readFileSync(taskDir +"\\information.txt", "utf8").split('\n');
-    var numberOfTests = parseInt(infoStrings[2]);
+async function compiler(Task, taskID){
 
     // Try to compile
     try{
@@ -28,11 +24,16 @@ function compiler(taskID){
         // Compilation Error
         return [["Test #1 ", "Compilation Error", "er"]]
     }
+    
+    // Get task from db
+    var task =  await Task.findOne({identificator: taskID}).exec()
+    var tests = task.tests
+
     // Starting Checking tests
     var result = [];
-    for(var i = 1; i<=numberOfTests; i++){
-
-        fs.writeFileSync(__dirname+'\\input.txt', fs.readFileSync(taskDir +"\\inputs\\" + i +".txt", "utf8"));
+    for(var i = 1; i<=tests.length; i++){
+        var test =  tests[i-1]
+        fs.writeFileSync(__dirname+'\\input.txt', test[0], "utf8");
 
         childProcess.execSync('start ' + __dirname + '\\tlchecker.bat');
         if (fs.readFileSync(__dirname +"\\TLlog.txt").length != 0){
@@ -48,7 +49,7 @@ function compiler(taskID){
             // Something goes wrong during execution
             result.push(["Test #" + i.toString() + " ", "Runtime Error", "er"]) // or no output :)
             break
-        }else if(fileContent != fs.readFileSync(taskDir +"\\outputs\\" + i +".txt", "utf8").trim()){
+        }else if(fileContent != test[1].trim()){
             // Wrong answer
             result.push(["Test #" + i.toString() + " ", "Wrong Answer", "er"])
             break

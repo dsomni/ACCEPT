@@ -30,7 +30,7 @@ var UserSchema = new mongoose.Schema({
 
     isTeacher: Boolean,
     hasClasses: Array
-});
+}, {collection: 'users'});
 
 // Create model from schema
 var User = mongoose.model('User', UserSchema );
@@ -48,7 +48,7 @@ function addStudent (login, password, name, grade){
     }]);
 }
 
-async function addTeacher (login, password, name, hasClasses){
+function addTeacher (login, password, name, hasClasses){
     User.insertMany([{
         login: login,
         password: password,
@@ -60,16 +60,8 @@ async function addTeacher (login, password, name, hasClasses){
 }
 function toDo(){
     //addStudent('96','1', 'Dima', '12A')
-    //addStudent('96','1', 'LzheDima', '12B')
+    addStudent('97','2', 'LzheDima', '12B')
     //addTeacher('0','0', 'admin', ['12A', '12B'])
 }
 
 toDo()
-
-async function addAttempt(){
-    var user = await User.findOne({login:'96'}).exec()
-    console.log(user)
-    user.attempts.push({taskID: 0, text:"fsdfsdfsfsd"})
-    user.save()
-}
-//addAttempt()
