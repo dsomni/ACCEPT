@@ -8,6 +8,7 @@ const flash = require('express-flash')
 const session = require('express-session')
 const methodOverride = require('method-override')
 const config = require('./config/db');
+var expressLayouts = require('express-ejs-layouts');
 
 //MongoDB connecting  
 mongoose.connect(config.db,{
@@ -55,6 +56,8 @@ app.set('view-engine', 'ejs')
 app.use(express.urlencoded({ extended: false }))
 app.use('/public',express.static('public')); //where search for static files
 
+app.use(expressLayouts);
+app.set('layout', 'layout.ejs')
 app.use(flash())
 app.use(session({
   secret: config.secret,
@@ -66,22 +69,41 @@ app.use(passport.session())
 app.use(methodOverride('_method'))
 
 // Main Page
-app.get('/', checkAuthenticated, (req, res) => {
-    res.render('main.ejs',{name : req.user.name});
+app.get('/', (req, res) => {
+    if(req.user){
+         res.render('main.ejs',{name : req.user.name,
+        title: "Main Page"});
+    }else{
+        res.render('main.ejs',{name : "",
+            title: "Main Page"});
+    }
 })
 
+app.post('/', passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/',
+    failureFlash: true
+}))
+
+
 // Task Page
-app.get('/task/:id', (req, res) => {
+app.get('/task/:id', checkAuthenticated, (req, res) => {
     if(req.user.attempts.length == 0){
-        res.render('task.ejs',{RESULT: [], ID: req.params.id, name: req.user.name});  
+        res.render('task.ejs',{RESULT: [],
+            ID: req.params.id, 
+            name: req.user.name, 
+            title: "Task " + req.params.id});  
     }else{
-        res.render('task.ejs',{RESULT: req.user.attempts[0].result, ID: req.params.id, name: req.user.name});  
+        res.render('task.ejs',{RESULT: req.user.attempts[0].result,
+            ID: req.params.id,
+            name: req.user.name, 
+            title: "Task " + req.params.id});  
     }
 
 })
 
 // Task Page listener
-app.post('/task/:id', async (req, res) => {
+app.post('/task/:id',checkAuthenticated, async (req, res) => {
     if(req.user.attempts.length == 0 || req.user.attempts[0].programText!=req.body.code){
         var result = checker.parser(req.body.code, req.params.id);
         req.user.attempts.unshift({taskID: req.params.id, date: Date.now().toString(),
@@ -90,38 +112,29 @@ app.post('/task/:id', async (req, res) => {
     }else{
         var result = req.user.attempts[0].result
     }
-    res.render('task.ejs', {RESULT: result, ID: req.params.id, name: req.user.name})
+    res.render('task.ejs', {RESULT: result, 
+        ID: req.params.id, 
+        name: req.user.name,
+        title: "Task " + req.params.id})
 })
 
-// Log In
-app.get('/login', checkNotAuthenticated, (req, res) => {
-    res.render('login.ejs')
+// Account Page
+app.get('/account',checkAuthenticated, async (req, res) => {
+    res.render('account.ejs',{RESULT: req.user.attempts[0].result})
 })
-  
-app.post('/login', passport.authenticate('local', {
-    successRedirect: '/',
-    failureRedirect: '/login',
-    failureFlash: true
-}), checkAuthenticated)
+
 
 // Log Out
 app.delete('/logout', (req, res) => {
     req.logOut()
-    res.redirect('/login')
+    res.redirect('/')
 })
-
-function checkNotAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-      return res.redirect('/')
-    }
-    next()
-}
 
 function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
         return next()
     }
-    res.redirect('/login')
+    res.redirect('/')
 }
 
 // Starting Server

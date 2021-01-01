@@ -1,0 +1,19 @@
+<header>
+<button onClick='location.href="/"'>to main</button>
+<button onClick='location.href="/task/0"'>to task</button>
+<div class = 'loginInterface'>
+<% if (name==""){ %>
+<form action="/" method="POST" class = "loging">
+    <input type="login" name="login" placeholder="Login" required>
+    <input type="password" name="password" placeholder="password" required>
+    <button type="submit">Log In</button>
+</form>
+<% } else { %>
+    <a href = '/account' class = 'userName'><%= name %></a>
+    <form action = '/logout?_method=DELETE' method = 'POST'>
+        <button type = 'submit'>Log Out</button>
+    </form>
+<% } %>
+</div>
+
+</header>

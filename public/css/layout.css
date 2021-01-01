@@ -1,0 +1,118 @@
+body{
+    margin: 0px;
+    background-color: #b6b6b6;
+}
+
+header{
+    position: sticky;
+    top: 0px;
+    background-color: #0b59b3;
+    padding-top: 20px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    height: 40px;
+}
+header button{
+    display: inline;
+    background-color: #ffffff;
+    border: none;
+    padding: 5px;
+    margin-left: 10px;
+    margin-bottom: 5px;
+    transition: all 300ms ease;
+    font-size: medium;
+    font-family: serif;
+}
+header button:hover{
+    border: none;
+    background-color: #bac0ba;
+    transform: scale(1.1);
+}
+header form{
+    display: inline;
+    margin-right: 0px;
+    margin-left: auto;
+}
+main{
+    width: 100%;
+    height: windowHight;
+    font-size: 20px;
+    margin-top: 0px;
+    margin-right: auto;
+    margin-left: 0px;
+    padding: 10px;
+}
+.wrapper{
+    /* width:100%; */
+    background-color: #999999;
+}
+
+.loginInterface{
+    position: fixed;
+    right : 15px;
+    display: inline;
+}
+
+.userName{
+    color: white;
+    font-size: 15pt;
+    font-family: Geneva, Arial, Helvetica, sans-serif;
+    text-decoration: none;
+}
+
+textarea::-webkit-scrollbar{
+    width: 0px;
+}
+
+#submit{
+    margin-top: 500px;
+    margin-left: 430px;
+    width: 100px;
+}
+#code{
+    position: absolute;
+    top: 140px;
+    left: 102px;
+    border: none;
+    width: 300px;
+    height: 360px;
+    resize: none;
+    padding: 10px;
+}
+#code:focus{
+    border: none;
+    outline: none;
+}
+#result{
+    position: absolute;
+    top: 140px;
+    left: 493px;
+    border: none;
+    width: 340px;
+    height: 360px;
+    resize: none;
+    padding: 10px;
+    font-size: large;
+    font-weight: bold;
+}
+#result:focus{
+    border: none;
+    outline: none;
+}
+.d{
+    background-image: url("../media/Icon.svg");
+    background-color: #097daeff;
+}
+
+#ok{
+    color: green;
+}
+
+#er{
+    color: red;
+}
+
+ul{
+    list-style: none;
+}
