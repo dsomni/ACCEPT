@@ -25,24 +25,52 @@ header{
 header button{
     display: inline;
     background-color: #ffffff;
-    border: none;
-    /* color: #3952F5; */
+    border: 2px solid #47b2e3;
     transition: all 300ms ease;
-    font-size: medium;
+    font-size: small;
     outline: none;
     font-family: serif;
-    padding-left: 20px;
-    padding-top: 30px;
+    padding: 5px; 
+    margin-left: 10px;
+    letter-spacing: 1px;
 }
 header button:hover{
-    color: #5555FF;
+    background-color: #a1d8f1;
     transform: scale(1.1);
 }
+
+.loginInterface{
+    position: fixed;
+    top: 20px;
+    right: 15px;
+    display: inline;
+}
+
+.navigationButtons{
+    position: fixed;
+    top: 20px;
+    left: 180px;
+    display: inline;
+}
+
+.userName{
+    color: #08aae0;
+    font-size: 15pt;
+    font-family: Geneva, Arial, Helvetica, sans-serif;
+    text-decoration: none;
+}
+
+.userName:hover{
+    text-decoration: underline;
+}
+
 header form{
     display: inline;
     margin-right: 0px;
     margin-left: auto;
 }
+
+
 header input{
     border: none;
     outline: none;
@@ -56,36 +84,18 @@ header img{
 main{
     font-size: 20px;
     margin-top: 0px;
-    /* margin-right: auto;
-    margin-left: 0px; */
     padding: 10px;
+    cursor: default;
 }
 h3{
-    color: #3952F5;
+    color: #4e4e4e;
     margin: 5px;
-}
-.navigationButtons{
-    display: inline;
-    position: relative;
-    top: -10px;
 }
 .wrapper{
     /* width:100%; */
     background-color: #999999;
 }
 
-.loginInterface{
-    position: fixed;
-    right : 15px;
-    display: inline;
-}
-
-.userName{
-    color: #00bfff;
-    font-size: 15pt;
-    font-family: Geneva, Arial, Helvetica, sans-serif;
-    text-decoration: none;
-}
 .taskAdderForm{
     display: flex;
     flex-direction: column;
@@ -94,6 +104,10 @@ h3{
     padding-left: 2vw;
     font-size: 15pt;
     font-weight: 600;
+}
+
+.taskAdderForm textarea{
+    font-size: 12pt;
 }
 
 .taskAdderForm button{
