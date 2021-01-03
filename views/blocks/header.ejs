@@ -1,9 +1,16 @@
 <header>
+<a href="http://vplicei.org/"><img src = "http://vplicei.org/wp-content/uploads/2016/01/vml-1.png" alt="ВМЛ"></a>
+<div class="navigationButtons">
+<% if (name!=""){ %>
+<% if (title!="Main Page"){ %>
 <button onClick='location.href="/"'>to main</button>
+<% }if (title.slice(0, 4)!="Task"){  %> 
 <button onClick='location.href="/task/0"'>to task</button>
-<% if (isTeacher){ %>
+<% }if (isTeacher){ %>
+    <% if (title!="Add Task"){ %>
     <button onClick='location.href="/addtask"'>to task adder</button>
-<% } %>  
+<% }}} %>
+</div>
 <div class = 'loginInterface'>
 <% if (name==""){ %>
 <form action="/" method="POST" class = "loging">

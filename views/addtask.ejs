@@ -17,22 +17,22 @@
 
         <form action='/addtask'  method="POST">
             <div class="taskAdderForm">
-                Title
+                <h3>Title</h3>
                 <textarea id="title" name = "title" required cols=2 placeholder="Place title here"></textarea>
-                <br>
-                Topic
+                <!-- <br> -->
+                <h3>Topic</h3>
                 <textarea id="topic" name = "topic"  cols=2 placeholder="Place topic here"></textarea>
-                <br>
-                Statement
+                <!-- <br> -->
+                <h3>Statement</h3>
                 <textarea id="statement" name = "statement" required cols=2 rows=10 placeholder="Place statement here"></textarea>
-                <br>
-                Examples
+                <!-- <br> -->
+                <h3>Examples</h3>
                 <%for (var i =0; i < 5; i++){  %>
                     <textarea id=<%= "exampleIn" +i %> name = <%= "exampleIn" +i %>  cols=1 rows=3 placeholder="Place example <%=i+1%> input here"></textarea>
                     <textarea id=<%= "exampleOut" +i %> name = <%= "exampleOut" +i %>  cols=1 rows=3 placeholder="Place example <%=i+1%> output here"></textarea>
-                    <br> 
+                    <!-- <br>  -->
                 <% } %>
-                Tests
+                <h3>Tests</h3>
                 <%for (var i =0; i < 20; i++){  %>
                     <textarea id=<%= "testIn" +i %> name = <%= "testIn" + i %>  cols=1 rows=3 placeholder="Place test <%=i+1%> input here"></textarea>
                     <textarea id=<%= "testOut" +i %> name = <%= "testOut" + i %>  cols=1 rows=3 placeholder="Place test <%=i+1%> output here"></textarea>

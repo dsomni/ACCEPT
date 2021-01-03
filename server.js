@@ -1,6 +1,6 @@
 // Connecting Modules
 const express = require('express')
-const checker = require(__dirname + '\\public\\checker\\checker.js');
+const checker = require(__dirname + '/public/checker/checker.js');
 const mongoose = require('mongoose');
 const passport = require('passport')
 const flash = require('express-flash')
@@ -8,7 +8,7 @@ const session = require('express-session')
 const methodOverride = require('method-override')
 const config = require('./config/db');
 const expressLayouts = require('express-ejs-layouts');
-const taskAdder = require(__dirname + '\\public\\scripts\\addTask.js');
+const taskAdder = require(__dirname + '/public/scripts/addTask.js');
 const app = express()
 
 //MongoDB connecting  
