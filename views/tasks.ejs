@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Задачи</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0,
+              maximum-scale=1.0, minimum-scale=1.0,
+              user-scalable=no, minimal-ui">
+        <meta name="full-screen" content="yes">
+
+        <!-- <link rel="stylesheet" href="/public/css/style.css" type="text/css"> -->
+        </head>
+    <body>
+        <main>
+            <table class='taskslist'>
+                <tr>
+                  <th>ID</th>
+                  <th>Задача</th>
+                  <th>Тема</th>
+                  <th>Автор</th>
+                  <th>Вердикт</th>
+                  </tr>
+                <% for (var i = 0; i < tasks.length; i++) { %>
+                <% var task = tasks[i]; %>
+                 <tr>
+                  <td><%= task.identificator + 1 %></td>
+                  <td> <a class="tlrefs" href=<%="/task/" + task.identificator %>> <%= task.title %> </a> </td>
+                  <td><%= task.topic %></td>
+                  <td><%= task.author %></td>
+                  <td><%= results[task.identificator] %></td>
+                 </tr>
+                <% } %>
+                </table>
+        </main>
+    </body>
+</html>

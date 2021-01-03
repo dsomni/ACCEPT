@@ -1,6 +1,7 @@
 body{
     margin: 0px;
-    background-color: #87ceeb;
+    background-color: #87ceeb
+    /*background-color: #f0f0f0*/
 }
 html{
     color: #000000;
@@ -20,41 +21,44 @@ header{
     top: 0px;
     background-color: #ffffff;
     height: 75px;
-    box-shadow: 0px 1px #00000025;
+    border-bottom: 1px solid black;
 }
 header button{
     display: inline;
     background-color: #ffffff;
-    border: 2px solid #47b2e3;
     transition: all 300ms ease;
-    font-size: small;
+    font-size: 9pt;
+    font-weight: bold;
+    border: none;
     outline: none;
-    font-family: serif;
+    font-family: sans-serif;
     padding: 5px; 
     margin-left: 10px;
     letter-spacing: 1px;
+    color: #0099ff;
 }
 header button:hover{
-    background-color: #a1d8f1;
     transform: scale(1.1);
+    color: #75b5ff;
 }
 
 .loginInterface{
     position: fixed;
-    top: 20px;
+    top: 25px;
     right: 15px;
     display: inline;
 }
 
 .navigationButtons{
     position: fixed;
-    top: 20px;
+    top: 25px;
     left: 180px;
     display: inline;
 }
 
 .userName{
-    color: #08aae0;
+    color: #154cff;
+    font-weight: bold;
     font-size: 15pt;
     font-family: Geneva, Arial, Helvetica, sans-serif;
     text-decoration: none;
@@ -69,7 +73,6 @@ header form{
     margin-right: 0px;
     margin-left: auto;
 }
-
 
 header input{
     border: none;
@@ -91,6 +94,55 @@ h3{
     color: #4e4e4e;
     margin: 5px;
 }
+
+
+.taskslist {
+    background: #f5ffff;
+    border-collapse: collapse;
+    text-align: left;
+    margin-top: 80px;
+    margin-left: 120px;
+    width: 70%;
+}
+
+.taskslist th {
+    border-top: 1px solid #6695fa;	
+    border-bottom: 1px solid #6695fa; 
+    /*background: linear-gradient(#83aaff, #3075e6);*/
+    background: #83aaff;
+    color: white;
+    padding: 10px 15px;
+    position: relative;
+}
+
+.taskslist tr:nth-child(odd) {
+    background: #ebf3f9;
+}
+
+.taskslist td {
+    border: 1px solid #e3eef7;
+    padding: 10px 15px;
+    position: relative;
+    transition: all 0.5s ease;
+}
+
+/*.taskslist td:last-child{
+    text-align: center;
+    padding: 10px 15px;
+}*/
+
+.tlrefs{
+    text-decoration: none;
+    color: #000000;
+    font-weight: bold;
+}
+
+.tlrefs:hover{
+    cursor: pointer;
+    color: #220bf3;
+    text-decoration: underline;
+}
+
 .wrapper{
     /* width:100%; */
     background-color: #999999;
@@ -112,6 +164,15 @@ h3{
 
 .taskAdderForm button{
     height: 50px;
+    font-size: large;
+    border-radius: 10px;
+    border: none;
+    background-color: #f1f1f1;
+    cursor: pointer;
+}
+
+.taskAdderForm button:hover{
+    background-color: #d4d3d3;
 }
 
 textarea::-webkit-scrollbar{

@@ -169,7 +169,7 @@ app.get('/addtask',checkPermission, async (req, res) => {
     })
 })
 
-app.post('/addtask',checkPermission, async (req, res) => {
+app.post('/addtask',checkAuthenticated, checkPermission, async (req, res) => {
     var user = req.user;
     var body = req.body;
 
@@ -199,6 +199,30 @@ app.post('/addtask',checkPermission, async (req, res) => {
     })
 })
 
+// Tasks List Page
+app.get('/tasks', checkAuthenticated, async (req, res) => {
+    var user = req.user;
+    var tasks = await Task.find({}).exec();
+    var attempts = req.user.attempts;
+    var results = [];
+    for (var i = 0; i < tasks.length; i++){
+        results.push("-")
+    }
+    for (var i = 0; i < tasks.length; i++){
+        for(var j = attempts.length-1; j >= 0; j--){
+            if( attempts[j].taskID == i){
+                results[i]=attempts[j].result[attempts[j].result.length - 1][1];
+                if(results[i] == "OK") break;
+            }
+        }
+    }
+    res.render('tasks.ejs',{name: user.name,
+        title : "Tasks List",
+        tasks: tasks,
+        results: results,
+        isTeacher: req.user.isTeacher
+    })
+})
 
 // Log Out
 app.delete('/logout', (req, res) => {

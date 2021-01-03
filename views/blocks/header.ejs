@@ -5,7 +5,7 @@
 <% if (title!="Main Page"){ %>
 <button onClick='location.href="/"'>ГЛАВНАЯ</button>
 <% }if (title.slice(0, 4)!="Task"){  %> 
-<button onClick='location.href="/task/0"'>ЗАДАЧИ</button>
+<button onClick='location.href="/tasks"'>ЗАДАЧИ</button>
 <% }if (isTeacher){ %>
     <% if (title!="Add Task"){ %>
     <button onClick='location.href="/addtask"'>ДОБАВИТЬ ЗАДАЧУ</button>
