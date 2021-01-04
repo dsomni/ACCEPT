@@ -3,25 +3,25 @@
 <div class="navigationButtons">
 <% if (name!=""){ %>
 <% if (title!="Main Page"){ %>
-<button onClick='location.href="/"'>ГЛАВНАЯ</button>
+<button onClick='location.href="/"'>Главная</button>
 <% }if (title.slice(0, 4)!="Task"){  %> 
-<button onClick='location.href="/tasks"'>ЗАДАЧИ</button>
+<button onClick='location.href="/tasks"'>Задачи</button>
 <% }if (isTeacher){ %>
     <% if (title!="Add Task"){ %>
-    <button onClick='location.href="/addtask"'>ДОБАВИТЬ ЗАДАЧУ</button>
+    <button onClick='location.href="/addtask"'>Добавить задачу</button>
 <% }}} %>
 </div>
 <div class = 'loginInterface'>
 <% if (name==""){ %>
 <form action="/" method="POST" class = "loging">
-    <input type="login" name="login" placeholder="ЛОГИН" required>
-    <input type="password" name="password" placeholder="ПАРОЛЬ" required>
+    <input type="login" name="login" placeholder="Логин" required>
+    <input type="password" name="password" placeholder="Пароль" required>
     <button type="submit">ВОЙТИ</button>
 </form>
 <% } else { %>
     <a href = '/account' class = 'userName'><%= name %></a>
     <form action = '/logout?_method=DELETE' method = 'POST'>
-        <button type = 'submit'>ВЫЙТИ</button>
+        <button type = 'submit'>Выйти</button>
     </form>
 <% } %>
 </div>

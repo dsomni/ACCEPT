@@ -14,21 +14,27 @@
         </head>
     <body>
         <main>
-
         <form action='/task/<%= ID %>'  method="POST">
             <div class="container">
-                <div>
-                    <textarea type="code" id="code" name = "code" required cols=30 rows=30 placeholder="Place code here"></textarea>
-                </div>
-                <button id="submit">Send</button>
-                <div>
-                    <div  id="result" name="result">
+                    <span id="left">
+                        <textarea class="taskarea" id="code" name = "code" required cols=30 rows=30 placeholder="Place code here"></textarea>
+                    </span>
+                    <span id="right">
+                        <textarea  class="taskarea" id="result" name = "result" required cols=30 rows=30 readonly>
+                            <% RESULT.forEach(function(item){ %>
+                            <p><%= item[0] %> <a id=<%= item[2] %>><%= item[1] %></a></p>
+                            <% }); %>
+                        </textarea>
+                    </span>
+                    <!-- <div  id="result" name="result">
                         <ul>
                             <% RESULT.forEach(function(item){ %>
                                 <li><%= item[0] %> <a id=<%= item[2] %>><%= item[1] %></a></li>
                             <% }); %>
                         </ul>
-                    </div>
+                    </div> -->
+                <div>
+                <button id="submit">Send</button>
                 </div>
             </div>
         </form>

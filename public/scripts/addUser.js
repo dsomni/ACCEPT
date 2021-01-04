@@ -54,6 +54,7 @@ function addTeacher (login, password, name, hasClasses){
         password: password,
         name: name,
 
+        attempts: [],
         isTeacher: true,
         hasClasses: hasClasses
     }]);

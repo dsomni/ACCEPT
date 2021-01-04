@@ -1,6 +1,6 @@
 body{
     margin: 0px;
-    background-color: #87ceeb
+    background-color: #87ceeb;
     /*background-color: #f0f0f0*/
 }
 html{
@@ -21,20 +21,21 @@ header{
     top: 0px;
     background-color: #ffffff;
     height: 75px;
-    border-bottom: 1px solid black;
+    box-shadow: 0px 2px #00000012;
 }
 header button{
     display: inline;
     background-color: #ffffff;
     transition: all 300ms ease;
-    font-size: 9pt;
+    font-size: 12pt;
+    font-variant-caps: small-caps;
     font-weight: bold;
     border: none;
     outline: none;
     font-family: sans-serif;
     padding: 5px; 
     margin-left: 10px;
-    letter-spacing: 1px;
+    /* letter-spacing: 1px; */
     color: #0099ff;
 }
 header button:hover{
@@ -60,6 +61,7 @@ header button:hover{
     color: #154cff;
     font-weight: bold;
     font-size: 15pt;
+    font-variant-caps: small-caps;
     font-family: Geneva, Arial, Helvetica, sans-serif;
     text-decoration: none;
 }
@@ -177,42 +179,7 @@ h3{
 
 textarea::-webkit-scrollbar{
     width: 0px;
-}
-
-#submit{
-    margin-top: 500px;
-    margin-left: 430px;
-    width: 100px;
-}
-#code{
-    position: absolute;
-    top: 140px;
-    left: 102px;
-    border: none;
-    width: 300px;
-    height: 360px;
-    resize: none;
-    padding: 10px;
-}
-#code:focus{
-    border: none;
-    outline: none;
-}
-#result{
-    position: absolute;
-    top: 140px;
-    left: 493px;
-    border: none;
-    width: 340px;
-    height: 360px;
-    resize: none;
-    padding: 10px;
-    font-size: large;
-    font-weight: bold;
-}
-#result:focus{
-    border: none;
-    outline: none;
+    height: 0px;
 }
 .d{
     background-image: url("../media/Icon.svg");
@@ -240,3 +207,23 @@ ul{
 .taskAdderForm ::placeholder{
     color: #000000aa;
 }
+.container{
+    display: inline;
+}
+.container span{
+    padding: 10px;
+    margin: -10px;
+    background: no-repeat;
+}
+.taskarea{
+    background-color: transparent;
+    width: 200px;
+    height: 300px;
+    padding: 10px;
+    margin: 20px;
+    border: none;
+    resize: none;
+}
+/* .taskarea:focus{
+    outline: none;
+} */
