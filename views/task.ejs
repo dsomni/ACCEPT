@@ -10,33 +10,32 @@
               user-scalable=no, minimal-ui">
         <meta name="full-screen" content="yes">
 
-        <!-- <link rel="stylesheet" href="/public/css/style.css" type="text/css"> -->
         </head>
     <body>
         <main>
         <form action='/task/<%= ID %>'  method="POST">
             <div class="container">
-                    <span id="left">
-                        <textarea class="taskarea" id="code" name = "code" required cols=30 rows=30 placeholder="Place code here"></textarea>
-                    </span>
-                    <span id="right">
-                        <textarea  class="taskarea" id="result" name = "result" required cols=30 rows=30 readonly>
-                            <% RESULT.forEach(function(item){ %>
-                            <p><%= item[0] %> <a id=<%= item[2] %>><%= item[1] %></a></p>
-                            <% }); %>
-                        </textarea>
-                    </span>
-                    <!-- <div  id="result" name="result">
+                    <div class="imgs">
+                        <img src="..\..\public\media\TopLeft.svg">
+                        <img src="..\..\public\media\TopRight.svg">
+                    </div>
+                    <textarea class="taskarea" id="code" name = "code" required placeholder="Place code here"></textarea>
+                    <div class="taskarea"  id="result" name="result" >
                         <ul>
                             <% RESULT.forEach(function(item){ %>
                                 <li><%= item[0] %> <a id=<%= item[2] %>><%= item[1] %></a></li>
                             <% }); %>
                         </ul>
-                    </div> -->
-                <div>
-                <button id="submit">Send</button>
-                </div>
+                    </div>
+                    <div class="imgsbottom">
+                        <img src="..\..\public\media\BottomLeft.svg">
+                        <img src="..\..\public\media\BottomRight.svg">
+                    </div>
             </div>
+            <div>
+                <button id="submit">Отправить</button>
+            </div>
+
         </form>
     </main>
     </body>

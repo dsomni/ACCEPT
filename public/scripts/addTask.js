@@ -1,6 +1,6 @@
 exports.addTask = async function (Task, title, statement, examples, tests, topic, author){
     var number = await Task.estimatedDocumentCount().exec()
-    Task.insertMany([{
+    await Task.insertMany([{
         identificator: number,
         title : title,
         statement: statement,

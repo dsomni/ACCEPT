@@ -35,7 +35,7 @@ header button{
     font-family: sans-serif;
     padding: 5px; 
     margin-left: 10px;
-    /* letter-spacing: 1px; */
+    letter-spacing: 0.5px;
     color: #0099ff;
 }
 header button:hover{
@@ -145,10 +145,9 @@ h3{
     text-decoration: underline;
 }
 
-.wrapper{
-    /* width:100%; */
+/*.wrapper{
     background-color: #999999;
-}
+}*/
 
 .taskAdderForm{
     display: flex;
@@ -207,23 +206,57 @@ ul{
 .taskAdderForm ::placeholder{
     color: #000000aa;
 }
-.container{
-    display: inline;
-}
-.container span{
-    padding: 10px;
-    margin: -10px;
-    background: no-repeat;
-}
+
+
 .taskarea{
+    vertical-align: top;
     background-color: transparent;
-    width: 200px;
-    height: 300px;
-    padding: 10px;
-    margin: 20px;
+    display: inline-block;
+    width: 300px;
+    height: 350px;
+    margin-left: 10px;
     border: none;
     resize: none;
+    margin-top: 0px;
+    background-color: white;
 }
-/* .taskarea:focus{
+#submit {
+    margin-left: 270px;
+    margin-top: 10px;
+    width: 100px;
+    height: 30px;
+}
+
+#result{
+    width: 304px;
+    height: 354px;
+}
+
+.imgs img{
+    /*border: 1px solid black;*/
+    display: inline-block;
+    margin-left: 10px;
+    margin-top: 20px;
+    margin-bottom: -6px;
+    width: 304px;
+}
+
+.imgsbottom img{
+    /*border: 1px solid black;*/
+    display: inline-block;
+    margin-left: 10px;
+    margin-top: -1px;
+    width: 304px;
+}
+
+.taskarea ul{
+    -moz-column-count: 2; /* Firefox */
+    -webkit-column-count: 2; /* Safari and Chrome */
+    column-count: 2;
+    list-style-type: none;
+    height: 354px;
+}
+
+.taskarea:focus{
     outline: none;
-} */
+} 

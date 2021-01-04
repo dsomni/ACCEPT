@@ -42,11 +42,7 @@ var UserSchema = new mongoose.Schema({
 }, {collection: 'users'});
 
 var TaskSchema = new mongoose.Schema({
-    identificator: { 
-        type: Number, 
-        unique: true,
-        index: true
-    },
+    identificator: Number,
     title : String,
     statement: String,
     examples: Array,
@@ -128,10 +124,12 @@ app.get('/task/:id', checkAuthenticated, (req, res) => {
 // Task Page listener
 app.post('/task/:id',checkAuthenticated, async (req, res) => {
     var prevCode = ""
+    var result="";
     var attempts = req.user.attempts;
     for(var i = 0; i < attempts.length; i++){
         if( attempts[i].taskID == req.params.id){
             prevCode = attempts[i].programText;
+            result =attempts[i].result;
             break;
         }
     }
@@ -140,8 +138,6 @@ app.post('/task/:id',checkAuthenticated, async (req, res) => {
         req.user.attempts.unshift({taskID: req.params.id, date: Date.now().toString(),
             programText: req.body.code, result: result})
         req.user.save()
-    }else{
-        var result = req.user.attempts[0].result
     }
     res.render('task.ejs', {RESULT: result, 
         ID: req.params.id, 
@@ -191,7 +187,7 @@ app.post('/addtask',checkAuthenticated, checkPermission, async (req, res) => {
         tests.push([tI, tO]);
     }
 
-    taskAdder.addTask(Task, body.title, body.statement, examples, tests, body.topic, user.name);
+    await taskAdder.addTask(Task, body.title, body.statement, examples, tests, body.topic, user.name);
 
     res.render('addtask.ejs',{name: user.name,
         title : "Add Task",

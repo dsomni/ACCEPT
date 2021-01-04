@@ -7,15 +7,15 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="210mm"
-   height="297mm"
-   viewBox="0 0 210 297"
+   width="100mm"
+   height="10mm"
+   viewBox="0 0 100 10"
    version="1.1"
-   id="svg8"
-   sodipodi:docname="Right.svg"
-   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)">
+   id="svg1441"
+   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
+   sodipodi:docname="BottomLeft.svg">
   <defs
-     id="defs2" />
+     id="defs1435" />
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -23,23 +23,22 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.021875"
-     inkscape:cx="-10003.937"
-     inkscape:cy="-1607.7497"
+     inkscape:zoom="1.979899"
+     inkscape:cx="211.02479"
+     inkscape:cy="71.566568"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
      showgrid="false"
-     inkscape:showpageshadow="false"
+     inkscape:pagecheckerboard="true"
      showborder="false"
      inkscape:window-width="1366"
      inkscape:window-height="704"
      inkscape:window-x="0"
      inkscape:window-y="27"
-     inkscape:window-maximized="1"
-     inkscape:pagecheckerboard="true" />
+     inkscape:window-maximized="1" />
   <metadata
-     id="metadata5">
+     id="metadata1438">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
@@ -55,8 +54,9 @@
      inkscape:groupmode="layer"
      id="layer1">
     <path
-       style="fill:#fefefe;fill-opacity:1;stroke:#000000;stroke-width:0.723543px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 0.41076405,123.69616 C 0.18181876,121.45907 0.8295955,9.898768 0.8295955,9.898768 L 98.65987,0.39828015 99.635395,115.65935 Z"
-       id="path849" />
+       style="fill:#ffffff;stroke:none;stroke-width:0.32656px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 0.01069474,0.16044002 100.01069,10.16041 V 0.1604098 l -99.99999526,3.022e-5"
+       id="path2019"
+       sodipodi:nodetypes="cccc" />
   </g>
 </svg>
