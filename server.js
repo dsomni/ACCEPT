@@ -85,7 +85,7 @@ app.use(methodOverride('_method'))
 // Main Page
 app.get('/', (req, res) => {
     if(req.user){
-         res.render('main.ejs',{name : req.user.name,
+        res.render('main.ejs',{name : req.user.name,
         title: "Main Page",
         isTeacher: req.user.isTeacher});
     }else{
@@ -104,19 +104,24 @@ app.post('/', passport.authenticate('local', {
 
 
 // Task Page
-app.get('/task/:id', checkAuthenticated, (req, res) => {
+app.get('/task/:id', checkAuthenticated, async (req, res) => {
+    var problem = await Task.findOne({identificator: req.params.id}).exec()
     if(req.user.attempts.length == 0){
         res.render('task.ejs',{RESULT: [],
             ID: req.params.id, 
             name: req.user.name, 
             title: "Task " + req.params.id,
-            isTeacher: req.user.isTeacher});  
+            isTeacher: req.user.isTeacher,
+            problem: problem
+        });  
     }else{
         res.render('task.ejs',{RESULT: req.user.attempts[0].result,
             ID: req.params.id,
             name: req.user.name, 
             title: "Task " + req.params.id,
-            isTeacher: req.user.isTeacher});  
+            isTeacher: req.user.isTeacher,
+            problem: problem
+        });  
     }
 
 })

@@ -13,6 +13,23 @@
         </head>
     <body>
         <main>
+        <div id="task">
+        <H1 id="taskname"><%= problem.title %></H1>
+        <div id="statement"><%= problem.statement %></div>
+        </div>
+        <table id="examples" class='taskslist'>
+            <tr>
+              <th>Input</th>
+              <th>Output</th>
+              </tr>
+            <% for (var i = 0; i < problem.examples.length; i++) { %>
+            <% var example = problem.examples[i]; %>
+             <tr>
+              <td><%= example[0] %></td>
+              <td> <%= example[1] %> </td>
+             </tr>
+            <% } %>
+        </table>
         <form action='/task/<%= ID %>'  method="POST">
             <div class="container">
                     <div class="imgs">

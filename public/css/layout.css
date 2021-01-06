@@ -1,6 +1,7 @@
 body{
     margin: 0px;
     background-color: #87ceeb;
+    min-width: 1000px;
     /*background-color: #f0f0f0*/
 }
 html{
@@ -44,16 +45,16 @@ header button:hover{
 }
 
 .loginInterface{
-    position: fixed;
+    position: absolute;
     top: 25px;
     right: 15px;
     display: inline;
 }
 
 .navigationButtons{
-    position: fixed;
-    top: 25px;
-    left: 180px;
+    position: relative;
+    top: -10px;
+    /* left: 180px; */
     display: inline;
 }
 
@@ -114,7 +115,6 @@ h3{
     background: #83aaff;
     color: white;
     padding: 10px 15px;
-    position: relative;
 }
 
 .taskslist tr:nth-child(odd) {
@@ -124,7 +124,6 @@ h3{
 .taskslist td {
     border: 1px solid #e3eef7;
     padding: 10px 15px;
-    position: relative;
     transition: all 0.5s ease;
 }
 
@@ -180,11 +179,6 @@ textarea::-webkit-scrollbar{
     width: 0px;
     height: 0px;
 }
-.d{
-    background-image: url("../media/Icon.svg");
-    background-color: #097daeff;
-}
-
 #ok{
     color: green;
 }
@@ -196,6 +190,11 @@ textarea::-webkit-scrollbar{
 ul{
     list-style: none;
 }
+
+.container{
+    margin-left: 15%;
+}
+
 .taskAdderForm textarea{
     border-radius: 1px;
     border-color: #000000;
@@ -206,7 +205,6 @@ ul{
 .taskAdderForm ::placeholder{
     color: #000000aa;
 }
-
 
 .taskarea{
     vertical-align: top;
@@ -221,10 +219,10 @@ ul{
     background-color: white;
 }
 #submit {
-    margin-left: 270px;
     margin-top: 10px;
     width: 100px;
     height: 30px;
+    margin-left: 420px;
 }
 
 #result{
@@ -259,4 +257,26 @@ ul{
 
 .taskarea:focus{
     outline: none;
-} 
+}
+.taskarea div{
+    overflow: scroll;
+}
+#statement{
+    text-indent: 50px;
+    line-height: 25px;
+    text-align: justify;
+    padding: 20px 30px 20px 30px;
+}
+#taskname{
+    /* width: 1000px; */
+    text-align: center;
+}
+#examples{
+    margin-left: 15%;
+    margin-top: 10px;
+}
+#task{
+    background-color: #ffffffaa;
+    margin-left: 15%;
+    margin-right: 15%;
+}
