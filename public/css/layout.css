@@ -228,6 +228,7 @@ ul{
 #result{
     width: 304px;
     height: 354px;
+    overflow: scroll;
 }
 
 .imgs img{
@@ -247,13 +248,6 @@ ul{
     width: 304px;
 }
 
-.taskarea ul{
-    -moz-column-count: 2; /* Firefox */
-    -webkit-column-count: 2; /* Safari and Chrome */
-    column-count: 2;
-    list-style-type: none;
-    height: 354px;
-}
 
 .taskarea:focus{
     outline: none;
@@ -262,10 +256,11 @@ ul{
     overflow: scroll;
 }
 #statement{
-    text-indent: 50px;
+    text-indent: 15px;
     line-height: 25px;
     text-align: justify;
     padding: 20px 30px 20px 30px;
+    white-space: pre-wrap;
 }
 #taskname{
     /* width: 1000px; */
@@ -274,9 +269,35 @@ ul{
 #examples{
     margin-left: 15%;
     margin-top: 10px;
+    width: 50%;
+    font-size: medium;
+    white-space: pre-wrap;
 }
 #task{
     background-color: #ffffffaa;
     margin-left: 15%;
     margin-right: 15%;
+}
+
+#editref{
+    text-decoration: none;
+    font-size: small;
+    color: #000000;
+    margin-left: 10px;
+}
+
+#editref:hover{
+    text-decoration: underline;
+    color: #0422a7;
+    cursor: pointer;
+}
+
+#task h4{
+    margin-left: -10%;
+    text-align: center;
+    white-space: pre-wrap;
+}
+
+#code{
+    white-space: pre-wrap;
 }

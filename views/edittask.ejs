@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Редактирование задачи</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0,
+              maximum-scale=1.0, minimum-scale=1.0,
+              user-scalable=no, minimal-ui">
+        <meta name="full-screen" content="yes">
+
+        <!-- <link rel="stylesheet" href="/public/css/style.css" type="text/css"> -->
+        </head>
+    <body>
+        <main>
+
+        <form action=<%= '/edittask/'+problem.identificator %>  method="POST">
+            <div class="taskAdderForm">
+                <h3>Название задачи</h3>
+                <textarea id="title" name = "title" required cols=2 placeholder="Введите название"><%= problem.title %></textarea>
+                <h3>Тема</h3>
+                <textarea id="topic" name = "topic"  cols=2 placeholder="Введите тему"><%= problem.topic %></textarea>
+                <h3>Условие</h3>
+                <textarea id="statementinput" name = "statement" required cols=2 rows=10 placeholder="Введите условиe"><%= problem.statement %></textarea>
+                <h3>Примеры</h3>
+                <% var len = problem.examples.length %>
+                <%for (var i =0; i < 5; i++){  %>
+                    <% if (i<len){ %>
+                        <textarea id=<%= "exampleIn" +i %> name = <%= "exampleIn" +i %>  cols=1 rows=3 placeholder="Пример <%=i+1%> INPUT"><%= problem.examples[i][0] %></textarea>
+                        <textarea id=<%= "exampleOut" +i %> name = <%= "exampleOut" +i %>  cols=1 rows=3 placeholder="Пример <%=i+1%> OUTPUT"><%= problem.examples[i][1] %></textarea>
+                    <% } else { %>
+                        <textarea id=<%= "exampleIn" +i %> name = <%= "exampleIn" +i %>  cols=1 rows=3 placeholder="Пример <%=i+1%> INPUT"></textarea>
+                        <textarea id=<%= "exampleOut" +i %> name = <%= "exampleOut" +i %>  cols=1 rows=3 placeholder="Пример <%=i+1%> OUTPUT"></textarea>
+                    <% } %>
+                    <% if (i!=4){ %>
+                    <br>
+                    <% } %>
+                <% } %>
+                <h3>Тесты</h3>
+                <% var len = problem.tests.length %>
+                <%for (var i =0; i < 20; i++){  %>
+                    <% if (i<len){ %>
+                        <textarea id=<%= "testIn" +i %> name = <%= "testIn" + i %>  cols=1 rows=3 placeholder="Тест <%=i+1%> INPUT"><%= problem.tests[i][0] %></textarea>
+                        <textarea id=<%= "testOut" +i %> name = <%= "testOut" + i %>  cols=1 rows=3 placeholder="Тест <%=i+1%> OUTPUT"><%= problem.tests[i][1] %></textarea>
+                    <% } else { %>
+                        <textarea id=<%= "testIn" +i %> name = <%= "testIn" + i %>  cols=1 rows=3 placeholder="Тест <%=i+1%> INPUT"></textarea>
+                        <textarea id=<%= "testOut" +i %> name = <%= "testOut" + i %>  cols=1 rows=3 placeholder="Тест <%=i+1%> OUTPUT"></textarea>
+                    <% } %>
+                    <br>
+                <% } %>
+                <button id="submit2">Сохранить изменения</button>
+            </div>
+
+        </form>
+    </main>
+    </body>
+</html>

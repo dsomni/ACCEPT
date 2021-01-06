@@ -106,23 +106,24 @@ app.post('/', passport.authenticate('local', {
 // Task Page
 app.get('/task/:id', checkAuthenticated, async (req, res) => {
     var problem = await Task.findOne({identificator: req.params.id}).exec()
-    if(req.user.attempts.length == 0){
-        res.render('task.ejs',{RESULT: [],
-            ID: req.params.id, 
-            name: req.user.name, 
-            title: "Task " + req.params.id,
-            isTeacher: req.user.isTeacher,
-            problem: problem
-        });  
-    }else{
-        res.render('task.ejs',{RESULT: req.user.attempts[0].result,
-            ID: req.params.id,
-            name: req.user.name, 
-            title: "Task " + req.params.id,
-            isTeacher: req.user.isTeacher,
-            problem: problem
-        });  
+    var attempts = req.user.attempts;
+    var result = []
+    var prevCode = "";
+    for(var i = 0; i < attempts.length; i++){
+        if( attempts[i].taskID == req.params.id){
+            result =attempts[i].result;
+            prevCode = attempts[i].programText;
+            break;
+        }
     }
+    res.render('task.ejs',{RESULT: result,
+        ID: req.params.id,
+        name: req.user.name, 
+        title: "Task " + req.params.id,
+        isTeacher: req.user.isTeacher,
+        problem: problem,
+        prevCode: prevCode
+    });  
 
 })
 
@@ -131,6 +132,7 @@ app.post('/task/:id',checkAuthenticated, async (req, res) => {
     var prevCode = ""
     var result="";
     var attempts = req.user.attempts;
+    var problem = await Task.findOne({identificator: req.params.id}).exec()
     for(var i = 0; i < attempts.length; i++){
         if( attempts[i].taskID == req.params.id){
             prevCode = attempts[i].programText;
@@ -148,7 +150,10 @@ app.post('/task/:id',checkAuthenticated, async (req, res) => {
         ID: req.params.id, 
         name: req.user.name,
         title: "Task " + req.params.id,
-        isTeacher: req.user.isTeacher})
+        isTeacher: req.user.isTeacher,
+        problem: problem,
+        prevCode: prevCode
+    })
 })
 
 // Account Page
@@ -222,6 +227,54 @@ app.get('/tasks', checkAuthenticated, async (req, res) => {
         tasks: tasks,
         results: results,
         isTeacher: req.user.isTeacher
+    })
+})
+
+// Edit Task Page
+app.get('/edittask/:id',checkPermission, async (req, res) => {
+    var problem = await Task.findOne({identificator: req.params.id}).exec()
+    var user = req.user;
+    res.render('edittask.ejs',{name: user.name,
+        title : "Edit Task",
+        isTeacher: req.user.isTeacher,
+        problem: problem
+    })
+})
+
+app.post('/edittask/:id',checkAuthenticated, checkPermission, async (req, res) => {
+    var user = req.user;
+    var body = req.body;
+    var problem = await Task.findOne({identificator: req.params.id}).exec()
+
+    var examples = [];
+    var exI, exO ;
+    for(var i =0; i < 5; i++){
+        eval("exI = body.exampleIn" + i)
+        eval("exO = body.exampleOut" + i)
+        if(exI=="" || exO == "") break;
+        examples.push([exI, exO]);
+    }
+
+    var tests = [];
+    var tI, tO ;
+    for(var i =0; i < 20; i++){
+        eval("tI = body.testIn" + i)
+        eval("tO = body.testOut" + i)
+        if(tI=="" || tO == "") break;
+        tests.push([tI, tO]);
+    }
+
+    //await taskAdder.addTask(Task, body.title, body.statement, examples, tests, body.topic, user.name);
+    problem.title = body.title;
+    problem.statement = body.statement;
+    problem.topic = body.topic;
+    problem.examples = examples;
+    problem.tests = tests;
+    await problem.save();
+    res.render('edittask.ejs',{name: user.name,
+        title : "Edit Task",
+        isTeacher: req.user.isTeacher,
+        problem: problem
     })
 })
 
