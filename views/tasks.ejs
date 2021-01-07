@@ -14,6 +14,10 @@
         </head>
     <body>
         <main>
+            <form action= '/tasks/1'  method="POST">
+                <textarea id="searcharea" name = "searcharea" rows=1 placeholder="Поиск задачи"></textarea><button id="submitsearch">Найти</button>
+            </form>
+
             <table class='taskslist'>
                 <tr>
                   <th>ID</th>
@@ -22,10 +26,13 @@
                   <th>Автор</th>
                   <th>Вердикт</th>
                   </tr>
-                <% for (var i = 0; i < tasks.length; i++) { %>
+                <% min = function(a,b){ if(a < b) return a; return b} %>
+                <% var onPage = 2 %>
+                <% if(tasks.length>0){ if(tasks[0].identificator!=0){ tasks.unshift([0]) } } %>
+                <% for (var i = (page-1)*onPage+1; i < min(page*onPage+1,tasks.length); i++) { %>
                 <% var task = tasks[i]; %>
                  <tr>
-                  <td><%= task.identificator + 1 %></td>
+                  <td><%= task.identificator %></td>
                   <td> <a class="tlrefs" href=<%="/task/" + task.identificator %>> <%= task.title %> </a> </td>
                   <td><%= task.topic %></td>
                   <td><%= task.author %></td>
@@ -33,6 +40,16 @@
                  </tr>
                 <% } %>
                 </table>
+
+                <% var page = Number(page) %>
+                <% var prevPage = page - 1 %>
+                <% var nextPage = page + 1 %>
+                <% if(page>1) { %>
+                    <button onClick=<%= 'location.href=\"/tasks/'+prevPage+"\"" %>>&lt;&lt;&lt;</button>
+                <% } %>
+                <% if(page*onPage<tasks.length-1) { %>
+                    <button onClick=<%= 'location.href=\"/tasks/'+nextPage+"\"" %>>&gt;&gt;&gt;</button>
+                <% } %>
         </main>
     </body>
 </html>

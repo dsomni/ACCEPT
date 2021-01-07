@@ -14,7 +14,7 @@
     <body>
         <main>
         <div id="task">
-        <H1 id="taskname"><%= problem.title %> <% if(isTeacher){ %> <a id="editref" href=<%= "/edittask/" + problem.identificator %> > [Редактировать] </a>   <% } %></H1>
+        <H1 id="taskname"><%= problem.title %> <% if(isTeacher){ %> <a id="editref" href=<%= "/edittask/" + problem.identificator %> > [Редактировать] </a> <a id="editref" href=<%= "/deletetask/" + problem.identificator %> > [Удалить] </a>  <% } %></H1>
         <h4>Тема: <%= problem.topic %>         Автор: <%= problem.author %></h3>
         <div id="statement"><%= problem.statement %></div>
         </div>
