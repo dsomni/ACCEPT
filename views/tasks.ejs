@@ -27,7 +27,7 @@
                   <th>Вердикт</th>
                   </tr>
                 <% min = function(a,b){ if(a < b) return a; return b} %>
-                <% var onPage = 2 %>
+                <% var onPage = 20 %>
                 <% if(tasks.length>0){ if(tasks[0].identificator!=0){ tasks.unshift([0]) } } %>
                 <% for (var i = (page-1)*onPage+1; i < min(page*onPage+1,tasks.length); i++) { %>
                 <% var task = tasks[i]; %>

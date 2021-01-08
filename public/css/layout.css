@@ -98,6 +98,12 @@ h3{
     margin: 5px;
 }
 
+h4{
+    color: #4e4e4e;
+    margin: 5px;
+    margin-left: 15px;
+    font-size: small;
+}
 
 .taskslist {
     background: #f5ffff;
@@ -157,6 +163,7 @@ h3{
     font-size: 15pt;
     font-weight: 600;
 }
+
 
 .taskAdderForm textarea{
     font-size: 12pt;
