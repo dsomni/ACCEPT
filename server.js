@@ -84,6 +84,7 @@ app.use(methodOverride('_method'))
 
 // Main Page
 app.get('/', (req, res) => {
+
     if(req.user){
         res.render('main.ejs',{name : req.user.name,
         title: "Main Page",
@@ -157,12 +158,42 @@ app.post('/task/:id',checkAuthenticated, async (req, res) => {
 })
 
 // Account Page
-app.get('/account',checkAuthenticated, async (req, res) => {
+app.get('/account/:page/:search',checkAuthenticated, async (req, res) => {
     var user = req.user;
-    res.render('account.ejs',{name: user.name,
+    var tasks = await Task.find({}).exec();
+    var attempts = req.user.attempts;
+    var results = [];
+    var foundTasks = [];
+    var foundAttempts = [];
+
+    toSearch = req.params.search;
+    if(toSearch == "default") toSearch="";
+
+
+    for(var i = 0; i < attempts.length; i++){
+        if(tasks[attempts[i].taskID].title.slice(0, toSearch.length) == toSearch){
+            foundAttempts.push(attempts[i]);
+            foundTasks.push(tasks[attempts[i].taskID]);
+        }
+    }
+
+    res.render('account.ejs',{
+        name: user.name,
         title : "Account",
-        isTeacher: req.user.isTeacher
+        results: results,
+        isTeacher: req.user.isTeacher,
+        page: req.params.page,
+        isTeacher: req.user.isTeacher,
+        attempts: foundAttempts,
+        tasks: foundTasks,
+        search: req.params.search
     })
+})
+
+app.post('/account/:page/:search', checkAuthenticated, async (req, res) => {
+    var toSearch = req.body.searcharea;
+    if(!toSearch) toSearch = "default";
+    res.redirect('/account/' + req.params.page.toString() +'/' + toSearch )
 })
 
 
@@ -206,39 +237,15 @@ app.post('/addtask',checkAuthenticated, checkPermission, async (req, res) => {
 })
 
 // Tasks List Page
-app.get('/tasks/:page', checkAuthenticated, async (req, res) => {
-    var user = req.user;
-    var tasks = await Task.find({}).exec();
-    var attempts = req.user.attempts;
-    var results = [];
-    for (var i = 0; i < tasks.length; i++){
-        results.push("-")
-    }
-    for (var i = 0; i < tasks.length; i++){
-        for(var j = attempts.length-1; j >= 0; j--){
-            if( attempts[j].taskID == i){
-                results[i]=attempts[j].result[attempts[j].result.length - 1][1];
-                if(results[i] == "OK") break;
-            }
-        }
-    }
-    res.render('tasks.ejs',{name: user.name,
-        title : "Tasks List",
-        tasks: tasks,
-        results: results,
-        isTeacher: req.user.isTeacher,
-        page: req.params.page
-    })
-})
-
-app.post('/tasks/:page', checkAuthenticated, async (req, res) => {
+app.get('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
     var user = req.user;
     var tasks = await Task.find({}).exec();
     var attempts = req.user.attempts;
     var results = [];
     var foundTasks = [];
 
-    toSearch = req.body.searcharea;
+    toSearch = req.params.search;
+    if(toSearch == "default") toSearch="";
 
     var result;
     for (var i = 0; i < tasks.length; i++){
@@ -251,20 +258,25 @@ app.post('/tasks/:page', checkAuthenticated, async (req, res) => {
                     if(result == "OK") break;
                 }
             }
+            if(result=="") result = "-";
             results.push(result)
         }
-
     }
 
-
-    res.render('tasks.ejs',{
-        name: user.name,
+    res.render('tasks.ejs',{name: user.name,
         title : "Tasks List",
         tasks: foundTasks,
         results: results,
         isTeacher: req.user.isTeacher,
-        page: req.params.page
+        page: req.params.page,
+        search: req.params.search
     })
+})
+
+app.post('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
+    var toSearch = req.body.searcharea;
+    if(!toSearch) toSearch = "default";
+    res.redirect('/tasks/' + req.params.page.toString() +'/' + toSearch )
 })
 
 
@@ -332,7 +344,7 @@ app.post('/deletetask/:id',checkAuthenticated, checkPermission, async (req, res)
 
     /* add popup */
 
-    res.redirect('/tasks/1');
+    res.redirect('/tasks/1/default');
 })
 
 // Log Out

@@ -10,11 +10,11 @@
               user-scalable=no, minimal-ui">
         <meta name="full-screen" content="yes">
 
-        <!-- <link rel="stylesheet" href="/public/css/style.css" type="text/css"> -->
+        <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
         </head>
     <body>
         <main>
-            <form action= '/tasks/1'  method="POST">
+            <form action= '/tasks/1/default'  method="POST">
                 <textarea id="searcharea" name = "searcharea" rows=1 placeholder="Поиск задачи"></textarea><button id="submitsearch">Найти</button>
             </form>
 
@@ -44,12 +44,18 @@
                 <% var page = Number(page) %>
                 <% var prevPage = page - 1 %>
                 <% var nextPage = page + 1 %>
+
                 <% if(page>1) { %>
-                    <button onClick=<%= 'location.href=\"/tasks/'+prevPage+"\"" %>>&lt;&lt;&lt;</button>
+                    <button onClick=<%= 'location.href=\"/tasks/'+prevPage + "/" + search + "\"" %>>&lt;&lt;&lt;</button>
+                <% }else { %>
+                    <button>&lt;&lt;&lt;</button>
                 <% } %>
                 <% if(page*onPage<tasks.length-1) { %>
-                    <button onClick=<%= 'location.href=\"/tasks/'+nextPage+"\"" %>>&gt;&gt;&gt;</button>
+                    <button onClick=<%= 'location.href=\"/tasks/'+nextPage + "/" + search + "\"" %>>&gt;&gt;&gt;</button>
+                <% }else { %>
+                    <button>&gt;&gt;&gt;</button>
                 <% } %>
+
         </main>
     </body>
 </html>

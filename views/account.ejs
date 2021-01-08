@@ -10,10 +10,47 @@
               user-scalable=no, minimal-ui">
         <meta name="full-screen" content="yes">
 
-        <!-- <link rel="stylesheet" href="/public/css/style.css" type="text/css"> -->
+        <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
         </head>
     <body>
         <main>
+            <form action= '/account/1/default'  method="POST">
+                <textarea id="searcharea" name = "searcharea" rows=1 placeholder="Поиск по задаче"></textarea><button id="submitsearch">Найти</button>
+            </form>
+
+            <table class='taskslist'>
+                <tr>
+                  <th>Дата</th>
+                  <th>Задача</th>
+                  <th>Вердикт</th>
+                  </tr>
+                <% var onPage = 10 %>
+                <% for (var i = (page-1)*onPage; i < min(page*onPage,attempts.length); i++) { %>
+                <% var attempt = attempts[i]; %>
+                <% var task = tasks[i]; %>
+                <% var item = attempt.result[attempt.result.length-1] %>
+                 <tr>
+                  <td> <a class="tlrefs" href=<%="/task/" + task.identificator %>> <%= new Date(attempt.date) %> </a> </td>
+                  <td> <a class="tlrefs" href=<%="/task/" + task.identificator %>> <%= task.title %> </a> </td>
+                  <td><%= item[0] %> <a id=<%= item[2] %>><%= item[1] %></a></td>
+                 </tr>
+                <% } %>
+                </table>
+
+                <% var page = Number(page) %>
+                <% var prevPage = page - 1 %>
+                <% var nextPage = page + 1 %>
+
+                <% if(page>1) { %>
+                    <button onClick=<%= 'location.href=\"/account/'+prevPage + "/" + search + "\"" %>>&lt;&lt;&lt;</button>
+                <% }else { %>
+                    <button>&lt;&lt;&lt;</button>
+                <% } %>
+                <% if(page*onPage<attempts.length) { %>
+                    <button onClick=<%= 'location.href=\"/account/'+nextPage + "/" + search + "\"" %>>&gt;&gt;&gt;</button>
+                <% }else { %>
+                    <button>&gt;&gt;&gt;</button>
+                <% } %>
         </main>
     </body>
 </html>
