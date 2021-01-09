@@ -45,6 +45,8 @@
                 <% var prevPage = page - 1 %>
                 <% var nextPage = page + 1 %>
 
+                <div><%= ((page-1)*onPage+1).toString() + "-" +  min(page*onPage,tasks.length-1).toString() + " из " +  (tasks.length-1).toString() %> </div>
+
                 <% if(page>1) { %>
                     <button onClick=<%= 'location.href=\"/tasks/'+prevPage + "/" + search + "\"" %>>&lt;&lt;&lt;</button>
                 <% }else { %>

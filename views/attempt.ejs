@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Попытка <%= date %></title>
+
+        <meta charset="utf-8">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0,
+              maximum-scale=1.0, minimum-scale=1.0,
+              user-scalable=no, minimal-ui">
+        <meta name="full-screen" content="yes">
+        <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
+        </head>
+    <body>
+        <main>
+        <form>
+            <% var maxDate = new Date(Number(date)); %>
+            <% var isoDate = maxDate.toISOString(); %>   
+            <% var Completedate = isoDate.substr(0, 10) + " " + isoDate.substr(11, 8) ; %>
+            <div>
+                <div>Дата: <%= Completedate %> </div>
+                <div><a class="tlrefs" href=<%="/account/" + login + "/1/default" %>>Пользователь <%= n_name %> </a> </div>
+                <a class="tlrefs" href=<%="/task/" + taskID %>>Задача #<%= taskID %> </a> 
+            </div>
+            <div class="container">
+                    <div class="imgs">
+                        <img src="..\..\public\media\TopLeft.svg">
+                        <img src="..\..\public\media\TopRight.svg">
+                    </div>
+                    <textarea class="taskarea" id="code" name = "code" readonly "><%= code %></textarea>
+                    <div class="taskarea"  id="result" name="result" >
+                        <ul>
+                            <% RESULT.forEach(function(item){ %>
+                                <li><%= item[0] %> <a id=<%= item[2] %>><%= item[1] %></a></li>
+                            <% }); %>
+                        </ul>
+                    </div>
+                    <div class="imgsbottom">
+                        <img src="..\..\public\media\BottomLeft.svg">
+                        <img src="..\..\public\media\BottomRight.svg">
+                    </div>
+            </div>
+
+        </form>
+    </main>
+    </body>
+</html>

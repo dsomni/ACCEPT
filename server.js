@@ -86,11 +86,16 @@ app.use(methodOverride('_method'))
 app.get('/', (req, res) => {
 
     if(req.user){
-        res.render('main.ejs',{name : req.user.name,
-        title: "Main Page",
-        isTeacher: req.user.isTeacher});
+        res.render('main.ejs',{
+            login: req.user.login,
+            name : req.user.name,
+            title: "Main Page",
+            isTeacher: req.user.isTeacher
+    });
     }else{
-        res.render('main.ejs',{name : "",
+        res.render('main.ejs',{
+            login: "",
+            name : "",
             title: "Main Page",
             isTeacher: false
         });
@@ -117,7 +122,9 @@ app.get('/task/:id', checkAuthenticated, async (req, res) => {
             break;
         }
     }
-    res.render('task.ejs',{RESULT: result,
+    res.render('task.ejs',{
+        login: req.user.login,
+        RESULT: result,
         ID: req.params.id,
         name: req.user.name, 
         title: "Task " + req.params.id,
@@ -147,7 +154,9 @@ app.post('/task/:id',checkAuthenticated, async (req, res) => {
             programText: req.body.code, result: result})
         req.user.save()
     }
-    res.render('task.ejs', {RESULT: result, 
+    res.render('task.ejs', {
+        login: user.login,
+        RESULT: result, 
         ID: req.params.id, 
         name: req.user.name,
         title: "Task " + req.params.id,
@@ -158,49 +167,65 @@ app.post('/task/:id',checkAuthenticated, async (req, res) => {
 })
 
 // Account Page
-app.get('/account/:page/:search',checkAuthenticated, async (req, res) => {
-    var user = req.user;
-    var tasks = await Task.find({}).exec();
-    var attempts = req.user.attempts;
-    var results = [];
-    var foundTasks = [];
-    var foundAttempts = [];
-
-    toSearch = req.params.search;
-    if(toSearch == "default") toSearch="";
-
-
-    for(var i = 0; i < attempts.length; i++){
-        if(tasks[attempts[i].taskID].title.slice(0, toSearch.length) == toSearch){
-            foundAttempts.push(attempts[i]);
-            foundTasks.push(tasks[attempts[i].taskID]);
-        }
+app.get('/account/:login/:page/:search',checkAuthenticated, checkValidation, async (req, res) => {
+    var user;
+    if(req.user.login == req.params.login){
+        user = req.user;
+    } else{
+        user = await User.findOne({login:req.params.login}).exec();
     }
 
-    res.render('account.ejs',{
-        name: user.name,
-        title : "Account",
-        results: results,
-        isTeacher: req.user.isTeacher,
-        page: req.params.page,
-        isTeacher: req.user.isTeacher,
-        attempts: foundAttempts,
-        tasks: foundTasks,
-        search: req.params.search
-    })
+    if(user){
+        var tasks = await Task.find({}).exec();
+        var attempts = user.attempts;
+        var results = [];
+        var foundTasks = [];
+        var foundAttempts = [];
+
+        toSearch = req.params.search;
+        if(toSearch == "default") toSearch="";
+
+
+        for(var i = 0; i < attempts.length; i++){
+            if(tasks[attempts[i].taskID].title.slice(0, toSearch.length) == toSearch){
+                foundAttempts.push(attempts[i]);
+                foundTasks.push(tasks[attempts[i].taskID]);
+            }
+        }
+
+        res.render('account.ejs',{
+            login: user.login,
+            name: req.user.name,
+            title : "Account",
+            results: results,
+            page: req.params.page,
+            isTeacher: req.user.isTeacher,
+            attempts: foundAttempts,
+            tasks: foundTasks,
+            search: req.params.search,
+            n_name: user.name
+        })
+    
+    } else{
+        res.redirect('/account/' + req.user.login + '/1/default')
+    }
 })
 
-app.post('/account/:page/:search', checkAuthenticated, async (req, res) => {
+app.post('/account/:login/:page/:search', checkAuthenticated, checkValidation, async (req, res) => {
     var toSearch = req.body.searcharea;
     if(!toSearch) toSearch = "default";
-    res.redirect('/account/' + req.params.page.toString() +'/' + toSearch )
+    res.redirect('/account/' + req.params.login.toString() + '/' + req.params.page.toString() +'/' + toSearch )
 })
+
+
 
 
 // Add Task Page
 app.get('/addtask',checkPermission, async (req, res) => {
     var user = req.user;
-    res.render('addtask.ejs',{name: user.name,
+    res.render('addtask.ejs',{
+        login: user.login,
+        name: req.user.name,
         title : "Add Task",
         isTeacher: req.user.isTeacher
     })
@@ -230,7 +255,9 @@ app.post('/addtask',checkAuthenticated, checkPermission, async (req, res) => {
 
     await taskAdder.addTask(Task, body.title, body.statement, examples, tests, body.topic, user.name);
 
-    res.render('addtask.ejs',{name: user.name,
+    res.render('addtask.ejs',{
+        login: user.login,
+        name: req.user.name,
         title : "Add Task",
         isTeacher: req.user.isTeacher
     })
@@ -263,7 +290,9 @@ app.get('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
         }
     }
 
-    res.render('tasks.ejs',{name: user.name,
+    res.render('tasks.ejs',{
+        login: user.login,
+        name: req.user.name,
         title : "Tasks List",
         tasks: foundTasks,
         results: results,
@@ -284,7 +313,9 @@ app.post('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
 app.get('/edittask/:id',checkPermission, async (req, res) => {
     var problem = await Task.findOne({identificator: req.params.id}).exec()
     var user = req.user;
-    res.render('edittask.ejs',{name: user.name,
+    res.render('edittask.ejs',{
+        login: user.login,
+        name: req.user.name,
         title : "Edit Task",
         isTeacher: req.user.isTeacher,
         problem: problem
@@ -320,7 +351,9 @@ app.post('/edittask/:id',checkAuthenticated, checkPermission, async (req, res) =
     problem.examples = examples;
     problem.tests = tests;
     await problem.save();
-    res.render('edittask.ejs',{name: user.name,
+    res.render('edittask.ejs',{
+        login: user.login,
+        name: req.user.name,
         title : "Edit Task",
         isTeacher: req.user.isTeacher,
         problem: problem
@@ -332,6 +365,7 @@ app.get('/deletetask/:id',checkPermission, async (req, res) => {
     var problem = await Task.findOne({identificator: req.params.id}).exec()
 
     res.render('deletetask.ejs',{
+        login: req.user.login,
         name: req.user.name,
         title : "Delete Task",
         isTeacher: req.user.isTeacher,
@@ -345,6 +379,96 @@ app.post('/deletetask/:id',checkAuthenticated, checkPermission, async (req, res)
     /* add popup */
 
     res.redirect('/tasks/1/default');
+})
+
+// Attempt Page
+app.get('/attempt/:login/:date',checkAuthenticated, checkValidation, async (req, res) => {
+    var user;
+    if(req.user.login == req.params.login){
+        user = req.user;
+    } else{
+        user = await User.findOne({login:req.params.login}).exec();
+    }
+
+    if(user){
+
+        var attempts = user.attempts;
+        var attempt;
+
+        for(var i = 0; i < attempts.length; i++){
+            if(attempts[i].date == req.params.date){
+                attempt = attempts[i];
+                break;
+            }
+        }
+
+        if(attempt){
+           res.render('attempt.ejs',{
+                login: user.login,
+                name: req.user.name,
+                title : "Attempt",
+                isTeacher: req.user.isTeacher,
+                RESULT : attempt.result,
+                code : attempt.programText,
+                taskID : attempt.taskID,
+                date : attempt.date,
+                n_name: user.name
+            }) 
+        } else{
+            console.log(1)
+            res.redirect('/account/' + req.user.login + '/1/default')
+        }
+
+    } else{
+        console.log(2)
+        res.redirect('/account/' + req.user.login + '/1/default')
+    }
+
+})
+
+// All Attempts Page
+app.get('/allattempts/:page/:search/:flag', checkAuthenticated, checkPermission, async (req, res) => {
+    var user = req.user;
+    var tasks = await Task.find({}).exec();
+    var attempts = req.user.attempts;
+    var results = [];
+    var foundTasks = [];
+
+    toSearch = req.params.search;
+    if(toSearch == "default") toSearch="";
+
+    var result;
+    for (var i = 0; i < tasks.length; i++){
+        if(tasks[i].title.slice(0, toSearch.length) == toSearch){
+            foundTasks.push(tasks[i])
+            result = ""
+            for(var j = attempts.length-1; j >= 0; j--){
+                if( attempts[j].taskID == i){
+                    result = attempts[j].result[attempts[j].result.length - 1][1];
+                    if(result == "OK") break;
+                }
+            }
+            if(result=="") result = "-";
+            results.push(result)
+        }
+    }
+
+    res.render('allattempts.ejs',{
+        login: user.login,
+        name: req.user.name,
+        title : "All Attempts",
+        tasks: foundTasks,
+        results: results,
+        isTeacher: req.user.isTeacher,
+        page: req.params.page,
+        search: req.params.search
+    })
+})
+
+app.post('/allattempts/:page/:search/:flag', checkAuthenticated, checkPermission, async (req, res) => {
+    var toSearch = req.body.searcharea;
+    if(!toSearch) toSearch = "default";
+    res.redirect('/allattempts/' + req.params.page.toString() +'/' + toSearch )
 })
 
 // Log Out
@@ -365,6 +489,14 @@ function checkPermission(req, res, next) {
         return next()
     }
     res.redirect('/')
+}
+
+
+function checkValidation(req, res, next) {
+    if (req.user.isTeacher || (req.user.login == req.params.login)) {
+        return next()
+    }
+    res.redirect('/account/' + req.user.login + '/1/default')
 }
 
 // Starting Server

@@ -19,7 +19,7 @@
     <button type="submit">Войти</button>
 </form>
 <% } else { %>
-    <a href = '/account/1/default' class = 'userName'><%= name %></a>
+    <a href = <%= '/account/'+ login +'/1/default' %> class = 'userName'><%= name %></a>
     <form action = '/logout?_method=DELETE' method = 'POST'>
         <button type = 'submit'>Выйти</button>
     </form>
