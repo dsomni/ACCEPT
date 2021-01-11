@@ -40,6 +40,7 @@
                 <h3>Тесты</h3>
                 <% var len = problem.tests.length %>
                 <%for (var i =0; i < 20; i++){  %>
+                    <h4>Тест <%= i+1 %></h4>
                     <% if (i<len){ %>
                         <textarea id=<%= "testIn" +i %> name = <%= "testIn" + i %>  cols=1 rows=3 placeholder="Тест <%=i+1%> INPUT"><%= problem.tests[i][0] %></textarea>
                         <textarea id=<%= "testOut" +i %> name = <%= "testOut" + i %>  cols=1 rows=3 placeholder="Тест <%=i+1%> OUTPUT"><%= problem.tests[i][1] %></textarea>

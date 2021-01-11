@@ -1,5 +1,0 @@
-node.js
-	ej
-	express
-	npm i --save mysql
-mongodb

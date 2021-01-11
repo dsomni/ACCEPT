@@ -1,6 +1,6 @@
 // Connecting Modules
-const express = require('express')
-const checker = require(__dirname + '/public/checker/checker.js');
+const express = require('express');
+const fs = require('fs');
 const mongoose = require('mongoose');
 const passport = require('passport')
 const flash = require('express-flash')
@@ -8,8 +8,10 @@ const session = require('express-session')
 const methodOverride = require('method-override')
 const config = require('./config/db');
 const expressLayouts = require('express-ejs-layouts');
+const childProcess = require("child_process");
 const taskAdder = require(__dirname + '/public/scripts/addTask.js');
 const app = express()
+
 
 //MongoDB connecting  
 mongoose.connect(config.db,{
@@ -112,58 +114,114 @@ app.post('/', passport.authenticate('local', {
 // Task Page
 app.get('/task/:id', checkAuthenticated, async (req, res) => {
     var problem = await Task.findOne({identificator: req.params.id}).exec()
-    var attempts = req.user.attempts;
-    var result = []
-    var prevCode = "";
-    for(var i = 0; i < attempts.length; i++){
-        if( attempts[i].taskID == req.params.id){
-            result =attempts[i].result;
-            prevCode = attempts[i].programText;
-            break;
-        }
-    }
-    res.render('task.ejs',{
-        login: req.user.login,
-        RESULT: result,
-        ID: req.params.id,
-        name: req.user.name, 
-        title: "Task " + req.params.id,
-        isTeacher: req.user.isTeacher,
-        problem: problem,
-        prevCode: prevCode
-    });  
 
+    fs.stat('public\\processes\\'+req.user.login+req.params.id, function(err) {
+        if (!err) {
+            fs.stat('public\\processes\\'+req.user.login+req.params.id+"\\result.txt", function(err) {
+                if (!err) {
+
+                    var resultStrings = fs.readFileSync('public\\processes\\'+req.user.login+req.params.id+"\\result.txt","utf-8").trim().split("\n");
+                    var codeText = fs.readFileSync('public\\processes\\'+req.user.login+req.params.id+"\\programText.txt","utf-8").trim();
+                    var result = [];
+                    for(var i = 0; i < resultStrings.length; i++){
+                        result.push(resultStrings[i].split('*'));
+                    }
+
+                    req.user.attempts.unshift({taskID: req.params.id, date: Date.now().toString(),
+                        programText: codeText, result: result})
+                    req.user.save()
+
+                    fs.rmdirSync('public\\processes\\'+req.user.login+req.params.id,{recursive: true});
+
+                    res.redirect('/task/'+req.params.id);
+        
+                }else if (err.code === 'ENOENT'){
+                    res.render('task.ejs',{
+                        login: req.user.login,
+                        RESULT: [["","Testing..","er"]],
+                        ID: req.params.id,
+                        name: req.user.name, 
+                        title: "Task " + req.params.id,
+                        isTeacher: req.user.isTeacher,
+                        problem: problem,
+                        prevCode: ""
+                    });  
+                }
+            });
+        }else {
+            var attempts = req.user.attempts;
+            var result = []
+            var prevCode = "";
+            for(var i = 0; i < attempts.length; i++){
+                if( attempts[i].taskID == req.params.id){
+                    result =attempts[i].result;
+                    prevCode = attempts[i].programText;
+                    break;
+                }
+            }
+            res.render('task.ejs',{
+                login: req.user.login,
+                RESULT: result,
+                ID: req.params.id,
+                name: req.user.name, 
+                title: "Task " + req.params.id,
+                isTeacher: req.user.isTeacher,
+                problem: problem,
+                prevCode: prevCode
+            }); 
+        }
+    });
 })
 
 // Task Page listener
 app.post('/task/:id',checkAuthenticated, async (req, res) => {
-    var prevCode = ""
-    var result="";
-    var attempts = req.user.attempts;
-    var problem = await Task.findOne({identificator: req.params.id}).exec()
-    for(var i = 0; i < attempts.length; i++){
-        if( attempts[i].taskID == req.params.id){
-            prevCode = attempts[i].programText;
-            result =attempts[i].result;
-            break;
+
+    fs.stat('public\\processes\\'+req.user.login+req.params.id, async function(err) {
+        if (!err) {
+            res.redirect('/task/'+req.params.id);
         }
-    }
-    if(prevCode == "" || prevCode != req.body.code ){
-        var result = await checker.parser(Task, req.body.code, req.params.id);
-        req.user.attempts.unshift({taskID: req.params.id, date: Date.now().toString(),
-            programText: req.body.code, result: result})
-        req.user.save()
-    }
-    res.render('task.ejs', {
-        login: user.login,
-        RESULT: result, 
-        ID: req.params.id, 
-        name: req.user.name,
-        title: "Task " + req.params.id,
-        isTeacher: req.user.isTeacher,
-        problem: problem,
-        prevCode: prevCode
-    })
+        else if (err.code === 'ENOENT') {
+
+            var prevCode = ""
+            var result="";
+            var attempts = req.user.attempts;
+            for(var i = 0; i < attempts.length; i++){
+                if( attempts[i].taskID == req.params.id){
+                    prevCode = attempts[i].programText;
+                    result =attempts[i].result;
+                    break;
+                }
+            }
+            if(prevCode == "" || prevCode != req.body.code ){
+
+
+                var programText = req.body.code;
+                let idx = programText.toUpperCase().indexOf('BEGIN')
+                if (idx == -1){
+                    // Parsing Error
+                    req.user.attempts.unshift({taskID: req.params.id, date: Date.now().toString(),
+                        programText: req.body.code, result: [["Test #1 ", "Presentation Error" ,"er"]]})
+                    req.user.save()
+
+                    res.redirect('/task/'+req.params.id);
+                    return;
+                }
+
+                // Parsing is OK
+                fs.mkdirSync('public\\processes\\'+req.user.login+req.params.id);
+
+                fs.writeFileSync('public\\processes\\'+req.user.login+req.params.id+"\\programText.txt",req.body.code,"utf-8");
+
+                childProcess.exec('node ' + __dirname + '\\public\\checker\\checker.js ' +
+                __dirname+'\\public\\processes\\'+req.user.login+req.params.id + " " +
+                'program'+req.user.login+req.params.id + " " +
+                req.params.id)
+
+            }
+            res.redirect('/task/'+req.params.id);
+        }
+    });
+
 })
 
 // Account Page
