@@ -60,9 +60,9 @@ function addTeacher (login, password, name, hasClasses){
     }]);
 }
 function toDo(){
-    //addStudent('96','1', 'Dima', '12A')
-    addStudent('97','2', 'LzheDima', '12B')
-    //addTeacher('0','0', 'admin', ['12A', '12B'])
+    addStudent('96','1', 'Dima', '12A')
+    //addStudent('97','2', 'LzheDima', '12B')
+    addTeacher('0','0', 'admin', ['12A', '12B'])
 }
 
 toDo()

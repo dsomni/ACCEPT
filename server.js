@@ -529,11 +529,17 @@ app.post('/allattempts/:page/:search/:flag', checkAuthenticated, checkPermission
     res.redirect('/allattempts/' + req.params.page.toString() +'/' + toSearch )
 })
 
+
 // Log Out
 app.delete('/logout', (req, res) => {
     req.logOut()
     res.redirect('/')
 })
+
+app.get('*', (req,res) => {
+    res.redirect('/');
+})
+
 
 function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
@@ -558,5 +564,6 @@ function checkValidation(req, res, next) {
 }
 
 // Starting Server
-app.listen(3000) // port
-console.log("Server started at port 3000")
+var port = process.env.PORT || 8080
+app.listen(port) // port
+console.log("Server started at port " + port)
