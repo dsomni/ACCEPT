@@ -15,7 +15,7 @@
     <body>
         <main>
             <form action= '/tasks/1/default'  method="POST">
-                <textarea id="searcharea" name = "searcharea" rows=1 placeholder="Поиск задачи"></textarea><button id="submitsearch">Найти</button>
+                <input id="searcharea" name = "searcharea" rows=1 placeholder="Поиск задачи"></input><button id="submitsearch">Найти</button>
             </form>
 
             <table class='taskslist'>
@@ -45,6 +45,7 @@
                 <% var prevPage = page - 1 %>
                 <% var nextPage = page + 1 %>
 
+                <div class='pageinfo'>
                 <div><%= ((page-1)*onPage+1).toString() + "-" +  min(page*onPage,tasks.length-1).toString() + " из " +  (tasks.length-1).toString() %> </div>
 
                 <% if(page>1) { %>
@@ -57,7 +58,7 @@
                 <% }else { %>
                     <button>&gt;&gt;&gt;</button>
                 <% } %>
-
+                </div>
         </main>
     </body>
 </html>

@@ -109,7 +109,7 @@ h4{
     background: #f5ffff;
     border-collapse: collapse;
     text-align: left;
-    margin-top: 80px;
+    margin-top: 20px;
     margin-left: 120px;
     width: 70%;
 }
@@ -199,7 +199,9 @@ ul{
 }
 
 .container{
-    margin-left: 15%;
+    margin-left: auto;
+    margin-right: auto;
+    width: 640px;
 }
 
 .taskAdderForm textarea{
@@ -224,18 +226,25 @@ ul{
     resize: none;
     margin-top: 0px;
     background-color: white;
+    font-size: large;
 }
 #submit {
     margin-top: 10px;
     width: 100px;
     height: 30px;
-    margin-left: 420px;
+
+}
+#submitdiv {
+    width: 100px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #result{
     width: 304px;
     height: 354px;
     overflow: scroll;
+    font-size: larger;
 }
 
 .imgs img{
@@ -276,14 +285,18 @@ ul{
 #examples{
     margin-left: 15%;
     margin-top: 10px;
-    width: 50%;
+    margin-bottom: 20px;
+    width: 640px;
     font-size: medium;
     white-space: pre-wrap;
+    margin-left: auto;
+    margin-right: auto;
 }
 #task{
-    background-color: #ffffffaa;
-    margin-left: 15%;
-    margin-right: 15%;
+    background-color: #e4e1e1aa;
+    margin-left: auto;
+    margin-right: auto;
+    width: 640px;
 }
 
 #editref{
@@ -307,4 +320,15 @@ ul{
 
 #code{
     white-space: pre-wrap;
+}
+
+#searcharea{
+    margin-left: 120px;
+    width: 10%;
+}
+
+.pageinfo {
+    margin-left: auto;
+    margin-right: auto;
+    width: 200px;
 }
