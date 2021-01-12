@@ -15,8 +15,12 @@
     <body>
         <main>
             <h1>Личный кабинет <%= n_name %></h1>
-            <form action= <%= '/account/'+ login +'/1/default' %>  method="POST">
+            <form action= <%= '/account/'+ u_login +'/1/default' %>  method="POST">
                 <input id="searcharea" name = "searcharea" rows=1 placeholder="Поиск по задаче"></input><button id="submitsearch">Найти</button>
+                <select name="selector" id = "selector"> 
+                    <option value="all" selected>Все посылки</option>
+                    <option value="oks" >Только успешные</option>
+                </select>
             </form>
 
             <table class='taskslist'>
@@ -35,7 +39,7 @@
                 <% var isoDate = maxDate.toISOString(); %>   
                 <% var date = isoDate.substr(0, 10) + " " + isoDate.substr(11, 8) ; %>
                  <tr>
-                  <td> <a class="tlrefs" href=<%="/attempt/" + login + '/' +  attempt.date  %>> <%= date %> </a> </td>
+                  <td> <a class="tlrefs" href=<%="/attempt/" + u_login + '/' +  attempt.date  %>> <%= date %> </a> </td>
                   <td> <a class="tlrefs" href=<%="/task/" + task.identificator %>> <%= task.title %> </a> </td>
                   <td><%= item[0] %> <a id=<%= item[2] %>><%= item[1] %></a></td>
                  </tr>
@@ -50,12 +54,12 @@
                 <div><%= ((page-1)*onPage+1).toString() + "-" +  min(page*onPage,attempts.length).toString() + " из " +  attempts.length.toString() %> </div>
 
                 <% if(page>1) { %>
-                    <button onClick=<%= 'location.href=\"/account/' + login + "/" +prevPage + "/" + search + "\"" %>>&lt;&lt;&lt;</button>
+                    <button onClick=<%= 'location.href=\"/account/' + u_login + "/" +prevPage + "/" + search + "\"" %>>&lt;&lt;&lt;</button>
                 <% }else { %>
                     <button>&lt;&lt;&lt;</button>
                 <% } %>
                 <% if(page*onPage<attempts.length) { %>
-                    <button onClick=<%= 'location.href=\"/account/'+ login + "/" +nextPage + "/" + search + "\"" %>>&gt;&gt;&gt;</button>
+                    <button onClick=<%= 'location.href=\"/account/'+ u_login + "/" +nextPage + "/" + search + "\"" %>>&gt;&gt;&gt;</button>
                 <% }else { %>
                     <button>&gt;&gt;&gt;</button>
                 <% } %>

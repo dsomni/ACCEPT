@@ -240,19 +240,24 @@ app.get('/account/:login/:page/:search',checkAuthenticated, checkValidation, asy
         var foundTasks = [];
         var foundAttempts = [];
 
-        toSearch = req.params.search;
+        var a = req.params.search.split('&');
+        var toSearch = a[0];
+        var types = a[1];
         if(toSearch == "default") toSearch="";
 
 
         for(var i = 0; i < attempts.length; i++){
-            if(tasks[attempts[i].taskID].title.slice(0, toSearch.length) == toSearch){
+            verylongresult = attempts[i].result[attempts[i].result.length -1 ][attempts[i].result[attempts[i].result.length -1 ].length - 1];
+            if((tasks[attempts[i].taskID].title.slice(0, toSearch.length) == toSearch) &&
+             (  (types=='all') ||  (verylongresult=='ok') )){
                 foundAttempts.push(attempts[i]);
                 foundTasks.push(tasks[attempts[i].taskID]);
             }
         }
 
         res.render('account.ejs',{
-            login: user.login,
+            login: req.user.login,
+            u_login: user.login,
             name: req.user.name,
             title : "Account",
             results: results,
@@ -265,13 +270,14 @@ app.get('/account/:login/:page/:search',checkAuthenticated, checkValidation, asy
         })
     
     } else{
-        res.redirect('/account/' + req.user.login + '/1/default')
+        res.redirect('/account/' + req.user.login + '/1/default&all')
     }
 })
 
 app.post('/account/:login/:page/:search', checkAuthenticated, checkValidation, async (req, res) => {
     var toSearch = req.body.searcharea;
     if(!toSearch) toSearch = "default";
+    toSearch +='&' + req.body.selector;
     res.redirect('/account/' + req.params.login.toString() + '/' + req.params.page.toString() +'/' + toSearch )
 })
 
@@ -474,12 +480,12 @@ app.get('/attempt/:login/:date',checkAuthenticated, checkValidation, async (req,
             }) 
         } else{
             console.log(1)
-            res.redirect('/account/' + req.user.login + '/1/default')
+            res.redirect('/account/' + req.user.login + '/1/default&all')
         }
 
     } else{
         console.log(2)
-        res.redirect('/account/' + req.user.login + '/1/default')
+        res.redirect('/account/' + req.user.login + '/1/default&all')
     }
 
 })
@@ -560,7 +566,7 @@ function checkValidation(req, res, next) {
     if (req.user.isTeacher || (req.user.login == req.params.login)) {
         return next()
     }
-    res.redirect('/account/' + req.user.login + '/1/default')
+    res.redirect('/account/' + req.user.login + '/1/default&all')
 }
 
 // Starting Server
