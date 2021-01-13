@@ -383,3 +383,7 @@ ul{
     cursor: pointer;
     text-decoration: underline;
 }
+#gradeLetter{
+    width: 50px;
+    
+}

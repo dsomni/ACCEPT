@@ -13,6 +13,7 @@ const taskAdder = require(__dirname + '/public/scripts/addTask.js');
 const lessonAdder = require(__dirname + '/public/scripts/addLesson.js');
 const app = express()
 
+var max = (a, b)=>{if(a>b)return a;return b}
 
 //MongoDB connecting  
 mongoose.connect(config.db,{
@@ -38,6 +39,7 @@ var UserSchema = new mongoose.Schema({
     name : String,
 
     grade: String,
+    gradeLetter: String,
     attempts: Array,
 
     isTeacher: Boolean,
@@ -356,7 +358,6 @@ app.get('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
     SearchGrade = a[2];
     if(toSearch == "default") toSearch="";
     var topics=[];
-
     var result;
     for (var i = 0; i < tasks.length; i++){
         if(topics.indexOf(tasks[i].topic)==-1){
@@ -377,7 +378,6 @@ app.get('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
             results.push(result)
         }
     }
-
     res.render('tasks.ejs',{
         login: user.login,
         name: req.user.name,
@@ -728,20 +728,19 @@ app.get('/students/:page/:search', checkAuthenticated, checkPermission,async (re
     var a = req.params.search.split('&');
     var toSearch = a[0];
     var SearchGrade = a[1];
-    var students;
+    var SearchLetter = a[2];
+    var students = [];
 
     if(SearchGrade!="all"){
         students = await User.find({grade: SearchGrade, isTeacher: false}).exec();
     }else{
         students = await User.find({isTeacher: false}).exec();
     }
-
     if(toSearch == "default") toSearch="";
-
-
     for (var i = 0; i < students.length; i++){
         if((students[i].name.slice(0, toSearch.length) == toSearch) && 
-        (SearchGrade == 'all' || SearchGrade==students[i].grade)){
+        (SearchGrade == 'all' || SearchGrade==students[i].grade) &&
+        (SearchLetter == 'all' || SearchLetter == students[i].gradeLetter)){
             foundStudents.push(students[i])
         }
     }
@@ -753,7 +752,7 @@ app.get('/students/:page/:search', checkAuthenticated, checkPermission,async (re
         name: req.user.name,
         title : "Students List",
         isTeacher: req.user.isTeacher,
-        page: req.params.page,
+        page: max(req.params.page, 1),
         search: req.params.search,
         students : foundStudents
     })
@@ -762,7 +761,8 @@ app.get('/students/:page/:search', checkAuthenticated, checkPermission,async (re
 app.post('/students/:page/:search', checkAuthenticated, checkPermission, async (req, res) => {
     var toSearch = req.body.searcharea;
     if(!toSearch) toSearch = "default";
-    toSearch += '&' + req.body.GradeSelector
+    toSearch += '&' + req.body.GradeSelector + 
+        '&' + (req.body.gradeLetter || "all")
     res.redirect('/students/' + req.params.page.toString() +'/' + toSearch )
 })
 

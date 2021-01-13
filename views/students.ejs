@@ -15,19 +15,20 @@
     <body>
         <main>
             <form action= '/students/1/default'  method="POST">
-                <input id="searcharea" name = "searcharea" rows=1 placeholder="Поиск ученика"></input>
+                <input id="searcharea" name = "searcharea" rows=1 placeholder="Поиск ученика">
                 <select name="GradeSelector" id = "GradeSelector"> 
                     <option value="all" selected>Все</option>
                     <% for(var i = 6; i < 12; i++) { %>
                     <option value=<%= i %> ><%= i %></option>
                     <% } %>
                 </select>
+                <input id="gradeLetter" name="gradeLetter" placeholder="Литера">
                 <button id="submitsearch">Найти</button>
             </form>
 
             <table class='taskslist'>
                 <tr>
-                  <th>Id</th>
+                  <th>Login</th>
                   <th>Имя</th>
                   <th>Класс</th>
                   <th>Уроки</th>
@@ -41,7 +42,7 @@
                  <tr>
                   <td><%= student.login %></td>
                   <td><%= student.name %> </td>
-                  <td><%= student.grade %></td>
+                  <td><%= student.grade + student.gradeLetter %></td>
                   <td><a class="tablerefs" href=<%="/lessons/" + student.login + "/1/default&all&all" %>>[тык] </a></td>
                   <td><a class="tablerefs" href=<%="/account/" + student.login + "/1/default&all" %>>[тык] </a></td>
                  </tr>

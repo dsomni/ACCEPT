@@ -37,6 +37,7 @@
                   <th>Вердикт</th>
                   </tr>
                 <% min = function(a,b){ if(a < b) return a; return b} %>
+                <% max = function(a,b){ if(a < b) return b; return a} %>
                 <% var onPage = 20 %>
                 <% if(lessons.length>0){ if(lessons[0].identificator!=0){ lessons.unshift([0]);results.unshift([0]) } } %>
                 <% for (var i = (page-1)*onPage+1; i < min(page*onPage+1,lessons.length); i++) { %>
@@ -57,7 +58,7 @@
                 <% var nextPage = page + 1 %>
 
                 <div class='pageinfo'>
-                <div><%= ((page-1)*onPage+1).toString() + "-" +  min(page*onPage,lessons.length-1).toString() + " из " +  (lessons.length-1).toString() %> </div>
+                <div><%= ((page-1)*onPage+1).toString() + " - " +  min(page*onPage,max(0, lessons.length-1)).toString() + " из " +  max(0, lessons.length-1).toString() %> </div>
 
                 <% if(page>1) { %>
                     <button onClick=<%= 'location.href=\"/lessons/'+ u_login + "/" +prevPage + "/" + search + "\"" %>>&lt;&lt;&lt;</button>

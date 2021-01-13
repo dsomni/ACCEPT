@@ -51,7 +51,7 @@
                 <% var nextPage = page + 1 %>
 
                 <div class="pageinfo">
-                <div><%= ((page-1)*onPage+1).toString() + "-" +  min(page*onPage,attempts.length).toString() + " из " +  attempts.length.toString() %> </div>
+                <div><%= ((page-1)*onPage+1).toString() + " - " +  min(page*onPage,attempts.length).toString() + " из " +  attempts.length.toString() %> </div>
 
                 <% if(page>1) { %>
                     <button onClick=<%= 'location.href=\"/account/' + u_login + "/" +prevPage + "/" + search + "\"" %>>&lt;&lt;&lt;</button>

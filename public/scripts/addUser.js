@@ -26,6 +26,7 @@ var UserSchema = new mongoose.Schema({
     name : String,
 
     grade: String,
+    gradeLetter: String,
     attempts: Array,
 
     isTeacher: Boolean,
@@ -35,13 +36,14 @@ var UserSchema = new mongoose.Schema({
 // Create model from schema
 var User = mongoose.model('User', UserSchema );
 
-function addStudent (login, password, name, grade){
+function addStudent (login, password, name, grade, gradeLetter){
     User.insertMany([{
         login: login,
         password: password,
         name: name,
 
         grade: grade,
+        gradeLetter: gradeLetter,
         attempts: [],
 
         isTeacher : false
@@ -60,9 +62,10 @@ function addTeacher (login, password, name, hasClasses){
     }]);
 }
 function toDo(){
-    addStudent('96','1', 'Dima', '12A')
+    addStudent('7А','2', 'Dima', '7', "А")
+    addStudent('8Б','2', 'Антон', '8', "Б")
     //addStudent('97','2', 'LzheDima', '12B')
-    addTeacher('0','0', 'admin', ['12A', '12B'])
+    // addTeacher('0','0', 'admin', ['А12', 'Б12'])
 }
 
 toDo()
