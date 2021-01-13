@@ -164,11 +164,6 @@ h4{
     font-weight: 600;
 }
 
-
-.taskAdderForm textarea{
-    font-size: 12pt;
-}
-
 .taskAdderForm button{
     height: 50px;
     font-size: large;
@@ -180,6 +175,18 @@ h4{
 
 .taskAdderForm button:hover{
     background-color: #d4d3d3;
+}
+
+.taskAdderForm textarea{
+    border-radius: 1px;
+    border-color: #000000;
+    outline: none;
+    background-color: #ffffff;
+    margin: 5px;
+    font-size: 12pt;
+}
+.taskAdderForm ::placeholder{
+    color: #000000aa;
 }
 
 textarea::-webkit-scrollbar{
@@ -204,16 +211,6 @@ ul{
     width: 640px;
 }
 
-.taskAdderForm textarea{
-    border-radius: 1px;
-    border-color: #000000;
-    outline: none;
-    background-color: #ffffff;
-    margin: 5px;
-}
-.taskAdderForm ::placeholder{
-    color: #000000aa;
-}
 
 .taskarea{
     vertical-align: top;
@@ -316,6 +313,7 @@ ul{
     margin-left: -10%;
     text-align: center;
     white-space: pre-wrap;
+    font-size:medium;
 }
 
 #code{
@@ -331,4 +329,46 @@ ul{
     margin-left: auto;
     margin-right: auto;
     width: 200px;
+}
+
+#grade{
+    width: 40px;
+    font-size: medium;
+}
+
+.lessonAdderForm{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    margin-top: 100px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 400px;
+    font-size: 22pt;
+    font-weight: 600;
+}
+
+.lessonAdderForm button{
+    height: 50px;
+    font-size: large;
+    border-radius: 10px;
+    border: none;
+    background-color: #f1f1f1;
+    cursor: pointer;
+}
+
+.lessonAdderForm button:hover{
+    background-color: #d4d3d3;
+}
+
+.lessonAdderForm textarea{
+    border-radius: 1px;
+    border-color: #000000;
+    outline: none;
+    background-color: #ffffff;
+    margin: 10px;
+    font-size: 20pt;
+}
+.lessonAdderForm ::placeholder{
+    color: #000000aa;
 }

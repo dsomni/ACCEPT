@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Задачи</title>
+        <title>Уроки</title>
 
         <meta charset="utf-8">
         <meta name="viewport"
@@ -14,62 +14,56 @@
         </head>
     <body>
         <main>
-            <form action= '/tasks/1/default'  method="POST">
-                <input id="searcharea" name = "searcharea" rows=1 placeholder="Поиск задачи"></input>
-                <select name="TopicSelector" id = "TopicSelector"> 
-                    <option value="all" selected> Все Темы</option>
-                    <% for(var i = 0; i < topics.length; i++) { %>
-                    <option value=<%= topics[i].replace(" ", "") %> > <%= topics[i] %></option>
-                    <% } %>
-                </select>
+            <form action= '/lessons/1/default'  method="POST">
+                <input id="searcharea" name = "searcharea" rows=1 placeholder="Поиск урока"></input>
+                <% if(isTeacher){ %>
                 <select name="GradeSelector" id = "GradeSelector"> 
                     <option value="all" selected>Все</option>
                     <% for(var i = 6; i < 12; i++) { %>
                     <option value=<%= i %> ><%= i %></option>
                     <% } %>
                 </select>
+                <% } %>
                 <button id="submitsearch">Найти</button>
             </form>
 
             <table class='taskslist'>
                 <tr>
                   <th>ID</th>
-                  <th>Задача</th>
-                  <th>Тема</th>
+                  <th>Урок</th>
                   <th>Класс</th>
                   <th>Автор</th>
                   <th>Вердикт</th>
                   </tr>
                 <% min = function(a,b){ if(a < b) return a; return b} %>
                 <% var onPage = 20 %>
-                <% if(tasks.length>0){ if(tasks[0].identificator!=0){ tasks.unshift([0]);results.unshift([0]) } } %>
-                <% for (var i = (page-1)*onPage+1; i < min(page*onPage+1,tasks.length); i++) { %>
-                <% var task = tasks[i]; %>
+                <% if(lessons.length>0){ if(lessons[0].identificator!=0){ lessons.unshift([0]);results.unshift([0]) } } %>
+                <% for (var i = (page-1)*onPage+1; i < min(page*onPage+1,lessons.length); i++) { %>
+                <% var lesson = lessons[i]; %>
                  <tr>
-                  <td><%= task.identificator %></td>
-                  <td> <a class="tlrefs" href=<%="/task/" + task.identificator %>> <%= task.title %> </a> </td>
-                  <td><%= task.topic %></td>
-                  <td><%= task.grade %></td>
-                  <td><%= task.author %></td>
+                  <td><%= lesson.identificator %></td>
+                  <td> <a class="tlrefs" href=<%="/lesson/" + lesson.identificator %>> <%= lesson.title %> </a> </td>
+                  <td><%= lesson.grade %></td>
+                  <td><%= lesson.author %></td>
                   <td><%= results[i] %></td>
                  </tr>
                 <% } %>
-            </table>
+                </table>
 
                 <% var page = Number(page) %>
                 <% var prevPage = page - 1 %>
                 <% var nextPage = page + 1 %>
 
                 <div class='pageinfo'>
-                <div><%= ((page-1)*onPage+1).toString() + "-" +  min(page*onPage,tasks.length-1).toString() + " из " +  (tasks.length-1).toString() %> </div>
+                <div><%= ((page-1)*onPage+1).toString() + "-" +  min(page*onPage,lessons.length-1).toString() + " из " +  (lessons.length-1).toString() %> </div>
 
                 <% if(page>1) { %>
-                    <button onClick=<%= 'location.href=\"/tasks/'+prevPage + "/" + search + "\"" %>>&lt;&lt;&lt;</button>
+                    <button onClick=<%= 'location.href=\"/lessons/'+prevPage + "/" + search + "\"" %>>&lt;&lt;&lt;</button>
                 <% }else { %>
                     <button>&lt;&lt;&lt;</button>
                 <% } %>
-                <% if(page*onPage<tasks.length-1) { %>
-                    <button onClick=<%= 'location.href=\"/tasks/'+nextPage + "/" + search + "\"" %>>&gt;&gt;&gt;</button>
+                <% if(page*onPage<lessons.length-1) { %>
+                    <button onClick=<%= 'location.href=\"/lessons/'+nextPage + "/" + search + "\"" %>>&gt;&gt;&gt;</button>
                 <% }else { %>
                     <button>&gt;&gt;&gt;</button>
                 <% } %>

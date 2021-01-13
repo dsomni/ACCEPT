@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Урок #<%= ID %></title>
+
+        <meta charset="utf-8">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0,
+              maximum-scale=1.0, minimum-scale=1.0,
+              user-scalable=no, minimal-ui">
+        <meta name="full-screen" content="yes">
+
+        </head>
+    <body>
+        <main>
+        <div id="task">
+        <H1 id="taskname"><%= lesson.title %> <% if(isTeacher){ %> <a id="editref" href=<%= "/editlesson/" + lesson.identificator %> > [Редактировать] </a> <a id="editref" href=<%= "/deletelesson/" + lesson.identificator %> > [Удалить] </a>  <% } %></H1>
+        <h4>Автор: <%= lesson.author %></h4>
+        <div id="statement"><%= lesson.description %></div>
+        </div>
+
+        <table class='taskslist'>
+            <tr>
+              <th>ID</th>
+              <th>Задача</th>
+              <th>Тема</th>
+              <th>Класс</th>
+              <th>Автор</th>
+              <th>Вердикт</th>
+              </tr>
+
+            <% if(tasks.length>0){ if(tasks[0].identificator!=0){ tasks.unshift([0]);results.unshift([0]) } } %>
+
+            <% for (var i = 1; i < tasks.length; i++) { %>
+            <% var task = tasks[i]; %>
+             <tr>
+              <td><%= task.identificator %></td>
+              <td> <a class="tlrefs" href=<%="/task/" + task.identificator %>> <%= task.title %> </a> </td>
+              <td><%= task.topic %></td>
+              <td><%= task.grade %></td>
+              <td><%= task.author %></td>
+              <td><%= results[i] %></td>
+             </tr>
+            <% } %>
+        </table>
+        
+    </main>
+    </body>
+</html>

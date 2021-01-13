@@ -10,6 +10,7 @@ const config = require('./config/db');
 const expressLayouts = require('express-ejs-layouts');
 const childProcess = require("child_process");
 const taskAdder = require(__dirname + '/public/scripts/addTask.js');
+const lessonAdder = require(__dirname + '/public/scripts/addLesson.js');
 const app = express()
 
 
@@ -45,6 +46,7 @@ var UserSchema = new mongoose.Schema({
 
 var TaskSchema = new mongoose.Schema({
     identificator: Number,
+    grade: Number,
     title : String,
     statement: String,
     examples: Array,
@@ -53,6 +55,20 @@ var TaskSchema = new mongoose.Schema({
     author: String
 
 }, {collection: 'tasks'});
+
+
+var LessonSchema = new mongoose.Schema({
+    identificator: Number,
+    grade: Number,
+    title : String,
+    description: String,
+    tasks: Array,
+    author: String
+
+}, {collection: 'lessons'});
+
+// Create model from schema
+var Lesson = mongoose.model('Lesson', LessonSchema );
 
 // Create model from schema
 var Task = mongoose.model('Task', TaskSchema );
@@ -317,7 +333,7 @@ app.post('/addtask',checkAuthenticated, checkPermission, async (req, res) => {
         tests.push([tI, tO]);
     }
 
-    await taskAdder.addTask(Task, body.title, body.statement, examples, tests, body.topic, user.name);
+    await taskAdder.addTask(Task, body.title, body.statement, examples, tests, body.topic,body.grade, user.name);
 
     res.render('addtask.ejs',{
         login: user.login,
@@ -330,17 +346,25 @@ app.post('/addtask',checkAuthenticated, checkPermission, async (req, res) => {
 // Tasks List Page
 app.get('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
     var user = req.user;
-    var tasks = await Task.find({}).exec();
     var attempts = req.user.attempts;
     var results = [];
     var foundTasks = [];
-
-    toSearch = req.params.search;
+    var tasks = await Task.find({}).exec();
+    var a = req.params.search.split('&');
+    toSearch = a[0];
+    SearchTopic = a[1];
+    SearchGrade = a[2];
     if(toSearch == "default") toSearch="";
+    var topics=[];
 
     var result;
     for (var i = 0; i < tasks.length; i++){
-        if(tasks[i].title.slice(0, toSearch.length) == toSearch){
+        if(topics.indexOf(tasks[i].topic)==-1){
+            topics.push(tasks[i].topic);
+        }
+        if((tasks[i].title.slice(0, toSearch.length) == toSearch) && 
+        (SearchTopic == 'all' || SearchTopic==tasks[i].topic.replace(" ", "")) && 
+        (SearchGrade == 'all' || SearchGrade==tasks[i].grade)){
             foundTasks.push(tasks[i])
             result = ""
             for(var j = attempts.length-1; j >= 0; j--){
@@ -362,13 +386,15 @@ app.get('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
         results: results,
         isTeacher: req.user.isTeacher,
         page: req.params.page,
-        search: req.params.search
+        search: req.params.search,
+        topics: topics
     })
 })
 
 app.post('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
     var toSearch = req.body.searcharea;
     if(!toSearch) toSearch = "default";
+    toSearch += '&' + req.body.TopicSelector +'&' + req.body.GradeSelector
     res.redirect('/tasks/' + req.params.page.toString() +'/' + toSearch )
 })
 
@@ -442,7 +468,7 @@ app.post('/deletetask/:id',checkAuthenticated, checkPermission, async (req, res)
 
     /* add popup */
 
-    res.redirect('/tasks/1/default');
+    res.redirect('/tasks/1/default&all&all');
 })
 
 // Attempt Page
@@ -490,38 +516,83 @@ app.get('/attempt/:login/:date',checkAuthenticated, checkValidation, async (req,
 
 })
 
-// All Attempts Page
-app.get('/allattempts/:page/:search/:flag', checkAuthenticated, checkPermission, async (req, res) => {
+
+// Add Lesson Page
+app.get('/addlesson',checkPermission, async (req, res) => {
     var user = req.user;
-    var tasks = await Task.find({}).exec();
+    res.render('addlesson.ejs',{
+        login: user.login,
+        name: req.user.name,
+        title : "Add Lesson",
+        isTeacher: req.user.isTeacher
+    })
+})
+
+app.post('/addlesson',checkAuthenticated, checkPermission, async (req, res) => {
+    var user = req.user;
+    var body = req.body;
+
+    var tasks = body.tasks.split(' ');
+
+    await lessonAdder.addLesson(Lesson, body.grade, body.title, body.description, tasks, user.name);
+
+    res.render('addlesson.ejs',{
+        login: user.login,
+        name: req.user.name,
+        title : "Add Lesson",
+        isTeacher: req.user.isTeacher
+    })
+})
+
+// Lessons List Page
+app.get('/lessons/:page/:search', checkAuthenticated, async (req, res) => {
+    var user = req.user;
     var attempts = req.user.attempts;
     var results = [];
-    var foundTasks = [];
+    var foundLessons = [];
 
-    toSearch = req.params.search;
+    var a = req.params.search.split('&');
+    var toSearch = a[0];
+    var lessons;
+    if(user.isTeacher){
+        lessons = await Lesson.find({}).exec();
+        SearchGrade = a[1];
+
+    }else{
+        SearchGrade = user.grade;
+        lessons = await Lesson.find({grade: SearchGrade}).exec();
+    }
+
     if(toSearch == "default") toSearch="";
 
     var result;
-    for (var i = 0; i < tasks.length; i++){
-        if(tasks[i].title.slice(0, toSearch.length) == toSearch){
-            foundTasks.push(tasks[i])
-            result = ""
-            for(var j = attempts.length-1; j >= 0; j--){
-                if( attempts[j].taskID == i){
-                    result = attempts[j].result[attempts[j].result.length - 1][1];
-                    if(result == "OK") break;
+    for (var i = 0; i < lessons.length; i++){
+        if((lessons[i].title.slice(0, toSearch.length) == toSearch) && 
+        (SearchGrade == 'all' || SearchGrade==lessons[i].grade)){
+            foundLessons.push(lessons[i])
+            result = "/" + lessons[i].tasks.length
+            var solved = 0;
+            for(var k = 0; k < lessons[i].tasks.length; k++){
+                var taskid = lessons[i].tasks[k];
+                 for(var j = attempts.length-1; j >= 0; j--){
+                    if( attempts[j].taskID == taskid){
+                        if(attempts[j].result[attempts[j].result.length - 1][1] == "OK"){
+                            solved+=1
+                            break;
+                        } 
+                    }
                 }
             }
-            if(result=="") result = "-";
+            result = solved + result;
             results.push(result)
         }
     }
 
-    res.render('allattempts.ejs',{
+    res.render('lessons.ejs',{
         login: user.login,
         name: req.user.name,
-        title : "All Attempts",
-        tasks: foundTasks,
+        title : "Lessons List",
+        lessons: foundLessons,
         results: results,
         isTeacher: req.user.isTeacher,
         page: req.params.page,
@@ -529,12 +600,106 @@ app.get('/allattempts/:page/:search/:flag', checkAuthenticated, checkPermission,
     })
 })
 
-app.post('/allattempts/:page/:search/:flag', checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/lessons/:page/:search', checkAuthenticated, async (req, res) => {
     var toSearch = req.body.searcharea;
     if(!toSearch) toSearch = "default";
-    res.redirect('/allattempts/' + req.params.page.toString() +'/' + toSearch )
+    toSearch += '&' + req.body.GradeSelector
+    res.redirect('/lessons/' + req.params.page.toString() +'/' + toSearch )
 })
 
+
+// Lesson Page
+app.get('/lesson/:id',checkAuthenticated, async (req, res) => {
+    var user = req.user;
+    var lesson = await Lesson.findOne({identificator: req.params.id});
+    if(!lesson){
+        res.redirect("/lessons/1/default&all&all")
+    }else{
+
+        var tasks = await Task.find({identificator : {$in : lesson.tasks}});
+        var results = [];
+        var attempts = req.user.attempts;
+
+        for(var i=0; i < tasks.length; i++){
+            var task = tasks[i];
+            result = ""
+            for(var j = attempts.length-1; j >= 0; j--){
+                if( attempts[j].taskID == task.identificator){
+                    result = attempts[j].result[attempts[j].result.length - 1][1];
+                    if(result == "OK") break;
+                }
+            }
+            if(result=="") result = "-";
+            results.push(result)
+        }
+
+
+        res.render('lesson.ejs',{
+            ID : lesson.identificator,
+            login: user.login,
+            name: req.user.name,
+            title : "Lesson",
+            isTeacher: req.user.isTeacher,
+            lesson : lesson,
+            tasks : tasks,
+            results : results,
+        })
+    }
+})
+
+// Delete Lesson Page
+app.get('/deletelesson/:id',checkAuthenticated,checkPermission, async (req, res) => {
+    var lesson = await Lesson.findOne({identificator: req.params.id}).exec()
+
+    res.render('deletelesson.ejs',{
+        login: req.user.login,
+        name: req.user.name,
+        title : "Delete Lesson",
+        isTeacher: req.user.isTeacher,
+        lesson: lesson
+    })
+})
+
+app.post('/deletelesson/:id',checkAuthenticated, checkPermission, async (req, res) => {
+    await Lesson.deleteOne({identificator: req.params.id}).exec();
+
+    /* add popup */
+
+    res.redirect('/lessons/1/default&all&all');
+})
+
+// Edit Lesson Page
+app.get('/editlesson/:id',checkAuthenticated, checkPermission, async (req, res) => {
+    var lesson = await Lesson.findOne({identificator: req.params.id}).exec()
+    var user = req.user;
+    res.render('editlesson.ejs',{
+        login: user.login,
+        name: req.user.name,
+        title : "Edit Lesson",
+        isTeacher: req.user.isTeacher,
+        lesson: lesson
+    })
+})
+
+app.post('/editlesson/:id',checkAuthenticated, checkPermission, async (req, res) => {
+    var user = req.user;
+    var body = req.body;
+    var lesson = await Lesson.findOne({identificator: req.params.id}).exec()
+
+    lesson.title = body.title;
+    lesson.description = body.description;
+    lesson.grade = body.grade;
+    lesson.tasks = body.tasks.split(' ');
+    await lesson.save();
+
+    res.render('editlesson.ejs',{
+        login: user.login,
+        name: req.user.name,
+        title : "Edit Lesson",
+        isTeacher: req.user.isTeacher,
+        lesson: lesson
+    })
+})
 
 // Log Out
 app.delete('/logout', (req, res) => {

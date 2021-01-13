@@ -2,14 +2,21 @@
 <a href="http://vplicei.org/"><img src = "http://vplicei.org/wp-content/uploads/2016/01/vml-1.png" alt="ВМЛ"></a>
 <div class="navigationButtons">
 <% if (name!=""){ %>
-<% if (title!="Main Page"){ %>
-<button onClick='location.href="/"'>Главная</button>
-<% }if (title.slice(0, 5)!="Tasks"){  %> 
-<button onClick='location.href="/tasks/1/default"'>Задачи</button>
-<% }if (isTeacher){ %>
-    <% if (title!="Add Task"){ %>
-    <button onClick='location.href="/addtask"'>Добавить задачу</button>
-<% }}} %>
+    <% if (title!="Main Page"){ %>
+    <button onClick='location.href="/"'>Главная</button>
+    <% }if (title.slice(0,5)!="Tasks"){  %> 
+    <button onClick='location.href="/tasks/1/default&all&all"'>Задачи</button>
+    <% }if (title.slice(0,7)!="Lessons"){  %> 
+        <button onClick='location.href="/lessons/1/default&all&all"'>Уроки</button>
+    <% }if (isTeacher){ %>
+        <% if (title!="Add Task"){ %>
+        <button onClick='location.href="/addtask"'>Добавить задачу</button>
+        <% } %>
+        <% if (title!="Add Lesson"){ %>
+            <button onClick='location.href="/addlesson"'>Добавить урок</button>
+        <% } %>
+    <% } %>
+<% } %>
 </div>
 <div class = 'loginInterface'>
 <% if (name==""){ %>
