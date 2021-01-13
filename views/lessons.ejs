@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Уроки</title>
+        <title>Уроки <%= n_name %></title>
 
         <meta charset="utf-8">
         <meta name="viewport"
@@ -14,7 +14,8 @@
         </head>
     <body>
         <main>
-            <form action= '/lessons/1/default'  method="POST">
+            <h1>Уроки <%= n_name %></h1>
+            <form action= '/lessons/'+ u_login +'/1/default'  method="POST">
                 <input id="searcharea" name = "searcharea" rows=1 placeholder="Поиск урока"></input>
                 <% if(isTeacher){ %>
                 <select name="GradeSelector" id = "GradeSelector"> 
@@ -41,8 +42,9 @@
                 <% for (var i = (page-1)*onPage+1; i < min(page*onPage+1,lessons.length); i++) { %>
                 <% var lesson = lessons[i]; %>
                  <tr>
-                  <td><%= lesson.identificator %></td>
-                  <td> <a class="tlrefs" href=<%="/lesson/" + lesson.identificator %>> <%= lesson.title %> </a> </td>
+                  <!--<td><%= lesson.identificator %></td> -->
+                  <td><%= i %></td>
+                  <td> <a class="tlrefs" href=<%="/lesson/"+ u_login + "/" + lesson.identificator %>> <%= lesson.title %> </a> </td>
                   <td><%= lesson.grade %></td>
                   <td><%= lesson.author %></td>
                   <td><%= results[i] %></td>
@@ -58,12 +60,12 @@
                 <div><%= ((page-1)*onPage+1).toString() + "-" +  min(page*onPage,lessons.length-1).toString() + " из " +  (lessons.length-1).toString() %> </div>
 
                 <% if(page>1) { %>
-                    <button onClick=<%= 'location.href=\"/lessons/'+prevPage + "/" + search + "\"" %>>&lt;&lt;&lt;</button>
+                    <button onClick=<%= 'location.href=\"/lessons/'+ u_login + "/" +prevPage + "/" + search + "\"" %>>&lt;&lt;&lt;</button>
                 <% }else { %>
                     <button>&lt;&lt;&lt;</button>
                 <% } %>
                 <% if(page*onPage<lessons.length-1) { %>
-                    <button onClick=<%= 'location.href=\"/lessons/'+nextPage + "/" + search + "\"" %>>&gt;&gt;&gt;</button>
+                    <button onClick=<%= 'location.href=\"/lessons/'+ u_login + "/" +nextPage + "/" + search + "\"" %>>&gt;&gt;&gt;</button>
                 <% }else { %>
                     <button>&gt;&gt;&gt;</button>
                 <% } %>

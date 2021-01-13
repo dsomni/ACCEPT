@@ -518,7 +518,7 @@ app.get('/attempt/:login/:date',checkAuthenticated, checkValidation, async (req,
 
 
 // Add Lesson Page
-app.get('/addlesson',checkPermission, async (req, res) => {
+app.get('/addlesson',checkAuthenticated,checkPermission, async (req, res) => {
     var user = req.user;
     res.render('addlesson.ejs',{
         login: user.login,
@@ -545,9 +545,16 @@ app.post('/addlesson',checkAuthenticated, checkPermission, async (req, res) => {
 })
 
 // Lessons List Page
-app.get('/lessons/:page/:search', checkAuthenticated, async (req, res) => {
-    var user = req.user;
-    var attempts = req.user.attempts;
+app.get('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) => {
+
+    var user;
+    if(req.user.login == req.params.login){
+        user = req.user;
+    }else{
+        user = await User.findOne({login : req.params.login}).exec();
+    }
+
+    var attempts = user.attempts;
     var results = [];
     var foundLessons = [];
 
@@ -589,7 +596,9 @@ app.get('/lessons/:page/:search', checkAuthenticated, async (req, res) => {
     }
 
     res.render('lessons.ejs',{
-        login: user.login,
+        u_login: user.login,
+        n_name: user.name,
+        login: req.user.login,
         name: req.user.name,
         title : "Lessons List",
         lessons: foundLessons,
@@ -600,17 +609,25 @@ app.get('/lessons/:page/:search', checkAuthenticated, async (req, res) => {
     })
 })
 
-app.post('/lessons/:page/:search', checkAuthenticated, async (req, res) => {
+app.post('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) => {
     var toSearch = req.body.searcharea;
     if(!toSearch) toSearch = "default";
     toSearch += '&' + req.body.GradeSelector
-    res.redirect('/lessons/' + req.params.page.toString() +'/' + toSearch )
+    res.redirect('/lessons/'+ req.params.login + '/' + req.params.page.toString() +'/' + toSearch )
 })
 
 
 // Lesson Page
-app.get('/lesson/:id',checkAuthenticated, async (req, res) => {
-    var user = req.user;
+app.get('/lesson/:login/:id',checkAuthenticated, async (req, res) => {
+
+    var user;
+    if(req.user.login == req.params.login){
+        user = req.user;
+    }else{
+        user = await User.findOne({login : req.params.login}).exec();;
+    }
+
+
     var lesson = await Lesson.findOne({identificator: req.params.id});
     if(!lesson){
         res.redirect("/lessons/1/default&all&all")
@@ -618,7 +635,7 @@ app.get('/lesson/:id',checkAuthenticated, async (req, res) => {
 
         var tasks = await Task.find({identificator : {$in : lesson.tasks}});
         var results = [];
-        var attempts = req.user.attempts;
+        var attempts = user.attempts;
 
         for(var i=0; i < tasks.length; i++){
             var task = tasks[i];
@@ -636,6 +653,8 @@ app.get('/lesson/:id',checkAuthenticated, async (req, res) => {
 
         res.render('lesson.ejs',{
             ID : lesson.identificator,
+            u_login: user.login,
+            n_name: user.name,
             login: user.login,
             name: req.user.name,
             title : "Lesson",
@@ -699,6 +718,52 @@ app.post('/editlesson/:id',checkAuthenticated, checkPermission, async (req, res)
         isTeacher: req.user.isTeacher,
         lesson: lesson
     })
+})
+
+// Students List Page
+app.get('/students/:page/:search', checkAuthenticated, checkPermission,async (req, res) => {
+    var user = req.user;
+    var foundStudents = []
+
+    var a = req.params.search.split('&');
+    var toSearch = a[0];
+    var SearchGrade = a[1];
+    var students;
+
+    if(SearchGrade!="all"){
+        students = await User.find({grade: SearchGrade, isTeacher: false}).exec();
+    }else{
+        students = await User.find({isTeacher: false}).exec();
+    }
+
+    if(toSearch == "default") toSearch="";
+
+
+    for (var i = 0; i < students.length; i++){
+        if((students[i].name.slice(0, toSearch.length) == toSearch) && 
+        (SearchGrade == 'all' || SearchGrade==students[i].grade)){
+            foundStudents.push(students[i])
+        }
+    }
+
+    foundStudents.sort((a,b) => { return a.name > b.name });
+
+    res.render('students.ejs',{
+        login: user.login,
+        name: req.user.name,
+        title : "Students List",
+        isTeacher: req.user.isTeacher,
+        page: req.params.page,
+        search: req.params.search,
+        students : foundStudents
+    })
+})
+
+app.post('/students/:page/:search', checkAuthenticated, checkPermission, async (req, res) => {
+    var toSearch = req.body.searcharea;
+    if(!toSearch) toSearch = "default";
+    toSearch += '&' + req.body.GradeSelector
+    res.redirect('/students/' + req.params.page.toString() +'/' + toSearch )
 })
 
 // Log Out

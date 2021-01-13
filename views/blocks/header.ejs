@@ -6,9 +6,12 @@
     <button onClick='location.href="/"'>Главная</button>
     <% }if (title.slice(0,5)!="Tasks"){  %> 
     <button onClick='location.href="/tasks/1/default&all&all"'>Задачи</button>
-    <% }if (title.slice(0,7)!="Lessons"){  %> 
-        <button onClick='location.href="/lessons/1/default&all&all"'>Уроки</button>
+    <% }if (title.slice(0,7)!="Lessons" || !u_login || login!=u_login){  %> 
+        <button onClick=<%= 'location.href=\"/lessons/'+ login + "/1/default&all&all" + "\"" %>> Уроки</button>
     <% }if (isTeacher){ %>
+        <% if (title!="Students List"){ %>
+            <button onClick='location.href="/students/1/default&all"'>Ученики</button>
+        <% } %>
         <% if (title!="Add Task"){ %>
         <button onClick='location.href="/addtask"'>Добавить задачу</button>
         <% } %>

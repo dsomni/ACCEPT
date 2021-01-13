@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Ученики</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0,
+              maximum-scale=1.0, minimum-scale=1.0,
+              user-scalable=no, minimal-ui">
+        <meta name="full-screen" content="yes">
+
+        <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
+        </head>
+    <body>
+        <main>
+            <form action= '/students/1/default'  method="POST">
+                <input id="searcharea" name = "searcharea" rows=1 placeholder="Поиск ученика"></input>
+                <select name="GradeSelector" id = "GradeSelector"> 
+                    <option value="all" selected>Все</option>
+                    <% for(var i = 6; i < 12; i++) { %>
+                    <option value=<%= i %> ><%= i %></option>
+                    <% } %>
+                </select>
+                <button id="submitsearch">Найти</button>
+            </form>
+
+            <table class='taskslist'>
+                <tr>
+                  <th>Id</th>
+                  <th>Имя</th>
+                  <th>Класс</th>
+                  <th>Уроки</th>
+                  <th>Кабинет</th>
+                  </tr>
+                <% min = function(a,b){ if(a < b) return a; return b} %>
+                <% var onPage = 20 %>
+                <% if(students.length>0){ if(students[0].identificator!=0){ students.unshift([0]); } } %>
+                <% for (var i = (page-1)*onPage+1; i < min(page*onPage+1,students.length); i++) { %>
+                <% var student = students[i]; %>
+                 <tr>
+                  <td><%= student.login %></td>
+                  <td><%= student.name %> </td>
+                  <td><%= student.grade %></td>
+                  <td><a class="tablerefs" href=<%="/lessons/" + student.login + "/1/default&all&all" %>>[тык] </a></td>
+                  <td><a class="tablerefs" href=<%="/account/" + student.login + "/1/default&all" %>>[тык] </a></td>
+                 </tr>
+                <% } %>
+                </table>
+
+                <% var page = Number(page) %>
+                <% var prevPage = page - 1 %>
+                <% var nextPage = page + 1 %>
+
+                <div class='pageinfo'>
+                <div><%= ((page-1)*onPage+1).toString() + "-" +  min(page*onPage,students.length-1).toString() + " из " +  (students.length-1).toString() %> </div>
+
+                <% if(page>1) { %>
+                    <button onClick=<%= 'location.href=\"/students/'+prevPage + "/" + search + "\"" %>>&lt;&lt;&lt;</button>
+                <% }else { %>
+                    <button>&lt;&lt;&lt;</button>
+                <% } %>
+                <% if(page*onPage<students.length-1) { %>
+                    <button onClick=<%= 'location.href=\"/students/'+nextPage + "/" + search + "\"" %>>&gt;&gt;&gt;</button>
+                <% }else { %>
+                    <button>&gt;&gt;&gt;</button>
+                <% } %>
+                </div>
+        </main>
+    </body>
+</html>

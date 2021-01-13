@@ -372,3 +372,14 @@ ul{
 .lessonAdderForm ::placeholder{
     color: #000000aa;
 }
+
+.tablerefs{
+    color: #000000;
+    font-size: large;
+    text-decoration: none;
+}
+.tablerefs:hover{
+    color: #5071df;
+    cursor: pointer;
+    text-decoration: underline;
+}
