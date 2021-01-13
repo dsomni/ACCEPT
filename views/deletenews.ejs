@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Удаление новости <%= news.identificator %></title>
+
+        <meta charset="utf-8">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0,
+              maximum-scale=1.0, minimum-scale=1.0,
+              user-scalable=no, minimal-ui">
+        <meta name="full-screen" content="yes">
+
+        </head>
+    <body>
+        <main>
+
+        <form action=<%= '/deletenews/'+news.identificator %>  method="POST">
+                <div>Вы уверены, что хотите удалить новость <%= news.identificator+1 %> "<%= news.title %>" ?</div>
+                <button id="submit3"  onClick='location.href="/"'>Удалить</button>
+        </form>
+        <button id="submit4"  onClick='location.href="/"'>Отмена</button>
+    </main>
+    </body>
+</html>

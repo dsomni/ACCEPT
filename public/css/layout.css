@@ -298,7 +298,7 @@ ul{
 
 #editref{
     text-decoration: none;
-    font-size: small;
+    font-size: medium;
     color: #000000;
     margin-left: 10px;
 }
@@ -385,5 +385,22 @@ ul{
 }
 #gradeLetter{
     width: 50px;
-    
+}
+
+.news{
+    margin-left: 10px;
+    padding-bottom: 15px;
+    padding-left: 25px;
+    padding-right: 30px;
+    padding-top: 1px;
+    margin-top: 20px;
+    margin-right: 50px;
+    border: none;
+    resize: none;
+    background-color: #ffffffa6;
+    font-size: 600;
+}
+
+.date{
+    font-weight: bold;
 }

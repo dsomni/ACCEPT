@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Добавление нововсти</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0,
+              maximum-scale=1.0, minimum-scale=1.0,
+              user-scalable=no, minimal-ui">
+        <meta name="full-screen" content="yes">
+
+        </head>
+    <body>
+        <main>
+
+        <form action='/addnews'  method="POST">
+            <div class="lessonAdderForm">
+                <h3>Заголовок новости</h3>
+                <textarea id="title" name = "title" required placeholder="Введите заголовок"></textarea>
+                <h3>Описание</h3>
+                <textarea id="text" name = "text" placeholder="Введите новость"></textarea>
+                <h3>Ссылка (опционально)</h3>
+                <textarea id="reference" name = "reference"  placeholder="Введите адрес ссылки"></textarea>
+                <button id="submit2">Добавить новость</button>
+            </div>
+        </form>
+    </main>
+    </body>
+</html>

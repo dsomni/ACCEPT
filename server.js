@@ -11,6 +11,7 @@ const expressLayouts = require('express-ejs-layouts');
 const childProcess = require("child_process");
 const taskAdder = require(__dirname + '/public/scripts/addTask.js');
 const lessonAdder = require(__dirname + '/public/scripts/addLesson.js');
+const newsAdder = require(__dirname + '/public/scripts/addNews.js');
 const app = express()
 
 var max = (a, b)=>{if(a>b)return a;return b}
@@ -69,6 +70,19 @@ var LessonSchema = new mongoose.Schema({
 
 }, {collection: 'lessons'});
 
+var NewsSchema = new mongoose.Schema({
+    identificator: Number,
+    title : String,
+    text: String,
+    reference: String,
+    date :  String,
+    author: String
+
+}, {collection: 'news'});
+
+// Create model from schema
+var News = mongoose.model('News', NewsSchema );
+
 // Create model from schema
 var Lesson = mongoose.model('Lesson', LessonSchema );
 
@@ -103,21 +117,24 @@ app.use(passport.session())
 app.use(methodOverride('_method'))
 
 // Main Page
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
 
+    var news = await News.find({}).exec();;
     if(req.user){
         res.render('main.ejs',{
             login: req.user.login,
             name : req.user.name,
             title: "Main Page",
-            isTeacher: req.user.isTeacher
-    });
+            isTeacher: req.user.isTeacher,
+            news: news
+        });
     }else{
         res.render('main.ejs',{
             login: "",
             name : "",
             title: "Main Page",
-            isTeacher: false
+            isTeacher: false,
+            news: news
         });
     }
 })
@@ -450,7 +467,7 @@ app.post('/edittask/:id',checkAuthenticated, checkPermission, async (req, res) =
     })
 })
 
-// Delte Task Page
+// Delete Task Page
 app.get('/deletetask/:id',checkPermission, async (req, res) => {
     var problem = await Task.findOne({identificator: req.params.id}).exec()
 
@@ -764,6 +781,84 @@ app.post('/students/:page/:search', checkAuthenticated, checkPermission, async (
     toSearch += '&' + req.body.GradeSelector + 
         '&' + (req.body.gradeLetter || "all")
     res.redirect('/students/' + req.params.page.toString() +'/' + toSearch )
+})
+
+// Add News Page
+app.get('/addnews',checkAuthenticated,checkPermission, async (req, res) => {
+    var user = req.user;
+    res.render('addnews.ejs',{
+        login: user.login,
+        name: req.user.name,
+        title : "Add News",
+        isTeacher: req.user.isTeacher
+    })
+})
+
+app.post('/addnews',checkAuthenticated, checkPermission, async (req, res) => {
+    var user = req.user;
+    var body = req.body;
+
+    await newsAdder.addNews(News, body.title, body.text, body.reference, user.name);
+
+    res.render('addnews.ejs',{
+        login: user.login,
+        name: req.user.name,
+        title : "Add News",
+        isTeacher: req.user.isTeacher
+    })
+})
+
+// Delete News Page
+app.get('/deletenews/:id',checkAuthenticated,checkPermission, async (req, res) => {
+    var news = await News.findOne({identificator: req.params.id}).exec()
+
+    res.render('deletenews.ejs',{
+        login: req.user.login,
+        name: req.user.name,
+        title : "Delete News",
+        isTeacher: req.user.isTeacher,
+        news: news
+    })
+})
+
+app.post('/deletenews/:id',checkAuthenticated, checkPermission, async (req, res) => {
+    await News.deleteOne({identificator: req.params.id}).exec();
+
+    /* add popup */
+
+    res.redirect('/');
+})
+
+// Edit News Pages
+app.get('/editnews/:id',checkAuthenticated, checkPermission, async (req, res) => {
+    var news = await News.findOne({identificator: req.params.id}).exec()
+    var user = req.user;
+    res.render('editnews.ejs',{
+        login: user.login,
+        name: req.user.name,
+        title : "Edit News",
+        isTeacher: req.user.isTeacher,
+        news: news
+    })
+})
+
+app.post('/editnews/:id',checkAuthenticated, checkPermission, async (req, res) => {
+    var user = req.user;
+    var body = req.body;
+    var news = await News.findOne({identificator: req.params.id}).exec()
+
+    news.title = body.title;
+    news.text = body.text;
+    news.reference = body.reference;
+    await news.save();
+
+    res.render('editnews.ejs',{
+        login: user.login,
+        name: req.user.name,
+        title : "Edit News",
+        isTeacher: req.user.isTeacher,
+        news: news
+    })
 })
 
 // Log Out

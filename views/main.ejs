@@ -9,13 +9,30 @@
               maximum-scale=1.0, minimum-scale=1.0,
               user-scalable=no, minimal-ui">
         <meta name="full-screen" content="yes">
-
-        <!-- <link rel="stylesheet" href="/public/css/style.css" type="text/css"> -->
         </head>
     <body>
         <main>
-        <% for(var i = 0; i <500; i++){ %>
-        Это главная страница!
+        <h1>Добро пожаловать, <%= name || "незнакомец" %>!</h1>
+        <% if (isTeacher){ %>
+        <a class="tlrefs" href="/addnews">[Добавить новость]</a>
+        <% } %>
+        <br>
+        <% for(var i = 0; i < news.length; i++){ %>
+        <div class="news">
+            <% var maxDate = new Date(Number(news[i].date)); %>
+            <% var isoDate = maxDate.toISOString(); %>   
+            <% var date = isoDate.substr(0, 10) ; %>
+            <h2><%= news[i].title %></h2>
+            <span class="date"> <%= date %> </span>
+            <%= news[i].text %>
+            <% if(news[i].reference!="") { %>
+                <a href=<%= news[i].reference %>>Ссылка</a>
+            <% }%>
+            <% if (isTeacher){ %>
+                <a id="editref" href=<%="/editnews/" + news[i].identificator %>>[редактировать]</a>
+                <a id="editref" href=<%="/deletenews/" + news[i].identificator %>>[удалить]</a>
+            <% } %>
+        </div>
         <% }%>
         </main>
     </body>
