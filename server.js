@@ -242,13 +242,13 @@ app.post('/task/:id',checkAuthenticated, async (req, res) => {
                 }
 
                 // Parsing is OK
-                fs.mkdirSync('public\\processes\\'+req.user.login+req.params.id);
+                fs.mkdirSync('public\\processes\\'+req.user.login+"_"+req.params.id);
 
-                fs.writeFileSync('public\\processes\\'+req.user.login+req.params.id+"\\programText.txt",req.body.code,"utf-8");
+                fs.writeFileSync('public\\processes\\'+req.user.login+"_"+req.params.id+"\\programText.txt",req.body.code,"utf-8");
 
                 childProcess.exec('node ' + __dirname + '\\public\\checker\\checker.js ' +
-                __dirname+'\\public\\processes\\'+req.user.login+req.params.id + " " +
-                'program'+req.user.login+req.params.id + " " +
+                __dirname+'\\public\\processes\\'+req.user.login+"_"+req.params.id + " " +
+                'program'+req.user.login+"_"+req.params.id + " " +
                 req.params.id)
 
             }

@@ -4,6 +4,19 @@ const childProcess = require("child_process");
 const mongoose = require('mongoose');
 const config = require('../../config/db');
 
+//For parsing pascal code
+function findArray(programText){
+    let res = []
+    for(let i = 5; i<programText.length;i++){
+        if (programText.slice(i-5, i)=="BEGIN"){
+            res.push([programText.slice(i-5, i), i])
+        }
+        if (programText.slice(i-3, i)=="END"){
+            res.push([programText.slice(i-3, i), i])
+        }
+    }
+    return res
+}
 
 async function go(){
 
@@ -47,10 +60,45 @@ async function go(){
     '\nassign (output,\''+ path + '\\output.txt\'); rewrite(output);'
 
     var programText = fs.readFileSync(path+"\\programText.txt", "utf-8");
-    let idx = programText.toUpperCase().indexOf('BEGIN')
 
-    programText = programText.slice(0, idx+5) + assignText + programText.slice(idx+5)
+    let b = new Set()
+    for(let i = 0; i<programText.length; i++){
+        if(programText[i].length>2 && programText[i][0]==programText[i][1] && programText[i][0]=="/"){
+            b.add(i)
+        }
+    }
 
+    let s = ''
+    for(let i = 0; i<programText.length; i++){
+        if(!b.has(i)){
+            s+='\n'+programText[i]
+        }
+    }
+
+    programText = s
+
+    while(programText.search("{")!=-1){
+        idx1 = programText.search("{")
+        idx2 = programText.search("}")
+        programText = programText.slice(0, idx1)+programText.slice(idx2+1)
+    }
+
+    var array = findArray(programText)
+
+    var begins = [];
+    for(let i = 0; i<array.length-1; i++){
+        if(array[i][0]=="BEGIN")
+        begins.push(i)
+        if(array[i][0]=="END"){
+            array[i] = [0, 0]
+            array[begins.pop()] = [0, 0]
+        }
+    }
+    var BeginEnd = array.filter(Element => Element[0] != 0)
+    if(BeginEnd[0][1]){
+        let idx = BeginEnd[0][1]
+        programText = programText.slice(0, idx) + assignText + programText.slice(idx)
+    }
     fs.writeFileSync(path + '\\'+fileName +'.pas', programText, "utf8");
 
     try{
