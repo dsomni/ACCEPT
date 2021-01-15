@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const config = require('../../config/db');
+const xlsx = require('node-xlsx').default;
 
 //MongoDB connecting  
 mongoose.connect(config.db,{
@@ -25,19 +26,18 @@ var UserSchema = new mongoose.Schema({
     password: String,
     name : String,
 
-    grade: String,
+    grade: Number,
     gradeLetter: String,
     attempts: Array,
 
-    isTeacher: Boolean,
-    hasClasses: Array
+    isTeacher: Boolean
 }, {collection: 'users'});
 
 // Create model from schema
 var User = mongoose.model('User', UserSchema );
 
-function addStudent (login, password, name, grade, gradeLetter){
-    User.insertMany([{
+async function addStudent (login, password, name, grade, gradeLetter){
+    await User.insertMany([{
         login: login,
         password: password,
         name: name,
@@ -50,22 +50,45 @@ function addStudent (login, password, name, grade, gradeLetter){
     }]);
 }
 
-function addTeacher (login, password, name, hasClasses){
+function addTeacher (login, password, name){
     User.insertMany([{
         login: login,
         password: password,
         name: name,
 
         attempts: [],
-        isTeacher: true,
-        hasClasses: hasClasses
+        isTeacher: true
     }]);
 }
-function toDo(){
-    addStudent('7А','2', 'Dima', '7', "А")
-    addStudent('8Б','2', 'Антон', '8', "Б")
-    //addStudent('97','2', 'LzheDima', '12B')
-    // addTeacher('0','0', 'admin', ['А12', 'Б12'])
+async function toDo(){
+
+    //await addTeacher("login","password","name")
+
+    /*await addTeacher("avu","2wsx3edcXC","Устюжанин А. В.")
+    await addTeacher("bla","2wsx3edcXC","Березина Л. А.")
+    await addTeacher("ngt","2wsx3edcXC","Ногуманова Г. Т.")
+    await addTeacher("vea","2wsx3edcXC","Воробьёва Е. А.")*/
+
+
+    const workSheetsFromFile = await xlsx.parse(`${__dirname}/users.xlsx`);
+    var data = workSheetsFromFile[0].data
+    var student, grade, gradeLetter, check;
+    for(var i = 1; i < data.length; i++){
+        student = data[i];
+        check = await User.findOne({login:student[0]})
+        grade = student[3].slice(0,student[3].length-1);
+        gradeLetter = student[3][student[3].length-1];
+        if(check){
+            check.password = student[2]
+            check.name = student[1]
+            check.grade = grade
+            check.gradeLetter = gradeLetter
+            await check.save()
+        }else{
+            await addStudent(student[0], student[2], student[1], grade, gradeLetter)
+        }
+    }
 }
 
 toDo()
+

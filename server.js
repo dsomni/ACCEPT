@@ -39,12 +39,11 @@ var UserSchema = new mongoose.Schema({
     password: String,
     name : String,
 
-    grade: String,
+    grade: Number,
     gradeLetter: String,
     attempts: Array,
 
-    isTeacher: Boolean,
-    hasClasses: Array
+    isTeacher: Boolean
 }, {collection: 'users'});
 
 var TaskSchema = new mongoose.Schema({
@@ -565,7 +564,7 @@ app.post('/addlesson',checkAuthenticated, checkPermission, async (req, res) => {
 app.get('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) => {
 
     var user;
-    if(req.user.login == req.params.login){
+    if(req.user.login == req.params.login || !req.user.isTeacher){
         user = req.user;
     }else{
         user = await User.findOne({login : req.params.login}).exec();
@@ -629,7 +628,7 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) =>
 app.post('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) => {
     var toSearch = req.body.searcharea;
     if(!toSearch) toSearch = "default";
-    toSearch += '&' + req.body.GradeSelector
+    toSearch += '&' + (req.body.GradeSelector || 'all')
     res.redirect('/lessons/'+ req.params.login + '/' + req.params.page.toString() +'/' + toSearch )
 })
 

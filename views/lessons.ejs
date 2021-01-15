@@ -15,7 +15,7 @@
     <body>
         <main>
             <h1>Уроки <%= n_name %></h1>
-            <form action= '/lessons/'+ u_login +'/1/default'  method="POST">
+            <form action= <%= '/lessons/'+ u_login +'/1/default' %>  method="POST">
                 <input id="searcharea" name = "searcharea" rows=1 placeholder="Поиск урока"></input>
                 <% if(isTeacher){ %>
                 <select name="GradeSelector" id = "GradeSelector"> 

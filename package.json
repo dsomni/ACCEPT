@@ -32,6 +32,7 @@
     "method-override": "^3.0.0",
     "mongoose": "^5.11.8",
     "ncp": "^2.0.0",
+    "node-xlsx": "^0.16.1",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
