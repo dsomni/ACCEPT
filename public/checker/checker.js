@@ -1,22 +1,10 @@
+  
 const fs = require('fs');
 const childProcess = require("child_process");
 
 const mongoose = require('mongoose');
 const config = require('../../config/db');
 
-//For parsing pascal code
-function findArray(programText){
-    let res = []
-    for(let i = 5; i<programText.length;i++){
-        if (programText.slice(i-5, i)=="BEGIN"){
-            res.push([programText.slice(i-5, i), i])
-        }
-        if (programText.slice(i-3, i)=="END"){
-            res.push([programText.slice(i-3, i), i])
-        }
-    }
-    return res
-}
 
 async function go(){
 
@@ -27,13 +15,14 @@ async function go(){
 
     var TaskSchema = new mongoose.Schema({
         identificator: Number,
+        grade: Number,
         title : String,
         statement: String,
         examples: Array,
         tests: Array,
         topic: String,
         author: String
-
+    
     }, {collection: 'tasks'});
 
     // Create model from schema
@@ -57,60 +46,72 @@ async function go(){
 
 
     var assignText='\nassign (input,\''+ path +'\\input.txt\'); reset(input);' +
-    '\nassign (output,\''+ path + '\\output.txt\'); rewrite(output);'
+    '\nassign (output,\''+ path + '\\output.txt\'); rewrite(output);' + '\n'
 
-    var programText = fs.readFileSync(path+"\\programText.txt", "utf-8");
+    var programText = fs.readFileSync(path+"\\programText.txt", "utf-8").trim().split(String.fromCharCode(10));
 
-    let b = new Set()
-    for(let i = 0; i<programText.length; i++){
-        if(programText[i].length>2 && programText[i][0]==programText[i][1] && programText[i][0]=="/"){
-            b.add(i)
-        }
-    }
-
+    // delete  one line comments
     let s = ''
     for(let i = 0; i<programText.length; i++){
-        if(!b.has(i)){
+        if(programText[i].search("//")!=-1){
+            s+='\n'+programText[i].slice(0,programText[i].search("//"))
+        }else{
             s+='\n'+programText[i]
         }
     }
 
     programText = s
 
+    // delete  multi-line comments
     while(programText.search("{")!=-1){
         idx1 = programText.search("{")
         idx2 = programText.search("}")
-        programText = programText.slice(0, idx1)+programText.slice(idx2+1)
+        programText = programText.slice(0, idx1) + programText.slice(idx2+1)
     }
 
-    var array = findArray(programText)
 
-    var begins = [];
-    for(let i = 0; i<array.length-1; i++){
-        if(array[i][0]=="BEGIN")
-        begins.push(i)
-        if(array[i][0]=="END"){
-            array[i] = [0, 0]
-            array[begins.pop()] = [0, 0]
+    var programText2 = programText.toUpperCase();
+    var BeginIndexes = []
+    var shift = -5;
+    var BeginCount = 0;
+
+    while(programText2.search("BEGIN")!= -1 || programText2.search("END;") != -1){
+        if(programText2.search("BEGIN") != -1){
+            shift += programText2.search("BEGIN")+ 5;
+            BeginIndexes.push(programText2.search("BEGIN"));
+            programText2 = programText2.slice(programText2.search("BEGIN")+5);
+            BeginCount+=1;
+        }
+        if (programText2.search("END;") != -1){
+            shift += programText2.search("END;")+ 4;
+            programText2 = programText2.slice(programText2.search("END;")+ 4)
+            BeginIndexes.pop();
         }
     }
-    var BeginEnd = array.filter(Element => Element[0] != 0)
 
-    let idx
-    if(BeginEnd[0][1]){
-        idx = BeginEnd[0][1]
-        programText = programText.slice(0, idx) + assignText + programText.slice(idx)
-    }else{
-        idx = -1
-    }
-    if (idx>=0){
-        fs.writeFileSync(path + '\\'+fileName +'.pas', programText, "utf8");
-    }else{
+
+
+
+    if(BeginIndexes.length!=1){
+        // Compilation Error
+
         result += "Test # 1" + "*" + "Compilation Error" + "*" + "er" 
         fs.writeFileSync(path + '\\result.txt', result, "utf8");
 
         process.exit();
     }
+
+    if(BeginCount==1){
+        idx = BeginIndexes[0]
+    }else{
+        idx = shift + BeginIndexes[0]  
+    }
+ 
+
+    programText = programText.slice(0, idx+5) + assignText + programText.slice(idx+5)
+
+    fs.writeFileSync(path + '\\'+fileName +'.pas', programText, "utf8");
+
     try{
         childProcess.execSync(__dirname + '\\pascalCompiler\\pabcnetcclear.exe '+ path + '\\'+fileName +'.pas');
     }catch{

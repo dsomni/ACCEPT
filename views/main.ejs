@@ -17,7 +17,7 @@
         <a class="tlrefs" href="/addnews">[Добавить новость]</a>
         <% } %>
         <br>
-        <% for(var i = 0; i < news.length; i++){ %>
+        <% for(var i = news.length -1 ; i >=0; i--){ %>
         <div class="news">
             <% var maxDate = new Date(Number(news[i].date)); %>
             <% var isoDate = maxDate.toISOString(); %>   

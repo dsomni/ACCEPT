@@ -149,39 +149,46 @@ app.post('/', passport.authenticate('local', {
 app.get('/task/:id', checkAuthenticated, async (req, res) => {
     var problem = await Task.findOne({identificator: req.params.id}).exec()
 
-    fs.stat('public\\processes\\'+req.user.login+req.params.id, function(err) {
+    fs.stat('public\\processes\\'+req.user.login+'_'+req.params.id, function(err,stats) {
         if (!err) {
-            fs.stat('public\\processes\\'+req.user.login+req.params.id+"\\result.txt", function(err) {
-                if (!err) {
+            if(Date.now() - stats.birthtimeMs >= 1.2*60*1000){
+                fs.rmdirSync('public\\processes\\'+req.user.login+'_'+req.params.id,{recursive: true});
 
-                    var resultStrings = fs.readFileSync('public\\processes\\'+req.user.login+req.params.id+"\\result.txt","utf-8").trim().split("\n");
-                    var codeText = fs.readFileSync('public\\processes\\'+req.user.login+req.params.id+"\\programText.txt","utf-8").trim();
-                    var result = [];
-                    for(var i = 0; i < resultStrings.length; i++){
-                        result.push(resultStrings[i].split('*'));
+                res.redirect('/task/'+req.params.id);
+            }else{
+                fs.stat('public\\processes\\'+req.user.login+'_'+req.params.id+"\\result.txt", async function(err) {
+                    if (!err) {
+
+                        var resultStrings = fs.readFileSync('public\\processes\\'+req.user.login+'_'+req.params.id+"\\result.txt","utf-8").trim().split("\n");
+                        var codeText = fs.readFileSync('public\\processes\\'+req.user.login+'_'+req.params.id+"\\programText.txt","utf-8").trim();
+                        var result = [];
+                        for(var i = 0; i < resultStrings.length; i++){
+                            result.push(resultStrings[i].split('*'));
+                        }
+
+                        req.user.attempts.unshift({taskID: req.params.id, date: Date.now().toString(),
+                            programText: codeText, result: result})
+                        await req.user.save()
+
+                        fs.rmdirSync('public\\processes\\'+req.user.login+'_'+req.params.id,{recursive: true});
+
+                        res.redirect('/task/'+req.params.id);
+            
+                    }else if (err.code === 'ENOENT'){
+                        res.render('task.ejs',{
+                            login: req.user.login,
+                            RESULT: [["","Testing..","er"]],
+                            ID: req.params.id,
+                            name: req.user.name, 
+                            title: "Task " + req.params.id,
+                            isTeacher: req.user.isTeacher,
+                            problem: problem,
+                            prevCode: ""
+                        });  
                     }
+                });                
+            }
 
-                    req.user.attempts.unshift({taskID: req.params.id, date: Date.now().toString(),
-                        programText: codeText, result: result})
-                    req.user.save()
-
-                    fs.rmdirSync('public\\processes\\'+req.user.login+req.params.id,{recursive: true});
-
-                    res.redirect('/task/'+req.params.id);
-        
-                }else if (err.code === 'ENOENT'){
-                    res.render('task.ejs',{
-                        login: req.user.login,
-                        RESULT: [["","Testing..","er"]],
-                        ID: req.params.id,
-                        name: req.user.name, 
-                        title: "Task " + req.params.id,
-                        isTeacher: req.user.isTeacher,
-                        problem: problem,
-                        prevCode: ""
-                    });  
-                }
-            });
         }else {
             var attempts = req.user.attempts;
             var result = []
@@ -228,20 +235,6 @@ app.post('/task/:id',checkAuthenticated, async (req, res) => {
             }
             if(prevCode == "" || prevCode != req.body.code ){
 
-
-                var programText = req.body.code;
-                let idx = programText.toUpperCase().indexOf('BEGIN')
-                if (idx == -1){
-                    // Parsing Error
-                    req.user.attempts.unshift({taskID: req.params.id, date: Date.now().toString(),
-                        programText: req.body.code, result: [["Test #1 ", "Presentation Error" ,"er"]]})
-                    req.user.save()
-
-                    res.redirect('/task/'+req.params.id);
-                    return;
-                }
-
-                // Parsing is OK
                 fs.mkdirSync('public\\processes\\'+req.user.login+"_"+req.params.id);
 
                 fs.writeFileSync('public\\processes\\'+req.user.login+"_"+req.params.id+"\\programText.txt",req.body.code,"utf-8");
