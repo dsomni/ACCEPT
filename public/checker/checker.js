@@ -95,12 +95,22 @@ async function go(){
         }
     }
     var BeginEnd = array.filter(Element => Element[0] != 0)
-    if(BeginEnd[0][1]){
-        let idx = BeginEnd[0][1]
-        programText = programText.slice(0, idx) + assignText + programText.slice(idx)
-    }
-    fs.writeFileSync(path + '\\'+fileName +'.pas', programText, "utf8");
 
+    let idx
+    if(BeginEnd[0][1]){
+        idx = BeginEnd[0][1]
+        programText = programText.slice(0, idx) + assignText + programText.slice(idx)
+    }else{
+        idx = -1
+    }
+    if (idx>=0){
+        fs.writeFileSync(path + '\\'+fileName +'.pas', programText, "utf8");
+    }else{
+        result += "Test # 1" + "*" + "Compilation Error" + "*" + "er" 
+        fs.writeFileSync(path + '\\result.txt', result, "utf8");
+
+        process.exit();
+    }
     try{
         childProcess.execSync(__dirname + '\\pascalCompiler\\pabcnetcclear.exe '+ path + '\\'+fileName +'.pas');
     }catch{
