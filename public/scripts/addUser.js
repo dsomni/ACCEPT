@@ -1,9 +1,16 @@
 const mongoose = require('mongoose');
-const config = require('../../config/db');
+const config = require('../../config/configs');
 const xlsx = require('node-xlsx').default;
 
 //MongoDB connecting  
-mongoose.connect(config.db,{
+var connectionString
+if(config.mongodbConfigs.User.Username!="" && config.mongodbConfigs.User.Password!=""){
+    connectionString = "mongodb://"+config.mongodbConfigs.User.Username+":"+config.mongodbConfigs.User.Password+"@"+config.mongodbConfigs.Host+"/"+config.mongodbConfigs.dbName
+}else{
+    connectionString = "mongodb://"+config.mongodbConfigs.Host+"/"+config.mongodbConfigs.dbName
+}
+
+mongoose.connect(connectionString,{
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
@@ -29,6 +36,7 @@ var UserSchema = new mongoose.Schema({
     grade: Number,
     gradeLetter: String,
     attempts: Array,
+    verdicts: Array,
 
     isTeacher: Boolean
 }, {collection: 'users'});
@@ -45,6 +53,7 @@ async function addStudent (login, password, name, grade, gradeLetter){
         grade: grade,
         gradeLetter: gradeLetter,
         attempts: [],
+        verdicts: [],
 
         isTeacher : false
     }]);
@@ -57,6 +66,7 @@ function addTeacher (login, password, name){
         name: name,
 
         attempts: [],
+        verdicts: [],
         isTeacher: true
     }]);
 }
@@ -83,6 +93,28 @@ async function toDo(){
             check.name = student[1]
             check.grade = grade
             check.gradeLetter = gradeLetter
+
+            if(check.verdicts.length==0){
+                let attempts = check.attempts
+                verdicts = []
+                for(var j = attempts.length-1; j >= 0; j--){
+                    let verdict = verdicts.find(item => item.taskID == attempts[j].taskID)
+                    if(!verdict){
+                        verdicts.push({
+                            taskID: attempts[j].taskID,
+                            result: attempts[j].result[attempts[j].result.length - 1][1]
+                        })
+                    } else if(verdict.result!="OK"){
+                        let idx = verdicts.findIndex(item => item.taskID == attempts[j].taskID)
+                        verdicts[idx] = {
+                            taskID: attempts[j].taskID,
+                            result: attempts[j].result[attempts[j].result.length - 1][1]
+                        }
+                    }
+                }
+                check.verdicts = verdicts;
+            }
+
             await check.save()
         }else{
             await addStudent(student[0], student[2], student[1], grade, gradeLetter)

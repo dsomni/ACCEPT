@@ -9,19 +9,18 @@ const methodOverride = require('method-override')
 const config = require('./config/configs');
 const expressLayouts = require('express-ejs-layouts');
 const childProcess = require("child_process");
-const taskAdder = require(__dirname + '/public/scripts/addTask.js');
-const lessonAdder = require(__dirname + '/public/scripts/addLesson.js');
-const newsAdder = require(__dirname + '/public/scripts/addNews.js');
+const Adder = require(__dirname + '/public/scripts/Adder.js');
 const app = express()
 
 //---------------------------------------------------------------------------------
-//MongoDB connecting
+// MongoDB connecting
 var connectionString
 if(config.mongodbConfigs.User.Username!="" && config.mongodbConfigs.User.Password!=""){
     connectionString = "mongodb://"+config.mongodbConfigs.User.Username+":"+config.mongodbConfigs.User.Password+"@"+config.mongodbConfigs.Host+"/"+config.mongodbConfigs.dbName
 }else{
     connectionString = "mongodb://"+config.mongodbConfigs.Host+"/"+config.mongodbConfigs.dbName
 }
+
 mongoose.connect(connectionString,{
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -47,6 +46,7 @@ var UserSchema = new mongoose.Schema({
     grade: Number,
     gradeLetter: String,
     attempts: Array,
+    verdicts: Array,
 
     isTeacher: Boolean
 }, {collection: config.mongodbConfigs.CollectionNames.users});
@@ -124,10 +124,20 @@ app.use(passport.session())
 app.use(methodOverride('_method'))
 
 //---------------------------------------------------------------------------------
+// Loading from DB
+var news;
+var lessons;
+async function load(){
+    news = await News.find({}).exec();
+    lessons = await Lesson.find({}).exec();
+}
+load()
+
+
+
+//---------------------------------------------------------------------------------
 // Main Page
 app.get('/', async (req, res) => {
-
-    var news = await News.find({}).exec();;
     if(req.user){
         res.render('main.ejs',{
             login: req.user.login,
@@ -173,6 +183,19 @@ app.get('/task/:id', checkAuthenticated, async (req, res) => {
                         var result = [];
                         for(var i = 0; i < resultStrings.length; i++){
                             result.push(resultStrings[i].split('*'));
+                        }
+
+                        let idx = req.user.verdicts.findIndex(item => item.taskID == req.params.id)
+                        if(idx==-1){
+                            req.user.verdicts.push({
+                                taskID: req.params.id,
+                                result: result[result.length - 1][1]
+                            })
+                        } else if(req.user.verdicts[idx]!="OK"){
+                            req.user.verdicts[idx] = {
+                                taskID: req.params.id,
+                                result: result[result.length - 1][1]
+                            }
                         }
 
                         req.user.attempts.unshift({taskID: req.params.id, date: Date.now().toString(),
@@ -294,7 +317,7 @@ app.post('/addtask',checkAuthenticated, checkPermission, async (req, res) => {
         tests.push([tI, tO]);
     }
 
-    await taskAdder.addTask(Task, body.title, body.statement, examples, tests, body.topic,body.grade, user.name);
+    await Adder.addTask(Task, body.title, body.statement, examples, tests, body.topic,body.grade, user.name);
 
     res.render('addtask.ejs',{
         login: user.login,
@@ -309,7 +332,6 @@ app.post('/addtask',checkAuthenticated, checkPermission, async (req, res) => {
 app.get('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
     var user = req.user;
     var attempts = req.user.attempts;
-    var results = [];
     var foundTasks = [];
     var tasks = await Task.find({}).exec();
     var a = req.params.search.split('&');
@@ -318,7 +340,8 @@ app.get('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
     SearchGrade = a[2];
     if(toSearch == "default") toSearch="";
     var topics=[];
-    var result;
+    var verdict;
+    var verdicts = [];
     for (var i = 0; i < tasks.length; i++){
         if(topics.indexOf(tasks[i].topic)==-1){
             topics.push(tasks[i].topic);
@@ -327,15 +350,13 @@ app.get('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
         (SearchTopic == 'all' || SearchTopic==tasks[i].topic.replace(" ", "")) && 
         (SearchGrade == 'all' || SearchGrade==tasks[i].grade)){
             foundTasks.push(tasks[i])
-            result = ""
-            for(var j = attempts.length-1; j >= 0; j--){
-                if( attempts[j].taskID == i){
-                    result = attempts[j].result[attempts[j].result.length - 1][1];
-                    if(result == "OK") break;
-                }
+            verdict = user.verdicts.find(item => item.taskID == tasks[i].identificator)
+            if(verdict){
+                verdict = verdict.result
+            }else{
+                verdict = "-"
             }
-            if(result=="") result = "-";
-            results.push(result)
+            verdicts.push(verdict)
         }
     }
     res.render('tasks.ejs',{
@@ -343,7 +364,7 @@ app.get('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
         name: req.user.name,
         title : "Tasks List",
         tasks: foundTasks,
-        results: results,
+        results: verdicts,
         isTeacher: req.user.isTeacher,
         page: req.params.page,
         search: req.params.search,
@@ -554,7 +575,8 @@ app.post('/addlesson',checkAuthenticated, checkPermission, async (req, res) => {
 
     var tasks = body.tasks.split(' ');
 
-    await lessonAdder.addLesson(Lesson, body.grade, body.title, body.description, tasks, user.name);
+    let lesson = await Adder.addLesson(Lesson, body.grade, body.title, body.description, tasks, user.name);
+    lessons.push(lesson)
 
     res.render('addlesson.ejs',{
         login: user.login,
@@ -575,40 +597,35 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) =>
         user = await User.findOne({login : req.params.login}).exec();
     }
 
-    var attempts = user.attempts;
     var results = [];
     var foundLessons = [];
 
     var a = req.params.search.split('&');
     var toSearch = a[0];
-    var lessons;
+    let usedLessons;
     if(user.isTeacher){
-        lessons = await Lesson.find({}).exec();
+        usedLessons = lessons
         SearchGrade = a[1];
 
     }else{
         SearchGrade = user.grade;
-        lessons = await Lesson.find({grade: SearchGrade}).exec();
+        usedLessons = lessons.filter(item => item.grade==SearchGrade)
     }
 
     if(toSearch == "default") toSearch="";
 
     var result;
-    for (var i = 0; i < lessons.length; i++){
-        if((lessons[i].title.slice(0, toSearch.length) == toSearch) && 
-        (SearchGrade == 'all' || SearchGrade==lessons[i].grade)){
-            foundLessons.push(lessons[i])
-            result = "/" + lessons[i].tasks.length
+    for (var i = 0; i < usedLessons.length; i++){
+        if((usedLessons[i].title.slice(0, toSearch.length) == toSearch) && 
+        (SearchGrade == 'all' || SearchGrade==usedLessons[i].grade)){
+            foundLessons.push(usedLessons[i])
+            result = "/" + usedLessons[i].tasks.length
             var solved = 0;
-            for(var k = 0; k < lessons[i].tasks.length; k++){
-                var taskid = lessons[i].tasks[k];
-                 for(var j = attempts.length-1; j >= 0; j--){
-                    if( attempts[j].taskID == taskid){
-                        if(attempts[j].result[attempts[j].result.length - 1][1] == "OK"){
-                            solved+=1
-                            break;
-                        } 
-                    }
+            for(var k = 0; k < usedLessons[i].tasks.length; k++){
+
+                let verdict = user.verdicts.find(item => item.taskID == usedLessons[i].tasks[k])
+                if(verdict && verdict.result=="OK"){
+                    solved+=1
                 }
             }
             result = solved + result;
@@ -649,26 +666,23 @@ app.get('/lesson/:login/:id',checkAuthenticated, async (req, res) => {
     }
 
 
-    var lesson = await Lesson.findOne({identificator: req.params.id});
+    let lesson = lessons.find(item => item.identificator==req.params.id);
     if(!lesson){
         res.redirect("/lessons/1/default&all&all")
     }else{
 
         var tasks = await Task.find({identificator : {$in : lesson.tasks}});
-        var results = [];
-        var attempts = user.attempts;
+        var verdicts = [];
+        var verdict;
 
         for(var i=0; i < tasks.length; i++){
-            var task = tasks[i];
-            result = ""
-            for(var j = attempts.length-1; j >= 0; j--){
-                if( attempts[j].taskID == task.identificator){
-                    result = attempts[j].result[attempts[j].result.length - 1][1];
-                    if(result == "OK") break;
-                }
+            verdict = user.verdicts.find(item => item.taskID == tasks[i].identificator)
+            if(verdict){
+                verdict = verdict.result
+            }else{
+                verdict = "-"
             }
-            if(result=="") result = "-";
-            results.push(result)
+            verdicts.push(verdict)
         }
 
 
@@ -682,7 +696,7 @@ app.get('/lesson/:login/:id',checkAuthenticated, async (req, res) => {
             isTeacher: req.user.isTeacher,
             lesson : lesson,
             tasks : tasks,
-            results : results,
+            results : verdicts,
         })
     }
 })
@@ -690,7 +704,7 @@ app.get('/lesson/:login/:id',checkAuthenticated, async (req, res) => {
 //---------------------------------------------------------------------------------
 // Delete Lesson Page
 app.get('/deletelesson/:id',checkAuthenticated,checkPermission, async (req, res) => {
-    var lesson = await Lesson.findOne({identificator: req.params.id}).exec()
+    let lesson = lessons.find(item => item.identificator==req.params.id);
 
     res.render('deletelesson.ejs',{
         login: req.user.login,
@@ -703,6 +717,7 @@ app.get('/deletelesson/:id',checkAuthenticated,checkPermission, async (req, res)
 
 app.post('/deletelesson/:id',checkAuthenticated, checkPermission, async (req, res) => {
     await Lesson.deleteOne({identificator: req.params.id}).exec();
+    lessons.splice(lessons.findIndex(item => item.identificator==req.params.id),1)
 
     /* add popup */
 
@@ -712,7 +727,7 @@ app.post('/deletelesson/:id',checkAuthenticated, checkPermission, async (req, re
 //---------------------------------------------------------------------------------
 // Edit Lesson Page
 app.get('/editlesson/:id',checkAuthenticated, checkPermission, async (req, res) => {
-    var lesson = await Lesson.findOne({identificator: req.params.id}).exec()
+    let lesson = lessons.find(item => item.identificator==req.params.id);
     var user = req.user;
     res.render('editlesson.ejs',{
         login: user.login,
@@ -726,13 +741,19 @@ app.get('/editlesson/:id',checkAuthenticated, checkPermission, async (req, res) 
 app.post('/editlesson/:id',checkAuthenticated, checkPermission, async (req, res) => {
     var user = req.user;
     var body = req.body;
-    var lesson = await Lesson.findOne({identificator: req.params.id}).exec()
+    let lesson = await Lesson.findOne({identificator: req.params.id}).exec()
 
     lesson.title = body.title;
     lesson.description = body.description;
     lesson.grade = body.grade;
     lesson.tasks = body.tasks.split(' ');
     await lesson.save();
+
+    let idx = lessons.findIndex(item => item.identificator==req.params.id);
+    lessons[idx].title = body.title;
+    lessons[idx].description = body.description;
+    lessons[idx].grade = body.grade;
+    lessons[idx].tasks = body.tasks.split(' ');
 
     res.render('editlesson.ejs',{
         login: user.login,
@@ -806,7 +827,8 @@ app.post('/addnews',checkAuthenticated, checkPermission, async (req, res) => {
     var user = req.user;
     var body = req.body;
 
-    await newsAdder.addNews(News, body.title, body.text, body.reference, user.name);
+    var new_news = await Adder.addNews(News, body.title, body.text, body.reference, user.name);
+    news.push(new_news);
 
     res.render('addnews.ejs',{
         login: user.login,
@@ -819,19 +841,20 @@ app.post('/addnews',checkAuthenticated, checkPermission, async (req, res) => {
 //---------------------------------------------------------------------------------
 // Delete News Page
 app.get('/deletenews/:id',checkAuthenticated,checkPermission, async (req, res) => {
-    var news = await News.findOne({identificator: req.params.id}).exec()
+    one_news = news.find(item => item.identificator==req.params.id)
 
     res.render('deletenews.ejs',{
         login: req.user.login,
         name: req.user.name,
         title : "Delete News",
         isTeacher: req.user.isTeacher,
-        news: news
+        news: one_news
     })
 })
 
 app.post('/deletenews/:id',checkAuthenticated, checkPermission, async (req, res) => {
     await News.deleteOne({identificator: req.params.id}).exec();
+    news.splice(news.findIndex(item => item.identificator==req.params.id),1)
 
     /* add popup */
 
@@ -841,33 +864,38 @@ app.post('/deletenews/:id',checkAuthenticated, checkPermission, async (req, res)
 //---------------------------------------------------------------------------------
 // Edit News Pages
 app.get('/editnews/:id',checkAuthenticated, checkPermission, async (req, res) => {
-    var news = await News.findOne({identificator: req.params.id}).exec()
+    one_news = news.find(item => item.identificator==req.params.id)
     var user = req.user;
     res.render('editnews.ejs',{
         login: user.login,
         name: req.user.name,
         title : "Edit News",
         isTeacher: req.user.isTeacher,
-        news: news
+        news: one_news
     })
 })
 
 app.post('/editnews/:id',checkAuthenticated, checkPermission, async (req, res) => {
     var user = req.user;
     var body = req.body;
-    var news = await News.findOne({identificator: req.params.id}).exec()
+    let newsDB = await News.findOne({identificator: req.params.id}).exec()
 
-    news.title = body.title;
-    news.text = body.text;
-    news.reference = body.reference;
-    await news.save();
+    newsDB.title = body.title;
+    newsDB.text = body.text;
+    newsDB.reference = body.reference;
+    await newsDB.save();
+
+    let idx = news.findIndex(item => item.identificator==req.params.id)
+    news[idx].title = body.title;
+    news[idx].text = body.text;
+    news[idx].reference = body.reference;
 
     res.render('editnews.ejs',{
         login: user.login,
         name: req.user.name,
         title : "Edit News",
         isTeacher: req.user.isTeacher,
-        news: news
+        news: newsDB
     })
 })
 
@@ -886,7 +914,7 @@ app.get('*', (req,res) => {
 })
 
 //---------------------------------------------------------------------------------
-// functions
+// Functions
 function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
         return next()

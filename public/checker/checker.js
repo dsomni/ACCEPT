@@ -3,9 +3,14 @@ const fs = require('fs');
 const childProcess = require("child_process");
 
 const mongoose = require('mongoose');
-const config = require('../../config/db');
+const config = require('../../config/configs');
 
-var connectionString = "mongodb://"+config.mongodbConfigs.User.Username+":"+config.mongodbConfigs.User.Password+"@"+config.mongodbConfigs.Host+"/"+config.mongodbConfigs.dbName
+var connectionString
+if(config.mongodbConfigs.User.Username!="" && config.mongodbConfigs.User.Password!=""){
+    connectionString = "mongodb://"+config.mongodbConfigs.User.Username+":"+config.mongodbConfigs.User.Password+"@"+config.mongodbConfigs.Host+"/"+config.mongodbConfigs.dbName
+}else{
+    connectionString = "mongodb://"+config.mongodbConfigs.Host+"/"+config.mongodbConfigs.dbName
+}
 
 async function go(){
 
