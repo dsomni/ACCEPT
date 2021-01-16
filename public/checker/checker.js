@@ -5,10 +5,11 @@ const childProcess = require("child_process");
 const mongoose = require('mongoose');
 const config = require('../../config/db');
 
+var connectionString = "mongodb://"+config.mongodbConfigs.User.Username+":"+config.mongodbConfigs.User.Password+"@"+config.mongodbConfigs.Host+"/"+config.mongodbConfigs.dbName
 
 async function go(){
 
-    mongoose.connect(config.db,{
+    mongoose.connect(connectionString,{
         useNewUrlParser: true,
         useUnifiedTopology: true
     })
@@ -23,7 +24,7 @@ async function go(){
         topic: String,
         author: String
     
-    }, {collection: 'tasks'});
+    }, {collection: config.mongodbConfigs.CollectionNames.tasks});
 
     // Create model from schema
     var Task = mongoose.model('Task', TaskSchema );
