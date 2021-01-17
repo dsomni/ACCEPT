@@ -1,4 +1,5 @@
 module.exports = {
+    PathToUsersList:"PATH", //Path to users.xlsx file
     port: "3000", //server port
     secret : 'secret',
     FolderLifeTime: 1.2*60*1000, //milliseconds

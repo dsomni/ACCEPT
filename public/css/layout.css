@@ -1,11 +1,9 @@
+/*-----------------------------------------------------------------------------*/
+/*Global*/
 body{
     margin: 0px;
     background-color: #87ceeb;
     min-width: 1000px;
-    /*background-color: #f0f0f0*/
-}
-html{
-    color: #000000;
 }
 ::-webkit-scrollbar{
     width: 5px;
@@ -15,8 +13,35 @@ html{
 }
 ::-webkit-scrollbar-thumb {
     background-color: #888888; 
-  }
+}
+main{
+    font-size: 20px;
+    margin-top: 0px;
+    padding: 10px;
+    cursor: default;
+}
+h3{
+    color: #4e4e4e;
+    margin: 5px;
+}
 
+h4{
+    color: #4e4e4e;
+    margin: 5px;
+    margin-left: 15px;
+    font-size: small;
+}
+textarea::-webkit-scrollbar{
+    width: 0px;
+    height: 0px;
+}
+ul{
+    list-style: none;
+}
+
+
+/*-----------------------------------------------------------------------------*/
+/*Header*/
 header{
     position: sticky;
     top: 0px;
@@ -43,34 +68,6 @@ header button:hover{
     transform: scale(1.1);
     color: #75b5ff;
 }
-
-.loginInterface{
-    position: absolute;
-    top: 25px;
-    right: 15px;
-    display: inline;
-}
-
-.navigationButtons{
-    position: relative;
-    top: -10px;
-    /* left: 180px; */
-    display: inline;
-}
-
-.userName{
-    color: #154cff;
-    font-weight: bold;
-    font-size: 15pt;
-    font-variant-caps: small-caps;
-    font-family: Geneva, Arial, Helvetica, sans-serif;
-    text-decoration: none;
-}
-
-.userName:hover{
-    text-decoration: underline;
-}
-
 header form{
     display: inline;
     margin-right: 0px;
@@ -87,112 +84,15 @@ header img{
     display: inline;
     width: 150px;
 }
-main{
-    font-size: 20px;
-    margin-top: 0px;
-    padding: 10px;
-    cursor: default;
-}
-h3{
-    color: #4e4e4e;
-    margin: 5px;
-}
 
-h4{
-    color: #4e4e4e;
-    margin: 5px;
-    margin-left: 15px;
-    font-size: small;
-}
 
-.taskslist {
-    background: #f5ffff;
-    border-collapse: collapse;
-    text-align: left;
-    margin-top: 20px;
-    margin-left: 120px;
-    width: 70%;
-}
+/*-----------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------*/
+/*ids*/
 
-.taskslist th {
-    border-top: 1px solid #6695fa;	
-    border-bottom: 1px solid #6695fa; 
-    /*background: linear-gradient(#83aaff, #3075e6);*/
-    background: #83aaff;
-    color: white;
-    padding: 10px 15px;
-}
-
-.taskslist tr:nth-child(odd) {
-    background: #ebf3f9;
-}
-
-.taskslist td {
-    border: 1px solid #e3eef7;
-    padding: 10px 15px;
-    transition: all 0.5s ease;
-}
-
-/*.taskslist td:last-child{
-    text-align: center;
-    padding: 10px 15px;
-}*/
-
-.tlrefs{
-    text-decoration: none;
-    color: #000000;
-    font-weight: bold;
-}
-
-.tlrefs:hover{
-    cursor: pointer;
-    color: #220bf3;
-    text-decoration: underline;
-}
-
-/*.wrapper{
-    background-color: #999999;
-}*/
-
-.taskAdderForm{
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    padding-right: 47vw;
-    padding-left: 2vw;
-    font-size: 15pt;
-    font-weight: 600;
-}
-
-.taskAdderForm button{
-    height: 50px;
-    font-size: large;
-    border-radius: 10px;
-    border: none;
-    background-color: #f1f1f1;
-    cursor: pointer;
-}
-
-.taskAdderForm button:hover{
-    background-color: #d4d3d3;
-}
-
-.taskAdderForm textarea{
-    border-radius: 1px;
-    border-color: #000000;
-    outline: none;
-    background-color: #ffffff;
-    margin: 5px;
-    font-size: 12pt;
-}
-.taskAdderForm ::placeholder{
-    color: #000000aa;
-}
-
-textarea::-webkit-scrollbar{
-    width: 0px;
-    height: 0px;
-}
+/*-----------------------------------------------------------------------------*/
+/*errors*/
 #ok{
     color: green;
 }
@@ -201,30 +101,8 @@ textarea::-webkit-scrollbar{
     color: red;
 }
 
-ul{
-    list-style: none;
-}
-
-.container{
-    margin-left: auto;
-    margin-right: auto;
-    width: 640px;
-}
-
-
-.taskarea{
-    vertical-align: top;
-    background-color: transparent;
-    display: inline-block;
-    width: 300px;
-    height: 350px;
-    margin-left: 10px;
-    border: none;
-    resize: none;
-    margin-top: 0px;
-    background-color: white;
-    font-size: large;
-}
+/*-----------------------------------------------------------------------------*/
+/*task page*/
 #submit {
     margin-top: 10px;
     width: 100px;
@@ -243,31 +121,6 @@ ul{
     overflow: scroll;
     font-size: large;
 }
-
-.imgs img{
-    /*border: 1px solid black;*/
-    display: inline-block;
-    margin-left: 10px;
-    margin-top: 20px;
-    margin-bottom: -6px;
-    width: 304px;
-}
-
-.imgsbottom img{
-    /*border: 1px solid black;*/
-    display: inline-block;
-    margin-left: 10px;
-    margin-top: -1px;
-    width: 304px;
-}
-
-
-.taskarea:focus{
-    outline: none;
-}
-.taskarea div{
-    overflow: scroll;
-}
 #statement{
     text-indent: 15px;
     line-height: 25px;
@@ -276,9 +129,9 @@ ul{
     white-space: pre-wrap;
 }
 #taskname{
-    /* width: 1000px; */
     text-align: center;
 }
+
 #examples{
     margin-left: 15%;
     margin-top: 10px;
@@ -295,7 +148,27 @@ ul{
     margin-right: auto;
     width: 640px;
 }
+#task h4{
+    margin-left: -10%;
+    text-align: center;
+    white-space: pre-wrap;
+    font-size:medium;
+}
+#code{
+    white-space: pre-wrap;
+}
 
+/*-----------------------------------------------------------------------------*/
+/*tasks page*/
+
+#searcharea{
+    margin-left: 120px;
+    width: 10%;
+}
+
+
+/*-----------------------------------------------------------------------------*/
+/*Lesson page*/
 #editref{
     text-decoration: none;
     font-size: medium;
@@ -308,85 +181,133 @@ ul{
     color: #0422a7;
     cursor: pointer;
 }
-
-#task h4{
-    margin-left: -10%;
-    text-align: center;
-    white-space: pre-wrap;
-    font-size:medium;
+/*-----------------------------------------------------------------------------*/
+/*editlesson page*/
+#grade{
+    width: 40px;
+    font-size: medium;
+}
+/*-----------------------------------------------------------------------------*/
+/*Students page*/
+#gradeLetter{
+    width: 50px;
 }
 
-#code{
-    white-space: pre-wrap;
+
+/*-----------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------*/
+/*classes*/
+
+
+/*-----------------------------------------------------------------------------*/
+/*task page*/
+.container{
+    margin-left: auto;
+    margin-right: auto;
+    width: 640px;
+}
+.imgs img{
+    display: inline-block;
+    margin-left: 10px;
+    margin-top: 20px;
+    margin-bottom: -6px;
+    width: 304px;
+}
+.imgsbottom img{
+    display: inline-block;
+    margin-left: 10px;
+    margin-top: -1px;
+    width: 304px;
+}
+.taskarea{
+    vertical-align: top;
+    background-color: transparent;
+    display: inline-block;
+    width: 300px;
+    height: 350px;
+    margin-left: 10px;
+    border: none;
+    resize: none;
+    margin-top: 0px;
+    background-color: white;
+    font-size: large;
+}
+.taskarea:focus{
+    outline: none;
+}
+.taskarea div{
+    overflow: scroll;
 }
 
-#searcharea{
+/*-----------------------------------------------------------------------------*/
+/*tasks page*/
+.taskslist {
+    background: #f5ffff;
+    border-collapse: collapse;
+    text-align: left;
+    margin-top: 20px;
     margin-left: 120px;
-    width: 10%;
+    width: 70%;
 }
-
+.taskslist th {
+    border-top: 1px solid #6695fa;	
+    border-bottom: 1px solid #6695fa; 
+    background: #83aaff;
+    color: white;
+    padding: 10px 15px;
+}
+.taskslist tr:nth-child(odd) {
+    background: #ebf3f9;
+}
+.taskslist td {
+    border: 1px solid #e3eef7;
+    padding: 10px 15px;
+    transition: all 0.5s ease;
+}
+.tlrefs{
+    text-decoration: none;
+    color: #000000;
+    font-weight: bold;
+}
+.tlrefs:hover{
+    cursor: pointer;
+    color: #220bf3;
+    text-decoration: underline;
+}
 .pageinfo {
     margin-left: auto;
     margin-right: auto;
     width: 200px;
 }
-
-#grade{
-    width: 40px;
-    font-size: medium;
+/*-----------------------------------------------------------------------------*/
+/*Header*/
+.navigationButtons{
+    position: relative;
+    top: -10px;
+    display: inline;
 }
-
-.lessonAdderForm{
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    margin-top: 100px;
-    margin-left: auto;
-    margin-right: auto;
-    width: 400px;
-    font-size: 22pt;
-    font-weight: 600;
+.loginInterface{
+    position: absolute;
+    top: 25px;
+    right: 15px;
+    display: inline;
 }
-
-.lessonAdderForm button{
-    height: 50px;
-    font-size: large;
-    border-radius: 10px;
-    border: none;
-    background-color: #f1f1f1;
-    cursor: pointer;
-}
-
-.lessonAdderForm button:hover{
-    background-color: #d4d3d3;
-}
-
-.lessonAdderForm textarea{
-    border-radius: 1px;
-    border-color: #000000;
-    outline: none;
-    background-color: #ffffff;
-    margin: 10px;
-    font-size: 20pt;
-}
-.lessonAdderForm ::placeholder{
-    color: #000000aa;
-}
-
-.tablerefs{
-    color: #000000;
-    font-size: large;
+.userName{
+    color: #154cff;
+    font-weight: bold;
+    font-size: 15pt;
+    font-variant-caps: small-caps;
+    font-family: Geneva, Arial, Helvetica, sans-serif;
     text-decoration: none;
 }
-.tablerefs:hover{
-    color: #5071df;
-    cursor: pointer;
+.userName:hover{
     text-decoration: underline;
 }
-#gradeLetter{
-    width: 50px;
-}
 
+
+/*-----------------------------------------------------------------------------*/
+/*main page*/
 .news{
     margin-left: 10px;
     padding-bottom: 15px;
@@ -400,7 +321,90 @@ ul{
     background-color: #ffffffa6;
     font-size: 600;
 }
-
 .date{
     font-weight: bold;
+}
+
+/*-----------------------------------------------------------------------------*/
+/*Students page*/
+.tablerefs{
+    color: #000000;
+    font-size: large;
+    text-decoration: none;
+}
+.tablerefs:hover{
+    color: #5071df;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+/*-----------------------------------------------------------------------------*/
+/*Task adder page*/
+.taskAdderForm{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    padding-right: 47vw;
+    padding-left: 2vw;
+    font-size: 15pt;
+    font-weight: 600;
+}
+.taskAdderForm button{
+    height: 50px;
+    font-size: large;
+    border-radius: 10px;
+    border: none;
+    background-color: #f1f1f1;
+    cursor: pointer;
+}
+.taskAdderForm button:hover{
+    background-color: #d4d3d3;
+}
+.taskAdderForm textarea{
+    border-radius: 1px;
+    border-color: #000000;
+    outline: none;
+    background-color: #ffffff;
+    margin: 5px;
+    font-size: 12pt;
+}
+.taskAdderForm ::placeholder{
+    color: #000000aa;
+}
+
+/*-----------------------------------------------------------------------------*/
+/*lessons adder page*/
+
+.lessonAdderForm{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    margin-top: 100px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 400px;
+    font-size: 22pt;
+    font-weight: 600;
+}
+.lessonAdderForm button{
+    height: 50px;
+    font-size: large;
+    border-radius: 10px;
+    border: none;
+    background-color: #f1f1f1;
+    cursor: pointer;
+}
+.lessonAdderForm button:hover{
+    background-color: #d4d3d3;
+}
+.lessonAdderForm textarea{
+    border-radius: 1px;
+    border-color: #000000;
+    outline: none;
+    background-color: #ffffff;
+    margin: 10px;
+    font-size: 20pt;
+}
+.lessonAdderForm ::placeholder{
+    color: #000000aa;
 }

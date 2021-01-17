@@ -79,8 +79,7 @@ async function toDo(){
     await addTeacher("ngt","2wsx3edcXC","Ногуманова Г. Т.")
     await addTeacher("vea","2wsx3edcXC","Воробьёва Е. А.")*/
 
-
-    const workSheetsFromFile = await xlsx.parse(`${__dirname}/users.xlsx`);
+    const workSheetsFromFile = await xlsx.parse(config.PathToUsersList);
     var data = workSheetsFromFile[0].data
     var student, grade, gradeLetter, check;
     for(var i = 1; i < data.length; i++){
