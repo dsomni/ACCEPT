@@ -19,6 +19,13 @@
             <button onClick='location.href="/addlesson"'>Добавить урок</button>
         <% } %>
     <% } %>
+    <%if (title.slice(0,5)!="About"){  %> 
+        <button onClick='location.href="/about"'>О проекте</button>
+    <% } %>
+    <%if (title.slice(0,4)=="Egg2"){  %> 
+        <button>Maze by Melaveetha & Dsomni</button>
+        <button>W;A;S;D;P</button>
+    <% } %>
 <% } %>
 </div>
 <div class = 'loginInterface'>

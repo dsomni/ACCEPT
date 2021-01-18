@@ -374,7 +374,6 @@ header img{
 
 /*-----------------------------------------------------------------------------*/
 /*lessons adder page*/
-
 .lessonAdderForm{
     display: flex;
     flex-direction: column;
@@ -407,4 +406,27 @@ header img{
 }
 .lessonAdderForm ::placeholder{
     color: #000000aa;
+}
+
+/*-----------------------------------------------------------------------------*/
+/*about page*/
+.about{
+    margin-left: 10px;
+    padding-bottom: 15px;
+    padding-left: 25px;
+    padding-right: 30px;
+    padding-top: 1px;
+    margin-top: 20px;
+    margin-right: 50px;
+    border: none;
+    resize: none;
+    background-color: #ffffffa6;
+    font-size: larger;
+}
+.about a{
+    text-decoration: none;
+    color: #000000;
+}
+#highlighting{
+    font-weight: bold;
 }

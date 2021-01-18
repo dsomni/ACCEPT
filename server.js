@@ -900,6 +900,37 @@ app.post('/editnews/:id',checkAuthenticated, checkPermission, async (req, res) =
 })
 
 //---------------------------------------------------------------------------------
+// About Page
+app.get('/about',checkAuthenticated, async (req, res) => {
+    res.render('about.ejs',{
+        login: req.user.login,
+        name: req.user.name,
+        title : "About",
+        isTeacher: req.user.isTeacher
+    })
+})
+
+//---------------------------------------------------------------------------------
+// ???
+app.get('/egg1',checkAuthenticated, async (req, res) => {
+    res.render('20122020.ejs',{
+        login: req.user.login,
+        name: req.user.name,
+        title : "Egg1",
+        isTeacher: req.user.isTeacher
+    })
+})
+app.get('/egg2',checkAuthenticated, async (req, res) => {
+    res.render('21122020.ejs',{
+        login: req.user.login,
+        name: req.user.name,
+        title : "Egg2",
+        isTeacher: req.user.isTeacher
+    })
+})
+
+
+//---------------------------------------------------------------------------------
 // Log Out
 app.delete('/logout', (req, res) => {
     req.logOut()

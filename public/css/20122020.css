@@ -1,0 +1,122 @@
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    text-decoration: none;
+    outline: none;
+}
+
+body {
+    overflow: hidden;
+    font-family: cursive;
+}
+
+#menu h1{
+    color: rgb(8, 8, 83);
+    font-weight: bold;
+}
+
+#menu {
+    text-align: center;
+    background-color: rgb(147, 230, 255) ;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    padding-top: 30vh;
+    z-index: 10;
+}
+
+#menu button{
+    display: block;
+    width: 50vw;
+    padding: 20px;
+    margin: 10px auto;
+    background-color: white;
+    border: 1px solid;
+    border-radius: 15px;
+    color: navy;
+    font-size: 25px;
+    font-family: monospace;
+    font-weight: bolder;
+}
+
+#control input[type=range] {
+    position: fixed;
+    padding: 0;
+    width: 30vw;
+    bottom: 15px;
+    margin-left: 67vw;
+    background-color: transparent;
+    -webkit-appearance: none;
+  }
+#control input[type=range]:focus {
+    outline: none;
+  }
+#control input[type=range]::-webkit-slider-runnable-track {
+    background: #ff11df;
+    border: 2px solid #b609ad;
+    border-radius: 20px;
+    width: 100%;
+    height: 40%;
+    cursor: pointer;
+  }
+#control input[type=range]::-webkit-slider-thumb {
+    margin-top: -14px;
+    width: 16px;
+    height: 36px;
+    background: #ffffff;
+    border: 1px solid #000000;
+    border-radius: 4px;
+    cursor: pointer;
+    -webkit-appearance: none;
+  }
+#control input[type=range]:focus::-webkit-slider-runnable-track {
+    background: #ff11df;
+    border: 2px solid #b609ad;
+  }
+#control button{
+    position: fixed;
+    padding: 0;
+    top: 15px;
+    left: 15px;
+    width: 45px;
+    height: 45px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: bold;
+    border: 1.5px solid black;
+    border-radius: 15px;
+    background-color: rgba(255, 255, 255, 0.5);
+
+}
+#speedTxt {
+    position: fixed;
+    bottom: 50px;
+    margin-left: 68vw;
+    font-size: 20px;
+    color: rgb(147, 230, 255);
+}
+
+#speedTxt2 {
+    position: fixed;
+    bottom: 50px;
+    right: 10px;
+    font-size: 20px;
+    color: rgb(147, 230, 255);
+}
+
+#rgb {
+    position: fixed;
+    bottom: 0px;
+    left: 10px;
+    font-size: 30px;
+}
+
+#canvas {
+    position: fixed;
+    top:0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: yellow;
+}

@@ -58,26 +58,7 @@ async function addStudent (login, password, name, grade, gradeLetter){
         isTeacher : false
     }]);
 }
-
-function addTeacher (login, password, name){
-    User.insertMany([{
-        login: login,
-        password: password,
-        name: name,
-
-        attempts: [],
-        verdicts: [],
-        isTeacher: true
-    }]);
-}
 async function toDo(){
-
-    //await addTeacher("login","password","name")
-
-    /*await addTeacher("avu","2wsx3edcXC","Устюжанин А. В.")
-    await addTeacher("bla","2wsx3edcXC","Березина Л. А.")
-    await addTeacher("ngt","2wsx3edcXC","Ногуманова Г. Т.")
-    await addTeacher("vea","2wsx3edcXC","Воробьёва Е. А.")*/
 
     const workSheetsFromFile = await xlsx.parse(config.PathToUsersList);
     var data = workSheetsFromFile[0].data
