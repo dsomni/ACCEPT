@@ -75,8 +75,9 @@ async function toDo(){
             check.name = student[1]
             check.grade = grade
             check.gradeLetter = gradeLetter
-            check.group = 1
-
+            if(!check.group){
+                check.group = 1;
+            }
             if(check.verdicts.length==0){
                 let attempts = check.attempts
                 verdicts = []

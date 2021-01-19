@@ -15,6 +15,10 @@
     <body>
         <main>
             <h1>Личный кабинет <%= n_name %></h1>
+            <% if(!isTeacher){ %>
+            <p>Класс: <%= user.grade + user.gradeLetter %></p>
+            <p>Группа: <%= user.group %></p>
+            <% } %>
             <form action= <%= '/account/'+ u_login +'/1/default' %>  method="POST">
                 <input id="searcharea" name = "searcharea" rows=1 placeholder="Поиск по задаче"></input><button id="submitsearch">Найти</button>
                 <select name="selector" id = "selector"> 

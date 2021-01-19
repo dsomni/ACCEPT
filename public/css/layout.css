@@ -201,10 +201,37 @@ header img{
 #change_groupeBtn{
     display: inline;
 }
+
 /*-----------------------------------------------------------------------------*/
 /*-----------------------------------------------------------------------------*/
 /*-----------------------------------------------------------------------------*/
 /*classes*/
+
+.lessonPopup dialog{
+    align-items: center;
+    border: 2px solid #000000;
+    border-radius: 10px;
+    font-size: 15pt;
+    font-weight: 100;
+}
+
+.lessonPopup .show{
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 12pt;
+    font-weight: 200;
+}
+
+.lessonPopup .show:hover{
+    cursor: pointer;
+    color: #2d2aee;
+    text-decoration: underline;
+}
+.lessonPopup .show:active{
+    outline: none;
+}
+
 
 
 /*-----------------------------------------------------------------------------*/
@@ -245,6 +272,31 @@ header img{
 }
 .taskarea div{
     overflow: scroll;
+}
+
+.taskPopup dialog{
+    align-items: center;
+    border: 2px solid #000000;
+    border-radius: 10px;
+    font-size: 15pt;
+    font-weight: 100;
+}
+
+.taskPopup .show{
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 12pt;
+    font-weight: 200;
+}
+
+.taskPopup .show:hover{
+    cursor: pointer;
+    color: #2d2aee;
+    text-decoration: underline;
+}
+.taskPopup .show:active{
+    outline: none;
 }
 
 /*-----------------------------------------------------------------------------*/
@@ -331,6 +383,28 @@ header img{
 .date{
     font-weight: bold;
 }
+.newsPopup dialog{
+    align-items: center;
+    border: 2px solid #000000;
+    border-radius: 10px;
+}
+
+.newsPopup .show{
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 11pt;
+}
+
+.newsPopup .show:hover{
+    cursor: pointer;
+    color: #2d2aee;
+    text-decoration: underline;
+}
+.newsPopup .show:active{
+    outline: none;
+}
+
 
 /*-----------------------------------------------------------------------------*/
 /*Students page*/
@@ -343,6 +417,33 @@ header img{
     color: #5071df;
     cursor: pointer;
     text-decoration: underline;
+}
+
+.group dialog{
+    align-items: center;
+    border: 2px solid #000000;
+    border-radius: 10px;
+}
+
+.group .show{
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 13pt;
+}
+
+.group .show:hover{
+    cursor: pointer;
+    color: #2d2aee;
+}
+.group .show:active{
+    outline: none;
+}
+
+.group input{
+    border: 1px solid #000000;
+    outline: none;
+    width: 50px;
 }
 
 /*-----------------------------------------------------------------------------*/

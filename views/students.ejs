@@ -23,8 +23,9 @@
                     <% } %>
                 </select>
                 <input id="gradeLetter" name="gradeLetter" placeholder="Литера">
+                <input id="gradeLetter" name="Group" placeholder="Группа">
                 <button id="submitsearch">Найти</button>
-                <button id="submitsave">Сохранить изменения</button>
+            </form>
             <table class='taskslist'>
                 <tr>
                   <th>Login</th>
@@ -40,16 +41,30 @@
                 <% for (var i = (page-1)*onPage+1; i < min(page*onPage+1,students.length); i++) { %>
                 <% var student = students[i]; %>
                  <tr>
-                  <td><%= student.login %></td>
-                  <td><%= student.name %> </td>
-                  <td><%= student.grade + student.gradeLetter %></td>
-                  <td><input id = "group_number" name = "login:<%= student.login %>" value="<%= student.group %>"></td>
-                  <td><a class="tablerefs" href=<%="/lessons/" + student.login + "/1/default&all&all" %>>[открыть] </a></td>
-                  <td><a class="tablerefs" href=<%="/account/" + student.login + "/1/default&all" %>>[открыть] </a></td>
+                    <td><%= student.login %></td>
+                    <td><%= student.name %> </td>
+                    <td><%= student.grade + student.gradeLetter %></td>
+
+                    
+                    <td>
+                        <span class="group">
+                        <dialog  id=<%='dialog' + i%>>
+                        <form action= <%='/editgroup/' + student.login + '/' +page +'/' + search %>  method="POST">
+                          Номер группы: 
+                          <input id="groupEditor" name="groupEditor" placeholder=<%=student.group%>> <button>Сохранить</button>
+                        </form> 
+                        <button onClick=<%='c(' + i + ');' %> >Назад</button>
+                        </dialog>
+                    <button onClick=<%='o(' + i + ');' %> class="show" ><%=student.group%></button>
+                        </form>
+                        </span>
+                    </td>
+
+                    <td><a class="tablerefs" href=<%="/lessons/" + student.login + "/1/default&all&all" %>>[открыть] </a></td>
+                    <td><a class="tablerefs" href=<%="/account/" + student.login + "/1/default&all" %>>[открыть] </a></td>
                  </tr>
                 <% } %>
                 </table>
-                </form>
                 <% var page = Number(page) %>
                 <% var prevPage = page - 1 %>
                 <% var nextPage = page + 1 %>
@@ -70,4 +85,12 @@
                 </div>
         </main>
     </body>
+    <script type = text/javascript>
+    function o(i) {
+        document.getElementById('dialog' + i).showModal();
+    }
+    function c(i) {
+        document.getElementById('dialog' + i).close();
+    }
+    </script>
 </html>

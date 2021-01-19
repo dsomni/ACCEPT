@@ -432,23 +432,9 @@ app.post('/edittask/:id',checkAuthenticated, checkPermission, async (req, res) =
 })
 
 //---------------------------------------------------------------------------------
-// Delete Task Page
-app.get('/deletetask/:id',checkPermission, async (req, res) => {
-    var problem = await Task.findOne({identificator: req.params.id}).exec()
-
-    res.render('deletetask.ejs',{
-        login: req.user.login,
-        name: req.user.name,
-        title : "Delete Task",
-        isTeacher: req.user.isTeacher,
-        problem: problem
-    })
-})
-
+// Delete Task
 app.post('/deletetask/:id',checkAuthenticated, checkPermission, async (req, res) => {
     await Task.deleteOne({identificator: req.params.id}).exec();
-
-    /* add popup */
 
     res.redirect('/tasks/1/default&all&all');
 })
@@ -475,7 +461,6 @@ app.get('/account/:login/:page/:search',checkAuthenticated, checkValidation, asy
         var types = a[1];
         if(toSearch == "DEFAULT") toSearch="";
 
-
         for(var i = 0; i < attempts.length; i++){
             verylongresult = attempts[i].result[attempts[i].result.length -1 ][attempts[i].result[attempts[i].result.length -1 ].length - 1];
             if((tasks[attempts[i].taskID].title.slice(0, toSearch.length).toUpperCase() == toSearch) &&
@@ -496,7 +481,8 @@ app.get('/account/:login/:page/:search',checkAuthenticated, checkValidation, asy
             attempts: foundAttempts,
             tasks: foundTasks,
             search: req.params.search,
-            n_name: user.name
+            n_name: user.name,
+            user: user
         })
     
     } else{
@@ -546,12 +532,10 @@ app.get('/attempt/:login/:date',checkAuthenticated, checkValidation, async (req,
                 n_name: user.name
             }) 
         } else{
-            console.log(1)
             res.redirect('/account/' + req.user.login + '/1/default&all')
         }
 
     } else{
-        console.log(2)
         res.redirect('/account/' + req.user.login + '/1/default&all')
     }
 
@@ -702,26 +686,12 @@ app.get('/lesson/:login/:id',checkAuthenticated, async (req, res) => {
 })
 
 //---------------------------------------------------------------------------------
-// Delete Lesson Page
-app.get('/deletelesson/:id',checkAuthenticated,checkPermission, async (req, res) => {
-    let lesson = lessons.find(item => item.identificator==req.params.id);
-
-    res.render('deletelesson.ejs',{
-        login: req.user.login,
-        name: req.user.name,
-        title : "Delete Lesson",
-        isTeacher: req.user.isTeacher,
-        lesson: lesson
-    })
-})
-
+// Delete Lesson
 app.post('/deletelesson/:id',checkAuthenticated, checkPermission, async (req, res) => {
     await Lesson.deleteOne({identificator: req.params.id}).exec();
     lessons.splice(lessons.findIndex(item => item.identificator==req.params.id),1)
 
-    /* add popup */
-
-    res.redirect('/lessons/1/default&all&all');
+    res.redirect('/lessons/0/1/default&all&all');
 })
 
 //---------------------------------------------------------------------------------
@@ -774,6 +744,7 @@ app.get('/students/:page/:search', checkAuthenticated, checkPermission,async (re
     var toSearch = a[0].toUpperCase();
     var SearchGrade = a[1];
     var SearchLetter = a[2];
+    var SearchGroup = a[3];
     var students = [];
 
     if(SearchGrade!="all"){
@@ -785,7 +756,8 @@ app.get('/students/:page/:search', checkAuthenticated, checkPermission,async (re
     for (var i = 0; i < students.length; i++){
         if((students[i].name.slice(0, toSearch.length).toUpperCase() == toSearch) && 
         (SearchGrade == 'all' || SearchGrade==students[i].grade) &&
-        (SearchLetter == 'all' || SearchLetter == students[i].gradeLetter)){
+        (SearchLetter == 'all' || SearchLetter.toUpperCase() == students[i].gradeLetter.toUpperCase()) &&
+        (SearchGroup == 'all' || SearchGroup == students[i].group)){
             foundStudents.push(students[i])
         }
     }
@@ -806,8 +778,9 @@ app.get('/students/:page/:search', checkAuthenticated, checkPermission,async (re
 app.post('/students/:page/:search', checkAuthenticated, checkPermission, async (req, res) => {
     var toSearch = req.body.searcharea;
     if(!toSearch) toSearch = "default";
-    toSearch += '&' + req.body.GradeSelector + 
-        '&' + (req.body.gradeLetter || "all")
+    toSearch += '&' + req.body.GradeSelector  + 
+        '&' + (req.body.gradeLetter || "all") + 
+        '&' + (req.body.Group || "all")
     let keys = Object.keys(req.body)
     let student;
     for(let i = 0; i<keys.length; i++){
@@ -850,24 +823,10 @@ app.post('/addnews',checkAuthenticated, checkPermission, async (req, res) => {
 })
 
 //---------------------------------------------------------------------------------
-// Delete News Page
-app.get('/deletenews/:id',checkAuthenticated,checkPermission, async (req, res) => {
-    one_news = news.find(item => item.identificator==req.params.id)
-
-    res.render('deletenews.ejs',{
-        login: req.user.login,
-        name: req.user.name,
-        title : "Delete News",
-        isTeacher: req.user.isTeacher,
-        news: one_news
-    })
-})
-
+// Delete News
 app.post('/deletenews/:id',checkAuthenticated, checkPermission, async (req, res) => {
     await News.deleteOne({identificator: req.params.id}).exec();
     news.splice(news.findIndex(item => item.identificator==req.params.id),1)
-
-    /* add popup */
 
     res.redirect('/');
 })
@@ -919,6 +878,17 @@ app.get('/about',checkAuthenticated, async (req, res) => {
         title : "About",
         isTeacher: req.user.isTeacher
     })
+})
+
+//---------------------------------------------------------------------------------
+// Edit Group
+app.post('/editgroup/:login/:page/:search',checkAuthenticated,checkPermission, async (req, res) => {
+    let student = await User.findOne({login: req.params.login})
+    if(req.body.groupEditor){
+        student.group = req.body.groupEditor;
+        await student.save() 
+    }
+    res.redirect('/students' + '/' +req.params.page +'/' + req.params.search);
 })
 
 //---------------------------------------------------------------------------------

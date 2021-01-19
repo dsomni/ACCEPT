@@ -15,7 +15,18 @@
         <main>
         <h2><%= n_name %></h2>
         <div id="task">
-        <H1 id="taskname"><%= lesson.title %> <% if(isTeacher){ %> <a id="editref" href=<%= "/editlesson/" + lesson.identificator %> > [Редактировать] </a> <a id="editref" href=<%= "/deletelesson/" + lesson.identificator %> > [Удалить] </a>  <% } %></H1>
+        <H1 id="taskname"><%= lesson.title %> <% if(isTeacher){ %> <a id="editref" href=<%= "/editlesson/" + lesson.identificator %> > [Редактировать] </a> 
+            <span class="lessonPopup">
+                <dialog  id='dialog'>
+                <form action= <%="/deletelesson/" + lesson.identificator %>  method="POST">
+                    Вы действительно хотите удалить урок "<%= lesson.title %>" ?
+                    <button>Да</button>
+                  </form> 
+                  <button onClick='c();'>Назад</button>
+                </dialog>
+              <button onClick='o();' class="show" >[Удалить]</button>
+              </span>
+        </H1>
         <h4>Автор: <%= lesson.author %></h4>
         <div id="statement"><%= lesson.description %></div>
         </div>
@@ -49,4 +60,12 @@
         
     </main>
     </body>
+    <script type = text/javascript>
+        function o() {
+            document.getElementById('dialog').showModal();
+        }
+        function c() {
+            document.getElementById('dialog').close();
+        }
+    </script>
 </html>

@@ -1,5 +1,5 @@
 module.exports = {
-    PathToUsersList:"/home/rostislav/Documents/Programming/Nodejs/TestSystem/public/scripts/users.xlsx", //Path to users.xlsx file
+    PathToUsersList:"PATH", //Path to users.xlsx file
     PathToTeachersList:"PATH", //Path to teachers.xlsx file
     port: "3000", //server port
     secret : 'secret',
