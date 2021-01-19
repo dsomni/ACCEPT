@@ -36,7 +36,13 @@
     <button type="submit">Войти</button>
 </form>
 <% } else { %>
-    <a href = <%= '/account/'+ login +'/1/default&all' %> class = 'userName'><%= name %></a>
+    <% if(name.indexOf(" ")!=-1){%>
+    <% var arrname = name.split(" ")%>
+    <% var strname = arrname[0]+" "%>
+    <% for(let i=1;i<arrname.length;i++){strname+=arrname[i][0]+". "}%>
+    <%} else{var strname = name} %>
+    <a href = <%= '/account/'+ login +'/1/default&all' %> class = 'userName'><%= strname %></a>
+
     <form action = '/logout?_method=DELETE' method = 'POST'>
         <button type = 'submit'>Выйти</button>
     </form>

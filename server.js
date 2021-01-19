@@ -331,14 +331,13 @@ app.post('/addtask',checkAuthenticated, checkPermission, async (req, res) => {
 // Tasks List Page
 app.get('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
     var user = req.user;
-    var attempts = req.user.attempts;
     var foundTasks = [];
     var tasks = await Task.find({}).exec();
     var a = req.params.search.split('&');
-    toSearch = a[0];
+    toSearch = a[0].toUpperCase();
     SearchTopic = a[1];
     SearchGrade = a[2];
-    if(toSearch == "default") toSearch="";
+    if(toSearch == "DEFAULT") toSearch="";
     var topics=[];
     var verdict;
     var verdicts = [];
@@ -346,7 +345,7 @@ app.get('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
         if(topics.indexOf(tasks[i].topic)==-1){
             topics.push(tasks[i].topic);
         }
-        if((tasks[i].title.slice(0, toSearch.length) == toSearch) && 
+        if((tasks[i].title.slice(0, toSearch.length).toUpperCase() == toSearch) && 
         (SearchTopic == 'all' || SearchTopic==tasks[i].topic.replace(" ", "")) && 
         (SearchGrade == 'all' || SearchGrade==tasks[i].grade)){
             foundTasks.push(tasks[i])
@@ -471,14 +470,14 @@ app.get('/account/:login/:page/:search',checkAuthenticated, checkValidation, asy
         var foundAttempts = [];
 
         var a = req.params.search.split('&');
-        var toSearch = a[0];
+        var toSearch = a[0].toUpperCase();
         var types = a[1];
-        if(toSearch == "default") toSearch="";
+        if(toSearch == "DEFAULT") toSearch="";
 
 
         for(var i = 0; i < attempts.length; i++){
             verylongresult = attempts[i].result[attempts[i].result.length -1 ][attempts[i].result[attempts[i].result.length -1 ].length - 1];
-            if((tasks[attempts[i].taskID].title.slice(0, toSearch.length) == toSearch) &&
+            if((tasks[attempts[i].taskID].title.slice(0, toSearch.length).toUpperCase() == toSearch) &&
              (  (types=='all') ||  (verylongresult=='ok') )){
                 foundAttempts.push(attempts[i]);
                 foundTasks.push(tasks[attempts[i].taskID]);
@@ -601,7 +600,7 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) =>
     var foundLessons = [];
 
     var a = req.params.search.split('&');
-    var toSearch = a[0];
+    var toSearch = a[0].toUpperCase();
     let usedLessons;
     if(user.isTeacher){
         usedLessons = lessons
@@ -612,11 +611,11 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) =>
         usedLessons = lessons.filter(item => item.grade==SearchGrade)
     }
 
-    if(toSearch == "default") toSearch="";
+    if(toSearch == "DEFAULT") toSearch="";
 
     var result;
     for (var i = 0; i < usedLessons.length; i++){
-        if((usedLessons[i].title.slice(0, toSearch.length) == toSearch) && 
+        if((usedLessons[i].title.slice(0, toSearch.length).toUpperCase() == toSearch) && 
         (SearchGrade == 'all' || SearchGrade==usedLessons[i].grade)){
             foundLessons.push(usedLessons[i])
             result = "/" + usedLessons[i].tasks.length
@@ -771,7 +770,7 @@ app.get('/students/:page/:search', checkAuthenticated, checkPermission,async (re
     var foundStudents = []
 
     var a = req.params.search.split('&');
-    var toSearch = a[0];
+    var toSearch = a[0].toUpperCase();
     var SearchGrade = a[1];
     var SearchLetter = a[2];
     var students = [];
@@ -781,9 +780,9 @@ app.get('/students/:page/:search', checkAuthenticated, checkPermission,async (re
     }else{
         students = await User.find({isTeacher: false}).exec();
     }
-    if(toSearch == "default") toSearch="";
+    if(toSearch == "DEFAULT") toSearch="";
     for (var i = 0; i < students.length; i++){
-        if((students[i].name.slice(0, toSearch.length) == toSearch) && 
+        if((students[i].name.slice(0, toSearch.length).toUpperCase() == toSearch) && 
         (SearchGrade == 'all' || SearchGrade==students[i].grade) &&
         (SearchLetter == 'all' || SearchLetter == students[i].gradeLetter)){
             foundStudents.push(students[i])
