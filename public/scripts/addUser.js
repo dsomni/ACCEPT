@@ -35,6 +35,7 @@ var UserSchema = new mongoose.Schema({
 
     grade: Number,
     gradeLetter: String,
+    group: String,
     attempts: Array,
     verdicts: Array,
 
@@ -44,7 +45,7 @@ var UserSchema = new mongoose.Schema({
 // Create model from schema
 var User = mongoose.model('User', UserSchema );
 
-async function addStudent (login, password, name, grade, gradeLetter){
+async function addStudent (login, password, name, grade, gradeLetter, group){
     await User.insertMany([{
         login: login,
         password: password,
@@ -52,6 +53,7 @@ async function addStudent (login, password, name, grade, gradeLetter){
 
         grade: grade,
         gradeLetter: gradeLetter,
+        group: group,
         attempts: [],
         verdicts: [],
 
@@ -73,6 +75,7 @@ async function toDo(){
             check.name = student[1]
             check.grade = grade
             check.gradeLetter = gradeLetter
+            check.group = 1
 
             if(check.verdicts.length==0){
                 let attempts = check.attempts
@@ -97,7 +100,7 @@ async function toDo(){
 
             await check.save()
         }else{
-            await addStudent(student[0], student[2], student[1], grade, gradeLetter)
+            await addStudent(student[0], student[2], student[1], grade, gradeLetter, 1)
         }
     }
 }

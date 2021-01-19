@@ -24,13 +24,13 @@
                 </select>
                 <input id="gradeLetter" name="gradeLetter" placeholder="Литера">
                 <button id="submitsearch">Найти</button>
-            </form>
-
+                <button id="submitsave">Сохранить изменения</button>
             <table class='taskslist'>
                 <tr>
                   <th>Login</th>
                   <th>Имя</th>
                   <th>Класс</th>
+                  <th>Группа</th>
                   <th>Уроки</th>
                   <th>Кабинет</th>
                   </tr>
@@ -43,12 +43,13 @@
                   <td><%= student.login %></td>
                   <td><%= student.name %> </td>
                   <td><%= student.grade + student.gradeLetter %></td>
+                  <td><input id = "group_number" name = "login:<%= student.login %>" value="<%= student.group %>"></td>
                   <td><a class="tablerefs" href=<%="/lessons/" + student.login + "/1/default&all&all" %>>[открыть] </a></td>
                   <td><a class="tablerefs" href=<%="/account/" + student.login + "/1/default&all" %>>[открыть] </a></td>
                  </tr>
                 <% } %>
                 </table>
-
+                </form>
                 <% var page = Number(page) %>
                 <% var prevPage = page - 1 %>
                 <% var nextPage = page + 1 %>

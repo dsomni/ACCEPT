@@ -45,6 +45,7 @@ var UserSchema = new mongoose.Schema({
 
     grade: Number,
     gradeLetter: String,
+    group: String,
     attempts: Array,
     verdicts: Array,
 
@@ -807,6 +808,17 @@ app.post('/students/:page/:search', checkAuthenticated, checkPermission, async (
     if(!toSearch) toSearch = "default";
     toSearch += '&' + req.body.GradeSelector + 
         '&' + (req.body.gradeLetter || "all")
+    let keys = Object.keys(req.body)
+    let student;
+    for(let i = 0; i<keys.length; i++){
+        if(keys[i].slice(0, 6)=="login:"){
+            student = await User.findOne({login: keys[i].slice(6)})
+            if(student.group != req.body[keys[i]]){
+                student.group = req.body[keys[i]]
+                await student.save()
+            }
+    }
+    }
     res.redirect('/students/' + req.params.page.toString() +'/' + toSearch )
 })
 
