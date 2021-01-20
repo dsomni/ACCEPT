@@ -100,7 +100,6 @@ var User = mongoose.model('User', UserSchema );
 //---------------------------------------------------------------------------------
 
 const initializePassport = require('./config/passport');
-const e = require('express');
 initializePassport(
   passport,
   User
@@ -434,9 +433,9 @@ app.post('/edittask/:id',checkAuthenticated, checkPermission, async (req, res) =
 //---------------------------------------------------------------------------------
 // Delete Task
 app.post('/deletetask/:id',checkAuthenticated, checkPermission, async (req, res) => {
-    await Task.deleteOne({identificator: req.params.id}).exec();
-
-    res.redirect('/tasks/1/default&all&all');
+    
+    childProcess.exec("node ./public/scripts/FixAfterDeleteTask.js "+req.params.id)
+    res.redirect('/tasks/1/default&all&all')
 })
 
 //---------------------------------------------------------------------------------
@@ -554,11 +553,10 @@ app.get('/addlesson',checkAuthenticated,checkPermission, async (req, res) => {
 })
 
 app.post('/addlesson',checkAuthenticated, checkPermission, async (req, res) => {
-    var user = req.user;
-    var body = req.body;
+    let user = req.user;
+    let body = req.body;
 
-    var tasks = body.tasks.split(' ');
-
+    let tasks = body.tasks.split(' ');
     let lesson = await Adder.addLesson(Lesson, body.grade, body.title, body.description, tasks, user.name);
     lessons.push(lesson)
 
@@ -640,7 +638,7 @@ app.post('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) =
 
 //---------------------------------------------------------------------------------
 // Lesson Page
-app.get('/lesson/:login/:id',checkAuthenticated, async (req, res) => {
+app.get('/lesson/:login/:id',checkAuthenticated, isAvailable, async (req, res) => {
 
     var user;
     if(req.user.login == req.params.login){
@@ -652,10 +650,10 @@ app.get('/lesson/:login/:id',checkAuthenticated, async (req, res) => {
 
     let lesson = lessons.find(item => item.identificator==req.params.id);
     if(!lesson){
-        res.redirect("/lessons/1/default&all&all")
+        res.redirect("/lessons/"+req.params.login+"/1/default&all&all")
     }else{
-
         var tasks = await Task.find({identificator : {$in : lesson.tasks}});
+        // var tasks = []
         var verdicts = [];
         var verdict;
 
@@ -669,11 +667,10 @@ app.get('/lesson/:login/:id',checkAuthenticated, async (req, res) => {
             verdicts.push(verdict)
         }
 
-
         res.render('lesson.ejs',{
             ID : lesson.identificator,
             u_login: user.login,
-            n_name: user.name,
+            u_name: user.name,
             login: user.login,
             name: req.user.name,
             title : "Lesson",
@@ -688,9 +685,8 @@ app.get('/lesson/:login/:id',checkAuthenticated, async (req, res) => {
 //---------------------------------------------------------------------------------
 // Delete Lesson
 app.post('/deletelesson/:id',checkAuthenticated, checkPermission, async (req, res) => {
-    await Lesson.deleteOne({identificator: req.params.id}).exec();
     lessons.splice(lessons.findIndex(item => item.identificator==req.params.id),1)
-
+    childProcess.exec("node ./public/scripts/FixAfterDeleteLesson.js "+req.params.id)
     res.redirect('/lessons/0/1/default&all&all');
 })
 
@@ -893,21 +889,11 @@ app.post('/editgroup/:login/:page/:search',checkAuthenticated,checkPermission, a
 
 //---------------------------------------------------------------------------------
 // ???
-app.get('/egg1',checkAuthenticated, async (req, res) => {
-    res.render('20122020.ejs',{
-        login: req.user.login,
-        name: req.user.name,
-        title : "Egg1",
-        isTeacher: req.user.isTeacher
-    })
+app.get('/egg1',checkAuthenticated, checkNotPermission, async (req, res) => {
+    res.sendFile(__dirname+'/views/20122020.html')
 })
-app.get('/egg2',checkAuthenticated, async (req, res) => {
-    res.render('21122020.ejs',{
-        login: req.user.login,
-        name: req.user.name,
-        title : "Egg2",
-        isTeacher: req.user.isTeacher
-    })
+app.get('/MazeByMalveetha&Dsomni',checkAuthenticated, checkNotPermission, async (req, res) => {
+    res.sendFile(__dirname+'/views/21122020.html')
 })
 
 
@@ -939,11 +925,24 @@ function checkPermission(req, res, next) {
     }
     res.redirect('/')
 }
+function checkNotPermission(req, res, next) {
+    if (req.user && req.user.isTeacher) {
+        res.redirect('/')
+    }else{
+        return next()
+    }
+}
 function checkValidation(req, res, next) {
     if (req.user.isTeacher || (req.user.login == req.params.login)) {
         return next()
     }
     res.redirect('/account/' + req.user.login + '/1/default&all')
+}
+function isAvailable(req, res, next) {
+    if (req.user.isTeacher || (req.user.grade == lessons.find(Element => Element.identificator == req.params.id).grade)) {
+        return next()
+    }
+    res.redirect('/lessons/' + req.user.login + '/1/default&all')
 }
 var max = (a, b)=>{if(a>b)return a;return b}
 
