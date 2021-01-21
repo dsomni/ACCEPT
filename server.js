@@ -184,6 +184,9 @@ app.get('/task/:id', checkAuthenticated, async (req, res) => {
                         for(var i = 0; i < resultStrings.length; i++){
                             result.push(resultStrings[i].split('*'));
                         }
+                        result.sort((a,b)=>{
+                            return Number(a[0].split('#')[1]) -  Number(b[0].split('#')[1])
+                        })
 
                         let idx = req.user.verdicts.findIndex(item => item.taskID == req.params.id)
                         if(idx==-1){
@@ -270,7 +273,7 @@ app.post('/task/:id',checkAuthenticated, async (req, res) => {
 
                 fs.writeFileSync('public\\processes\\'+req.user.login+"_"+req.params.id+"\\programText.txt",req.body.code,"utf-8");
 
-                childProcess.exec('node ' + __dirname + '\\public\\checker\\checker.js ' +
+                childProcess.exec('node ' + __dirname + '\\public\\checker\\checker2.js ' +
                 __dirname+'\\public\\processes\\'+req.user.login+"_"+req.params.id + " " +
                 'program'+req.user.login+"_"+req.params.id + " " +
                 req.params.id)
