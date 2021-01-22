@@ -126,10 +126,8 @@ app.use(methodOverride('_method'))
 //---------------------------------------------------------------------------------
 // Loading from DB
 var news;
-var lessons;
 async function load(){
     news = await News.find({}).exec();
-    lessons = await Lesson.find({}).exec();
 }
 load()
 
@@ -169,47 +167,59 @@ app.get('/task/:id', checkAuthenticated, async (req, res) => {
     var problem = await Task.findOne({identificator: req.params.id}).exec()
 
     fs.stat('public\\processes\\'+req.user.login+'_'+req.params.id, function(err,stats) {
-        if (!err) {
+        if (!err && Date.now()) {
             if(Date.now() - stats.birthtimeMs >= config.FolderLifeTime){
                 fs.rmdirSync('public\\processes\\'+req.user.login+'_'+req.params.id,{recursive: true});
 
                 res.redirect('/task/'+req.params.id);
             }else{
-                fs.stat('public\\processes\\'+req.user.login+'_'+req.params.id+"\\result.txt", async function(err) {
+                fs.stat('public\\processes\\'+req.user.login+'_'+req.params.id+"\\result.txt", async function(err,stats2) {
                     if (!err) {
-
                         var resultStrings = fs.readFileSync('public\\processes\\'+req.user.login+'_'+req.params.id+"\\result.txt","utf-8").trim().split("\n");
-                        var codeText = fs.readFileSync('public\\processes\\'+req.user.login+'_'+req.params.id+"\\programText.txt","utf-8").trim();
-                        var result = [];
-                        for(var i = 0; i < resultStrings.length; i++){
-                            result.push(resultStrings[i].split('*'));
-                        }
-                        result.sort((a,b)=>{
-                            return Number(a[0].split('#')[1]) -  Number(b[0].split('#')[1])
-                        })
-
-                        let idx = req.user.verdicts.findIndex(item => item.taskID == req.params.id)
-                        if(idx==-1){
-                            req.user.verdicts.push({
-                                taskID: req.params.id,
-                                result: result[result.length - 1][1]
-                            })
-                        } else if(req.user.verdicts[idx]!="OK"){
-                            req.user.verdicts[idx] = {
-                                taskID: req.params.id,
-                                result: result[result.length - 1][1]
+                        if(resultStrings[0] == 'Test # 1*Compilation Error*er' || resultStrings.length == problem.tests.length){
+                            var codeText = fs.readFileSync('public\\processes\\'+req.user.login+'_'+req.params.id+"\\programText.txt","utf-8").trim();
+                            var result = [];
+                            for(var i = 0; i < resultStrings.length; i++){
+                                result.push(resultStrings[i].split('*'));
                             }
+                            result.sort((a,b)=>{
+                                return Number(a[0].split('#')[1]) -  Number(b[0].split('#')[1])
+                            })
+    
+                            let idx = req.user.verdicts.findIndex(item => item.taskID == req.params.id)
+                            if(idx==-1){
+                                req.user.verdicts.push({
+                                    taskID: req.params.id,
+                                    result: getVerdict(result)
+                                })
+                            } else if(req.user.verdicts[idx].result!="OK"){
+                                req.user.verdicts.splice(idx,1);
+                                req.user.verdicts.push({
+                                    taskID: req.params.id,
+                                    result: getVerdict(result)
+                                })
+                            }
+    
+                            req.user.attempts.unshift({taskID: req.params.id, date: Date.now().toString(),
+                                programText: codeText, result: result})
+                            await req.user.save()
+    
+                            fs.rmdirSync('public\\processes\\'+req.user.login+'_'+req.params.id,{recursive: true});
+    
+                            res.redirect('/task/'+req.params.id);
+                        }else{
+                            res.render('task.ejs',{
+                                login: req.user.login,
+                                RESULT: [["","Testing..","er"]],
+                                ID: req.params.id,
+                                name: req.user.name, 
+                                title: "Task " + req.params.id,
+                                isTeacher: req.user.isTeacher,
+                                problem: problem,
+                                prevCode: ""
+                            });  
                         }
-
-                        req.user.attempts.unshift({taskID: req.params.id, date: Date.now().toString(),
-                            programText: codeText, result: result})
-                        await req.user.save()
-
-                        fs.rmdirSync('public\\processes\\'+req.user.login+'_'+req.params.id,{recursive: true});
-
-                        res.redirect('/task/'+req.params.id);
-            
-                    }else if (err.code === 'ENOENT'){
+                    }else{
                         res.render('task.ejs',{
                             login: req.user.login,
                             RESULT: [["","Testing..","er"]],
@@ -271,9 +281,9 @@ app.post('/task/:id',checkAuthenticated, async (req, res) => {
 
                 fs.mkdirSync('public\\processes\\'+req.user.login+"_"+req.params.id);
 
-                fs.writeFileSync('public\\processes\\'+req.user.login+"_"+req.params.id+"\\programText.txt",req.body.code,"utf-8");
+                await fs.writeFileSync('public\\processes\\'+req.user.login+"_"+req.params.id+"\\programText.txt",req.body.code,"utf-8");
 
-                childProcess.exec('node ' + __dirname + '\\public\\checker\\checker2.js ' +
+                childProcess.exec('node ' + __dirname + '\\public\\checker\\checker3.js ' +
                 __dirname+'\\public\\processes\\'+req.user.login+"_"+req.params.id + " " +
                 'program'+req.user.login+"_"+req.params.id + " " +
                 req.params.id)
@@ -437,7 +447,8 @@ app.post('/edittask/:id',checkAuthenticated, checkPermission, async (req, res) =
 // Delete Task
 app.post('/deletetask/:id',checkAuthenticated, checkPermission, async (req, res) => {
     
-    childProcess.exec("node ./public/scripts/FixAfterDeleteTask.js "+req.params.id)
+    childProcess.exec("node "+__dirname+"\\public\\scripts\\FixAfterDeleteTask.js "+req.params.id)
+
     res.redirect('/tasks/1/default&all&all')
 })
 
@@ -560,8 +571,7 @@ app.post('/addlesson',checkAuthenticated, checkPermission, async (req, res) => {
     let body = req.body;
 
     let tasks = body.tasks.split(' ');
-    let lesson = await Adder.addLesson(Lesson, body.grade, body.title, body.description, tasks, user.name);
-    lessons.push(lesson)
+    await Adder.addLesson(Lesson, body.grade, body.title, body.description, tasks, user.name);
 
     res.render('addlesson.ejs',{
         login: user.login,
@@ -588,6 +598,7 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) =>
     var a = req.params.search.split('&');
     var toSearch = a[0].toUpperCase();
     let usedLessons;
+    lessons = await Lesson.find({}).exec();
     if(user.isTeacher){
         usedLessons = lessons
         SearchGrade = a[1];
@@ -647,10 +658,10 @@ app.get('/lesson/:login/:id',checkAuthenticated, isAvailable, async (req, res) =
     if(req.user.login == req.params.login){
         user = req.user;
     }else{
-        user = await User.findOne({login : req.params.login}).exec();;
+        user = await User.findOne({login : req.params.login}).exec();
     }
 
-
+    lessons = await Lesson.find({}).exec();
     let lesson = lessons.find(item => item.identificator==req.params.id);
     if(!lesson){
         res.redirect("/lessons/"+req.params.login+"/1/default&all&all")
@@ -688,15 +699,14 @@ app.get('/lesson/:login/:id',checkAuthenticated, isAvailable, async (req, res) =
 //---------------------------------------------------------------------------------
 // Delete Lesson
 app.post('/deletelesson/:id',checkAuthenticated, checkPermission, async (req, res) => {
-    lessons.splice(lessons.findIndex(item => item.identificator==req.params.id),1)
-    childProcess.exec("node ./public/scripts/FixAfterDeleteLesson.js "+req.params.id)
+    childProcess.exec("node "+__dirname+"\\public\\scripts\\FixAfterDeleteLesson.js "+req.params.id)
     res.redirect('/lessons/0/1/default&all&all');
 })
 
 //---------------------------------------------------------------------------------
 // Edit Lesson Page
 app.get('/editlesson/:id',checkAuthenticated, checkPermission, async (req, res) => {
-    let lesson = lessons.find(item => item.identificator==req.params.id);
+    let lesson = await Lesson.findOne({identificator:req.params.id}).exec();
     var user = req.user;
     res.render('editlesson.ejs',{
         login: user.login,
@@ -717,12 +727,6 @@ app.post('/editlesson/:id',checkAuthenticated, checkPermission, async (req, res)
     lesson.grade = body.grade;
     lesson.tasks = body.tasks.split(' ');
     await lesson.save();
-
-    let idx = lessons.findIndex(item => item.identificator==req.params.id);
-    lessons[idx].title = body.title;
-    lessons[idx].description = body.description;
-    lessons[idx].grade = body.grade;
-    lessons[idx].tasks = body.tasks.split(' ');
 
     res.render('editlesson.ejs',{
         login: user.login,
@@ -826,7 +830,6 @@ app.post('/addnews',checkAuthenticated, checkPermission, async (req, res) => {
 app.post('/deletenews/:id',checkAuthenticated, checkPermission, async (req, res) => {
     await News.deleteOne({identificator: req.params.id}).exec();
     news.splice(news.findIndex(item => item.identificator==req.params.id),1)
-
     res.redirect('/');
 })
 
@@ -941,13 +944,23 @@ function checkValidation(req, res, next) {
     }
     res.redirect('/account/' + req.user.login + '/1/default&all')
 }
-function isAvailable(req, res, next) {
-    if (req.user.isTeacher || (req.user.grade == lessons.find(Element => Element.identificator == req.params.id).grade)) {
+async function isAvailable(req, res, next) {
+    lesson = await Lesson.findOne({identificator : req.params.id}).exec();
+    if (req.user.isTeacher || (req.user.grade == lesson.grade)) {
         return next()
     }
     res.redirect('/lessons/' + req.user.login + '/1/default&all')
 }
-var max = (a, b)=>{if(a>b)return a;return b}
+var max = (a, b)=>{if(a>b)return a;return b};
+
+function getVerdict(results){
+    for(let i=0;i<results.length;i++){
+        if(results[i][1]!="OK"){
+            return results[i][1];
+        }
+    }
+    return "OK";
+}
 
 //---------------------------------------------------------------------------------
 // Starting Server

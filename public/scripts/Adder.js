@@ -9,7 +9,6 @@ exports.addLesson = async function (Lesson, grade, title, description, tasks, au
         author: author
     }
     await Lesson.insertMany([lesson]);
-    return lesson;
 }
 
 exports.addNews = async function (News, title, text, reference, author){

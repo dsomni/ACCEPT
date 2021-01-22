@@ -1,62 +1,85 @@
+  
 const fs = require('fs');
 const childProcess = require("child_process");
 
-var path = process.argv[2];
-var fileName = process.argv[3];
-var i = Number(process.argv[4]);
+const mongoose = require('mongoose');
+const config = require('../../config/configs');
 
-
-async function run(){
-
-    input = fs.readFileSync(path + '\\input'+i+".txt",'utf-8');
-    output = fs.readFileSync(path + '\\output'+i+".txt",'utf-8');
-
-    var pOutput ='';
-    var result ="Test #" + (i+1).toString() + "*" + "Wrong Answer" + "*" + "er" +"\n";
-    
-    var spawnProcess = childProcess.spawn(path + '\\'+fileName +'.exe', [], {shell: false});
-
-    spawnProcess.on('error', function (error) {
-        fs.appendFileSync(path + '\\result.txt', "Test #" + (i+1).toString() + "*" + "Wrong Answer" + "*" + "er" +"\n",  function(error){ if(error) throw error;});
-        spawnProcess.stdout.removeAllListeners();
-        spawnProcess.stderr.removeAllListeners();
-        process.exit()
-
-    });
-    spawnProcess.stdout.on('data', function (data){
-
-        pOutput +=data.toString('utf-8');
-        if(pOutput.trim()==output){
-            result = "Test #" + (i+1).toString() + "*" + "OK" + "*" + "ok" +"\n";
-        }else{
-            result = "Test #" + (i+1).toString() + "*" + "Wrong Answer" + "*" + "er" +"\n";
-        }
-    });
-    spawnProcess.stderr.on('data', function (data) {
-        fs.appendFileSync(path + '\\result.txt', "Test #" + (i+1).toString() + "*" + "Runtime error" + "*" + "er" +"\n",  function(error){ if(error) throw error;});
-        spawnProcess.stdout.removeAllListeners();
-        spawnProcess.stderr.removeAllListeners();
-        process.exit()
-        
-    });
-
-    spawnProcess.on('close', (code) => {
-        fs.appendFileSync(path + '\\result.txt', result, function(error){ if(error) throw error;});
-        spawnProcess.stdout.removeAllListeners();
-        spawnProcess.stderr.removeAllListeners();
-        process.exit()
-    });
-    
-    spawnProcess.stdin.write(input);
-    spawnProcess.stdin.end();
-
-    setTimeout(()=>{
-        result = "Test #" + (i+1).toString() + "*" + "Time limit exceeded" + "*" + "er" +"\n"
-        fs.appendFileSync(path + '\\result.txt', result, function(error){ if(error) throw error;});
-        spawnProcess.stdout.removeAllListeners();
-        spawnProcess.stderr.removeAllListeners();
-        spawnProcess.kill('SIGINT');
-        process.exit()
-    },1100)
+var connectionString
+if(config.mongodbConfigs.User.Username!="" && config.mongodbConfigs.User.Password!=""){
+    connectionString = "mongodb://"+config.mongodbConfigs.User.Username+":"+config.mongodbConfigs.User.Password+"@"+config.mongodbConfigs.Host+"/"+config.mongodbConfigs.dbName
+}else{
+    connectionString = "mongodb://"+config.mongodbConfigs.Host+"/"+config.mongodbConfigs.dbName
 }
-run()
+
+async function go(){
+
+    mongoose.connect(connectionString,{
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    })
+
+    var TaskSchema = new mongoose.Schema({
+        identificator: Number,
+        grade: Number,
+        title : String,
+        statement: String,
+        examples: Array,
+        tests: Array,
+        topic: String,
+        author: String
+    
+    }, {collection: config.mongodbConfigs.CollectionNames.tasks});
+
+    // Create model from schema
+    var Task = mongoose.model('Task', TaskSchema );
+
+    var task;
+
+
+    var path = process.argv[2];
+    var fileName = process.argv[3];
+    var taskid = process.argv[4];
+
+
+    var programText = fs.readFileSync(path+"\\programText.txt", "utf-8");
+
+    fs.writeFileSync(path + '\\'+fileName +'.pas', programText, "utf8");
+
+    
+    try{
+        childProcess.execSync(__dirname + '\\pascalCompiler\\pabcnetcclear.exe '+ path + '\\'+fileName +'.pas');
+    }catch{
+        // Compilation Error
+        
+        fs.writeFileSync(path + '\\result.txt', "Test # 1" + "*" + "Compilation Error" + "*" + "er" , "utf8");
+
+        process.exit();
+    }
+
+    task =  await Task.findOne({identificator: taskid}).exec()
+
+    var tests = task.tests
+
+    for(var i = 0; i<tests.length; i++){
+        fs.writeFileSync(path + '\\input'+i+".txt", tests[i][0], "utf8");
+        fs.writeFileSync(path + '\\output'+i+".txt", tests[i][1], "utf8");
+    }
+
+    fs.writeFileSync(path + '\\result.txt', "");
+
+    for(var i = 0; i < tests.length; i++){
+
+        childProcess.exec('node' + ' ' +
+        __dirname + '\\checker3helper.js' + ' ' + 
+        path + ' ' +
+        fileName + ' ' +
+        i);
+    
+    }
+    setTimeout(()=>{
+        process.exit()
+    },1000)
+
+}
+go();

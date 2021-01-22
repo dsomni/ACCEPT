@@ -3,7 +3,7 @@ module.exports = {
     PathToTeachersList:"PATH", //Path to teachers.xlsx file
     port: "3000", //server port
     secret : 'secret',
-    FolderLifeTime: 1.2*60*1000, //milliseconds
+    FolderLifeTime: 0.7*60*1000, //milliseconds
     mongodbConfigs:{
         dbName: "db", //mongodb data base name
         Host:"localhost:27017",//where data base located(default: "localhost:27017")

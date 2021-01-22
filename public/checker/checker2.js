@@ -37,38 +37,94 @@ async function go(){
     var task;
 
 
+
     var path = process.argv[2];
     var fileName = process.argv[3];
     var taskid = process.argv[4];
-
-
-    /*var path="D:\\Code\\TestSystemPack\\TestSystem\\public\\processes"
-    var fileName = "test"
-    var taskid =6;
     var result = "";
 
-    let pt='var a:integer;\n' +
-    'Begin\n' + 
-    'while(True) do writeln(1);\n' +
-    'End.'*/
+    var tltext = 'del ' + path + '\\TLlog.txt\n' + 
+    'del ' + path + '\\output.txt\n' +
+    'start ' + path + '\\' + fileName + '.exe\n' +
+    'timeout /t 1\n'+
+    'taskkill /im ' + fileName + '.exe >> '+ path + '\\TLlog.txt\n' +
+    'exit';
 
-    /*let pt='var a,i:integer;\n' +
-    'Begin\n' + 
-    'readln(a);\n' +
-    'for i:=1 to 5 do writeln(a);\n' +
-    'End.'*/
 
-    var programText = fs.readFileSync(path+"\\programText.txt", "utf-8");
+    var assignText='\nassign (input,\''+ path +'\\input.txt\'); reset(input);' +
+    '\nassign (output,\''+ path + '\\output.txt\'); rewrite(output);' + '\n'
+
+    var programText = fs.readFileSync(path+"\\programText.txt", "utf-8").trim().split(String.fromCharCode(10));
+
+    // delete  one line comments
+    let s = ''
+    for(let i = 0; i<programText.length; i++){
+        if(programText[i].search("//")!=-1){
+            s+='\n'+programText[i].slice(0,programText[i].search("//"))
+        }else{
+            s+='\n'+programText[i]
+        }
+    }
+
+    programText = s
+
+    // delete  multi-line comments
+    while(programText.search("{")!=-1){
+        idx1 = programText.search("{")
+        idx2 = programText.search("}")
+        programText = programText.slice(0, idx1) + programText.slice(idx2+1)
+    }
+
+
+    var programText2 = programText.toUpperCase();
+    var BeginIndexes = []
+    var shift = -5;
+    var BeginCount = 0;
+
+    while(programText2.search("BEGIN")!= -1 || programText2.search("END;") != -1){
+        if(programText2.search("BEGIN") != -1){
+            shift += programText2.search("BEGIN")+ 5;
+            BeginIndexes.push(programText2.search("BEGIN"));
+            programText2 = programText2.slice(programText2.search("BEGIN")+5);
+            BeginCount+=1;
+        }
+        if (programText2.search("END;") != -1){
+            shift += programText2.search("END;")+ 4;
+            programText2 = programText2.slice(programText2.search("END;")+ 4)
+            BeginIndexes.pop();
+        }
+    }
+
+
+
+
+    if(BeginIndexes.length!=1){
+        // Compilation Error
+
+        result += "Test # 1" + "*" + "Compilation Error" + "*" + "er" 
+        fs.writeFileSync(path + '\\result.txt', result, "utf8");
+
+        process.exit();
+    }
+
+    if(BeginCount==1){
+        idx = BeginIndexes[0]
+    }else{
+        idx = shift + BeginIndexes[0]  
+    }
+ 
+
+    programText = programText.slice(0, idx+5) + assignText + programText.slice(idx+5)
 
     fs.writeFileSync(path + '\\'+fileName +'.pas', programText, "utf8");
 
-    
     try{
         childProcess.execSync(__dirname + '\\pascalCompiler\\pabcnetcclear.exe '+ path + '\\'+fileName +'.pas');
     }catch{
         // Compilation Error
         
-        fs.writeFileSync(path + '\\result.txt', "Test # 1" + "*" + "Compilation Error" + "*" + "er" , "utf8");
+        result += "Test # 1" + "*" + "Compilation Error" + "*" + "er" 
+        fs.writeFileSync(path + '\\result.txt', result, "utf8");
 
         process.exit();
     }
@@ -82,27 +138,39 @@ async function go(){
         fs.writeFileSync(path + '\\output'+i+".txt", tests[i][1], "utf8");
     }
 
-    fs.writeFileSync(path + '\\result.txt', "");
 
     for(var i = 0; i < tests.length; i++){
 
-        /*console.log('node' + ' ' +
-        __dirname + '\\checker3.js' + ' ' + 
-        path + ' ' +
-        fileName + ' ' +
-        i)*/
+        fs.writeFileSync(path + '\\input.txt', fs.readFileSync(path+'\\input' + i + '.txt', "utf8").trim(), "utf8");
 
-        childProcess.exec('node' + ' ' +
-        __dirname + '\\checker3.js' + ' ' + 
-        path + ' ' +
-        fileName + ' ' +
-        i);
 
-        setTimeout(()=>{
-            process.exit()
-        },400)
-    
+
+        fs.writeFileSync(path + '\\tlchecker.bat', tltext, "utf8");
+
+
+        childProcess.execSync('start ' + path + '\\tlchecker.bat');
+        if (fs.readFileSync(path +"\\TLlog.txt").length != 0){
+            // Time Limit
+            result += "Test #" + (i+1).toString() + "*" + "Time Limit exceeded" + "*" + "er" +"\n" 
+            break;
+        }
+
+
+        let fileContent = fs.readFileSync(path +"\\output.txt", "utf8").trim();
+        let correctOutput = fs.readFileSync(path +"\\output" + i + '.txt', "utf8").trim();
+
+        if (fileContent.length == 0){
+            // Something goes wrong during execution
+            result += "Test #" + (i+1).toString() + "*" + "Runtime Error" + "*" + "er" +"\n" 
+            break
+        }else if(fileContent != correctOutput){
+            // Wrong answer
+            result += "Test #" + (i+1).toString() + "*" + "Wrong Answer" + "*" + "er" +"\n" 
+            break
+        }
+        result += "Test #" + (i+1).toString() + "*" + "OK" + "*" + "ok" +"\n" 
     }
+    fs.writeFileSync(path + '\\result.txt', result, "utf8");
 
 }
 go();
