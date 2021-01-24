@@ -10,7 +10,6 @@
               user-scalable=no, minimal-ui">
         <meta name="full-screen" content="yes">
 
-        <!-- <link rel="stylesheet" href="/public/css/style.css" type="text/css"> -->
         </head>
     <body>
         <main>
@@ -21,8 +20,23 @@
                 <textarea id="title" name = "title" required cols=2 placeholder="Введите название"><%= problem.title %></textarea>
                 <h3>Тема</h3>
                 <textarea id="topic" name = "topic"  cols=2 placeholder="Введите тему"><%= problem.topic %></textarea>
+                <h3>Класс <input id="grade" name = "grade" value=<%= problem.grade %>> </input></h3>
+                <br>
+
                 <h3>Условие</h3>
                 <textarea id="statementinput" name = "statement" required cols=2 rows=10 placeholder="Введите условиe"><%= problem.statement %></textarea>
+                <br>
+
+                <h3>Подсказка (опционально)</h3>
+                <% if (!problem.hint.doesExist){ %>
+                <textarea id="hintinput" name = "hint" cols=2 rows=10 placeholder="Введите подсказку"></textarea>
+                <h3>Показывать подсказку через <input id="grade" name = "attemptsForHint" > </input>попыток</h3>
+                <% } else {%>
+                <textarea id="hintinput" name = "hint" cols=2 rows=10 placeholder="Введите подсказку"><%= problem.hint.text %></textarea>
+                <h3>Показывать подсказку через <input id="grade" name = "attemptsForHint" value =<%= problem.hint.attemptsForHint %> > </input>попыток</h3>
+                <% }%>
+                <br>
+
                 <h3>Примеры</h3>
                 <% var len = problem.examples.length %>
                 <%for (var i =0; i < 5; i++){  %>
@@ -37,6 +51,8 @@
                     <br>
                     <% } %>
                 <% } %>
+                <br>
+
                 <h3>Тесты</h3>
                 <% var len = problem.tests.length %>
                 <%for (var i =0; i < 20; i++){  %>

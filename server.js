@@ -60,6 +60,7 @@ var TaskSchema = new mongoose.Schema({
     examples: Array,
     tests: Array,
     topic: String,
+    hint: Object,
     author: String
 
 }, {collection: config.mongodbConfigs.CollectionNames.tasks});
@@ -164,8 +165,8 @@ app.post('/', passport.authenticate('local', {
 //---------------------------------------------------------------------------------
 // Task Page
 app.get('/task/:id', checkAuthenticated, async (req, res) => {
-    var problem = await Task.findOne({identificator: req.params.id}).exec()
-
+    let problem = await Task.findOne({identificator: req.params.id}).exec()
+    let showHint = req.user.attempts.filter(item => item.taskID == req.params.id).length >= problem.hint.attemptsForHint;
     fs.stat('public\\processes\\'+req.user.login+'_'+req.params.id, function(err,stats) {
         if (!err && Date.now()) {
             if(Date.now() - stats.birthtimeMs >= config.FolderLifeTime){
@@ -216,7 +217,8 @@ app.get('/task/:id', checkAuthenticated, async (req, res) => {
                                 title: "Task " + req.params.id,
                                 isTeacher: req.user.isTeacher,
                                 problem: problem,
-                                prevCode: ""
+                                prevCode: "",
+                                showHint: showHint
                             });  
                         }
                     }else{
@@ -228,12 +230,12 @@ app.get('/task/:id', checkAuthenticated, async (req, res) => {
                             title: "Task " + req.params.id,
                             isTeacher: req.user.isTeacher,
                             problem: problem,
-                            prevCode: ""
+                            prevCode: "",
+                            showHint: showHint
                         });  
                     }
                 });                
             }
-
         }else {
             var attempts = req.user.attempts;
             var result = []
@@ -253,7 +255,8 @@ app.get('/task/:id', checkAuthenticated, async (req, res) => {
                 title: "Task " + req.params.id,
                 isTeacher: req.user.isTeacher,
                 problem: problem,
-                prevCode: prevCode
+                prevCode: prevCode,
+                showHint: showHint
             }); 
         }
     });
@@ -330,7 +333,25 @@ app.post('/addtask',checkAuthenticated, checkPermission, async (req, res) => {
         tests.push([tI, tO]);
     }
 
-    await Adder.addTask(Task, body.title, body.statement, examples, tests, body.topic,body.grade, user.name);
+
+    var hint;
+    let hintText = body.hint;
+    let attemptsForHint = body.attemptsForHint;
+    if(hintText && attemptsForHint){
+        hint = {
+            text: hintText,
+            attemptsForHint: attemptsForHint,
+            doesExist: true
+        }
+    }else{
+        hint = {
+            text: '',
+            attemptsForHint: 0,
+            doesExist: false
+        }
+    }
+
+    await Adder.addTask(Task, body.title, body.statement, examples, tests, body.topic,body.grade, hint, user.name);
 
     res.render('addtask.ejs',{
         login: user.login,
@@ -428,11 +449,29 @@ app.post('/edittask/:id',checkAuthenticated, checkPermission, async (req, res) =
         tests.push([tI, tO]);
     }
 
+    var hint;
+    let hintText = body.hint;
+    let attemptsForHint = body.attemptsForHint;
+    if(hintText && attemptsForHint){
+        hint = {
+            text: hintText,
+            attemptsForHint: attemptsForHint,
+            doesExist: true
+        }
+    }else{
+        hint = {
+            text: '',
+            attemptsForHint: 0,
+            doesExist: false
+        }
+    }
+
     problem.title = body.title;
     problem.statement = body.statement;
     problem.topic = body.topic;
     problem.examples = examples;
     problem.tests = tests;
+    problem.hint = hint;
     await problem.save();
     res.render('edittask.ejs',{
         login: user.login,
@@ -894,14 +933,16 @@ app.post('/editgroup/:login/:page/:search',checkAuthenticated,checkPermission, a
 })
 
 //---------------------------------------------------------------------------------
-// ???
+// ??? toDo
 app.get('/egg1',checkAuthenticated, checkNotPermission, async (req, res) => {
     res.sendFile(__dirname+'/views/20122020.html')
 })
 app.get('/MazeByMalveetha&Dsomni',checkAuthenticated, checkNotPermission, async (req, res) => {
     res.sendFile(__dirname+'/views/21122020.html')
 })
-
+app.get('/ukrainegg',checkAuthenticated, checkNotPermission, async (req, res) => {
+    res.sendFile(__dirname+'/views/19012021.html')
+})
 
 //---------------------------------------------------------------------------------
 // Log Out

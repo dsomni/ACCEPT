@@ -16,19 +16,23 @@
         <div id="task">
         <H1 id="taskname"><%= problem.title %> <% if(isTeacher){ %> <a id="editref" href=<%= "/edittask/" + problem.identificator %> > [Редактировать] </a>
             <span class="taskPopup">
-                <dialog  id='dialog'>
+                <dialog  id='dialog_delete'>
                 <form action= <%="/deletetask/" + problem.identificator %>  method="POST">
                     Вы действительно хотите удалить задачу "<%= problem.title %>" ?
                     <button>Да</button>
                   </form> 
-                  <button onClick='c();'>Назад</button>
+                  <button onClick='c_delete();'>Назад</button>
                 </dialog>
-              <button onClick='o();' class="show" >[Удалить]</button>
+              <button onClick='o_delete();' class="show" >[Удалить]</button>
               </span>
         </H1>
         <% } %>
         <h4>Тема: <%= problem.topic %>         Автор: <%= problem.author %></h4>
-        <div id="statement"><%= problem.statement %></div>
+        <div class="statement"><%= problem.statement %></div>
+        <% if(problem.hint.doesExist && showHint) { %>
+            <button onclick="ShowHideHint()">Показать/скрыть подсказку</button>
+        <% } %>
+        <div class="statement" id="hint"><%= problem.hint.text %></div>
         </div>
         <table id="examples" class='taskslist'>
             <tr>
@@ -71,11 +75,20 @@
     </main>
     </body>
     <script type = text/javascript>
-        function o() {
-            document.getElementById('dialog').showModal();
+        function o_delete() {
+            document.getElementById('dialog_delete').showModal();
         }
-        function c() {
-            document.getElementById('dialog').close();
+        function c_delete() {
+            document.getElementById('dialog_delete').close();
+        }
+        document.getElementById("hint").style.display = "none";
+        function ShowHideHint() {
+            var x = document.getElementById("hint");
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
         }
     </script>
 </html>

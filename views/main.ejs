@@ -12,7 +12,11 @@
         </head>
     <body>
         <main>
-        <h1>Добро пожаловать, <%= name || "незнакомец" %>!</h1>
+        <% if(name && name.slice(0,5).toUpperCase() == "БАГИН" ) { %>
+            <h1 style="background-image: url(../public/media/asdf.hg); background-size: 100px;">Добро пожаловать, <img style="transform: scale(2)" src="../public/media/thdk.ng"> <%= name  %>!<img style="transform: scale(2)" src="../public/media/thdk.ng"></h1>
+        <% } else{  %>
+            <h1>Добро пожаловать, <%= name || "незнакомец" %>!</h1>
+        <% } %>
         <% if (isTeacher){ %>
         <a class="tlrefs" href="/addnews">[Добавить новость]</a>
         <% } %>

@@ -20,6 +20,7 @@ var TaskSchema = new mongoose.Schema({
     examples: Array,
     tests: Array,
     topic: String,
+    hint: Object,
     author: String
 
 }, {collection: config.mongodbConfigs.CollectionNames.tasks});

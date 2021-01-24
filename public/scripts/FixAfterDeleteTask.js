@@ -20,6 +20,7 @@ var TaskSchema = new mongoose.Schema({
     examples: Array,
     tests: Array,
     topic: String,
+    hint: Object,
     author: String
 
 }, {collection: config.mongodbConfigs.CollectionNames.tasks});
@@ -90,7 +91,6 @@ async function run(){
         if( lesson.tasks.length==0){
             toDelete.push(lesson.identificator)
         }
-        }
         for(let j = 0; j<lesson.tasks.length; j++){
             if(lesson.tasks[j]>deletedTask){
                 lesson.tasks[j]-=1
@@ -136,6 +136,7 @@ async function run(){
     }
 }
 run()
+
 setTimeout(()=>{
     process.exit()
 },15000)

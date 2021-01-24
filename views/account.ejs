@@ -38,7 +38,12 @@
                 <% for (var i = (page-1)*onPage; i < min(page*onPage,attempts.length); i++) { %>
                 <% var attempt = attempts[i]; %>
                 <% var task = tasks[i]; %>
-                <% var item = attempt.result[attempt.result.length-1] %>
+
+                <% var item = attempt.result.find(el => el[2]=="er"); %>
+                <% if(!item) { %>
+                <% item = attempt.result[attempt.result.lenth - 1]; %>
+                <% }%>
+                <% if(!item) item = ["😡","Don't spam F5 during testing!!!", "er"] %>
                 <% var maxDate = new Date(Number(attempt.date)); %>
                 <% var isoDate = maxDate.toISOString(); %>   
                 <% var date = isoDate.substr(0, 10) + " " + isoDate.substr(11, 8) ; %>
