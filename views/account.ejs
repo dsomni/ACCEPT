@@ -41,9 +41,10 @@
 
                 <% var item = attempt.result.find(el => el[2]=="er"); %>
                 <% if(!item) { %>
-                <% item = attempt.result[attempt.result.lenth - 1]; %>
+                <% item = attempt.result[attempt.result.length - 1]; %>
                 <% }%>
-                <% if(!item) item = ["😡","Don't spam F5 during testing!!!", "er"] %>
+                <% console.log(item); %>
+                <% if(!item || item[0]=='') item = ["😡","Don't spam F5 during testing!!!", "er"]; %>
                 <% var maxDate = new Date(Number(attempt.date)); %>
                 <% var isoDate = maxDate.toISOString(); %>   
                 <% var date = isoDate.substr(0, 10) + " " + isoDate.substr(11, 8) ; %>
