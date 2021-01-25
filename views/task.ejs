@@ -29,8 +29,8 @@
         <% } %>
         <h4>Тема: <%= problem.topic %>         Автор: <%= problem.author %></h4>
         <div class="statement"><%= problem.statement %></div>
-        <% if(problem.hint.doesExist && showHint) { %>
-            <button onclick="ShowHideHint()">Показать/скрыть подсказку</button>
+        <% if(true || problem.hint.doesExist && showHint) { %>
+            <button id="HintButton" onclick="ShowHideHint()">Показать/скрыть подсказку</button>
         <% } %>
         <div class="statement" id="hint"><%= problem.hint.text %></div>
         </div>

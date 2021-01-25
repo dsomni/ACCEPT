@@ -43,10 +43,8 @@
               <th>История</th>
               </tr>
 
-            <% if(tasks.length>0){ if(tasks[0].identificator!=0){ tasks.unshift([0]);results.unshift([0]) } } %>
-
-            <% for (var i = 1; i < tasks.length; i++) { %>
-            <% var task = tasks[i]; %>
+            <% for (var i = 0; i < lesson.tasks.length; i++) { %>
+            <% var task = tasks.find(item => item.identificator == lesson.tasks[i]); %>
              <tr>
               <td><%= task.identificator %></td>
               <td> <a class="tlrefs" href=<%="/task/" + task.identificator %>> <%= task.title %> </a> </td>

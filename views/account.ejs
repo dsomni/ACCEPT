@@ -19,7 +19,7 @@
             <p>Класс: <%= user.grade + user.gradeLetter %></p>
             <p>Группа: <%= user.group %></p>
             <% } %>
-            <form action= <%= '/account/'+ u_login +'/1/default' %>  method="POST">
+            <form class="SearchUI" action= <%= '/account/'+ u_login +'/1/default' %>  method="POST">
                 <input id="searcharea" name = "searcharea" rows=1 placeholder="Поиск по задаче"></input><button id="submitsearch">Найти</button>
                 <select name="selector" id = "selector"> 
                     <option value="all" selected>Все посылки</option>
@@ -43,7 +43,6 @@
                 <% if(!item) { %>
                 <% item = attempt.result[attempt.result.length - 1]; %>
                 <% }%>
-                <% console.log(item); %>
                 <% if(!item || item[0]=='') item = ["😡","Don't spam F5 during testing!!!", "er"]; %>
                 <% var maxDate = new Date(Number(attempt.date)); %>
                 <% var isoDate = maxDate.toISOString(); %>   

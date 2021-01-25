@@ -282,12 +282,12 @@ app.post('/task/:id',checkAuthenticated, async (req, res) => {
             }
             if(prevCode == "" || prevCode != req.body.code ){
 
-                fs.mkdirSync('public\\processes\\'+req.user.login+"_"+req.params.id);
+                fs.mkdirSync('public\\processes\\processes\\'+req.user.login+"_"+req.params.id);
 
-                await fs.writeFileSync('public\\processes\\'+req.user.login+"_"+req.params.id+"\\programText.txt",req.body.code,"utf-8");
+                fs.writeFileSync('public\\processes\\processes\\'+req.user.login+"_"+req.params.id+"\\programText.txt",req.body.code,"utf-8");
 
                 childProcess.exec('node ' + __dirname + '\\public\\checker\\checker3.js ' +
-                __dirname+'\\public\\processes\\'+req.user.login+"_"+req.params.id + " " +
+                __dirname+'\\public\\processes\\processes\\'+req.user.login+"_"+req.params.id + " " +
                 'program'+req.user.login+"_"+req.params.id + " " +
                 req.params.id)
 
@@ -706,20 +706,17 @@ app.get('/lesson/:login/:id',checkAuthenticated, isAvailable, async (req, res) =
         res.redirect("/lessons/"+req.params.login+"/1/default&all&all")
     }else{
         var tasks = await Task.find({identificator : {$in : lesson.tasks}});
-        // var tasks = []
         var verdicts = [];
         var verdict;
-
-        for(var i=0; i < tasks.length; i++){
-            verdict = user.verdicts.find(item => item.taskID == tasks[i].identificator)
-            if(verdict){
-                verdict = verdict.result
-            }else{
+        for(var i=0; i < lesson.tasks.length; i++){
+            verdict = user.verdicts.find(item => item.taskID == lesson.tasks[i])
+            if(!verdict){
                 verdict = "-"
+            }else{
+                verdict = verdict.result
             }
             verdicts.push(verdict)
         }
-
         res.render('lesson.ejs',{
             ID : lesson.identificator,
             u_login: user.login,
@@ -940,7 +937,7 @@ app.get('/egg1',checkAuthenticated, checkNotPermission, async (req, res) => {
 app.get('/MazeByMalveetha&Dsomni',checkAuthenticated, checkNotPermission, async (req, res) => {
     res.sendFile(__dirname+'/views/21122020.html')
 })
-app.get('/ukrainegg',checkAuthenticated, checkNotPermission, async (req, res) => {
+app.get('/emojiegg',checkAuthenticated, checkNotPermission, async (req, res) => {
     res.sendFile(__dirname+'/views/19012021.html')
 })
 

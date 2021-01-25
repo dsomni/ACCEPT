@@ -14,12 +14,12 @@
         </head>
     <body>
         <main>
-            <form action= '/tasks/1/default'  method="POST">
-                <input id="searcharea" name = "searcharea" rows=1 placeholder="Поиск задачи"></input>
+            <form class="SearchUI" action= '/tasks/1/default'  method="POST">
+                <input name = "searcharea" rows=1 placeholder="Поиск задачи"></input>
                 <select name="TopicSelector"> 
                     <option value="all" selected> Все Темы</option>
                     <% for(var i = 0; i < topics.length; i++) { %>
-                    <option value=<%= topics[i].replace(" ", "") %> > <%= topics[i] %></option>
+                        <option value=<%= topics[i].replace(" ", "") %> > <%= topics[i] %></option>
                     <% } %>
                 </select>
                 <select name="GradeSelector"> 
