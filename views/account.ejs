@@ -32,6 +32,7 @@
                   <th>Дата</th>
                   <th>Задача</th>
                   <th>Вердикт</th>
+                  <th>Язык</th>
                   </tr>
                 <% var onPage = 10 %>
                 <% min = function(a,b){ if(a < b) return a; return b} %>
@@ -51,6 +52,7 @@
                   <td> <a class="tlrefs" href=<%="/attempt/" + u_login + '/' +  attempt.date  %>> <%= date %> </a> </td>
                   <td> <a class="tlrefs" href=<%="/task/" + task.identificator %>> <%= task.title %> </a> </td>
                   <td><%= item[0] %> <a id=<%= item[2] %>><%= item[1] %></a></td>
+                  <td><%= attempt.language || 'Pascal' %></td>
                  </tr>
                 <% } %>
                 </table>

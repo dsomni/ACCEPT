@@ -29,7 +29,7 @@
         <% } %>
         <h4>Тема: <%= problem.topic %>         Автор: <%= problem.author %></h4>
         <div class="statement"><%= problem.statement %></div>
-        <% if(true || problem.hint.doesExist && showHint) { %>
+        <% if(problem.hint.doesExist && showHint) { %>
             <button id="HintButton" onclick="ShowHideHint()">Показать/скрыть подсказку</button>
         <% } %>
         <div class="statement" id="hint"><%= problem.hint.text %></div>
@@ -47,8 +47,16 @@
              </tr>
             <% } %>
         </table>
+
+
         <form action='/task/<%= ID %>'  method="POST">
             <div class="container">
+
+                <select name="languageSelector" id = "languageSelector"> 
+                    <option value="Pascal" <% if (!language || language=="Pascal"){%> selected <%}%>>Pascal ABC.NET</option>
+                    <option value="Python" <% if (language=="Python"){%> selected <%}%>>Python</option>
+                </select>
+
                     <div class="imgs">
                         <img src="..\..\public\media\TopLeft.svg">
                         <img src="..\..\public\media\TopRight.svg">

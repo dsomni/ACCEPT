@@ -178,7 +178,7 @@ app.get('/task/:id', checkAuthenticated, async (req, res) => {
                     if (!err) {
                         var resultStrings = fs.readFileSync('public\\processes\\'+req.user.login+'_'+req.params.id+"\\result.txt","utf-8").trim().split("\n");
                         if(resultStrings[0] == 'Test # 1*Compilation Error*er' || resultStrings.length == problem.tests.length){
-                            var codeText = fs.readFileSync('public\\processes\\'+req.user.login+'_'+req.params.id+"\\programText.txt","utf-8").trim();
+
                             var result = [];
                             for(var i = 0; i < resultStrings.length; i++){
                                 result.push(resultStrings[i].split('*'));
@@ -201,9 +201,20 @@ app.get('/task/:id', checkAuthenticated, async (req, res) => {
                                 })
                             }
     
-                            req.user.attempts.unshift({taskID: req.params.id, date: Date.now().toString(),
-                                programText: codeText, result: result})
+                            let attempts = req.user.attempts;
+                            var idxx = 0;
+                            var obj = {};
+                            for(let k = 0; k < attempts.length; k++){
+                                if( attempts[k].taskID == req.params.id){
+                                    obj = req.user.attempts[k];
+                                    idxx = k;
+                                    break;
+                                }
+                            }
+                            req.user.attempts.splice(idxx,1,{taskID: obj.taskID, date: obj.date,
+                                programText: obj.programText, result: result, language: obj.language})
                             await req.user.save()
+
     
                             fs.rmdirSync('public\\processes\\'+req.user.login+'_'+req.params.id,{recursive: true});
     
@@ -218,7 +229,8 @@ app.get('/task/:id', checkAuthenticated, async (req, res) => {
                                 isTeacher: req.user.isTeacher,
                                 problem: problem,
                                 prevCode: "",
-                                showHint: showHint
+                                showHint: showHint,
+                                language: language
                             });  
                         }
                     }else{
@@ -231,7 +243,8 @@ app.get('/task/:id', checkAuthenticated, async (req, res) => {
                             isTeacher: req.user.isTeacher,
                             problem: problem,
                             prevCode: "",
-                            showHint: showHint
+                            showHint: showHint,
+                            language: req.user.attempts[0].language
                         });  
                     }
                 });                
@@ -240,10 +253,12 @@ app.get('/task/:id', checkAuthenticated, async (req, res) => {
             var attempts = req.user.attempts;
             var result = []
             var prevCode = "";
+            var language = "";
             for(var i = 0; i < attempts.length; i++){
                 if( attempts[i].taskID == req.params.id){
                     result =attempts[i].result;
                     prevCode = attempts[i].programText;
+                    language = attempts[i].language;
                     break;
                 }
             }
@@ -256,7 +271,8 @@ app.get('/task/:id', checkAuthenticated, async (req, res) => {
                 isTeacher: req.user.isTeacher,
                 problem: problem,
                 prevCode: prevCode,
-                showHint: showHint
+                showHint: showHint,
+                language: language
             }); 
         }
     });
@@ -282,12 +298,18 @@ app.post('/task/:id',checkAuthenticated, async (req, res) => {
             }
             if(prevCode == "" || prevCode != req.body.code ){
 
-                fs.mkdirSync('public\\processes\\processes\\'+req.user.login+"_"+req.params.id);
+                let language = req.body.languageSelector;
+                
+                req.user.attempts.unshift({taskID: req.params.id, date: Date.now().toString(),
+                    programText: req.body.code, result: [], language: language})
+                await req.user.save()
 
-                fs.writeFileSync('public\\processes\\processes\\'+req.user.login+"_"+req.params.id+"\\programText.txt",req.body.code,"utf-8");
+                fs.mkdirSync('public\\processes\\'+req.user.login+"_"+req.params.id);
 
-                childProcess.exec('node ' + __dirname + '\\public\\checker\\checker3.js ' +
-                __dirname+'\\public\\processes\\processes\\'+req.user.login+"_"+req.params.id + " " +
+                fs.writeFileSync('public\\processes\\'+req.user.login+"_"+req.params.id+"\\programText.txt",req.body.code,"utf-8");
+
+                childProcess.exec('node ' + __dirname + '\\public\\checker\\checker3'+language+'.js ' +
+                __dirname+'\\public\\processes\\'+req.user.login+"_"+req.params.id + " " +
                 'program'+req.user.login+"_"+req.params.id + " " +
                 req.params.id)
 
@@ -514,9 +536,10 @@ app.get('/account/:login/:page/:search',checkAuthenticated, checkValidation, asy
         if(toSearch == "DEFAULT") toSearch="";
 
         for(var i = 0; i < attempts.length; i++){
-            verylongresult = attempts[i].result[attempts[i].result.length -1 ][attempts[i].result[attempts[i].result.length -1 ].length - 1];
+            //verylongresult = attempts[i].result[attempts[i].result.length -1 ][attempts[i].result[attempts[i].result.length -1 ].length - 1];
+            verylongresult = getVerdict(attempts[i].result);
             if((tasks[attempts[i].taskID].title.slice(0, toSearch.length).toUpperCase() == toSearch) &&
-             (  (types=='all') ||  (verylongresult=='ok') )){
+             (  (types=='all') ||  (verylongresult=='OK') )){
                 foundAttempts.push(attempts[i]);
                 foundTasks.push(tasks[attempts[i].taskID]);
             }
@@ -581,7 +604,8 @@ app.get('/attempt/:login/:date',checkAuthenticated, checkValidation, async (req,
                 code : attempt.programText,
                 taskID : attempt.taskID,
                 date : attempt.date,
-                n_name: user.name
+                n_name: user.name,
+                language: attempt.language
             }) 
         } else{
             res.redirect('/account/' + req.user.login + '/1/default&all')

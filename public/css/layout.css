@@ -160,6 +160,11 @@ header img{
 #HintButton:hover{
     box-shadow: 0 0 8px #aaaaff;
 }
+#languageSelector{
+    margin-left: auto;
+    margin-right: auto;
+    width: 300px;
+}
 
 
 /*-----------------------------------------------------------------------------*/
