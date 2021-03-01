@@ -1,52 +1,51 @@
 <header>
-<a href="http://vplicei.org/"><img src = "http://vplicei.org/wp-content/uploads/2016/01/vml-1.png" alt="ВМЛ"></a>
-<div class="navigationButtons">
-<% if (name!=""){ %>
-    <% if (title!="Main Page"){ %>
-    <button onClick='location.href="/"'>Главная</button>
-    <% }if (title.slice(0,5)!="Tasks"){  %> 
-    <button onClick='location.href="/tasks/1/default&all&all"'>Задачи</button>
-    <% }if (title.slice(0,7)!="Lessons" || !u_login || login!=u_login){  %> 
-        <button onClick=<%= 'location.href=\"/lessons/'+ login + "/1/default&all&all" + "\"" %>> Уроки</button>
-    <% }if (isTeacher){ %>
-        <% if (title!="Students List"){ %>
-            <button onClick='location.href="/students/1/default&all&all&all"'>Ученики</button>
+    <a href="http://vplicei.org/"><img id="vplicei-icon" src = "http://vplicei.org/wp-content/uploads/2016/01/vml-1.png" alt="ВМЛ"></a>
+    <div class="navigationButtons">
+    <% if (name!=""){ %>
+        <% if (title!="Main Page"){ %>
+            <button onClick='location.href="/"'><img src="../../public/media/main.svg">Главная</button>
+        <% }if (title.slice(0,5)!="Tasks"){  %>
+            <button onClick='location.href="/tasks/1/default&all&all"'><img src="../../public/media/task.svg">Задачи</button>
+        <% }if (title.slice(0,7)!="Lessons" || !u_login || login!=u_login){  %>
+            <button onClick=<%= 'location.href=\"/lessons/'+ login + "/1/default&all&all" + "\"" %>> <img src="../../public/media/lesson.svg">Уроки</button>
+        <% }if (isTeacher){ %>
+            <% if (title!="Students List"){ %>
+                <button onClick='location.href="/students/1/default&all&all&all"'><img src="../../public/media/students.svg">Ученики</button>
+            <% } %>
+            <% if (title!="Add Task"){ %>
+                <button onClick='location.href="/addtask"'><img src="../../public/media/AddTask.svg">Добавить задачу</button>
+            <% } %>
+            <% if (title!="Add Lesson"){ %>
+                <button onClick='location.href="/addlesson"'> <img src="../../public/media/AddLesson.svg"> Добавить урок</button>
+            <% } %>
         <% } %>
-        <% if (title!="Add Task"){ %>
-        <button onClick='location.href="/addtask"'>Добавить задачу</button>
+        <%if (title.slice(0,5)!="About"){  %>
+            <button onClick='location.href="/about"'><img src="../../public/media/question.svg">О проекте</button>
         <% } %>
-        <% if (title!="Add Lesson"){ %>
-            <button onClick='location.href="/addlesson"'>Добавить урок</button>
+        <%if (title.slice(0,4)=="Egg2"){  %>
+            <button>Maze by Melaveetha & Dsomni</button>
+            <button>W;A;S;D;P</button>
         <% } %>
     <% } %>
-    <%if (title.slice(0,5)!="About"){  %> 
-        <button onClick='location.href="/about"'>О проекте</button>
-    <% } %>
-    <%if (title.slice(0,4)=="Egg2"){  %> 
-        <button>Maze by Melaveetha & Dsomni</button>
-        <button>W;A;S;D;P</button>
-    <% } %>
-<% } %>
-</div>
-<div class = 'loginInterface'>
-<% if (name==""){ %>
-<form action="/" method="POST">
-    <input type="login" name="login" placeholder="Логин" required>
-    <input type="password" name="password" placeholder="Пароль" required>
-    <button type="submit">Войти</button>
-</form>
-<% } else { %>
-    <% if(name.indexOf(" ")!=-1){%>
-    <% var arrname = name.split(" ")%>
-    <% var strname = arrname[0]+" "%>
-    <% for(let i=1;i<arrname.length;i++){strname+=arrname[i][0]+". "}%>
-    <%} else{var strname = name} %>
-    <a href = <%= '/account/'+ login +'/1/default&all' %> class = 'userName'><%= strname %></a>
+    </div>
+    <div class = 'loginInterface'>
+        <% if (name==""){ %>
+            <form action="/" method="POST">
+                <input type="login" name="login" placeholder="Логин" required>
+                <input type="password" name="password" placeholder="Пароль" required>
+                <button type="submit">Войти</button>
+            </form>
+        <% } else { %>
+            <% if(name.indexOf(" ")!=-1){%>
+                <% var arrname = name.split(" ")%>
+                <% var strname = arrname[0]+" "%>
+                <% for(let i=1;i<arrname.length;i++){strname+=arrname[i][0]+". "}%>
+            <%} else{var strname = name} %>
+            <a href = <%= '/account/'+ login +'/1/default&all' %> class = 'userName'><img src="../../public/media/account.svg"> <%= strname %></a>
 
-    <form action = '/logout?_method=DELETE' method = 'POST'>
-        <button type = 'submit'>Выйти</button>
-    </form>
-<% } %>
-</div>
-
+            <form action = '/logout?_method=DELETE' method = 'POST'>
+                <button type = 'submit'>Выйти</button>
+            </form>
+        <% } %>
+    </div>
 </header>

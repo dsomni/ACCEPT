@@ -1,20 +1,25 @@
 /*-----------------------------------------------------------------------------*/
 /*Global*/
+*{
+    --main-bg-color: #87ceeb;
+    --header-color: #fff;
+}
 body{
     margin: 0px;
-    background-color: #87ceeb;
+    background-color: var(--main-bg-color);
     min-width: 1000px;
 }
 ::-webkit-scrollbar{
     width: 5px;
 }
 ::-webkit-scrollbar-track{
-    background-color: #ffffff;
+    background-color: var(--header-color);
 }
 ::-webkit-scrollbar-thumb {
-    background-color: #888888; 
+    background-color: #888888;
 }
 main{
+    margin-left: 70px;
     font-size: 20px;
     margin-top: 0px;
     padding: 10px;
@@ -43,14 +48,26 @@ ul{
 /*-----------------------------------------------------------------------------*/
 /*Header*/
 header{
-    position: sticky;
+    position: fixed;
     top: 0px;
-    background-color: #ffffff;
-    height: 75px;
+    left: 0px;
+    background-color: var(--header-color);
+    height: 100%;
+    width: 60px;
+    z-index: 1;
+    overflow-x: hidden;
     box-shadow: 0px 2px #00000012;
+    transition: ease-in-out .4s;
+}
+header:hover{
+    width: 210px;
+}
+header:hover input{
+    width: 180px;
 }
 header button{
-    background-color: #ffffff;
+    display: block;
+    background-color: var(--header-color);
     transition: all 300ms ease;
     font-size: 12pt;
     font-variant-caps: small-caps;
@@ -58,30 +75,29 @@ header button{
     border: none;
     outline: none;
     font-family: sans-serif;
-    padding: 5px; 
-    margin-left: 10px;
+    margin-top: 10px;
+    margin-left: 5px;
     letter-spacing: 0.5px;
     color: #0099ff;
+}
+header button img{
+    width: 45px;
+    margin-right: 10px;
 }
 header button:hover{
     transform: scale(1.1);
     color: #75b5ff;
 }
-header form{
-    display: inline;
-    margin-right: 0px;
-    margin-left: auto;
-}
-
 header input{
+    width: 50px;
     border: none;
     outline: none;
+    margin-bottom: 10px;
 }
-header img{
-    padding-top: 15px;
-    padding-left: 10px;
-    display: inline;
-    width: 150px;
+#vplicei-icon{
+    height: 50px;
+    padding-left: 5px;
+    padding-top: 5px;
 }
 /*-----------------------------------------------------------------------------*/
 /*-----------------------------------------------------------------------------*/
@@ -165,8 +181,6 @@ header img{
     margin-right: auto;
     width: 300px;
 }
-
-
 /*-----------------------------------------------------------------------------*/
 /*Lesson page*/
 #editref{
@@ -317,8 +331,8 @@ header img{
     width: 70%;
 }
 .taskslist th {
-    border-top: 1px solid #6695fa;	
-    border-bottom: 1px solid #6695fa; 
+    border-top: 1px solid #6695fa;
+    border-bottom: 1px solid #6695fa;
     background: #83aaff;
     color: white;
     padding: 10px 15px;
@@ -349,15 +363,26 @@ header img{
 /*-----------------------------------------------------------------------------*/
 /*Header*/
 .navigationButtons{
-    position: relative;
-    top: -10px;
-    display: inline;
+    display: block;
+    margin-top: 20px;
+    white-space: nowrap;
 }
 .loginInterface{
     position: absolute;
-    top: 25px;
-    right: 15px;
-    display: inline;
+    bottom: 0px;
+    margin-bottom: 20px;
+    margin-top: 10px;
+    margin-left: 10px;
+    white-space: nowrap;
+}
+.loginInterface input{
+    display: block;
+}
+.loginInterface button{
+    margin-left: -5px;
+}
+.loginInterface img{
+    width: 45px;
 }
 .userName{
     color: #154cff;
@@ -366,9 +391,10 @@ header img{
     font-variant-caps: small-caps;
     font-family: Geneva, Arial, Helvetica, sans-serif;
     text-decoration: none;
+    transition: 1s;
 }
 .userName:hover{
-    text-decoration: underline;
+    transform: scale(1.1);
 }
 
 
@@ -479,7 +505,7 @@ header img{
     border-radius: 1px;
     border-color: #000000;
     outline: none;
-    background-color: #ffffff;
+    background-color: var(--header-color);
     margin: 5px;
     font-size: 12pt;
 }
@@ -515,7 +541,7 @@ header img{
     border-radius: 1px;
     border-color: #000000;
     outline: none;
-    background-color: #ffffff;
+    background-color: var(--header-color);
     margin: 10px;
     font-size: 20pt;
 }
