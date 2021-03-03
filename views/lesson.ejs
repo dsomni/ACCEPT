@@ -44,7 +44,8 @@
               </tr>
 
             <% for (var i = 0; i < lesson.tasks.length; i++) { %>
-            <% var task = tasks.find(item => item.identificator == lesson.tasks[i]); %>
+            <% var task = tasks.find(item => item.identificator == lesson.tasks[i]);
+            if (task) { %>
              <tr>
               <td><%= task.identificator %></td>
               <td> <a class="tlrefs" href=<%="/task/" + task.identificator %>> <%= task.title %> </a> </td>
@@ -54,7 +55,7 @@
               <td><%= results[i] %></td>
               <td><a class="tlrefs" href=<%="/account/" + u_login + "/1/" + task.title.replace(' ','%20') + "&all" %> >[все попытки]</a></td>
              </tr>
-            <% } %>
+            <% }} %>
         </table>
         
     </main>

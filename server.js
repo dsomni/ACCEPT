@@ -649,8 +649,10 @@ app.post('/addlesson',checkAuthenticated, checkPermission, async (req, res) => {
 app.get('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) => {
 
     var user;
+    console.log(req.params)
     if(req.user.login == req.params.login || !req.user.isTeacher){
         user = req.user;
+
     }else{
         user = await User.findOne({login : req.params.login}).exec();
     }
