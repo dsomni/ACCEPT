@@ -280,7 +280,7 @@ app.get('/task/:id', checkAuthenticated, async (req, res) => {
 // Task Page listener
 app.post('/task/:id',checkAuthenticated, async (req, res) => {
 
-    fs.stat('public\\processes\\'+req.user.login+req.params.id, async function(err) {
+    fs.stat('public\\processes\\'+req.user.login+"_"+req.params.id, async function(err) {
         if (!err) {
             res.redirect('/task/'+req.params.id);
         }
