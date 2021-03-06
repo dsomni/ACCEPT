@@ -15,6 +15,9 @@
     <body>
         <main>
             <h1>Уроки <%= n_name %></h1>
+            <% if (isTeacher){ %>
+                <a class="tlrefs addhref" href="/addlesson">[Добавить урок]</a>
+            <% } %>
             <form class="SearchUI" action= <%= '/lessons/'+ u_login +'/1/default' %>  method="POST">
                 <input name = "searcharea" rows=1 placeholder="Поиск урока"></input>
                 <% if(isTeacher){ %>

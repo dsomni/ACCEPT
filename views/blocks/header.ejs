@@ -1,40 +1,40 @@
 <header>
-    <a href="http://vplicei.org/"><img id="vplicei-icon" src = "http://vplicei.org/wp-content/uploads/2016/01/vml-1.png" alt="ВМЛ"></a>
-    <div class="navigationButtons">
-    <% if (name){ %>
-            <button onClick='location.href="/"'><img src="/public/media/main.svg">Главная</button>
-            <button onClick='location.href="/tasks/1/default&all&all"'><img src="/public/media/task.svg">Задачи</button>
-            <button onClick=<%= 'location.href=\"/lessons/'+ login + "/1/default&all&all" + "\"" %>> <img src="/public/media/lesson.svg">Уроки</button>
-        <%if (isTeacher){ %>
-            <button onClick='location.href="/students/1/default&all&all&all"'><img src="/public/media/students.svg">Ученики</button>
-            <button onClick='location.href="/addtask"'><img src="/public/media/AddTask.svg">Добавить задачу</button>
-            <button onClick='location.href="/addlesson"'> <img src="/public/media/AddLesson.svg"> Добавить урок</button>
+    <div id="outer">
+        <div class="navigationButtons">
+        <a href="http://vplicei.org/"><img id="Logo" src = "/public/media/Logo.svg" alt="ACCEPT"></a>
+        <% if (name){ %>
+                <button onClick='location.href="/"'><img src="/public/media/main.svg">Главная</button>
+                <button onClick='location.href="/tasks/1/default&all&all"'><img src="/public/media/task.svg">Задачи</button>
+                <button onClick=<%= 'location.href=\"/lessons/'+ login + "/1/default&all&all" + "\"" %>> <img src="/public/media/lesson.svg">Уроки</button>
+            <%if (isTeacher){ %>
+                <button onClick='location.href="/students/1/default&all&all&all"'><img src="/public/media/students.svg">Ученики</button>
+            <% } %>
+            <button onClick='location.href="/about"'><img src="/public/media/information.svg">О проекте</button>
+            <%if (title.slice(0,4)=="Egg2"){  %>
+                <button>Maze by Melaveetha & Dsomni</button>
+                <button>W;A;S;D;P</button>
+            <% } %>
         <% } %>
-        <button onClick='location.href="/about"'><img src="/public/media/question.svg">О проекте</button>
-        <%if (title.slice(0,4)=="Egg2"){  %>
-            <button>Maze by Melaveetha & Dsomni</button>
-            <button>W;A;S;D;P</button>
-        <% } %>
-    <% } %>
-    </div>
-    <div class = 'loginInterface'>
-        <% if (!name){ %>
-            <form action="/" method="POST">
-                <input type="login" name="login" placeholder="Логин" required>
-                <input type="password" name="password" placeholder="Пароль" required>
-                <button type="submit">Войти</button>
-            </form>
-        <% } else { %>
-            <% if(name.indexOf(" ")!=-1){%>
-                <% var arrname = name.split(" ")%>
-                <% var strname = arrname[0]+" "%>
-                <% for(let i=1;i<arrname.length;i++){strname+=arrname[i][0]+". "}%>
-            <%} else{var strname = name} %>
-            <a href = <%= '/account/'+ login +'/1/default&all' %> class = 'userName'><img src="/public/media/account.svg"> <%= strname %></a>
+        </div>
+        <div class = 'loginInterface'>
+            <% if (!name){ %>
+                <form action="/" method="POST">
+                    <input type="login" name="login" placeholder="Логин" required>
+                    <input type="password" name="password" placeholder="Пароль" required>
+                    <button type="submit">Войти</button>
+                </form>
+            <% } else { %>
+                <% if(name.indexOf(" ")!=-1){%>
+                    <% var arrname = name.split(" ")%>
+                    <% var strname = arrname[0]+" "%>
+                    <% for(let i=1;i<arrname.length;i++){strname+=arrname[i][0]+". "}%>
+                <%} else{var strname = name} %>
+                <a href = <%= '/account/'+ login +'/1/default&all' %> class = 'userName'><img src="/public/media/account.svg"> <%= strname %></a>
 
-            <form action = '/logout?_method=DELETE' method = 'POST'>
-                <button type = 'submit'><img src="/public/media/logout.svg">Выйти</button>
-            </form>
-        <% } %>
+                <form action = '/logout?_method=DELETE' method = 'POST'>
+                    <button type = 'submit'><img src="/public/media/logout.svg">Выйти</button>
+                </form>
+            <% } %>
+        </div>
     </div>
 </header>

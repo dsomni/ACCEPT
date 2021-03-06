@@ -14,15 +14,19 @@
         </head>
     <body>
         <main>
+            <h1>Задачи</h1>
+            <% if (isTeacher){ %>
+                <a class="tlrefs addhref" href="/addlesson">[Добавить урок]</a>
+            <% } %>
             <form class="SearchUI" action= '/tasks/1/default'  method="POST">
                 <input name = "searcharea" rows=1 placeholder="Поиск задачи"></input>
-                <select name="TopicSelector"> 
+                <select name="TopicSelector">
                     <option value="all" selected> Все Темы</option>
                     <% for(var i = 0; i < topics.length; i++) { %>
                         <option value=<%= topics[i].replace(" ", "") %> > <%= topics[i] %></option>
                     <% } %>
                 </select>
-                <select name="GradeSelector"> 
+                <select name="GradeSelector">
                     <option value="all" selected>Все</option>
                     <% for(var i = 6; i < 12; i++) { %>
                     <option value=<%= i %> ><%= i %></option>
@@ -30,7 +34,6 @@
                 </select>
                 <button>Найти</button>
             </form>
-
             <table class='taskslist'>
                 <tr>
                   <th>ID</th>

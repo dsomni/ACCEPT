@@ -3,6 +3,7 @@
 *{
     --main-bg-color: #87ceeb;
     --header-color: #fff;
+    font-family: 'Roboto', sans-serif;
 }
 body{
     background-color: var(--main-bg-color);
@@ -78,7 +79,7 @@ header button{
     font-weight: bold;
     border: none;
     outline: none;
-    font-family: sans-serif;
+    font-family:  sans-serif;
     margin-top: 10px;
     margin-left: 5px;
     letter-spacing: 0.5px;
@@ -98,10 +99,11 @@ header input{
     outline: none;
     margin-bottom: 10px;
 }
-#vplicei-icon{
-    height: 50px;
-    padding-left: 5px;
-    padding-top: 5px;
+#Logo{
+    height: 70px;
+    margin-left: 5px;
+    margin-top: 5px;
+    margin-bottom: 20px;
 }
 /*-----------------------------------------------------------------------------*/
 /*-----------------------------------------------------------------------------*/
@@ -359,6 +361,10 @@ header input{
     color: #220bf3;
     text-decoration: underline;
 }
+.addhref{
+    margin-left: 120px;
+    margin-bottom: 20px;
+}
 .pageinfo {
     margin-left: auto;
     margin-right: auto;
@@ -366,16 +372,22 @@ header input{
 }
 /*-----------------------------------------------------------------------------*/
 /*Header*/
+#outer{
+    width: 100%;
+    min-height: 600px;
+    height: 100%;
+    position: relative;
+}
 .navigationButtons{
-    display: block;
+   position: absolute;
+   top: 0px;
     margin-top: 20px;
     white-space: nowrap;
 }
 .loginInterface{
-    position: relative;
+    position: absolute;
     bottom: 0px;
     margin-bottom: 10px;
-    margin-top: 60px;
     margin-left: 10px;
     white-space: nowrap;
 }
@@ -579,9 +591,20 @@ header input{
 }
 /*-----------------------------------------------------------------------------*/
 .SearchUI{
+    margin: 20px;
     margin-left: 120px;
     width: 40%;
     display: grid;
     grid-template-columns: 1fr 1fr 0.5fr 0.5fr 0.5fr;
     gap: 2px;
+}
+#Acronim-container{
+    width: 100%;
+    text-align: center;
+}
+#Acronim{
+    width: 50%;
+}
+.student_info{
+    margin-left: 120px;
 }
