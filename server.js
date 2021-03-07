@@ -90,7 +90,12 @@ var TournamentSchema = new mongoose.Schema({
     description: String,
     tasks: Array,
     author: String,
-    participants: Array
+    participants: Array,
+    whenStarts: String,
+    whenEnds: String,
+    isBegan: Boolean,
+    isEnded: Boolean
+
 }, { collection: config.mongodbConfigs.CollectionNames.tournaments});
 
 // Create model from schema
@@ -659,7 +664,6 @@ app.post('/addlesson',checkAuthenticated, checkPermission, async (req, res) => {
 app.get('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) => {
 
     var user;
-    // console.log(req.params)
     if(req.user.login == req.params.login || !req.user.isTeacher){
         user = req.user;
 
@@ -960,9 +964,9 @@ app.post('/addtournament',checkAuthenticated, checkPermission, async (req, res) 
     let user = req.user;
     let body = req.body;
     let tasks = body.tasks.split(' ');
-    await Adder.addTournament(Tournament, body.title, body.description, tasks, user.name, []);
+    await Adder.addTournament(Tournament, body.title, body.description, tasks, user.name, body.whenStarts.replace('T', ' '), body.whenEnds.replace('T', ' '), []);
 
-    res.render('addTournament.ejs',{
+    res.render('addtournament.ejs',{
         login: user.login,
         name: req.user.name,
         title: "Add Tournament",
@@ -975,7 +979,6 @@ app.post('/addtournament',checkAuthenticated, checkPermission, async (req, res) 
 app.get('/tournaments/:login/:page/:search', checkAuthenticated, async (req, res) => {
 
     var user;
-    // console.log(req.params)
     if(req.user.login == req.params.login || !req.user.isTeacher){
         user = req.user;
     }else{
@@ -988,26 +991,33 @@ app.get('/tournaments/:login/:page/:search', checkAuthenticated, async (req, res
     var a = req.params.search.split('&');
     var toSearch = a[0].toUpperCase();
 
-    Tournaments = await Tournament.find({}).exec();
-    let usedTournaments= Tournaments;
+    let Tournaments = await Tournament.find({}).exec();
 
-    if(toSearch == "DEFAULT") toSearch="";
-
+    if (toSearch == "DEFAULT") toSearch = "";
+    let now = new Date()
     var result;
-    for (var i = 0; i < usedTournaments.length; i++){
-        if (usedTournaments[i].title.slice(0, toSearch.length).toUpperCase() == toSearch){
-            foundTournaments.push(usedTournaments[i])
-            result = "/" + usedTournaments[i].tasks.length
+    for (var i = 0; i < Tournaments.length; i++){
+        if (Tournaments[i].title.slice(0, toSearch.length).toUpperCase() == toSearch){
+            foundTournaments.push(Tournaments[i])
+            result = "/" + Tournaments[i].tasks.length
             var solved = 0;
-            for (var k = 0; k < usedTournaments[i].tasks.length; k++){
+            for (var k = 0; k < Tournaments[i].tasks.length; k++){
 
-                let verdict = user.verdicts.find(item => item.taskID == usedTournaments[i].tasks[k])
+                let verdict = user.verdicts.find(item => item.taskID == Tournaments[i].tasks[k])
                 if(verdict && verdict.result=="OK"){
                     solved+=1
                 }
             }
             result = solved + result;
             results.push(result)
+            if (!Tournaments[i].isBegan) {
+                Tournaments[i].isBegan = now.getTime() > Date.parse(Tournaments[i].whenStarts)
+            }
+            if (!Tournaments[i].isEnded) {
+                Tournaments[i].isEnded = now.getTime() > Date.parse(Tournaments[i].whenEnds)
+            }
+            await Tournaments[i].save()
+
         }
     }
 
@@ -1033,7 +1043,7 @@ app.post('/tournaments/:login/:page/:search', checkAuthenticated, async (req, re
 
 //---------------------------------------------------------------------------------
 // Tournament Page
-app.get('/tournament/:login/:id',checkAuthenticated, checkTournamentValidation, async (req, res) => {
+app.get('/tournament/:login/:id', checkAuthenticated, checkTournamentValidation, async (req, res) => {
     var user;
     if(req.user.login == req.params.login){
         user = req.user;
@@ -1042,34 +1052,39 @@ app.get('/tournament/:login/:id',checkAuthenticated, checkTournamentValidation, 
     }
 
     Tournaments = await Tournament.find({}).exec();
-    let tournament = Tournaments.find(item => item.identificator==req.params.id);
-    if (!tournament){
-        res.redirect("/tournaments/"+req.params.login+"/1/default&all&all")
-    }else{
-        var tasks = await Task.find({ identificator: { $in: tournament.tasks}});
-        var verdicts = [];
-        var verdict;
-        for (var i = 0; i < tournament.tasks.length; i++){
-            verdict = user.verdicts.find(item => item.taskID == tournament.tasks[i])
-            if(!verdict){
-                verdict = "-"
-            }else{
-                verdict = verdict.result
+    let tournament = Tournaments.find(item => item.identificator == req.params.id);
+        if (!tournament) {
+            res.redirect("/tournaments/" + req.params.login + "/1/default&all&all")
+        } else {
+            console.log(tournament)
+            if (req.user.isTeacher || tournament.isEnded || tournament.isBegan && tournament.participants.find(item => item.id == req.params.login)) {
+                var tasks = await Task.find({ identificator: { $in: tournament.tasks } });
+                var verdicts = [];
+                var verdict;
+                for (var i = 0; i < tournament.tasks.length; i++) {
+                    verdict = user.verdicts.find(item => item.taskID == tournament.tasks[i])
+                    if (!verdict) {
+                        verdict = "-"
+                    } else {
+                        verdict = verdict.result
+                    }
+                    verdicts.push(verdict)
+                }
+                res.render('tournament.ejs', {
+                    ID: tournament.identificator,
+                    u_login: user.login,
+                    u_name: user.name,
+                    login: user.login,
+                    name: req.user.name,
+                    title: "Tournament",
+                    isTeacher: req.user.isTeacher,
+                    tournament: tournament,
+                    tasks: tasks,
+                    results: verdicts,
+                })
+            } else {
+                res.redirect('/tournaments/' + req.user.login + '/1/default&all&all')
             }
-            verdicts.push(verdict)
-        }
-        res.render('tournament.ejs',{
-            ID: tournament.identificator,
-            u_login: user.login,
-            u_name: user.name,
-            login: user.login,
-            name: req.user.name,
-            title: "Tournament",
-            isTeacher: req.user.isTeacher,
-            tournament : tournament,
-            tasks : tasks,
-            results : verdicts,
-        })
     }
 })//V
 
@@ -1094,6 +1109,8 @@ app.post('/edittournament/:id',checkAuthenticated, checkPermission, async (req, 
 
     tournament.title = body.title;
     tournament.description = body.description;
+    tournament.whenStarts = body.whenStarts;
+    tournament.duration = body.duration;
     tournament.tasks = body.tasks.split(' ');
     tournament.participants = body.participants.split(' ');
     await tournament.save();
@@ -1109,17 +1126,17 @@ app.post('/edittournament/:id',checkAuthenticated, checkPermission, async (req, 
 
 
 //---------------------------------------------------------------------------------
-
-app.get('/regTournament/:tournamentid', async (req, res)=>{
-    //Call registr
-    console.log(req.params.tournamentid)
-    let tournament = await Tournament.findOne({identificator: req.params.tournamentid}).exec()
-    tournament.participants.push({
-        id : req.user.login,
-        score: 0,
-        solved : []
-    });
-    await tournament.save();
+//Register to tournament
+app.get('/regTournament/:tournament_id', async (req, res) => {
+    let tournament = await Tournament.findOne({ identificator: req.params.tournament_id }).exec()
+    if (!tournament.isBegan) {
+        tournament.participants.push({
+            id: req.user.login,
+            score: 0,
+            solved: []
+        });
+        await tournament.save();
+    }
     res.redirect('/tournaments/'+req.user.login+'/1/default&all&all')
 })
 
@@ -1229,6 +1246,6 @@ function getVerdict(results){
 
 //---------------------------------------------------------------------------------
 // Starting Server
-var port = config.port--
+var port = config.port
 app.listen(port) // port
 console.log("Server started at port " + port)

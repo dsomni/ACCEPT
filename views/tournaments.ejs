@@ -31,7 +31,9 @@
                     <th>Турнир</th>
                     <th>Автор</th>
                     <th>Вердикт</th>
-                    <th>Регистрация</th>
+                    <th>Начало</th>
+                    <th>Окончание</th>
+                    <th>Статус</th>
                   </tr>
                 <% min = function(a,b){ if(a < b) return a; return b} %>
                 <% max = function(a,b){ if(a < b) return b; return a} %>
@@ -45,12 +47,20 @@
                   <td> <a class="tlrefs" href=<%="/tournament/"+ u_login + "/" + tournament.identificator %>> <%= tournament.title %> </a> </td>
                   <td><%= tournament.author %></td>
                   <td><%= results[i] %></td>
-                  <% let registered = tournament.participants.find(item=>item.id==u_login);%>
-                  <% if(!registered){ %>
-                  <td><a style="text-decoration: none;" href=<%= "/regTournament/" + tournament.identificator %>>Зарегистрироваться</a></td>
-                  <% } else { %>
-                    <td><a style="text-decoration: none; color: chartreuse;">Вы зарегистрированы!</a></td>
-                  <% } %>
+                  <td><%= tournament.whenStarts %></td>
+                  <td><%= tournament.whenEnds %></td>
+                  <% if(!tournament.isBegan){ %>
+                    <% let registered = tournament.participants.find(item=>item.id==u_login);%>
+                    <% if(!registered){ %>
+                        <td><a style="text-decoration: none;" href=<%= "/regTournament/" + tournament.identificator %>>Регистрация</a></td>
+                    <% } else { %>
+                        <td><a style="text-decoration: none; color: chartreuse;">Вы зарегистрированы!</a></td>
+                    <% } %>
+                  <% } else if(!tournament.isEnded) { %>
+                        <td> <a style="color: firebrick;">Проводится</a> </td>
+                    <% }else{ %>
+                        <td> <a style="color: Red;">Завершен</a> </td>
+                    <% } %>
                  </tr>
                 <% } %>
                 </table>

@@ -39,7 +39,7 @@ exports.addTask = async function (Task, title, statement, examples, tests, topic
         author: author
     }]);
 }
-exports.addTournament = async function (Tournament, title, description, tasks, author, participants) {
+exports.addTournament = async function (Tournament, title, description, tasks, author, whenStarts, whenEnds, participants) {
     var number = await Tournament.estimatedDocumentCount().exec()
     let tournament = {
         identificator: number,
@@ -47,7 +47,11 @@ exports.addTournament = async function (Tournament, title, description, tasks, a
         description: description,
         tasks: tasks,
         author: author,
-        participants: participants
+        participants: participants,
+        whenStarts: whenStarts,
+        whenEnds: whenEnds,
+        isBegan: false,
+        isEnded: false
     }
     await Tournament.insertMany([tournament]);
 }
