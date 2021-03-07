@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Добавление турнира</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0,
+              maximum-scale=1.0, minimum-scale=1.0,
+              user-scalable=no, minimal-ui">
+        <meta name="full-screen" content="yes">
+
+        </head>
+    <body>
+        <main>
+
+        <form action='/addtournament'  method="POST">
+            <div class="lessonAdderForm">
+                <h3>Название турнира</h3>
+                <textarea id="title" name = "title" required placeholder="Введите название"></textarea>
+                <h3>Описание</h3>
+                <textarea id="description" name = "description" placeholder="Введите описание"></textarea>
+                <h3>Задачи</h3>
+                <textarea id="tasks" name="tasks" required placeholder="Введите номера задач через пробел"></textarea>
+                <button id="submit2">Добавить турнир</button>
+            </div>
+        </form>
+    </main>
+    </body>
+</html>

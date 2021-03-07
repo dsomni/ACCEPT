@@ -39,5 +39,16 @@ exports.addTask = async function (Task, title, statement, examples, tests, topic
         author: author
     }]);
 }
-
+exports.addTournament = async function (Tournament, title, description, tasks, author, participants) {
+    var number = await Tournament.estimatedDocumentCount().exec()
+    let tournament = {
+        identificator: number,
+        title: title,
+        description: description,
+        tasks: tasks,
+        author: author,
+        participants: participants
+    }
+    await Tournament.insertMany([tournament]);
+}
 

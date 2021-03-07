@@ -1,11 +1,12 @@
 <header>
     <div id="outer">
         <div class="navigationButtons">
-        <a href="http://vplicei.org/"><img id="Logo" src = "/public/media/Logo.svg" alt="ACCEPT"></a>
+        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstleyVEVO"><img id="Logo" src = "/public/media/Logo.svg" alt="ACCEPT"></a>
         <% if (name){ %>
                 <button onClick='location.href="/"'><img src="/public/media/main.svg">Главная</button>
                 <button onClick='location.href="/tasks/1/default&all&all"'><img src="/public/media/task.svg">Задачи</button>
-                <button onClick=<%= 'location.href=\"/lessons/'+ login + "/1/default&all&all" + "\"" %>> <img src="/public/media/lesson.svg">Уроки</button>
+                <button onClick=<%='location.href=\"/lessons/' + login + "/1/default&all&all" + "\"" %>> <img src="/public/media/lesson.svg">Уроки</button>
+                <button onClick=<%= 'location.href=\"/tournaments/'+ login + "/1/default&all&all" + "\"" %>> <img src="/public/media/tournament.svg">Турниры</button>
             <%if (isTeacher){ %>
                 <button onClick='location.href="/students/1/default&all&all&all"'><img src="/public/media/students.svg">Ученики</button>
             <% } %>
@@ -29,7 +30,7 @@
                     <% var strname = arrname[0]+" "%>
                     <% for(let i=1;i<arrname.length;i++){strname+=arrname[i][0]+". "}%>
                 <%} else{var strname = name} %>
-                <a href = <%= '/account/'+ login +'/1/default&all' %> class = 'userName'><img src="/public/media/account.svg"> <%= strname %></a>
+                <button onClick='location.href="<%= '/account/'+ login +'/1/default&all' %>"'><img src="/public/media/account.svg"> <%= strname %></button>
 
                 <form action = '/logout?_method=DELETE' method = 'POST'>
                     <button type = 'submit'><img src="/public/media/logout.svg">Выйти</button>

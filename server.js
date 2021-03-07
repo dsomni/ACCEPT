@@ -11,7 +11,6 @@ const expressLayouts = require('express-ejs-layouts');
 const childProcess = require("child_process");
 const Adder = require(__dirname + '/public/scripts/Adder.js');
 const app = express()
-
 //---------------------------------------------------------------------------------
 // MongoDB connecting
 var connectionString
@@ -35,8 +34,8 @@ mongoose.connection.on('error', (err) => {
 mongoose.set('useCreateIndex', true);
 
 var UserSchema = new mongoose.Schema({
-    login: { 
-        type: String, 
+    login: {
+        type: String,
         unique: true,
         index: true
     },
@@ -65,7 +64,6 @@ var TaskSchema = new mongoose.Schema({
 
 }, {collection: config.mongodbConfigs.CollectionNames.tasks});
 
-
 var LessonSchema = new mongoose.Schema({
     identificator: Number,
     grade: Number,
@@ -86,6 +84,15 @@ var NewsSchema = new mongoose.Schema({
 
 }, {collection: config.mongodbConfigs.CollectionNames.news});
 
+var TournamentSchema = new mongoose.Schema({
+    identificator: Number,
+    title : String,
+    description: String,
+    tasks: Array,
+    author: String,
+    participants: Array
+}, { collection: config.mongodbConfigs.CollectionNames.tournaments});
+
 // Create model from schema
 var News = mongoose.model('News', NewsSchema );
 
@@ -97,6 +104,9 @@ var Task = mongoose.model('Task', TaskSchema );
 
 // Create model from schema
 var User = mongoose.model('User', UserSchema );
+
+// Create model from schema
+var Tournament = mongoose.model('Tournament', TournamentSchema);
 
 //---------------------------------------------------------------------------------
 
@@ -136,7 +146,7 @@ load()
 
 //---------------------------------------------------------------------------------
 // Main Page
-app.get('/', async (req, res) => {
+app.get('/', (req, res) =>  {
     if(req.user){
         res.render('main.ejs',{
             login: req.user.login,
@@ -154,7 +164,7 @@ app.get('/', async (req, res) => {
             news: news
         });
     }
-})
+});
 
 app.post('/', passport.authenticate('local', {
     successRedirect: '/',
@@ -186,7 +196,7 @@ app.get('/task/:id', checkAuthenticated, async (req, res) => {
                             result.sort((a,b)=>{
                                 return Number(a[0].split('#')[1]) -  Number(b[0].split('#')[1])
                             })
-    
+
                             let idx = req.user.verdicts.findIndex(item => item.taskID == req.params.id)
                             if(idx==-1){
                                 req.user.verdicts.push({
@@ -200,7 +210,7 @@ app.get('/task/:id', checkAuthenticated, async (req, res) => {
                                     result: getVerdict(result)
                                 })
                             }
-    
+
                             let attempts = req.user.attempts;
                             var idxx = 0;
                             var obj = {};
@@ -215,39 +225,39 @@ app.get('/task/:id', checkAuthenticated, async (req, res) => {
                                 programText: obj.programText, result: result, language: obj.language})
                             await req.user.save()
 
-    
+
                             fs.rmdirSync('public\\processes\\'+req.user.login+'_'+req.params.id,{recursive: true});
-    
+
                             res.redirect('/task/'+req.params.id);
                         }else{
                             res.render('task.ejs',{
                                 login: req.user.login,
                                 RESULT: [["","Testing..","er"]],
                                 ID: req.params.id,
-                                name: req.user.name, 
+                                name: req.user.name,
                                 title: "Task " + req.params.id,
                                 isTeacher: req.user.isTeacher,
                                 problem: problem,
                                 prevCode: "",
                                 showHint: showHint,
                                 language: language
-                            });  
+                            });
                         }
                     }else{
                         res.render('task.ejs',{
                             login: req.user.login,
                             RESULT: [["","Testing..","er"]],
                             ID: req.params.id,
-                            name: req.user.name, 
+                            name: req.user.name,
                             title: "Task " + req.params.id,
                             isTeacher: req.user.isTeacher,
                             problem: problem,
                             prevCode: "",
                             showHint: showHint,
                             language: req.user.attempts[0].language
-                        });  
+                        });
                     }
-                });                
+                });
             }
         }else {
             var attempts = req.user.attempts;
@@ -266,14 +276,14 @@ app.get('/task/:id', checkAuthenticated, async (req, res) => {
                 login: req.user.login,
                 RESULT: result,
                 ID: req.params.id,
-                name: req.user.name, 
+                name: req.user.name,
                 title: "Task " + req.params.id,
                 isTeacher: req.user.isTeacher,
                 problem: problem,
                 prevCode: prevCode,
                 showHint: showHint,
                 language: language
-            }); 
+            });
         }
     });
 })
@@ -299,7 +309,7 @@ app.post('/task/:id',checkAuthenticated, async (req, res) => {
             if(prevCode == "" || prevCode != req.body.code ){
 
                 let language = req.body.languageSelector;
-                
+
                 req.user.attempts.unshift({taskID: req.params.id, date: Date.now().toString(),
                     programText: req.body.code, result: [], language: language})
                 await req.user.save()
@@ -401,8 +411,8 @@ app.get('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
         if(topics.indexOf(tasks[i].topic)==-1){
             topics.push(tasks[i].topic);
         }
-        if((tasks[i].title.slice(0, toSearch.length).toUpperCase() == toSearch) && 
-        (SearchTopic == 'all' || SearchTopic==tasks[i].topic.replace(" ", "")) && 
+        if((tasks[i].title.slice(0, toSearch.length).toUpperCase() == toSearch) &&
+        (SearchTopic == 'all' || SearchTopic==tasks[i].topic.replace(" ", "")) &&
         (SearchGrade == 'all' || SearchGrade==tasks[i].grade)){
             foundTasks.push(tasks[i])
             verdict = user.verdicts.find(item => item.taskID == tasks[i].identificator)
@@ -507,7 +517,7 @@ app.post('/edittask/:id',checkAuthenticated, checkPermission, async (req, res) =
 //---------------------------------------------------------------------------------
 // Delete Task
 app.post('/deletetask/:id',checkAuthenticated, checkPermission, async (req, res) => {
-    
+
     childProcess.exec("node "+__dirname+"\\public\\scripts\\FixAfterDeleteTask.js "+req.params.id)
 
     res.redirect('/tasks/1/default&all&all')
@@ -559,7 +569,7 @@ app.get('/account/:login/:page/:search',checkAuthenticated, checkValidation, asy
             n_name: user.name,
             user: user
         })
-    
+
     } else{
         res.redirect('/account/' + req.user.login + '/1/default&all')
     }
@@ -606,7 +616,7 @@ app.get('/attempt/:login/:date',checkAuthenticated, checkValidation, async (req,
                 date : attempt.date,
                 n_name: user.name,
                 language: attempt.language
-            }) 
+            })
         } else{
             res.redirect('/account/' + req.user.login + '/1/default&all')
         }
@@ -649,7 +659,7 @@ app.post('/addlesson',checkAuthenticated, checkPermission, async (req, res) => {
 app.get('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) => {
 
     var user;
-    console.log(req.params)
+    // console.log(req.params)
     if(req.user.login == req.params.login || !req.user.isTeacher){
         user = req.user;
 
@@ -677,7 +687,7 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) =>
 
     var result;
     for (var i = 0; i < usedLessons.length; i++){
-        if((usedLessons[i].title.slice(0, toSearch.length).toUpperCase() == toSearch) && 
+        if((usedLessons[i].title.slice(0, toSearch.length).toUpperCase() == toSearch) &&
         (SearchGrade == 'all' || SearchGrade==usedLessons[i].grade)){
             foundLessons.push(usedLessons[i])
             result = "/" + usedLessons[i].tasks.length
@@ -717,7 +727,7 @@ app.post('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) =
 
 //---------------------------------------------------------------------------------
 // Lesson Page
-app.get('/lesson/:login/:id',checkAuthenticated, isAvailable, async (req, res) => {
+app.get('/lesson/:login/:id',checkAuthenticated, isLessonAvailable, async (req, res) => {
 
     var user;
     if(req.user.login == req.params.login){
@@ -819,7 +829,7 @@ app.get('/students/:page/:search', checkAuthenticated, checkPermission,async (re
     }
     if(toSearch == "DEFAULT") toSearch="";
     for (var i = 0; i < students.length; i++){
-        if((students[i].name.slice(0, toSearch.length).toUpperCase() == toSearch) && 
+        if((students[i].name.slice(0, toSearch.length).toUpperCase() == toSearch) &&
         (SearchGrade == 'all' || SearchGrade==students[i].grade) &&
         (SearchLetter == 'all' || SearchLetter.toUpperCase() == students[i].gradeLetter.toUpperCase()) &&
         (SearchGroup == 'all' || SearchGroup == students[i].group)){
@@ -843,8 +853,8 @@ app.get('/students/:page/:search', checkAuthenticated, checkPermission,async (re
 app.post('/students/:page/:search', checkAuthenticated, checkPermission, async (req, res) => {
     var toSearch = req.body.searcharea;
     if(!toSearch) toSearch = "default";
-    toSearch += '&' + req.body.GradeSelector  + 
-        '&' + (req.body.gradeLetter || "all") + 
+    toSearch += '&' + req.body.GradeSelector  +
+        '&' + (req.body.gradeLetter || "all") +
         '&' + (req.body.Group || "all")
     let keys = Object.keys(req.body)
     let student;
@@ -933,6 +943,187 @@ app.post('/editnews/:id',checkAuthenticated, checkPermission, async (req, res) =
     })
 })
 
+
+//---------------------------------------------------------------------------------
+// Add Tournament Page
+app.get('/addtournament',checkAuthenticated,checkPermission, async (req, res) => {
+    var user = req.user;
+    res.render('addtournament.ejs',{
+        login: user.login,
+        name: req.user.name,
+        title: "Add Tournament",
+        isTeacher: req.user.isTeacher
+    })
+})//V
+
+app.post('/addtournament',checkAuthenticated, checkPermission, async (req, res) => {
+    let user = req.user;
+    let body = req.body;
+    let tasks = body.tasks.split(' ');
+    await Adder.addTournament(Tournament, body.title, body.description, tasks, user.name, []);
+
+    res.render('addTournament.ejs',{
+        login: user.login,
+        name: req.user.name,
+        title: "Add Tournament",
+        isTeacher: req.user.isTeacher
+    })
+})//V
+
+//---------------------------------------------------------------------------------
+// Tournaments List Page
+app.get('/tournaments/:login/:page/:search', checkAuthenticated, async (req, res) => {
+
+    var user;
+    // console.log(req.params)
+    if(req.user.login == req.params.login || !req.user.isTeacher){
+        user = req.user;
+    }else{
+        user = await User.findOne({login : req.params.login}).exec();
+    }
+
+    var results = [];
+    var foundTournaments=[];
+
+    var a = req.params.search.split('&');
+    var toSearch = a[0].toUpperCase();
+
+    Tournaments = await Tournament.find({}).exec();
+    let usedTournaments= Tournaments;
+
+    if(toSearch == "DEFAULT") toSearch="";
+
+    var result;
+    for (var i = 0; i < usedTournaments.length; i++){
+        if (usedTournaments[i].title.slice(0, toSearch.length).toUpperCase() == toSearch){
+            foundTournaments.push(usedTournaments[i])
+            result = "/" + usedTournaments[i].tasks.length
+            var solved = 0;
+            for (var k = 0; k < usedTournaments[i].tasks.length; k++){
+
+                let verdict = user.verdicts.find(item => item.taskID == usedTournaments[i].tasks[k])
+                if(verdict && verdict.result=="OK"){
+                    solved+=1
+                }
+            }
+            result = solved + result;
+            results.push(result)
+        }
+    }
+
+    res.render('tournaments.ejs',{
+        u_login: user.login,
+        n_name: user.name,
+        login: req.user.login,
+        name: req.user.name,
+        title: "Tournaments List",
+        tournaments: foundTournaments,
+        results: results,
+        isTeacher: req.user.isTeacher,
+        page: req.params.page,
+        search: req.params.search
+    })
+})//V
+
+app.post('/tournaments/:login/:page/:search', checkAuthenticated, async (req, res) => {
+    var toSearch = req.body.searcharea;
+    if(!toSearch) toSearch = "default";
+    res.redirect('/tournaments/'+ req.params.login + '/' + req.params.page.toString() +'/' + toSearch )
+})//V
+
+//---------------------------------------------------------------------------------
+// Tournament Page
+app.get('/tournament/:login/:id',checkAuthenticated, checkTournamentValidation, async (req, res) => {
+    var user;
+    if(req.user.login == req.params.login){
+        user = req.user;
+    }else{
+        user = await User.findOne({login : req.params.login}).exec();
+    }
+
+    Tournaments = await Tournament.find({}).exec();
+    let tournament = Tournaments.find(item => item.identificator==req.params.id);
+    if (!tournament){
+        res.redirect("/tournaments/"+req.params.login+"/1/default&all&all")
+    }else{
+        var tasks = await Task.find({ identificator: { $in: tournament.tasks}});
+        var verdicts = [];
+        var verdict;
+        for (var i = 0; i < tournament.tasks.length; i++){
+            verdict = user.verdicts.find(item => item.taskID == tournament.tasks[i])
+            if(!verdict){
+                verdict = "-"
+            }else{
+                verdict = verdict.result
+            }
+            verdicts.push(verdict)
+        }
+        res.render('tournament.ejs',{
+            ID: tournament.identificator,
+            u_login: user.login,
+            u_name: user.name,
+            login: user.login,
+            name: req.user.name,
+            title: "Tournament",
+            isTeacher: req.user.isTeacher,
+            tournament : tournament,
+            tasks : tasks,
+            results : verdicts,
+        })
+    }
+})//V
+
+//---------------------------------------------------------------------------------
+// Edit Tournament Page
+app.get('/edittournament/:id',checkAuthenticated, checkPermission, async (req, res) => {
+    let tournament = await Tournament.findOne({identificator:req.params.id}).exec();
+    var user = req.user;
+    res.render('edittournament.ejs',{
+        login: user.login,
+        name: req.user.name,
+        title: "Edit Tournament",
+        isTeacher: req.user.isTeacher,
+        tournament: tournament
+    })
+})//V
+
+app.post('/edittournament/:id',checkAuthenticated, checkPermission, async (req, res) => {
+    var user = req.user;
+    var body = req.body;
+    let tournament = await Tournament.findOne({identificator: req.params.id}).exec()
+
+    tournament.title = body.title;
+    tournament.description = body.description;
+    tournament.tasks = body.tasks.split(' ');
+    tournament.participants = body.participants.split(' ');
+    await tournament.save();
+
+    res.render('edittournament.ejs',{
+        login: user.login,
+        name: req.user.name,
+        title: "Edit Tournament",
+        isTeacher: req.user.isTeacher,
+        tournament: tournament
+    })
+})//V
+
+
+//---------------------------------------------------------------------------------
+
+app.get('/regTournament/:tournamentid', async (req, res)=>{
+    //Call registr
+    console.log(req.params.tournamentid)
+    let tournament = await Tournament.findOne({identificator: req.params.tournamentid}).exec()
+    tournament.participants.push({
+        id : req.user.login,
+        score: 0,
+        solved : []
+    });
+    await tournament.save();
+    res.redirect('/tournaments/'+req.user.login+'/1/default&all&all')
+})
+
+
 //---------------------------------------------------------------------------------
 // About Page
 app.get('/about',checkAuthenticated, async (req, res) => {
@@ -950,7 +1141,7 @@ app.post('/editgroup/:login/:page/:search',checkAuthenticated,checkPermission, a
     let student = await User.findOne({login: req.params.login})
     if(req.body.groupEditor){
         student.group = req.body.groupEditor;
-        await student.save() 
+        await student.save()
     }
     res.redirect('/students' + '/' +req.params.page +'/' + req.params.search);
 })
@@ -1008,13 +1199,23 @@ function checkValidation(req, res, next) {
     }
     res.redirect('/account/' + req.user.login + '/1/default&all')
 }
-async function isAvailable(req, res, next) {
+
+function checkTournamentValidation(req, res, next) {
+    if (req.user.isTeacher || (req.user.login == req.params.login)) {
+        return next()
+    }
+    res.redirect('/tournaments/' + req.user.login + '/1/default&all')
+}
+
+async function isLessonAvailable(req, res, next) {
+    consol.log(req)
     lesson = await Lesson.findOne({identificator : req.params.id}).exec();
     if (req.user.isTeacher || (req.user.grade == lesson.grade)) {
         return next()
     }
     res.redirect('/lessons/' + req.user.login + '/1/default&all')
 }
+
 var max = (a, b)=>{if(a>b)return a;return b};
 
 function getVerdict(results){
@@ -1028,6 +1229,6 @@ function getVerdict(results){
 
 //---------------------------------------------------------------------------------
 // Starting Server
-var port = config.port
+var port = config.port--
 app.listen(port) // port
 console.log("Server started at port " + port)

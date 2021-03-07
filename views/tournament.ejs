@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Турнир #<%= ID %>
+    </title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,
+              maximum-scale=1.0, minimum-scale=1.0,
+              user-scalable=no, minimal-ui">
+    <meta name="full-screen" content="yes">
+    <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
+</head>
+
+<body>
+    <main>
+        <h2>
+            <%= u_name %>
+        </h2>
+        <div id="task">
+            <H1 id="taskname">
+                <%= tournament.title; %>
+                    <% if(isTeacher){ %> <a id="editref" href=<%="/edittournament/" + tournament.identificator %> >
+                            [Редактировать] </a>
+            </H1>
+            <% } %>
+                <h4>Автор: <%= tournament.author %>
+                </h4>
+                <div style="margin-left: 20px;" id="statement">
+                    <%= tournament.description %>
+                </div>
+        </div>
+
+        <table class='taskslist'>
+            <tr>
+                <th>ID</th>
+                <th>Задача</th>
+                <th>Автор</th>
+                <th>Вердикт</th>
+                <th>История</th>
+            </tr>
+
+            <% for (var i=0; i < tournament.tasks.length; i++) { %>
+                <% var task=tasks.find(item=> item.identificator == tournament.tasks[i]);
+                    if (task) { %>
+                    <tr>
+                        <td>
+                            <%= task.identificator %>
+                        </td>
+                        <td> <a class="tlrefs" href=<%="/task/" + task.identificator %>> <%= task.title %> </a> </td>
+                        <td>
+                            <%= task.author %>
+                        </td>
+                        <td>
+                            <%= results[i] %>
+                        </td>
+                        <td><a class="tlrefs" href=<%="/account/" + u_login + "/1/" + task.title.replace(' ',' %20')
+                                + "&all" %> >[все попытки]</a></td>
+                    </tr>
+                    <% }} %>
+        </table>
+    </main>
+</body>
+
+</html>

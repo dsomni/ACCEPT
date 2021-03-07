@@ -20,14 +20,14 @@
                 <form action= <%="/deletetask/" + problem.identificator %>  method="POST">
                     Вы действительно хотите удалить задачу "<%= problem.title %>" ?
                     <button>Да</button>
-                  </form> 
+                  </form>
                   <button onClick='c_delete();'>Назад</button>
                 </dialog>
               <button onClick='o_delete();' class="show" >[Удалить]</button>
               </span>
         </H1>
         <% } %>
-        <h4>Тема: <%= problem.topic %>         Автор: <%= problem.author %></h4>
+        <h4>Тема: <%= problem.topic %>         Автор: <%= problem.author %></h4><!-- скрывать тему на турнире -->
         <div class="statement"><%= problem.statement %></div>
         <% if(problem.hint.doesExist && showHint) { %>
             <button id="HintButton" onclick="ShowHideHint()">Показать/скрыть подсказку</button>

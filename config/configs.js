@@ -15,7 +15,8 @@ module.exports = {
             users: "users", //with users
             news : "news", //with news
             tasks: "tasks", //with tasks
-            lessons: "lessons"//with lessons
+            lessons: "lessons",//with lessons
+            tournament: "tournaments"
         }
     },
 }

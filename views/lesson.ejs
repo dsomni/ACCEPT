@@ -18,11 +18,11 @@
             <H1 id="taskname"><%= lesson.title; %> <% if(isTeacher){ %> <a id="editref" href=<%= "/editlesson/" + lesson.identificator %> > [Редактировать] </a> 
                 <span class="lessonPopup">
                     <dialog  id='dialog'>
-                    <form action= <%="/deletelesson/" + lesson.identificator %>  method="POST">
-                        Вы действительно хотите удалить урок "<%= lesson.title %>" ?
-                        <button>Да</button>
-                      </form> 
-                      <button onClick='c();'>Назад</button>
+                        <form action= <%="/deletelesson/" + lesson.identificator %>  method="POST">
+                            Вы действительно хотите удалить урок "<%= lesson.title %>" ?
+                            <button>Да</button>
+                        </form>
+                        <button onClick='c();'>Назад</button>
                     </dialog>
                   <button onClick='o();' class="show" >[Удалить]</button>
                   </span>

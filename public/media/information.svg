@@ -23,11 +23,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.7"
-     inkscape:cx="-146.12735"
-     inkscape:cy="250.93713"
+     inkscape:zoom="0.49497475"
+     inkscape:cx="139.93738"
+     inkscape:cy="83.255011"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="text1299"
      inkscape:document-rotation="0"
      showgrid="false"
      inkscape:window-width="1366"
@@ -51,23 +51,17 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:115.761px;line-height:1.25;font-family:'AR PL KaitiM GB';-inkscape-font-specification:'AR PL KaitiM GB';stroke-width:2.04939;stroke-miterlimit:4;stroke-dasharray:none"
-       x="22.100876"
-       y="92.602364"
+    <g
+       aria-label="i
+"
+       transform="scale(0.98835796,1.0117792)"
        id="text1299"
-       transform="scale(0.98835796,1.0117792)"><tspan
-         sodipodi:role="line"
-         id="tspan1297"
-         x="22.100876"
-         y="92.602364"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'AR PL KaitiM GB';-inkscape-font-specification:'AR PL KaitiM GB';stroke-width:2.04939;stroke-miterlimit:4;stroke-dasharray:none">i</tspan><tspan
-         sodipodi:role="line"
-         x="22.100876"
-         y="237.30363"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:115.761px;line-height:1.25;font-family:'AR PL KaitiM GB';-inkscape-font-specification:'AR PL KaitiM GB';stroke-width:2.04939;stroke-miterlimit:4;stroke-dasharray:none">
+      <path
+         d="m 50.249791,14.825441 q -3.052292,0 -4.861057,1.695717 -1.808766,1.808766 -1.808766,4.974106 0,2.487053 1.921813,4.861058 1.469623,1.808765 4.74801,1.921813 3.052292,0 4.974106,-2.147909 1.808765,-2.034861 1.808765,-4.634962 0,-3.16534 -2.034861,-4.861058 -2.147909,-1.808765 -4.74801,-1.808765 z m 3.843627,61.158888 V 36.643676 h -3.16534 q -6.104584,6.556776 -17.974608,6.556776 v 3.16534 q 9.496019,0 11.304785,0.565239 1.808766,0.452191 1.808766,1.695718 v 27.35758 q 0,2.374005 -1.695718,3.504484 -1.695718,1.356574 -4.861058,1.356574 h -9.156876 v 3.16534 h 40.471132 v -3.16534 h -9.49602 q -3.391436,0 -5.313249,-1.130479 -1.695718,-1.130478 -1.921814,-3.730579 z"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'AR PL KaitiM GB';-inkscape-font-specification:'AR PL KaitiM GB';stroke-width:2.04939;stroke-miterlimit:4;stroke-dasharray:none"
-         id="tspan1301" /></text>
+         id="path834" />
+    </g>
     <circle
        style="opacity:1;fill:none;stroke:#000000;stroke-width:3.43958333;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
        id="path1884"
