@@ -302,7 +302,6 @@ app.post('/task/:id',checkAuthenticated, async (req, res) => {
         else if (err.code === 'ENOENT') {
 
             var prevCode = ""
-            var result="";
             var attempts = req.user.attempts;
             for(var i = 0; i < attempts.length; i++){
                 if( attempts[i].taskID == req.params.id){
@@ -1056,35 +1055,33 @@ app.get('/tournament/:login/:id', checkAuthenticated, checkTournamentValidation,
         if (!tournament) {
             res.redirect("/tournaments/" + req.params.login + "/1/default&all&all")
         } else {
-            console.log(tournament)
-            if (req.user.isTeacher || tournament.isEnded || tournament.isBegan && tournament.participants.find(item => item.id == req.params.login)) {
-                var tasks = await Task.find({ identificator: { $in: tournament.tasks } });
-                var verdicts = [];
-                var verdict;
-                for (var i = 0; i < tournament.tasks.length; i++) {
-                    verdict = user.verdicts.find(item => item.taskID == tournament.tasks[i])
-                    if (!verdict) {
-                        verdict = "-"
-                    } else {
-                        verdict = verdict.result
-                    }
-                    verdicts.push(verdict)
+            var tasks = await Task.find({ identificator: { $in: tournament.tasks } });
+            var verdicts = [];
+            var verdict;
+            for (var i = 0; i < tournament.tasks.length; i++) {
+                verdict = user.verdicts.find(item => item.taskID == tournament.tasks[i])
+                if (!verdict) {
+                    verdict = "-"
+                } else {
+                    verdict = verdict.result
                 }
-                res.render('tournament.ejs', {
-                    ID: tournament.identificator,
-                    u_login: user.login,
-                    u_name: user.name,
-                    login: user.login,
-                    name: req.user.name,
-                    title: "Tournament",
-                    isTeacher: req.user.isTeacher,
-                    tournament: tournament,
-                    tasks: tasks,
-                    results: verdicts,
-                })
-            } else {
-                res.redirect('/tournaments/' + req.user.login + '/1/default&all&all')
+                verdicts.push(verdict)
             }
+            if (!(req.user.isTeacher || tournament.isEnded || tournament.isBegan && tournament.participants.find(item => item.id == req.params.login))) {
+                tasks = [];
+            }
+            res.render('tournament.ejs', {
+                ID: tournament.identificator,
+                u_login: user.login,
+                u_name: user.name,
+                login: user.login,
+                name: req.user.name,
+                title: "Tournament",
+                isTeacher: req.user.isTeacher,
+                tournament: tournament,
+                tasks: tasks,
+                results: verdicts,
+            });
     }
 })//V
 
@@ -1225,7 +1222,6 @@ function checkTournamentValidation(req, res, next) {
 }
 
 async function isLessonAvailable(req, res, next) {
-    consol.log(req)
     lesson = await Lesson.findOne({identificator : req.params.id}).exec();
     if (req.user.isTeacher || (req.user.grade == lesson.grade)) {
         return next()

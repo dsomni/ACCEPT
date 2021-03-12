@@ -16,7 +16,7 @@
         <main>
             <form class="SearchUI" action= '/students/1/default'  method="POST">
                 <input name = "searcharea" rows=1 placeholder="Поиск ученика">
-                <select name="GradeSelector" id = "GradeSelector"> 
+                <select name="GradeSelector" id = "GradeSelector">
                     <option value="all" selected>Все</option>
                     <% for(var i = 6; i < 12; i++) { %>
                     <option value=<%= i %> ><%= i %></option>

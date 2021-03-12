@@ -8,6 +8,7 @@
 body{
     background-color: var(--main-bg-color);
     min-width: 1000px;
+    scrollbar-width: thin;
 }
 ::-webkit-scrollbar{
     width: 5px;
@@ -40,6 +41,9 @@ textarea::-webkit-scrollbar{
     width: 0px;
     height: 0px;
 }
+textarea{
+    scrollbar-width: none;
+}
 ul{
     list-style: none;
 }
@@ -61,6 +65,7 @@ header{
     z-index: 1;
     overflow-x: hidden;
     overflow-y: scroll;
+    scrollbar-width: thin;
     box-shadow: 0px 2px #00000012;
     transition: ease-in-out .4s;
 }
@@ -80,7 +85,6 @@ header button{
     font-weight: bold;
     border: none;
     outline: none;
-    font-family:  sans-serif;
     margin-top: 10px;
     margin-left: 5px;
     letter-spacing: 0.5px;
@@ -397,9 +401,6 @@ header input{
 }
 .loginInterface button{
     margin-left: -5px;
-}
-.loginInterface img{
-    width: 45px;
 }
 
 /*-----------------------------------------------------------------------------*/
