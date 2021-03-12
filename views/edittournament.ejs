@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Редактирование турнира</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0,
+              maximum-scale=1.0, minimum-scale=1.0,
+              user-scalable=no, minimal-ui">
+        <meta name="full-screen" content="yes">
+
+        </head>
+    <body>
+        <main>
+
+        <form action=<%= '/edittournament/'+tournament.identificator %>  method="POST">
+            <div class="lessonAdderForm">
+                <h3>Название турнира</h3>
+                <textarea id="title" name = "title" required placeholder="Введите название"><%=tournament.title%></textarea>
+                <h3>Описание</h3>
+                <textarea id="description" name = "description" placeholder="Введите описание"><%=tournament.description%></textarea>
+                <h3>Задачи</h3>
+                <textarea id="tasks" name="tasks" required placeholder="Введите номера задач через пробел"><%=tournament.tasks.join(' ')%></textarea>
+                <h3>Дата проведения</h3>
+                <input style="width: 90%;margin-left: auto;margin-right: auto;margin-bottom: 10px;" class="dateChooser" type="datetime-local" name="whenStarts" required value=<%= tournament.whenStarts.replace(' ', 'T')%>>
+                <h3>Дата окончания</h3>
+                <input style="width: 90%;margin-left: auto;margin-right: auto;margin-bottom: 10px;" class="dateChooser" type="datetime-local" name="whenEnds" required value=<%= tournament.whenEnds.replace(' ', 'T')%>>
+                <button id="submit2">Сохранить турнир</button>
+            </div>
+        </form>
+    </main>
+    </body>
+</html>

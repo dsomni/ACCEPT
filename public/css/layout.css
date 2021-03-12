@@ -71,6 +71,7 @@ header{
 }
 header:hover{
     width: 220px;
+    word-wrap: normal;
 }
 header:hover input{
     width: 180px;

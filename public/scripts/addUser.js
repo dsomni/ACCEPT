@@ -25,8 +25,8 @@ mongoose.set('useCreateIndex', true);
 
 
 var UserSchema = new mongoose.Schema({
-    login: { 
-        type: String, 
+    login: {
+        type: String,
         unique: true,
         index: true
     },
@@ -48,7 +48,7 @@ var User = mongoose.model('User', UserSchema );
 async function addStudent (login, password, name, grade, gradeLetter, group){
     await User.insertMany([{
         login: login,
-        password: password,
+        password: password,//хэширование
         name: name,
 
         grade: grade,

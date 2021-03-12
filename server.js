@@ -1009,14 +1009,6 @@ app.get('/tournaments/:login/:page/:search', checkAuthenticated, async (req, res
             }
             result = solved + result;
             results.push(result)
-            if (!Tournaments[i].isBegan) {
-                Tournaments[i].isBegan = now.getTime() > Date.parse(Tournaments[i].whenStarts)
-            }
-            if (!Tournaments[i].isEnded) {
-                Tournaments[i].isEnded = now.getTime() > Date.parse(Tournaments[i].whenEnds)
-            }
-            await Tournaments[i].save()
-
         }
     }
 
@@ -1067,7 +1059,7 @@ app.get('/tournament/:login/:id', checkAuthenticated, checkTournamentValidation,
                 }
                 verdicts.push(verdict)
             }
-            if (!(req.user.isTeacher || tournament.isEnded || tournament.isBegan && tournament.participants.find(item => item.id == req.params.login))) {
+            if (!(req.user.isTeacher || tournament.isEnded || tournament.isBegan && tournament.participants.find(item => item.login == req.params.login))) {
                 tasks = [];
             }
             res.render('tournament.ejs', {
@@ -1084,6 +1076,14 @@ app.get('/tournament/:login/:id', checkAuthenticated, checkTournamentValidation,
             });
     }
 })//V
+
+//---------------------------------------------------------------------------------
+// Tournament Task Page
+app.get('/tournament/:login/:id/:taskid', checkAuthenticated, checkTournamentValidation, async (req, res) => {
+    res.json({ sucсess: true });
+    //
+});
+
 
 //---------------------------------------------------------------------------------
 // Edit Tournament Page
@@ -1106,10 +1106,9 @@ app.post('/edittournament/:id',checkAuthenticated, checkPermission, async (req, 
 
     tournament.title = body.title;
     tournament.description = body.description;
-    tournament.whenStarts = body.whenStarts;
-    tournament.duration = body.duration;
+    tournament.whenStarts = body.whenStarts.replace('T', ' ');
+    tournament.whenEnds = body.whenEnds.replace('T', ' ');
     tournament.tasks = body.tasks.split(' ');
-    tournament.participants = body.participants.split(' ');
     await tournament.save();
 
     res.render('edittournament.ejs',{
@@ -1128,9 +1127,10 @@ app.get('/regTournament/:tournament_id', async (req, res) => {
     let tournament = await Tournament.findOne({ identificator: req.params.tournament_id }).exec()
     if (!tournament.isBegan) {
         tournament.participants.push({
-            id: req.user.login,
+            login: req.user.login,
             score: 0,
-            solved: []
+            solved: [], //{taskID: , time: }
+            attempts:[] //{taskID: , task_attempts: [{taskID: , time: , }] }
         });
         await tournament.save();
     }
@@ -1188,7 +1188,27 @@ app.get('*', (req,res) => {
 
 //---------------------------------------------------------------------------------
 // Functions
-function checkAuthenticated(req, res, next) {
+
+async function checkTimings() {
+    let Tournaments = await Tournament.find({isEnded:false});
+    let now = new Date()
+    for (let i = 1; i < Tournaments.length; i++){
+        let began = Tournaments[i].isBegan;
+        let ended = Tournaments[i].isEnded;
+        if (!Tournaments[i].isBegan) {
+            Tournaments[i].isBegan = now.getTime() > Date.parse(Tournaments[i].whenStarts)
+            //startTournament();
+        }
+        if (!Tournaments[i].isEnded) {
+            Tournaments[i].isEnded = now.getTime() > Date.parse(Tournaments[i].whenEnds)
+        }
+        if (began == Tournaments[i].isBegan && ended == Tournaments[i].isEnded)
+            await Tournaments[i].save()
+    }
+}
+
+async function checkAuthenticated(req, res, next) {
+    await checkTimings();
     if (req.isAuthenticated()) {
         return next()
     }
