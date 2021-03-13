@@ -56,3 +56,17 @@ exports.addTournament = async function (Tournament, title, description, tasks, a
     await Tournament.insertMany([tournament]);
 }
 
+exports.addTaskToTournament = async function (Tournament, tour_id, title, statement, examples, tests) {
+
+    let tournament = await Tournament.findOne({ identificator: tour_id }).exec();
+
+    tournament.tasks.push({
+        identificator: tournament.tasks.length,
+        title: title,
+        statement: statement,
+        examples: examples,
+        tests: tests,
+    });
+
+    await tournament.save();
+}

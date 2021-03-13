@@ -37,8 +37,8 @@ var LessonSchema = new mongoose.Schema({
 }, {collection: config.mongodbConfigs.CollectionNames.lessons});
 
 var UserSchema = new mongoose.Schema({
-    login: { 
-        type: String, 
+    login: {
+        type: String,
         unique: true,
         index: true
     },

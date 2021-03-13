@@ -21,8 +21,10 @@
         <div id="task">
             <H1 id="taskname">
                 <%= tournament.title; %>
-                    <% if(isTeacher){ %> <a id="editref" href=<%="/edittournament/" + tournament.identificator %> >
-                            [Редактировать] </a>
+                    <% if(isTeacher){ %>
+                        <a id="editref" href=<%="/edittournament/" + tournament.identificator %> > [Редактировать] </a>
+                        <a id="editref" href=<%="/addtask_tt/" + tournament.identificator %> > [Добавить задачу] </a>
+                        <a id="editref" href=<%="/addparticipant_tt/" + tournament.identificator %> > [Добавить участников] </a>
             </H1>
             <% } %>
                 <h4>Автор: <%= tournament.author %>
@@ -41,14 +43,14 @@
                 <th>История</th>
             </tr>
 
-            <% for (var i=0; i < tournament.tasks.length; i++) { %>
-                <% var task=tasks.find(item=> item.identificator == tournament.tasks[i]);
+            <% for (var i=0; i < tasks.length; i++) { %>
+                <% let task = tasks[i];
                     if (task) { %>
                     <tr>
                         <td>
                             <%= task.identificator %>
                         </td>
-                        <td> <a class="tlrefs" href=<%="/task/" + task.identificator %>> <%= task.title %> </a> </td>
+                        <td> <a class="tlrefs" href=<%="/task_tt/"+tournament.identificator  + '/' + task.identificator %>> <%= task.title %> </a> </td>
                         <td>
                             <%= task.author %>
                         </td>

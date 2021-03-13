@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Задача <%= ID %></title>
+
+        <meta charset="utf-8">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0,
+              maximum-scale=1.0, minimum-scale=1.0,
+              user-scalable=no, minimal-ui">
+        <meta name="full-screen" content="yes">
+
+        </head>
+    <body>
+        <main>
+        <div id="task">
+        <H1 id="taskname"><%= problem.title %> <% if(isTeacher){ %> <a id="editref" href=<%= "/edittask/" + problem.identificator %> > [Редактировать] </a>
+            <span class="taskPopup">
+                <dialog  id='dialog_delete'>
+                <form action= <%="/deletetask_tt/" + TUR_ID +'/'  + problem.identificator %>  method="POST">
+                    Вы действительно хотите удалить задачу "<%= problem.title %>" ?
+                    <button>Да</button>
+                  </form>
+                  <button onClick='c_delete();'>Назад</button>
+                </dialog>
+              <button onClick='o_delete();' class="show" >[Удалить]</button>
+              </span>
+        </H1>
+        <% } %>
+        <h4>Автор: <%= problem.author %></h4>
+        <div class="statement"><%= problem.statement %></div>
+        </div>
+        <table id="examples" class='taskslist'>
+            <tr>
+              <th>Example Input</th>
+              <th>Example Output</th>
+              </tr>
+            <% for (var i = 0; i < problem.examples.length; i++) { %>
+            <% var example = problem.examples[i]; %>
+             <tr>
+              <td><%= example[0] %></td>
+              <td> <%= example[1] %> </td>
+             </tr>
+            <% } %>
+        </table>
+
+
+        <form action=<%='/task_tt/' + TUR_ID + '/' + problem.identificator %>  method="POST">
+            <div class="container">
+
+                <select name="languageSelector" id = "languageSelector">
+                    <option value="Pascal" <% if (!language || language=="Pascal"){%> selected <%}%>>Pascal ABC.NET</option>
+                    <option value="Python" <% if (language=="Python"){%> selected <%}%>>Python</option>
+                </select>
+
+                    <div class="imgs">
+                        <img src="..\..\public\media\TopLeft.svg">
+                        <img src="..\..\public\media\TopRight.svg">
+                    </div>
+                    <textarea class="taskarea" id="code" name = "code" required placeholder="Place code here"><%= prevCode %></textarea>
+                    <div class="taskarea"  id="result" name="result" >
+                        <ul>
+                            <% RESULT.forEach(function(item){ %>
+                                <li><%= item[0] %> <a id=<%= item[2] %>><%= item[1] %></a></li>
+                            <% }); %>
+                        </ul>
+                    </div>
+                    <div class="imgsbottom">
+                        <img src="..\..\public\media\BottomLeft.svg">
+                        <img src="..\..\public\media\BottomRight.svg">
+                    </div>
+            </div>
+            <div id="submitdiv">
+                <button id="submit">Отправить</button>
+            </div>
+
+        </form>
+
+    </main>
+    </body>
+    <script type = text/javascript>
+        function o_delete() {
+            document.getElementById('dialog_delete').showModal();
+        }
+        function c_delete() {
+            document.getElementById('dialog_delete').close();
+        }
+    </script>
+</html>
