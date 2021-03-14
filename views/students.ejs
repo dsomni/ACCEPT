@@ -45,18 +45,17 @@
                     <td><%= student.name %> </td>
                     <td><%= student.grade + student.gradeLetter %></td>
 
-                    
+
                     <td>
-                        <span class="group">
-                        <dialog  id=<%='dialog' + i%>>
-                        <form action= <%='/editgroup/' + student.login + '/' +page +'/' + search %>  method="POST">
-                          Номер группы: 
-                          <input id="groupEditor" name="groupEditor" placeholder=<%=student.group%>> <button>Сохранить</button>
-                        </form> 
-                        <button onClick=<%='c(' + i + ');' %> >Назад</button>
-                        </dialog>
-                    <button onClick=<%='o(' + i + ');' %> class="show" ><%=student.group%></button>
-                        </form>
+                        <span class="group" style="cursor: grab;">
+                            <dialog  id=<%='dialog' + i%>>
+                                <form action= <%='/editgroup/' + student.login + '/' +page +'/' + search %>  method="POST">
+                                    Номер группы:
+                                    <input id="groupEditor" name="groupEditor" placeholder=<%=student.group%>> <button>Сохранить</button>
+                                </form>
+                                <button onClick=<%='c(' + i + ');' %> >Назад</button>
+                            </dialog>
+                                <button onClick=<%='o(' + i + ');' %> class="show" ><%=student.group|| 'Edit'%></button>
                         </span>
                     </td>
 

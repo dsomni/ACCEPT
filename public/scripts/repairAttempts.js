@@ -13,27 +13,24 @@ mongoose.connect(connectionString, {
     useUnifiedTopology: true
 })
 
-const Lesson = require('../../config/models/Lesson');
+const User = require('../../config/models/User');
 
-async function run() {
-
-    //-----------------------------------------------------------------
-    // Repair Hints
-    let lessons = await Lesson.find({}).exec()
-    for (let i = 0; i < lessons.length; i++) {
-        let lesson = lessons[i];
-        for (let j = 0; j < lesson.tasks.length; j++){
-            if (!String(lesson.tasks[j]).split('_')[1]) {
-                lesson.tasks[j] = '0_' + lesson.tasks[j];
-            }
+async function go()  {
+    let users = await User.find({}).exec();
+    for (let i = 0; i < users.length; i++) {
+        let user = users[i];
+        let attempts = user.attempts;
+        for (let j = 0; j < attempts.length; j++){
+            if (!attempts[j].taskID.includes('_'))
+                attempts[j].taskID = '0_' + attempts[j].taskID;
         }
-        lesson.markModified('tasks')
-        await lesson.save();
+        user.attempts = attempts;
+        users[i].markModified('attempts');
+        await  user.save( );
     }
 }
+go();
 
-run()
-
-setTimeout(() => {
+setTimeout(()=>{
     process.exit()
-}, 10000)
+},10000)

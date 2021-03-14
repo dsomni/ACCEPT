@@ -105,13 +105,13 @@ app.post('/', passport.authenticate('local', {
 //---------------------------------------------------------------------------------
 // Task Page
 app.get('/task/:id', checkAuthenticated, async (req, res) => {
-    let problem = await Task.findOne({identificator: req.params.id}).exec()
+    let language = req.body.languageSelector;
+    let problem = await Task.findOne({identificator: req.params.id}).exec();
     let showHint = req.user.attempts.filter(item => item.taskID == req.params.id).length >= problem.hint.attemptsForHint;
-    fs.stat('public\\processes\\'+req.user.login+'_'+req.params.id, function(err,stats) {
+    fs.stat('public\\processes\\' + req.user.login +'_'+req.params.id, function(err,stats) {
         if (!err && Date.now()) {
             if(Date.now() - stats.birthtimeMs >= config.FolderLifeTime){
                 fs.rmdirSync('public\\processes\\'+req.user.login+'_'+req.params.id,{recursive: true});
-
                 res.redirect('/task/'+req.params.id);
             }else{
                 fs.stat('public\\processes\\'+req.user.login+'_'+req.params.id+"\\result.txt", async function(err,stats2) {
@@ -458,6 +458,7 @@ app.get('/account/:login/:page/:search',checkAuthenticated, checkValidation, asy
 
     if(user){
         let tasks = await Task.find({}).exec();
+        let tournaments = await Tournament.find({}).exec();
         let attempts = user.attempts;
         let results = [];
         let foundTasks = [];
@@ -467,16 +468,27 @@ app.get('/account/:login/:page/:search',checkAuthenticated, checkValidation, asy
         let toSearch = a[0].toUpperCase();
         let types = a[1];
         if(toSearch == "DEFAULT") toSearch="";
+        let tourTask =[]
+        tournaments.forEach(tournament => tournament.tasks.forEach(task => tourTask.push(task)));
 
         for(let i = 0; i < attempts.length; i++){
             //verylongresult = attempts[i].result[attempts[i].result.length -1 ][attempts[i].result[attempts[i].result.length -1 ].length - 1];
             verylongresult = getVerdict(attempts[i].result);
-            if((tasks[attempts[i].taskID].title.slice(0, toSearch.length).toUpperCase() == toSearch) &&
-             (  (types=='all') ||  (verylongresult=='OK') )){
+            if ((attempts[i].taskID.split('_')[0] != '0') && ((types=='all') || (verylongresult=='OK'))){
+                let task = tourTask.find(item => item.identificator == attempts[i].taskID);
+                if (task && task.title.slice(0, toSearch.length).toUpperCase() == toSearch){
+                    foundAttempts.push(attempts[i]);
+                    foundTasks.push(task);
+                }
+            }
+            else if ((tasks[parseInt(attempts[i].taskID.split('_')[1])].title.slice(0, toSearch.length).toUpperCase() == toSearch) &&
+                ((types=='all') || (verylongresult=='OK'))){
                 foundAttempts.push(attempts[i]);
-                foundTasks.push(tasks[attempts[i].taskID]);
+                let task = tasks.find(item => item.identificator == attempts[i].taskID);
+                foundTasks.push(task);
             }
         }
+
 
         res.render('account.ejs',{
             login: req.user.login,
@@ -981,12 +993,20 @@ app.post('/edittournament/:id',checkAuthenticated, checkPermission, async (req, 
 app.get('/regTournament/:tournament_id', checkAuthenticated, async (req, res) => {
     let tournament = await Tournament.findOne({ identificator: req.params.tournament_id }).exec()
     if (!tournament.isBegan) {
-        tournament.participants.push({
+        let newRes = {
             login: req.user.login,
-            score: 0,
-            solved: [], //{taskID: , time: }
-            attempts:[] //{taskID: , task_attempts: [{taskID: , time: , }] }
-        });
+            sumscore: 0,
+            sumtime: 0,
+            tasks: []
+        }
+        // for (let i = 0; i < tournament.tasks.length; i++) {
+        //     newRes.tasks.push({
+        //         score: 0,
+        //         dtime: 0,//from start
+        //         tries: 0
+        //     })
+        // }
+        tournament.results.push(newRes);
         await tournament.save();
     }
     res.redirect('/tournaments/'+req.user.login+'/1/default&all&all')
@@ -1052,6 +1072,8 @@ app.get('/task_tt/:tour_id/:id', checkAuthenticated, async (req, res) => {
     let tour_id = req.params.tour_id
     let problem = await Tournament.findOne({ identificator: tour_id }).exec();
     let whenEnds = problem.whenEnds;
+    let isBegan = problem.isBegan;
+    let language = req.body.languageSelector;
     problem = problem.tasks.find(item => item.identificator == req.params.id);
     fs.stat('public\\processes\\' + req.user.login + '_' + req.params.id, function (err, stats) {
         if (!err && Date.now()) {
@@ -1122,7 +1144,8 @@ app.get('/task_tt/:tour_id/:id', checkAuthenticated, async (req, res) => {
                                 problem: problem,
                                 prevCode: "",
                                 language: language,
-                                whenEnds: whenEnds
+                                whenEnds: whenEnds,
+                                isBegan: isBegan
                             });
                         }
                     } else {
@@ -1137,7 +1160,8 @@ app.get('/task_tt/:tour_id/:id', checkAuthenticated, async (req, res) => {
                             problem: problem,
                             prevCode: "",
                             language: req.user.attempts[0].language,
-                            whenEnds: whenEnds
+                            whenEnds: whenEnds,
+                                isBegan: isBegan
                         });
                     }
                 });
@@ -1166,7 +1190,8 @@ app.get('/task_tt/:tour_id/:id', checkAuthenticated, async (req, res) => {
                 problem: problem,
                 prevCode: prevCode,
                 language: language,
-                whenEnds: whenEnds
+                whenEnds: whenEnds,
+                isBegan: isBegan
             });
         }
     });
@@ -1176,7 +1201,7 @@ app.post('/task_tt/:tour_id/:id', checkAuthenticated, async (req, res) => {
 
     fs.stat('public\\processes\\' + req.user.login + '_' + req.params.id, async function (err) {
         if (!err) {
-            res.redirect('/task_tt/' + tour_id + '/' + req.params.id);
+            res.redirect('/task_tt/' + req.params.tour_id + '/' + req.params.id);
         }
         else if (err.code === 'ENOENT') {
 
@@ -1209,7 +1234,7 @@ app.post('/task_tt/:tour_id/:id', checkAuthenticated, async (req, res) => {
                     req.params.id)
 
             }
-            res.redirect('/task_tt/' + tour_id + '/' + req.params.id);
+            res.redirect('/task_tt/' + req.params.tour_id + '/' + req.params.id);
         }
     });
 
@@ -1233,7 +1258,7 @@ app.get('/tournament/:login/:id', checkAuthenticated, checkTournamentValidation,
         let verdicts = [];
         let verdict;
         for (let i = 0; i < tournament.tasks.length; i++) {
-            verdict = user.verdicts.find(item => item.taskID == tournament.tasks[i])
+            verdict = user.verdicts.find(item => item.taskID == tournament.tasks[i].identificator)
             if (!verdict) {
                 verdict = "-"
             } else {
@@ -1241,7 +1266,7 @@ app.get('/tournament/:login/:id', checkAuthenticated, checkTournamentValidation,
             }
             verdicts.push(verdict)
         }
-        if (!(req.user.isTeacher || tournament.isEnded || tournament.isBegan && tournament.participants.find(item => item.login == req.params.login))) {
+        if (!(req.user.isTeacher || tournament.isEnded || tournament.isBegan && tournament.results.find(item => item.login == req.params.login))) {
             tasks = [];
         }
         res.render('tournament.ejs', {
@@ -1259,7 +1284,56 @@ app.get('/tournament/:login/:id', checkAuthenticated, checkTournamentValidation,
     }
 })//V
 
+//---------------------------------------------------------------------------------
+// Edit tournament task
 
+app.get('/edittask_tt/:tour_id/:id', checkAuthenticated, checkPermission, async (req, res) => {
+    let tournament = await Tournament.findOne({ identificator: req.params.tour_id });
+    let task = tournament.tasks.find(item => item.identificator == req.params.id);
+    res.render('edittasktournament.ejs', {
+        login: req.user.login,
+        name: req.user.name,
+        title: "Edit Tournament Task",
+        isTeacher: req.user.isTeacher,
+        task: task,
+        tour_id: req.params.tour_id
+    })
+});
+
+app.post('/edittask_tt/:tour_id/:id', checkAuthenticated, checkPermission, async (req, res) => {
+    let body = req.body;
+    let user = req.user;
+    let tournament = await Tournament.findOne({ identificator: req.params.tour_id });
+    let problem = tournament.tasks.find(item => item.identificator == req.params.id);
+
+    let examples = [];
+    let exI, exO;
+    for (let i = 0; i < 5; i++) {
+        eval("exI = body.exampleIn" + i)
+        eval("exO = body.exampleOut" + i)
+        if (exI == "" || exO == "") break;
+        examples.push([exI, exO]);
+    }
+
+    let tests = [];
+    let tI, tO;
+    for (let i = 0; i < 20; i++) {
+        eval("tI = body.testIn" + i)
+        eval("tO = body.testOut" + i)
+        if (tI == "" || tO == "") break;
+        tests.push([tI, tO]);
+    }
+
+    problem.title = body.title;
+    problem.statement = body.statement;
+    problem.examples = examples;
+    problem.tests = tests;
+
+    tournament.markModified('tasks');
+    await tournament.save();
+
+    res.redirect('/edittask_tt/'+req.params.tour_id + '/' + req.params.id);
+});
 
 //---------------------------------------------------------------------------------
 // About Page
@@ -1325,7 +1399,18 @@ async function checkTimings() {
         if (!Tournaments[i].isEnded) {
             Tournaments[i].isEnded = now.getTime() > Date.parse(Tournaments[i].whenEnds)
         }
-        if (began == Tournaments[i].isBegan && ended == Tournaments[i].isEnded)
+        if (began != Tournaments[i].isBegan) {
+            Tournaments[i].results.forEach(item => {
+                for (let i = 0; i < item.tasks.length; i++) {
+                    newRes.tasks.push({
+                        score: 0,
+                        dtime: 0,//from start
+                        tries: 0
+                    })
+                }
+            });
+        }
+        if (began != Tournaments[i].isBegan || ended != Tournaments[i].isEnded)
             await Tournaments[i].save()
     }
 }
@@ -1381,7 +1466,9 @@ function getVerdict(results){
             return results[i][1];
         }
     }
-    return "OK";
+    if(results.length>0)
+        return "OK";
+    return 'err';
 }
 
 //---------------------------------------------------------------------------------

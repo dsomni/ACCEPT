@@ -15,12 +15,17 @@
         <main>
         <form>
             <% var maxDate = new Date(Number(date)); %>
-            <% var isoDate = maxDate.toISOString(); %>   
+            <% var isoDate = maxDate.toISOString(); %>
             <% var Completedate = isoDate.substr(0, 10) + " " + isoDate.substr(11, 8) ; %>
             <div>
                 <div>Дата: <%= Completedate %> </div>
                 <div><a class="tlrefs" href=<%="/account/" + login + "/1/default" %>>Пользователь <%= n_name %> </a> </div>
-                <a class="tlrefs" href=<%="/task/" + taskID %>>Задача #<%= taskID %> </a>
+                <% if(parseInt(taskID.split('_')[0])!=0){ %>
+                    <a class="tlrefs" href=<%="/tournament/" + login + '/' + taskID.split('_')[0] %>>Турнир #<%= parseInt(taskID.split('_')[0]) %> </a>
+                    <a class="tlrefs" href=<%="/task_tt/" + taskID.split('_')[0] + '/' + taskID %>>Задача #<%= parseInt(taskID.split('_')[1])+1 %> </a>
+                <% }else{ %>
+                    <a class="tlrefs" href=<%="/task/" + taskID %>>Задача #<%= parseInt(taskID.split('_')[1])+1 %> </a>
+                <% } %>
                 <div>Язык: <%= language || 'Pascal' %> </div>
             </div>
             <div class="container">

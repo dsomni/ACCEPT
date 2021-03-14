@@ -18,7 +18,7 @@ const Task = require('../../config/models/Task');
 const Lesson = require('../../config/models/Lesson');
 
 
-var deletedTask = '0_'+process.argv[2]
+var deletedTask = process.argv[2]
 
 
 
@@ -28,8 +28,8 @@ async function run(){
     let tasks = await Task.find({}).exec()
     for(let i = 0; i<tasks.length; i++){
         task = tasks[i]
-        if(task.identificator>deletedTask){
-            task.identificator = task.identificator-1
+        if (task.identificator.split('_')[1] > deletedTask.split('_')[1]){
+            task.identificator = task.identificator.split('_')[0]  + '_' + (parseInt(task.identificator.split('_')[1])-1)
             task.save()
         }
     }
@@ -47,8 +47,8 @@ async function run(){
             toDelete.push(lesson.identificator)
         }
         for(let j = 0; j<lesson.tasks.length; j++){
-            if(lesson.tasks[j]>deletedTask){
-                lesson.tasks[j]-=1
+            if (lesson.tasks[j].split('_')[1] > deletedTask.split('_')[1]){
+                lesson.tasks[j] = lesson.tasks[j].identificator.split('_')[0] + '_' + (parseInt(lesson.tasks[j].identificator.split('_')[1]) - 1)
             }
         }
         await lesson.save()
@@ -68,8 +68,8 @@ async function run(){
             deleted = attempts.findIndex(Element => Element.taskID == deletedTask)
         }
         for(let j = 0; j<attempts.length; j++){
-            if(attempts[j].taskID>deletedTask){
-                attempts[j].taskID-=1;
+            if (attempts[j].taskID.split('_')[1] > deletedTask.split('_')[1]){
+                attempts[j].taskID = attempts[j].taskID.split('_')[0] + '_' + (parseInt(attempts[j].taskID.split('_')[1]) - 1);
             }
         }
         user.attempts = attempts;
@@ -81,8 +81,8 @@ async function run(){
             deleted = verdicts.findIndex(Element => Element.taskID == deletedTask)
         }
         for(let j = 0; j<verdicts.length; j++){
-            if(verdicts[j].taskID>deletedTask){
-                verdicts[j].taskID-=1;
+            if (verdicts[j].taskID.split('_')[1] > deletedTask.split('_')[1]){
+                verdicts[j].taskID = verdicts[j].taskID.split('_')[0] + '+' + (parseInt(verdicts[j].taskID.split('_')[1]) - 1);;
             }
         }
         user.verdicts = verdicts;

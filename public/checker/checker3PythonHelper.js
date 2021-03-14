@@ -13,7 +13,7 @@ async function run(){
 
     var pOutput ='';
     var result ="Test #" + (i+1).toString() + "*" + "Wrong Answer" + "*" + "er" +"\n";
-    
+
     var spawnProcess = childProcess.spawn(__dirname + '\\pythonCompiler\\python.exe', [path + '\\'+fileName +'.py'], {shell: false});
 
     spawnProcess.on('error', function (error) {
@@ -37,7 +37,7 @@ async function run(){
         spawnProcess.stdout.removeAllListeners();
         spawnProcess.stderr.removeAllListeners();
         process.exit()
-        
+
     });
 
     spawnProcess.on('close', (code) => {
@@ -46,7 +46,7 @@ async function run(){
         spawnProcess.stderr.removeAllListeners();
         process.exit()
     });
-    
+
     spawnProcess.stdin.write(input);
     spawnProcess.stdin.end();
 

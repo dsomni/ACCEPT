@@ -40,7 +40,7 @@
                 <% var onPage = 20 %>
                 <% if(tournaments.length>0){ if(tournaments[0].identificator!=0){ tournaments.unshift([0]);results.unshift([0]) } } %>
                 <% for (var i = (page-1)*onPage+1; i < min(page*onPage+1,tournaments.length); i++) { %>
-                <% var tournament = tournaments[i-1]; %>
+                <% var tournament = tournaments[i]; %>
                  <tr>
                   <!--<td><%= tournament.identificator %></td> -->
                   <td><%= i %></td>
@@ -50,7 +50,7 @@
                   <td><%= tournament.whenStarts %></td>
                   <td><%= tournament.whenEnds %></td>
                   <% if(!tournament.isBegan){ %>
-                    <% let registered = tournament.participants.find(item=>item.id==u_login);%>
+                    <% let registered = tournament.results.find(item=>item.login==login);%>
                     <% if(!registered){ %>
                         <td><a style="text-decoration: none;" href=<%= "/regTournament/" + tournament.identificator %>>Регистрация</a></td>
                     <% } else { %>

@@ -14,11 +14,20 @@ const TournamentSchema = new mongoose.Schema({
         tests: Array,
     }],
     author: String,
-    participants: Array,
     whenStarts: String,
     whenEnds: String,
     isBegan: Boolean,
-    isEnded: Boolean
+    isEnded: Boolean,
+    results: [{
+        login: String,
+        sumscore: Number,
+        sumtime: Number,//sum from start
+        tasks: [{
+            score: Number,
+            dtime: Number,//from start
+            tries: Number
+        }]
+    }]
 
 }, { collection: config.mongodbConfigs.CollectionNames.tournaments });
 

@@ -21,7 +21,7 @@ async function go(){
 
     let path = process.argv[2];
     let fileName = process.argv[3];
-    let taskid = process.argv[4].split('_')[1];
+    let taskid = process.argv[4];
     let tour_id = process.argv[4].split('_')[0];
 
 

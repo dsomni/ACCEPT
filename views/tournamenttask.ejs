@@ -16,7 +16,8 @@
         <div id="task">
         <H1 id="taskname"><%= problem.title %></H1>
         <div style="text-align: center;">
-            <% if(isTeacher){ %> <a id="editref" href=<%= "/edittask/" + problem.identificator %> > [Редактировать] </a>
+            <% if(isTeacher){ %> <a id="editref" href=<%= "/edittask_tt/" + TUR_ID +'/' + problem.identificator %> > [Редактировать] </a>
+                <% if(!isBegan){ %>
                 <span class="taskPopup">
                     <dialog  id='dialog_delete'>
                     <form action= <%="/deletetask_tt/" + TUR_ID +'/'  + problem.identificator %>  method="POST">
@@ -27,7 +28,7 @@
                     </dialog>
                 <button onClick='o_delete();' class="show" >[Удалить]</button>
                 </span>
-            <% } %>
+            <% }} %>
         </div>
         <div class="statement"><%= problem.statement %></div>
         </div>

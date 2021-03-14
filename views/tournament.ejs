@@ -22,41 +22,48 @@
                 <div style="text-align: center; margin: 10px;">
                     <% if(isTeacher){ %>
                         <a id="editref" href=<%="/edittournament/" + tournament.identificator %> > [Редактировать] </a>
+                        <% if(!tournament.isBegan) { %>
                         <a id="editref" href=<%="/addtask_tt/" + tournament.identificator %> > [Добавить задачу] </a>
                         <a id="editref" href=<%="/addparticipant_tt/" + tournament.identificator %> > [Добавить участников] </a>
-                    <% } %>
+                    <% }} %>
                 </div>
                 <h4>Автор: <%= tournament.author %></h4>
                 <div style="margin-left: 20px;" id="statement">
                     <%= tournament.description %>
                 </div>
             </div>
+            <% if(tasks.length!=0){ %>
+                <table class='taskslist'>
+                    <tr>
+                        <th>ID</th>
+                        <th>Задача</th>
+                        <th>Вердикт</th>
+                        <th>История</th>
+                    </tr>
 
-            <table class='taskslist'>
-                <tr>
-                    <th>ID</th>
-                    <th>Задача</th>
-                    <th>Вердикт</th>
-                    <th>История</th>
-                </tr>
-
-                <% for (var i=0; i < tasks.length; i++) { %>
-                    <% let task = tasks[i];
-                        if (task) { %>
-                        <tr>
-                            <td>
-                                <%= parseInt(task.identificator.split('_')[1])+1 %>
-                            </td>
-                            <td> <a class="tlrefs" href=<%="/task_tt/"+tournament.identificator  + '/' + task.identificator %>> <%= task.title %> </a> </td>
-                            <td>
-                                <%= results[i] %>
-                            </td>
-                            <td><a class="tlrefs" href=<%="/account/" + u_login + "/1/" + task.title.replace(' ',' %20')
-                                    + "&all" %> >[все попытки]</a></td>
-                        </tr>
-                        <% }} %>
-            </table>
-            <p class="countDownTimer" id="countDownTimer"></p>
+                    <% for (var i=0; i < tasks.length; i++) { %>
+                        <% let task = tasks[i];
+                            if (task) { %>
+                            <tr>
+                                <td>
+                                    <%= parseInt(task.identificator.split('_')[1])+1 %>
+                                </td>
+                                <td> <a class="tlrefs" href=<%="/task_tt/"+tournament.identificator  + '/' + task.identificator %>> <%= task.title %> </a> </td>
+                                <td>
+                                    <%= results[i] %>
+                                </td>
+                                <td><a class="tlrefs" href=<%="/account/" + u_login + "/1/" + task.title.replace(' ',' %20')
+                                        + "&all" %> >[все попытки]</a></td>
+                            </tr>
+                            <% }} %>
+                </table>
+                <p class="countDownTimer" id="countDownTimer"></p>
+            <% }else{ %>
+                <% if(isTeacher){ %>
+                    <h1 style="text-align: center;color:Red">Добавьте задачу</h1>
+                <% }else{ %>
+                    <h1 style="text-align: center;color:Red">Вы не зарегистрированы!</h1>
+                <% }} %>
         </main>
     </body>
     <script>
