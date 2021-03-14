@@ -68,9 +68,10 @@ header{
     scrollbar-width: thin;
     box-shadow: 0px 2px #00000012;
     transition: ease-in-out .4s;
-    transition-delay: .5s;
+    transition-delay: 0s;
 }
 header:hover{
+    transition-delay: .5s;
     width: 220px;
     word-wrap: normal;
 }
@@ -91,6 +92,7 @@ header button{
     margin-left: 5px;
     letter-spacing: 0.5px;
     color: #0099ff;
+    cursor: pointer;
 }
 header button img{
     width: 45px;
@@ -149,6 +151,8 @@ header input{
 }
 #taskname{
     text-align: center;
+    margin: 10px;
+    padding: 10px;
 }
 
 #examples{
@@ -166,9 +170,9 @@ header input{
     margin-left: auto;
     margin-right: auto;
     width: 640px;
+    padding: 10px;
 }
 #task h4{
-    margin-left: -10%;
     text-align: center;
     white-space: pre-wrap;
     font-size:medium;
@@ -596,4 +600,27 @@ header input{
 }
 .student_info{
     margin-left: 120px;
+}
+.SaveChanges{
+    position: fixed;
+    top: 25px;
+    right: 10%;
+    height: 50px;
+    width: 30%;
+    font-size: large;
+    border-radius: 10px;
+    border: none;
+    background-color: #f1f1f1;
+    cursor: pointer;
+}
+.countDownTimer{
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    min-width: 10%;
+    min-height: 5vh;
+    border: solid 2px black;
+    border-radius: 5px;
+    background-color: #e4e1e1aa;
+    font-size: 2rem;
 }

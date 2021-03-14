@@ -1,68 +1,88 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <title>Турнир #<%= ID %>
+        </title>
 
-<head>
-    <title>Турнир #<%= ID %>
-    </title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0,
+                maximum-scale=1.0, minimum-scale=1.0,
+                user-scalable=no, minimal-ui">
+        <meta name="full-screen" content="yes">
+        <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
+    </head>
 
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0,
-              maximum-scale=1.0, minimum-scale=1.0,
-              user-scalable=no, minimal-ui">
-    <meta name="full-screen" content="yes">
-    <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
-</head>
-
-<body>
-    <main>
-        <h2>
-            <%= u_name %>
-        </h2>
-        <div id="task">
-            <H1 id="taskname">
-                <%= tournament.title; %>
+    <body>
+        <main>
+            <h2>
+                <%= u_name %>
+            </h2>
+            <div id="task">
+                <H1 id="taskname"><%= tournament.title; %></H1>
+                <div style="text-align: center; margin: 10px;">
                     <% if(isTeacher){ %>
                         <a id="editref" href=<%="/edittournament/" + tournament.identificator %> > [Редактировать] </a>
                         <a id="editref" href=<%="/addtask_tt/" + tournament.identificator %> > [Добавить задачу] </a>
                         <a id="editref" href=<%="/addparticipant_tt/" + tournament.identificator %> > [Добавить участников] </a>
-            </H1>
-            <% } %>
-                <h4>Автор: <%= tournament.author %>
-                </h4>
+                    <% } %>
+                </div>
+                <h4>Автор: <%= tournament.author %></h4>
                 <div style="margin-left: 20px;" id="statement">
                     <%= tournament.description %>
                 </div>
-        </div>
+            </div>
 
-        <table class='taskslist'>
-            <tr>
-                <th>ID</th>
-                <th>Задача</th>
-                <th>Автор</th>
-                <th>Вердикт</th>
-                <th>История</th>
-            </tr>
+            <table class='taskslist'>
+                <tr>
+                    <th>ID</th>
+                    <th>Задача</th>
+                    <th>Вердикт</th>
+                    <th>История</th>
+                </tr>
 
-            <% for (var i=0; i < tasks.length; i++) { %>
-                <% let task = tasks[i];
-                    if (task) { %>
-                    <tr>
-                        <td>
-                            <%= task.identificator %>
-                        </td>
-                        <td> <a class="tlrefs" href=<%="/task_tt/"+tournament.identificator  + '/' + task.identificator %>> <%= task.title %> </a> </td>
-                        <td>
-                            <%= task.author %>
-                        </td>
-                        <td>
-                            <%= results[i] %>
-                        </td>
-                        <td><a class="tlrefs" href=<%="/account/" + u_login + "/1/" + task.title.replace(' ',' %20')
-                                + "&all" %> >[все попытки]</a></td>
-                    </tr>
-                    <% }} %>
-        </table>
-    </main>
-</body>
+                <% for (var i=0; i < tasks.length; i++) { %>
+                    <% let task = tasks[i];
+                        if (task) { %>
+                        <tr>
+                            <td>
+                                <%= parseInt(task.identificator.split('_')[1])+1 %>
+                            </td>
+                            <td> <a class="tlrefs" href=<%="/task_tt/"+tournament.identificator  + '/' + task.identificator %>> <%= task.title %> </a> </td>
+                            <td>
+                                <%= results[i] %>
+                            </td>
+                            <td><a class="tlrefs" href=<%="/account/" + u_login + "/1/" + task.title.replace(' ',' %20')
+                                    + "&all" %> >[все попытки]</a></td>
+                        </tr>
+                        <% }} %>
+            </table>
+            <p class="countDownTimer" id="countDownTimer"></p>
+        </main>
+    </body>
+    <script>
+        let countDownDate = new Date('<%= tournament.whenEnds.replace(' ', 'T') %>').getTime();
+        var x = setInterval(function() {
+                // Get today's date and time
+                var now = new Date().getTime();
 
+                // Find the distance between now and the count down date
+                var distance = countDownDate - now;
+
+                // Time calculations for days, hours, minutes and seconds
+                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                // Display the result in the element with id="demo"
+                document.getElementById("countDownTimer").innerHTML = days + "d " + hours + "h "
+                + minutes + "m " + seconds + "s ";
+
+                // If the count down is finished, write some text
+                if (distance < 0) {
+                    clearInterval(x);
+                    document.getElementById("countDownTimer").innerHTML = "Окончен";
+                }
+            }, 1000);
+    </script>
 </html>

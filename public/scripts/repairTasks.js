@@ -1,27 +1,36 @@
 const mongoose = require('mongoose');
 const config = require('../../config/configs');
 
-var connectionString;
+var connectionString
 if (config.mongodbConfigs.User.Username != "" && config.mongodbConfigs.User.Password != "") {
     connectionString = "mongodb://" + config.mongodbConfigs.User.Username + ":" + config.mongodbConfigs.User.Password + "@" + config.mongodbConfigs.Host + "/" + config.mongodbConfigs.dbName
 } else {
     connectionString = "mongodb://" + config.mongodbConfigs.Host + "/" + config.mongodbConfigs.dbName
-};
+}
 
 mongoose.connect(connectionString, {
     useNewUrlParser: true,
     useUnifiedTopology: true
-});
+})
 
-const Tournament = require('../../config/models/Tournament');
+const Task = require('../../config/models/Task');
 
-var deletedTask = process.argv[3];
-var TourId = process.argv[2];
+async function run() {
 
-let tournament = await Tournament.find({ identificator: TourId });
+    //-----------------------------------------------------------------
+    // Repair Hints
+    let tasks = await Task.find({}).exec()
+    for (let i = 0; i < tasks.length; i++) {
+        let task = tasks[i];
+        if (!task.identificator.split('_')[1]) {
+            task.identificator = '0_' + task.identificator;
+            await task.save();
+        }
+    }
+}
 
-tournament.tasks.pop(deletedTask);
+run()
 
-for (let i = 0; i < tournament.tasks.length; i++){
-    if (tournament.tasks[i] > deletedTask) tournament.tasks[i].identificator -= 1;
-};
+setTimeout(() => {
+    process.exit()
+}, 10000)

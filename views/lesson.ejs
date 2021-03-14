@@ -15,19 +15,21 @@
         <main>
         <h2><%= u_name %></h2>
         <div id="task">
-            <H1 id="taskname"><%= lesson.title; %> <% if(isTeacher){ %> <a id="editref" href=<%= "/editlesson/" + lesson.identificator %> > [Редактировать] </a> 
-                <span class="lessonPopup">
-                    <dialog  id='dialog'>
-                        <form action= <%="/deletelesson/" + lesson.identificator %>  method="POST">
-                            Вы действительно хотите удалить урок "<%= lesson.title %>" ?
-                            <button>Да</button>
-                        </form>
-                        <button onClick='c();'>Назад</button>
-                    </dialog>
-                  <button onClick='o();' class="show" >[Удалить]</button>
-                  </span>
-            </H1>
-            <% } %>
+            <H1 id="taskname"><%= lesson.title; %></H1>
+            <div style="text-align: center;margin: 10px;">
+                <% if(isTeacher){ %> <a id="editref" href=<%= "/editlesson/" + lesson.identificator %> > [Редактировать] </a>
+                    <span class="lessonPopup">
+                        <dialog  id='dialog'>
+                            <form action= <%="/deletelesson/" + lesson.identificator %>  method="POST">
+                                Вы действительно хотите удалить урок "<%= lesson.title %>" ?
+                                <button>Да</button>
+                            </form>
+                            <button onClick='c();'>Назад</button>
+                        </dialog>
+                    <button onClick='o();' class="show" >[Удалить]</button>
+                    </span>
+                <% } %>
+            </div>
             <h4>Автор: <%= lesson.author %></h4>
             <div style="margin-left: 20px;" id="statement"><%= lesson.description %></div>
             </div>
@@ -44,10 +46,11 @@
               </tr>
 
             <% for (var i = 0; i < lesson.tasks.length; i++) { %>
-            <% var task = tasks.find(item => item.identificator == lesson.tasks[i]);
+            <% var task = tasks[i]
             if (task) { %>
              <tr>
-              <td><%= task.identificator %></td>
+              <!--<td><%= parseInt(task.identificator.split('_')[1]) %></td>-->
+              <td><%= i+1 %></td>
               <td> <a class="tlrefs" href=<%="/task/" + task.identificator %>> <%= task.title %> </a> </td>
               <td><%= task.topic %></td>
               <td><%= task.grade %></td>

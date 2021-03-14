@@ -13,25 +13,14 @@ mongoose.connect(connectionString,{
     useUnifiedTopology: true
 })
 
-var LessonSchema = new mongoose.Schema({
-    identificator: Number,
-    grade: Number,
-    title : String,
-    description: String,
-    tasks: Array,
-    author: String
-
-}, {collection: config.mongodbConfigs.CollectionNames.lessons});
-
-// Create model from schema
-var Lesson = mongoose.model('Lesson', LessonSchema );
+const Lesson = require('../../config/models/Lesson');
 
 var deletedLesson = process.argv[2]
 
 async function run(){
     await Lesson.deleteOne({identificator: deletedLesson})
     let lesson;
-    let lessons = await Task.find({}).exec()
+    let lessons = await Lesson.find({}).exec()
     for(let i = 0; i<lessons.length; i++){
         lesson = lessons[i]
         if(lesson.identificator>deletedLesson){
@@ -41,3 +30,7 @@ async function run(){
     }
 }
 run()
+
+setTimeout(() => {
+    process.exit()
+}, 10000)

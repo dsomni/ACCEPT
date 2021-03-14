@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 const config = require('../../config/configs');
 const xlsx = require('node-xlsx').default;
+const bcrypt = require('bcryptjs');
 
-//MongoDB connecting  
+//MongoDB connecting
 var connectionString
 if(config.mongodbConfigs.User.Username!="" && config.mongodbConfigs.User.Password!=""){
     connectionString = "mongodb://"+config.mongodbConfigs.User.Username+":"+config.mongodbConfigs.User.Password+"@"+config.mongodbConfigs.Host+"/"+config.mongodbConfigs.dbName
@@ -23,32 +24,12 @@ mongoose.connection.on('error', (err) => {
 
 mongoose.set('useCreateIndex', true);
 
-
-var UserSchema = new mongoose.Schema({
-    login: {
-        type: String,
-        unique: true,
-        index: true
-    },
-    password: String,
-    name : String,
-
-    grade: Number,
-    gradeLetter: String,
-    group: String,
-    attempts: Array,
-    verdicts: Array,
-
-    isTeacher: Boolean
-}, {collection: 'users'});
-
-// Create model from schema
-var User = mongoose.model('User', UserSchema );
+const User = require('../../config/models/User');
 
 async function addStudent (login, password, name, grade, gradeLetter, group){
     await User.insertMany([{
         login: login,
-        password: password,//хэширование
+        password: bcrypt.hashSync(password, 10),
         name: name,
 
         grade: grade,
@@ -108,3 +89,7 @@ async function toDo(){
 
 toDo()
 
+
+setTimeout(() => {
+    process.exit()
+}, 10000)

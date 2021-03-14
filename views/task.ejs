@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Задача <%= ID %></title>
+        <title>Задача <%= parseInt(ID.split('_')[1])+1 %></title>
 
         <meta charset="utf-8">
         <meta name="viewport"
@@ -14,19 +14,22 @@
     <body>
         <main>
         <div id="task">
-        <H1 id="taskname"><%= problem.title %> <% if(isTeacher){ %> <a id="editref" href=<%= "/edittask/" + problem.identificator %> > [Редактировать] </a>
-            <span class="taskPopup">
-                <dialog  id='dialog_delete'>
-                <form action= <%="/deletetask/" + problem.identificator %>  method="POST">
-                    Вы действительно хотите удалить задачу "<%= problem.title %>" ?
-                    <button>Да</button>
-                  </form>
-                  <button onClick='c_delete();'>Назад</button>
-                </dialog>
-              <button onClick='o_delete();' class="show" >[Удалить]</button>
-              </span>
-        </H1>
-        <% } %>
+        <H1 id="taskname"><%= problem.title %></H1>
+        <div style="text-align: center; margin: 20px;">
+            <% if(isTeacher){ %>
+                <a id="editref" href=<%= "/edittask/" + problem.identificator %> > [Редактировать] </a>
+                <span class="taskPopup">
+                    <dialog  id='dialog_delete'>
+                    <form action= <%="/deletetask/" + problem.identificator %>  method="POST">
+                        Вы действительно хотите удалить задачу "<%= problem.title %>" ?
+                        <button>Да</button>
+                    </form>
+                    <button onClick='c_delete();'>Назад</button>
+                    </dialog>
+                <button onClick='o_delete();' class="show" >[Удалить]</button>
+                </span>
+            <% } %>
+        </div>
         <h4>Тема: <%= problem.topic %>         Автор: <%= problem.author %></h4><!-- скрывать тему на турнире -->
         <div class="statement"><%= problem.statement %></div>
         <% if(problem.hint.doesExist && showHint) { %>
@@ -43,7 +46,7 @@
             <% var example = problem.examples[i]; %>
              <tr>
               <td><%= example[0] %></td>
-              <td> <%= example[1] %> </td>
+              <td><%= example[1] %></td>
              </tr>
             <% } %>
         </table>
@@ -79,7 +82,7 @@
             </div>
 
         </form>
-    
+
     </main>
     </body>
     <script type = text/javascript>

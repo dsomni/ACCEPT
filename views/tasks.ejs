@@ -16,7 +16,7 @@
         <main>
             <h1>Задачи</h1>
             <% if (isTeacher){ %>
-                <a class="tlrefs addhref" href="/addlesson">[Добавить урок]</a>
+                <a class="tlrefs addhref" href="/addtask">[Добавить задачу]</a>
             <% } %>
             <form class="SearchUI" action= '/tasks/1/default'  method="POST">
                 <input name = "searcharea" rows=1 placeholder="Поиск задачи"></input>
@@ -49,7 +49,7 @@
                 <% for (var i = (page-1)*onPage+1; i < min(page*onPage+1,tasks.length); i++) { %>
                 <% var task = tasks[i]; %>
                  <tr>
-                  <td><%= task.identificator %></td>
+                  <td><%= parseInt(task.identificator.split('_')[1])+ 1 %></td>
                   <td> <a class="tlrefs" href=<%="/task/" + task.identificator %>> <%= task.title %> </a> </td>
                   <td><%= task.topic %></td>
                   <td><%= task.grade %></td>

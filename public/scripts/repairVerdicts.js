@@ -12,57 +12,8 @@ mongoose.connect(connectionString,{
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
-var TaskSchema = new mongoose.Schema({
-    identificator: Number,
-    grade: Number,
-    title : String,
-    statement: String,
-    examples: Array,
-    tests: Array,
-    topic: String,
-    hint: Object,
-    author: String
 
-}, {collection: config.mongodbConfigs.CollectionNames.tasks});
-
-
-
-var UserSchema = new mongoose.Schema({
-    login: {
-        type: String,
-        unique: true,
-        index: true
-    },
-    password: String,
-    name : String,
-
-    grade: Number,
-    gradeLetter: String,
-    group: String,
-    attempts: Array,
-    verdicts: Array,
-
-    isTeacher: Boolean
-}, {collection: config.mongodbConfigs.CollectionNames.users});
-
-var LessonSchema = new mongoose.Schema({
-    identificator: Number,
-    grade: Number,
-    title : String,
-    description: String,
-    tasks: Array,
-    author: String
-
-}, {collection: config.mongodbConfigs.CollectionNames.lessons});
-
-// Create model from schema
-var Task = mongoose.model('Task', TaskSchema );
-
-// Create model from schema
-var User = mongoose.model('User', UserSchema );
-
-// Create model from schema
-var Lesson = mongoose.model('Lesson', LessonSchema );
+const User = require('../../config/models/User');
 
 async function run(){
 

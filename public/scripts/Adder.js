@@ -29,7 +29,7 @@ exports.addTask = async function (Task, title, statement, examples, tests, topic
     var number = await Task.estimatedDocumentCount().exec()
     await Task.insertMany([{
         grade: grade,
-        identificator: number,
+        identificator: '0_'+number,
         title : title,
         statement: statement,
         examples: examples,
@@ -61,7 +61,7 @@ exports.addTaskToTournament = async function (Tournament, tour_id, title, statem
     let tournament = await Tournament.findOne({ identificator: tour_id }).exec();
 
     tournament.tasks.push({
-        identificator: tournament.tasks.length,
+        identificator: tour_id + '_' + tournament.tasks.length,
         title: title,
         statement: statement,
         examples: examples,

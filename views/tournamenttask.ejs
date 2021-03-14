@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Задача <%= ID %></title>
+        <title>Задача <%= parseInt(ID.split('_')[1])+1 %></title>
 
         <meta charset="utf-8">
         <meta name="viewport"
@@ -14,20 +14,21 @@
     <body>
         <main>
         <div id="task">
-        <H1 id="taskname"><%= problem.title %> <% if(isTeacher){ %> <a id="editref" href=<%= "/edittask/" + problem.identificator %> > [Редактировать] </a>
-            <span class="taskPopup">
-                <dialog  id='dialog_delete'>
-                <form action= <%="/deletetask_tt/" + TUR_ID +'/'  + problem.identificator %>  method="POST">
-                    Вы действительно хотите удалить задачу "<%= problem.title %>" ?
-                    <button>Да</button>
-                  </form>
-                  <button onClick='c_delete();'>Назад</button>
-                </dialog>
-              <button onClick='o_delete();' class="show" >[Удалить]</button>
-              </span>
-        </H1>
-        <% } %>
-        <h4>Автор: <%= problem.author %></h4>
+        <H1 id="taskname"><%= problem.title %></H1>
+        <div style="text-align: center;">
+            <% if(isTeacher){ %> <a id="editref" href=<%= "/edittask/" + problem.identificator %> > [Редактировать] </a>
+                <span class="taskPopup">
+                    <dialog  id='dialog_delete'>
+                    <form action= <%="/deletetask_tt/" + TUR_ID +'/'  + problem.identificator %>  method="POST">
+                        Вы действительно хотите удалить задачу "<%= problem.title %>" ?
+                        <button>Да</button>
+                    </form>
+                    <button onClick='c_delete();'>Назад</button>
+                    </dialog>
+                <button onClick='o_delete();' class="show" >[Удалить]</button>
+                </span>
+            <% } %>
+        </div>
         <div class="statement"><%= problem.statement %></div>
         </div>
         <table id="examples" class='taskslist'>
@@ -39,7 +40,7 @@
             <% var example = problem.examples[i]; %>
              <tr>
               <td><%= example[0] %></td>
-              <td> <%= example[1] %> </td>
+              <td><%= example[1] %></td>
              </tr>
             <% } %>
         </table>
@@ -75,7 +76,7 @@
             </div>
 
         </form>
-
+        <p class="countDownTimer" id="countDownTimer"></p>
     </main>
     </body>
     <script type = text/javascript>
@@ -85,5 +86,31 @@
         function c_delete() {
             document.getElementById('dialog_delete').close();
         }
+    </script>
+    <script>
+        let countDownDate = new Date('<%= whenEnds.replace(' ', 'T') %>').getTime();
+        var x = setInterval(function() {
+                // Get today's date and time
+                var now = new Date().getTime();
+
+                // Find the distance between now and the count down date
+                var distance = countDownDate - now;
+
+                // Time calculations for days, hours, minutes and seconds
+                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                // Display the result in the element with id="demo"
+                document.getElementById("countDownTimer").innerHTML = days + "d " + hours + "h "
+                + minutes + "m " + seconds + "s ";
+
+                // If the count down is finished, write some text
+                if (distance < 0) {
+                    clearInterval(x);
+                    document.getElementById("countDownTimer").innerHTML = "Окончен";
+                }
+            }, 1000);
     </script>
 </html>
