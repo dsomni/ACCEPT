@@ -10,6 +10,7 @@ const config = require('./config/configs');
 const expressLayouts = require('express-ejs-layouts');
 const childProcess = require("child_process");
 const Adder = require(__dirname + '/public/scripts/Adder.js');
+const Fuse = require('fuse.js')
 const app = express();
 //---------------------------------------------------------------------------------
 // MongoDB connecting
@@ -42,6 +43,7 @@ const Tournament = require('./config/models/Tournament');
 //---------------------------------------------------------------------------------
 
 const initializePassport = require('./config/passport');
+const { log } = require('console');
 initializePassport(
     passport,
     User
@@ -326,33 +328,51 @@ app.post('/addtask',checkAuthenticated, checkPermission, async (req, res) => {
 // Tasks List Page
 app.get('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
     let user = req.user;
-    let foundTasks = [];
     let tasks = await Task.find({}).exec();
+    let foundTasks = []
     let a = req.params.search.split('&');
-    toSearch = a[0].toUpperCase();
-    SearchTopic = a[1];
-    SearchGrade = a[2];
-    if(toSearch == "DEFAULT") toSearch="";
-    let topics=[];
+    if (a[0] != "default" || a[1] != "all" || a[2] != "all") {
+        toSearch = a[0] == "default" ? "" : a[0].toUpperCase();
+        SearchTopic = a[1] == "all" ? "" : a[1].toUpperCase();
+        SearchGrade = a[2] == "all" ? "" : a[2];
+
+        const fuse = new Fuse(tasks, {
+            includeScore: true,
+            keys: ["title"]
+        });
+
+        if (toSearch == "")
+            tasks.forEach(task => {
+                if ((task.topic.split(" ").join("").trim().toUpperCase() == SearchTopic || SearchTopic == "") && (task.grade == SearchGrade || SearchGrade == "")) {
+                    foundTasks.push(task);
+                }
+            })
+        else
+            fuse.search(toSearch).forEach(task => {
+                if ((task.score < 0.6 || !task.score) && (task.item.topic.split(" ").join("").trim().toUpperCase() == SearchTopic || SearchTopic == "") && (task.item.grade == SearchGrade || SearchGrade == "")) {
+                    foundTasks.push(task.item);
+                }
+            });
+    }
+    let topics = [];
     let verdict;
     let verdicts = [];
-    for (let i = 0; i < tasks.length; i++){
-        if(topics.indexOf(tasks[i].topic)==-1){
+    for (let i = 0; i < tasks.length; i++) {
+        if (topics.indexOf(tasks[i].topic) == -1) {
             topics.push(tasks[i].topic);
         }
-        if((tasks[i].title.slice(0, toSearch.length).toUpperCase() == toSearch) &&
-        (SearchTopic == 'all' || SearchTopic==tasks[i].topic.replace(" ", "")) &&
-        (SearchGrade == 'all' || SearchGrade==tasks[i].grade)){
-            foundTasks.push(tasks[i])
-            verdict = user.verdicts.find(item => item.taskID == tasks[i].identificator)
-            if(verdict){
-                verdict = verdict.result
-            }else{
-                verdict = "-"
-            }
-            verdicts.push(verdict)
-        }
     }
+    if (foundTasks.length == 0) {
+        foundTasks = tasks;
+    }
+    foundTasks.forEach(task => {
+        if (task.verdict) {
+            verdict = verdict.result
+        } else {
+            verdict = "-"
+        }
+        verdicts.push(verdict);
+    });
     res.render('tasks.ejs',{
         login: user.login,
         name: req.user.name,
@@ -368,7 +388,7 @@ app.get('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
 
 app.post('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
     let toSearch = req.body.searcharea;
-    if(!toSearch) toSearch = "default";
+    if (!toSearch) toSearch = "default";
     toSearch += '&' + req.body.TopicSelector +'&' + req.body.GradeSelector
     res.redirect('/tasks/' + req.params.page.toString() +'/' + toSearch )
 })
@@ -465,9 +485,8 @@ app.get('/account/:login/:page/:search',checkAuthenticated, checkValidation, asy
         let foundAttempts = [];
 
         let a = req.params.search.split('&');
-        let toSearch = a[0].toUpperCase();
+        let toSearch = a[0]=="default"? "":a[0];
         let types = a[1];
-        if(toSearch == "DEFAULT") toSearch="";
         let tourTask =[]
         tournaments.forEach(tournament => tournament.tasks.forEach(task => tourTask.push(task)));
 
@@ -597,36 +616,49 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) =>
     }
 
     let results = [];
-    let foundLessons = [];
 
     let a = req.params.search.split('&');
-    let toSearch = a[0].toUpperCase();
+    let toSearch = a[0] == "default" ? "" : a[0].toUpperCase();
+    let SearchGrade = a[1]=="all"? "" : a[1];
     let usedLessons;
-    lessons = await Lesson.find({}).exec();
+    let lessons = (await Lesson.find({}).exec()).slice(1);
     if(user.isTeacher){
         usedLessons = lessons
-        SearchGrade = a[1];
-
+        SearchGrade = SearchGrade;
     }else{
         SearchGrade = user.grade;
         usedLessons = lessons.filter(item => item.grade==SearchGrade)
     }
 
-    if(toSearch == "DEFAULT") toSearch="";
+    const fuse = new Fuse(usedLessons, {
+        includeScore: true,
+        keys: ["title"]
+    });
+
+    lessons = [];
+
+    if (toSearch == "")
+        lessons = usedLessons.filter(lesson => SearchGrade == lesson.grade || SearchGrade=="");
+    else
+        fuse.search(toSearch).forEach(lesson => {
+            console.log(lesson);
+            if (lesson.score < 0.5 && (SearchGrade == lesson.item.grade || SearchGrade=="")) {
+                lessons.push(lesson.item);
+            }
+        });
+
+    if (lessons.length == 0)
+        lessons = usedLessons;
 
     let result;
-    for (let i = 0; i < usedLessons.length; i++){
-        if((usedLessons[i].title.slice(0, toSearch.length).toUpperCase() == toSearch) &&
-        (SearchGrade == 'all' || SearchGrade==usedLessons[i].grade)){
-            foundLessons.push(usedLessons[i])
-            result = "/" + usedLessons[i].tasks.length
-            let solved = 0;
-            for(let k = 0; k < usedLessons[i].tasks.length; k++){
+    for (let i = 0; i < lessons.length; i++) {
+        result = "/" + lessons[i].tasks.length
+        let solved = 0;
+        for (let k = 0; k < lessons[i].tasks.length; k++) {
 
-                let verdict = user.verdicts.find(item => item.taskID == usedLessons[i].tasks[k])
-                if(verdict && verdict.result=="OK"){
-                    solved+=1
-                }
+            let verdict = user.verdicts.find(item => item.taskID == lessons[i].tasks[k])
+            if (verdict && verdict.result == "OK") {
+                solved += 1
             }
             result = solved + result;
             results.push(result)
@@ -639,7 +671,7 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) =>
         login: req.user.login,
         name: req.user.name,
         title : "Lessons List",
-        lessons: foundLessons,
+        lessons: lessons,
         results: results,
         isTeacher: req.user.isTeacher,
         page: req.params.page,
@@ -737,31 +769,41 @@ app.post('/editlesson/:id', checkAuthenticated, checkPermission, async (req, res
 // Students List Page
 app.get('/students/:page/:search', checkAuthenticated, checkPermission,async (req, res) => {
     let user = req.user;
-    let foundStudents = []
+    let foundStudents;
+    let students;
 
     let a = req.params.search.split('&');
-    let toSearch = a[0].toUpperCase();
-    let SearchGrade = a[1];
-    let SearchLetter = a[2];
-    let SearchGroup = a[3];
-    let students = [];
-
-    if(SearchGrade!="all"){
-        students = await User.find({grade: SearchGrade, isTeacher: false}).exec();
-    }else{
-        students = await User.find({isTeacher: false}).exec();
+    let SearchGrade = a[1] == "all" ? '' : a[1];
+    if (SearchGrade != "") {
+        students = await User.find({ grade: SearchGrade, isTeacher: false }).exec();
+    } else {
+        students = await User.find({ isTeacher: false }).exec();
     }
-    if(toSearch == "DEFAULT") toSearch="";
-    for (let i = 0; i < students.length; i++){
-        if((students[i].name.slice(0, toSearch.length).toUpperCase() == toSearch) &&
-        (SearchGrade == 'all' || SearchGrade==students[i].grade) &&
-        (SearchLetter == 'all' || SearchLetter.toUpperCase() == students[i].gradeLetter.toUpperCase()) &&
-        (SearchGroup == 'all' || SearchGroup == students[i].group)){
-            foundStudents.push(students[i])
-        }
+    if (a[0] != "default" || a[2] != "all" || a[3] != "all") {
+        let toSearch = a[0] == "default" ? '' : a[0];
+        let SearchLetter = a[2] == "all" ? '' : a[2].toUpperCase();
+        let SearchGroup = a[3] == "all" ? '' : a[3];
+        foundStudents = []
+        const fuse = new Fuse(students, {
+            includeScore: true,
+            keys: ['name']
+        });
+        if (toSearch == "")
+            students.forEach(student => {
+                if((student.gradeLetter == SearchLetter || SearchLetter == "") && (student.group == SearchGroup || SearchGroup == "")) {
+                    foundStudents.push(student);
+                }
+            });
+        else
+            fuse.search(toSearch).forEach(student => {
+                if((student.score < 0.5) && (student.item.gradeLetter == SearchLetter || SearchLetter == "") && (student.item.group == SearchGroup || SearchGroup == "")) {
+                    foundStudents.push(student.item);
+                }
+            });
+    } else {
+        foundStudents = students;
     }
-
-    foundStudents.sort((a,b) => { return a.name > b.name });
+    foundStudents.sort((a, b) => { return a.name > b.name });
 
     res.render('students.ejs',{
         login: user.login,
@@ -904,34 +946,41 @@ app.get('/tournaments/:login/:page/:search', checkAuthenticated, async (req, res
     }else{
         user = await User.findOne({login : req.params.login}).exec();
     }
-
     let results = [];
     let foundTournaments=[];
 
     let a = req.params.search.split('&');
-    let toSearch = a[0].toUpperCase();
+    let toSearch = a[0]=="default"? '' : a[0].toUpperCase();
 
-    let Tournaments = await Tournament.find({}).exec();
+    let Tournaments = (await Tournament.find({}).exec()).slice(1);
 
-    if (toSearch == "DEFAULT") toSearch = "";
+    const fuse = new Fuse(Tournaments, {
+        includeScore: true,
+        keys: ["title"]
+    });
+
+    if (toSearch=="")
+        foundTournaments = Tournaments;
+    else
+        foundTournaments = fuse.search(toSearch).map(tournament => tournament.item)
+
+
     let result;
-    for (let i = 0; i < Tournaments.length; i++){
-        if (Tournaments[i].title.slice(0, toSearch.length).toUpperCase() == toSearch){
-            foundTournaments.push(Tournaments[i])
-            result = "/" + Tournaments[i].tasks.length
-            let solved = 0;
-            for (let k = 0; k < Tournaments[i].tasks.length; k++){
+    for (let i = 0; i < foundTournaments.length; i++){
+        result = "/" + foundTournaments[i].tasks.length
+        let solved = 0;
+        for (let k = 0; k < foundTournaments[i].tasks.length; k++){
 
-                let verdict = user.verdicts.find(item => item.taskID == Tournaments[i].tasks[k].identificator)
-                if(verdict && verdict.result=="OK"){
-                    solved+=1
-                }
+            let verdict = user.verdicts.find(item => item.taskID == foundTournaments[i].tasks[k].identificator)
+            if(verdict && verdict.result=="OK"){
+                solved+=1
             }
-            result = solved + result;
-            results.push(result)
         }
+        result = solved + result;
+        results.push(result)
     }
 
+    foundTournaments.sort((a, b) => { return a._id < b._id })
     res.render('tournaments.ejs',{
         u_login: user.login,
         n_name: user.name,

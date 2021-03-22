@@ -23,7 +23,7 @@
                 <select name="TopicSelector">
                     <option value="all" selected> Все Темы</option>
                     <% for(var i = 0; i < topics.length; i++) { %>
-                        <option value=<%= topics[i].replace(" ", "") %> > <%= topics[i] %></option>
+                        <option value=<%= topics[i].split(" ").join("") %> > <%= topics[i] %></option>
                     <% } %>
                 </select>
                 <select name="GradeSelector">
