@@ -624,3 +624,35 @@ header input{
     background-color: #e4e1e1aa;
     font-size: 2rem;
 }
+.ChatMessage{
+    width: calc(100%-2px);
+    border: solid black 2px;
+    margin: 0;
+}
+#sendMessage{
+    border: none;
+    border-top: solid green 2px;
+    width: 100%;
+    height: 40px;
+    padding: 0px;
+    margin: 0px;
+}
+#chat{
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    top: 0px;
+    right: 0px;
+    background-color: white;
+    overflow: hidden;
+    margin: 0px;
+    padding: 0px;
+}
+#messages{
+    width: 100%;
+    height: 310px;
+    background-color: white;
+    overflow: scroll;
+    margin: 0px;
+    padding: 0px;
+}

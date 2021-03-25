@@ -10,7 +10,8 @@ const config = require('./config/configs');
 const expressLayouts = require('express-ejs-layouts');
 const childProcess = require("child_process");
 const Adder = require(__dirname + '/public/scripts/Adder.js');
-const Fuse = require('fuse.js')
+const Fuse = require('fuse.js');
+const socketIo = require('socket.io')
 const app = express();
 //---------------------------------------------------------------------------------
 // MongoDB connecting
@@ -43,7 +44,7 @@ const Tournament = require('./config/models/Tournament');
 //---------------------------------------------------------------------------------
 
 const initializePassport = require('./config/passport');
-const { log } = require('console');
+const { log, Console } = require('console');
 initializePassport(
     passport,
     User
@@ -74,6 +75,7 @@ async function load(){
     news = await News.find({}).exec();
 }
 load();
+
 
 //---------------------------------------------------------------------------------
 // Main Page
@@ -1522,6 +1524,23 @@ function getVerdict(results){
 
 //---------------------------------------------------------------------------------
 // Starting Server
-let port = config.port
-app.listen(port) // port
-console.log("Server started at port " + port)
+let port = config.port;
+let server = app.listen(port); // port
+console.log("Server started at port " + port);
+
+//---------------------------------------------------------------------------------
+// socket setup
+let io = socketIo(server);
+let tour;
+io.on("connection", (socket) => {
+    socket.on('new user', async (obj) => {
+        tour = await Tournament.findOne({ identificator: obj.id }).exec();
+        tour.messages.forEach(item => socket.emit("chat message", item));
+    })
+    socket.on("chat message", async (obj) => {
+        io.emit('chat message', obj.data);
+        tour = await Tournament.findOne({ identificator: obj.id }).exec();
+        tour.messages.push(obj.data);
+        tour.save()
+    })
+});

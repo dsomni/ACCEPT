@@ -5,6 +5,7 @@ const TournamentSchema = new mongoose.Schema({
     identificator: Number,
     title: String,
     description: String,
+    messages: [String],
     tasks: [{
         identificator: String,
         author: String,
