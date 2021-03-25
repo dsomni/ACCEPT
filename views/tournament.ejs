@@ -106,7 +106,7 @@
         let input = document.getElementById("sendMessage");
         if(input){
             input.addEventListener("keyup", (e)=>{
-                if(e.keyCode==13){
+                if(e.keyCode==13 && !e.shiftKey){
                     if (input.value) {
                         socket.emit('chat message', {id: <%= ID %>, data: input.value});
                         input.value = '';
