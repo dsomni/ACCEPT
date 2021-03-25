@@ -628,6 +628,7 @@ header input{
     width: calc(100%-2px);
     border: solid black 2px;
     margin: 0;
+    white-space: pre-line;
 }
 #sendMessage{
     border: none;
