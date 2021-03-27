@@ -23,60 +23,7 @@ var identificator = process.argv[2];
 async function run() {
     tournament = await Tournament.findOne({ identificator: identificator });
 
-
-
-    let results = [{
-        login: '123',
-        sumscore: 168,
-        sumtime: 1230912,//sum from start
-        tasks: [
-            {
-                score: 100,
-                dtime: 567,//from start
-                tries: 2
-            },
-            {
-                score: 30,
-                dtime: 23523,//from start
-                tries: 5
-            },
-            {
-                score: 10,
-                dtime: 123123,//from start
-                tries: 2
-            },
-            {
-                score: 0,
-                dtime: 123,//from start
-                tries: 6
-            }]
-    },
-    {
-        login: '124',
-        sumscore: 178,
-        sumtime: 1230912,//sum from start
-        tasks: [
-            {
-                score: 100,
-                dtime: 567,//from start
-                tries: 2
-            },
-            {
-                score: 30,
-                dtime: 23523,//from start
-                tries: 5
-            },
-            {
-                score: 10,
-                dtime: 123123,//from start
-                tries: 2
-            },
-            {
-                score: 10,
-                dtime: 123,//from start
-                tries: 6
-            }]
-    }]
+    results = tournament.results;
 
     results.sort((a, b) => {return b.sumscore - a.sumscore;});
 
@@ -125,6 +72,8 @@ async function run() {
         }
     }
     var rightNow = new Date();
+    rightNow = new Date(rightNow.valueOf()+1000*60*60*3); // +3
+    //console.log(rightNow);
     var res = rightNow.toISOString().slice(0,10).replace(/-/g,".");
     wb.write(path.join(__dirname + "/../tables/"+tournament.title + " Results_" + res + ".xlsx"));
 

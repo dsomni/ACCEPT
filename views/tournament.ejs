@@ -57,10 +57,12 @@
                             </tr>
                             <% }} %>
                 </table>
-                <p class="countDownTimer" id="countDownTimer"></p>
+                <p class="countDownTimer" id="countDownTimer"></p>   
             <% }else{ %>
                 <% if(isTeacher){ %>
                     <h1 style="text-align: center;color:Red">Добавьте задачу</h1>
+                <% }else if(registered){ %>
+                        <h1 style="text-align: center;color:Red">Турнир ещё не начался</h1>    
                 <% }else{ %>
                     <h1 style="text-align: center;color:Red">Вы не зарегистрированы!</h1>
                 <% }} %>
@@ -74,7 +76,6 @@
     </body>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        if(<%= tournament.isBegan %>){
             let countDownDate = new Date('<%= tournament.whenEnds.replace(' ', 'T') %>').getTime();
             var x = setInterval(function() {
                     // Get today's date and time
@@ -99,7 +100,6 @@
                         document.getElementById("countDownTimer").innerHTML = "Окончен";
                     }
                 }, 1000);
-        };
         var socket = io();
         socket.emit("new user", {id: <%= ID %>, data:''})
         let out = document.getElementById("messages");

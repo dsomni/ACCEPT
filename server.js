@@ -76,6 +76,9 @@ async function load(){
 }
 load();
 
+//---------------------------------------------------------------------------------
+// Checking tournaments
+childProcess.exec('node ' + __dirname + '\\public\\scripts\\Tchecker.js');
 
 //---------------------------------------------------------------------------------
 // Main Page
@@ -1051,14 +1054,16 @@ app.get('/regTournament/:tournament_id', checkAuthenticated, async (req, res) =>
             sumtime: 0,
             tasks: []
         }
-        // for (let i = 0; i < tournament.tasks.length; i++) {
-        //     newRes.tasks.push({
-        //         score: 0,
-        //         dtime: 0,//from start
-        //         tries: 0
-        //     })
-        // }
+        for (let i = 0; i < tournament.tasks.length; i++) {
+            newRes.tasks.push({
+                score: 0,
+                dtime: 0,//from start
+               tries: 0
+            })
+        }
+    
         tournament.results.push(newRes);
+        tournament.markModified('results');
         await tournament.save();
     }
     res.redirect('/tournaments/'+req.user.login+'/1/default&all&all')
@@ -1318,8 +1323,12 @@ app.get('/tournament/:login/:id', checkAuthenticated, checkTournamentValidation,
             }
             verdicts.push(verdict)
         }
+        let registered = false;
         if (!(req.user.isTeacher || tournament.isEnded || tournament.isBegan && tournament.results.find(item => item.login == req.params.login))) {
             tasks = [];
+        }
+        if(!tournament.isBegan && tournament.results.find(item => item.login == req.params.login)){
+            registered = true;
         }
         res.render('tournament.ejs', {
             ID: tournament.identificator,
@@ -1332,6 +1341,7 @@ app.get('/tournament/:login/:id', checkAuthenticated, checkTournamentValidation,
             tournament: tournament,
             tasks: tasks,
             results: verdicts,
+            registered: registered
         });
     }
 })//V

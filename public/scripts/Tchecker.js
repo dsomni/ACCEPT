@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const config = require('../../config/configs');
+const childProcess = require("child_process");
 
 var connectionString
 if (config.mongodbConfigs.User.Username != "" && config.mongodbConfigs.User.Password != "") {
@@ -21,10 +22,13 @@ var now;
 
 async function checkEnd(){
     now = new Date();
+    now = new Date(now.valueOf()+1000*60*60*3);
     let b = false;
+    //console.log(to_check_end)
+    //console.log(now)
     for(let i=0;i<to_check_end.length;i++){
         tournament = to_check_end[i];
-        if(Date.parse(tournament.whenEnds)-now.getTime()>=500){
+        if(now.valueOf() - Date.parse(tournament.whenEnds)-3*60*60*1000>=0){
             b = true;
             tournament.isEnded = true;
             await tournament.save();
@@ -32,21 +36,25 @@ async function checkEnd(){
         }
     }
     if(b){
+        fillTo_check_begin();
         fillTo_check_end();
     }
 }
 
 async function checkBegin(){
     now = new Date();
+    now = new Date(now.valueOf()+1000*60*60*3);
+    //console.log(to_check_begin)
+    //console.log(now)
     let b = false;
     for(let i=0;i<to_check_begin.length;i++){
         tournament = to_check_begin[i];
-        if(now.getTime() - Date.parse(tournament.whenStarts)>=0){
+        if(now.valueOf() - Date.parse(tournament.whenStarts)-3*60*60*1000>=0){
             b = true;
             tournament.isBegan = true;
             tournament.results.forEach(item => {
-                for (let i = 0; i < item.tasks.length; i++) {
-                    newRes.tasks.push({
+                for (let i = 0; i < tournament.tasks.length; i++) {
+                    item.tasks.push({
                         score: 0,
                         dtime: 0,//from start
                         tries: 0
@@ -59,15 +67,16 @@ async function checkBegin(){
     }
     if(b){
         fillTo_check_begin();
+        fillTo_check_end();
     }
 }
 
 async function fillTo_check_end(){
-    to_check_end = await Tournament.find({isBegin:true,isEnded:false}).exec();
+    to_check_end = await Tournament.find({isBegan:true,isEnded:false}).exec();
 }
 
 async function fillTo_check_begin(){
-    to_check_begin = await Tournament.find({isBegin:false}).exec();
+    to_check_begin = await Tournament.find({isBegan:false}).exec();
 }
 
 fillTo_check_begin();
