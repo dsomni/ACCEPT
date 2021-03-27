@@ -1025,7 +1025,8 @@ app.post('/edittournament/:id',checkAuthenticated, checkPermission, async (req, 
 
     tournament.title = body.title;
     tournament.description = body.description;
-    tournament.whenStarts = body.whenStarts.replace('T', ' ');
+    if(body.whenStarts)
+        tournament.whenStarts = body.whenStarts.replace('T', ' ');
     tournament.whenEnds = body.whenEnds.replace('T', ' ');
     await tournament.save();
 
@@ -1437,7 +1438,7 @@ app.get('*', (req,res) => {
 //---------------------------------------------------------------------------------
 // Functions
 
-async function checkTimings() {
+/*async function checkTimings() {
     let Tournaments = await Tournament.find({isEnded:false});
     let now = new Date()
     for (let i = 1; i < Tournaments.length; i++){
@@ -1464,11 +1465,10 @@ async function checkTimings() {
         if (began != Tournaments[i].isBegan || ended != Tournaments[i].isEnded)
             await Tournaments[i].save()
     }
-}
-
+}*/
 
 async function checkAuthenticated(req, res, next) {
-    await checkTimings();
+    //await checkTimings();
     if (req.isAuthenticated()) {
         return next()
     }
@@ -1521,6 +1521,12 @@ function getVerdict(results){
         return "OK";
     return 'err';
 }
+
+//---------------------------------------------------------------------------------
+// Tournirnaments timer checker start
+setInterval(()=>{
+    childProcess.exec('node ' + __dirname + '\\public\\scripts\\Tchecker.js');
+},1000*60*10)
 
 //---------------------------------------------------------------------------------
 // Starting Server
