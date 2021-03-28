@@ -11,7 +11,8 @@ const expressLayouts = require('express-ejs-layouts');
 const childProcess = require("child_process");
 const Adder = require(__dirname + '/public/scripts/Adder.js');
 const Fuse = require('fuse.js');
-const socketIo = require('socket.io')
+const socketIo = require('socket.io');
+const path = require('path');
 const app = express();
 //---------------------------------------------------------------------------------
 // MongoDB connecting
@@ -78,7 +79,8 @@ load();
 
 //---------------------------------------------------------------------------------
 // Checking tournaments
-childProcess.exec('node ' + __dirname + '\\public\\scripts\\Tchecker.js');
+//console.log('node ' + path.join(__dirname, '/public/scripts/Tchecker.js'));
+childProcess.exec('node ' + path.join(__dirname, '/public/scripts/Tchecker.js'));
 
 //---------------------------------------------------------------------------------
 // Main Page
@@ -115,15 +117,15 @@ app.get('/task/:id', checkAuthenticated, async (req, res) => {
     let language = req.body.languageSelector;
     let problem = await Task.findOne({identificator: req.params.id}).exec();
     let showHint = req.user.attempts.filter(item => item.taskID == req.params.id).length >= problem.hint.attemptsForHint;
-    fs.stat('public\\processes\\' + req.user.login +'_'+req.params.id, function(err,stats) {
+    fs.stat(path.normalize('public/processes/') + req.user.login +'_'+req.params.id, function(err,stats) {
         if (!err && Date.now()) {
             if(Date.now() - stats.birthtimeMs >= config.FolderLifeTime){
-                fs.rmdirSync('public\\processes\\'+req.user.login+'_'+req.params.id,{recursive: true});
+                fs.rmdirSync(path.normalize('public/processes/' + req.user.login+'_'+req.params.id),{recursive: true});
                 res.redirect('/task/'+req.params.id);
             }else{
-                fs.stat('public\\processes\\'+req.user.login+'_'+req.params.id+"\\result.txt", async function(err,stats2) {
+                fs.stat(path.join('public/processes/' + req.user.login+'_'+req.params.id + "/result.txt"), async function(err,stats2) {
                     if (!err) {
-                        let resultStrings = fs.readFileSync('public\\processes\\'+req.user.login+'_'+req.params.id+"\\result.txt","utf-8").trim().split("\n");
+                        let resultStrings = fs.readFileSync(path.normalize('public/processes/' + req.user.login+'_'+req.params.id + "/result.txt"),"utf-8").trim().split("\n");
                         if(resultStrings[0] == 'Test # 1*Compilation Error*er' || resultStrings.length == problem.tests.length){
 
                             let result = [];
@@ -163,7 +165,7 @@ app.get('/task/:id', checkAuthenticated, async (req, res) => {
                             await req.user.save()
 
 
-                            fs.rmdirSync('public\\processes\\'+req.user.login+'_'+req.params.id,{recursive: true});
+                            fs.rmdirSync(path.normalize('public/processes/'+req.user.login+'_'+req.params.id),{recursive: true});
 
                             res.redirect('/task/'+req.params.id);
                         }else{
@@ -227,7 +229,7 @@ app.get('/task/:id', checkAuthenticated, async (req, res) => {
 // Task Page listener
 app.post('/task/:id',checkAuthenticated, async (req, res) => {
 
-    fs.stat('public\\processes\\'+req.user.login+"_"+req.params.id, async function(err) {
+    fs.stat(path.normalize('public/processes/'+req.user.login+"_"+req.params.id), async function(err) {
         if (!err) {
             res.redirect('/task/'+req.params.id);
         }
@@ -250,12 +252,12 @@ app.post('/task/:id',checkAuthenticated, async (req, res) => {
                     programText: req.body.code, result: [], language: language})
                 await req.user.save()
 
-                fs.mkdirSync('public\\processes\\'+req.user.login+"_"+req.params.id);
+                fs.mkdirSync(path.normalize(__dirname + '/public/processes/'+req.user.login+"_"+req.params.id));
 
-                fs.writeFileSync('public\\processes\\'+req.user.login+"_"+req.params.id+"\\programText.txt",req.body.code,"utf-8");
+                fs.writeFileSync(path.normalize('public/processes/'+req.user.login+"_"+req.params.id+"/programText.txt"),req.body.code,"utf-8");
 
-                childProcess.exec('node ' + __dirname + '\\public\\checker\\checker3'+language+'.js ' +
-                __dirname+'\\public\\processes\\'+req.user.login+"_"+req.params.id + " " +
+                childProcess.exec('node ' + path.join(__dirname, '/public/checker/checker3'+language+'.js ') + ' ' +
+                    path.join(__dirname, '/public/processes/'+req.user.login+"_"+req.params.id) + " " +
                 'program'+req.user.login+"_"+req.params.id + " " +
                 req.params.id)
 
@@ -360,8 +362,7 @@ app.get('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
             });
     }
     let topics = [];
-    let verdict;
-    let verdicts = [];
+
     for (let i = 0; i < tasks.length; i++) {
         if (topics.indexOf(tasks[i].topic) == -1) {
             topics.push(tasks[i].topic);
@@ -370,8 +371,11 @@ app.get('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
     if (foundTasks.length == 0) {
         foundTasks = tasks;
     }
+    let verdict;
+    let verdicts = [];
     foundTasks.forEach(task => {
-        if (task.verdict) {
+        verdict = user.verdicts.find(item => item.taskID == task.identificator)
+        if (verdict) {
             verdict = verdict.result
         } else {
             verdict = "-"
@@ -466,7 +470,7 @@ app.post('/edittask/:id', checkAuthenticated, checkPermission, async (req, res) 
 // Delete Task
 app.post('/deletetask/:id',checkAuthenticated, checkPermission, async (req, res) => {
 
-    childProcess.exec("node "+__dirname+"\\public\\scripts\\FixAfterDeleteTask.js "+req.params.id)
+    childProcess.exec("node " + path.join(__dirname,"/public/scripts/FixAfterDeleteTask.js")+ " "+req.params.id)
 
     res.redirect('/tasks/1/default&all&all')
 })
@@ -490,11 +494,11 @@ app.get('/account/:login/:page/:search',checkAuthenticated, checkValidation, asy
         let foundAttempts = [];
 
         let a = req.params.search.split('&');
-        let toSearch = a[0]=="default"? "":a[0];
+        let toSearch = a[0]=="default"? "":a[0].toUpperCase();
         let types = a[1];
         let tourTask =[]
-        tournaments.forEach(tournament => tournament.tasks.forEach(task => tourTask.push(task)));
 
+        tournaments.forEach(tournament => tournament.tasks.forEach(task => tourTask.push(task)));
         for(let i = 0; i < attempts.length; i++){
             //verylongresult = attempts[i].result[attempts[i].result.length -1 ][attempts[i].result[attempts[i].result.length -1 ].length - 1];
             verylongresult = getVerdict(attempts[i].result);
@@ -505,14 +509,16 @@ app.get('/account/:login/:page/:search',checkAuthenticated, checkValidation, asy
                     foundTasks.push(task);
                 }
             }
-            else if ((tasks[parseInt(attempts[i].taskID.split('_')[1])].title.slice(0, toSearch.length).toUpperCase() == toSearch) &&
-                ((types=='all') || (verylongresult=='OK'))){
-                foundAttempts.push(attempts[i]);
-                let task = tasks.find(item => item.identificator == attempts[i].taskID);
-                foundTasks.push(task);
+            else {
+                if ((attempts[i].taskID.split('_')[0] == '0') && ((types=='all') || (verylongresult=='OK'))){
+                    let task = tasks.find(item => item.identificator == attempts[i].taskID);
+                    if (task && task.title.slice(0, toSearch.length).toUpperCase() == toSearch){
+                        foundAttempts.push(attempts[i]);
+                        foundTasks.push(task);
+                    }
+                }
             }
         }
-
 
         res.render('account.ejs',{
             login: req.user.login,
@@ -646,7 +652,7 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) =>
         lessons = usedLessons.filter(lesson => SearchGrade == lesson.grade || SearchGrade=="");
     else
         fuse.search(toSearch).forEach(lesson => {
-            console.log(lesson);
+            //console.log(lesson);
             if (lesson.score < 0.5 && (SearchGrade == lesson.item.grade || SearchGrade=="")) {
                 lessons.push(lesson.item);
             }
@@ -737,7 +743,7 @@ app.get('/lesson/:login/:id',checkAuthenticated, isLessonAvailable, async (req, 
 //---------------------------------------------------------------------------------
 // Delete Lesson
 app.post('/deletelesson/:id',checkAuthenticated, checkPermission, async (req, res) => {
-    childProcess.exec("node "+__dirname+"\\public\\scripts\\FixAfterDeleteLesson.js "+req.params.id)
+    childProcess.exec("node " + path.join(__dirname,"/public/scripts/FixAfterDeleteLesson.js") + " "+req.params.id)
     res.redirect('/lessons/0/1/default&all&all');
 })
 
@@ -1054,14 +1060,7 @@ app.get('/regTournament/:tournament_id', checkAuthenticated, async (req, res) =>
             sumtime: 0,
             tasks: []
         }
-        for (let i = 0; i < tournament.tasks.length; i++) {
-            newRes.tasks.push({
-                score: 0,
-                dtime: 0,//from start
-               tries: 0
-            })
-        }
-    
+
         tournament.results.push(newRes);
         tournament.markModified('results');
         await tournament.save();
@@ -1116,7 +1115,7 @@ app.post('/addtask_tt/:tour_id',checkAuthenticated, checkPermission, async (req,
 // Delete Task from Tournament
 app.post('/deletetask_tt/:tour_id/:id', checkAuthenticated, checkPermission, async (req, res) => {
 
-    childProcess.exec("node " + __dirname + "\\public\\scripts\\FixAfterDeleteTournamentTask.js " +
+    childProcess.exec("node " + path.join(__dirname, "/public/scripts/FixAfterDeleteTournamentTask.js") + " " +
         req.params.tour_id + " " + req.params.id)
 
     res.redirect('/tournament/' + req.user.login + '/' + req.params.tour_id);
@@ -1127,21 +1126,21 @@ app.post('/deletetask_tt/:tour_id/:id', checkAuthenticated, checkPermission, asy
 // Tournament Task Page
 app.get('/task_tt/:tour_id/:id', checkAuthenticated, async (req, res) => {
     let tour_id = req.params.tour_id
-    let problem = await Tournament.findOne({ identificator: tour_id }).exec();
-    let whenEnds = problem.whenEnds;
-    let isBegan = problem.isBegan;
+    let tournament = await Tournament.findOne({ identificator: tour_id }).exec();
+    let whenEnds = tournament.whenEnds;
+    let isBegan = tournament.isBegan;
     let language = req.body.languageSelector;
-    problem = problem.tasks.find(item => item.identificator == req.params.id);
-    fs.stat('public\\processes\\' + req.user.login + '_' + req.params.id, function (err, stats) {
+    problem = tournament.tasks.find(item => item.identificator == req.params.id);
+    fs.stat(path.normalize('public/processes/' + req.user.login + '_' + req.params.id), function (err, stats) {
         if (!err && Date.now()) {
             if (Date.now() - stats.birthtimeMs >= config.FolderLifeTime) {
-                fs.rmdirSync('public\\processes\\' + req.user.login + '_' + req.params.id, { recursive: true });
+                fs.rmdirSync(path.normalize('public/processes/' + req.user.login + '_' + req.params.id), { recursive: true });
 
                 res.redirect('/task_tt/' + tour_id + '/' + req.params.id);
             } else {
-                fs.stat('public\\processes\\' + req.user.login + '_' + req.params.id + "\\result.txt", async function (err, stats2) {
+                fs.stat(path.normalize('public/processes/' + req.user.login + '_' + req.params.id + "/result.txt"), async function (err, stats2) {
                     if (!err) {
-                        let resultStrings = fs.readFileSync('public\\processes\\' + req.user.login + '_' + req.params.id + "\\result.txt", "utf-8").trim().split("\n");
+                        let resultStrings = fs.readFileSync(path.normalize('public/processes/' + req.user.login + '_' + req.params.id + "/result.txt"), "utf-8").trim().split("\n");
                         if (resultStrings[0] == 'Test # 1*Compilation Error*er' || resultStrings.length == problem.tests.length) {
 
                             let result = [];
@@ -1186,28 +1185,31 @@ app.get('/task_tt/:tour_id/:id', checkAuthenticated, async (req, res) => {
                             await req.user.save()
 
                             // tournament results update
-                            let user_result_idx = problem.results.findIndex(item => item.login == req.user.login.toString());
-                            let task_idx = req.params.id;
-                            if(problem.results[user_result_idx][task_idx].score!=100){
-                                problem.results[user_result_idx][task_idx].tries +=1;
-                                let score =  getScore(result); //?
-                                if( problem.results[user_result_idx][task_idx].score < score){
-                                    problem.results[user_result_idx].sumscore-=problem.results[user_result_idx][task_idx].score;
-                                    problem.results[user_result_idx].sumscore+= score;
-                                    problem.results[user_result_idx][task_idx].score = score;
+                            //tournament.results.forEach(item => console.log(item.login == req.user.login.toString()))
+                            let user_result_idx = tournament.results.findIndex(item => item.login == req.user.login.toString());
+                            //console.log( tournament.results[user_result_idx]);
+                            let task_idx =req.params.id.split('_')[1];
+                            //console.log(tournament.results[user_result_idx].tasks, task_idx);
+                            if (tournament.results[user_result_idx].tasks[task_idx].score!=100){
+                                tournament.results[user_result_idx].tasks[task_idx].tries +=1;
+                                let score =  getScore(result);
+                                if( tournament.results[user_result_idx].tasks[task_idx].score < score){
+                                    tournament.results[user_result_idx].sumscore -= tournament.results[user_result_idx].tasks[task_idx].score;
+                                    tournament.results[user_result_idx].sumscore += score;
+                                    tournament.results[user_result_idx].tasks[task_idx].score = score;
 
                                     let now = new Date();
-                                    problem.results[user_result_idx].sumtime -= problem.results[user_result_idx][task_idx].dtime;
-                                    problem.results[user_result_idx].sumtime += now.getTime()-Date.parse(problem.whenStarts);
-                                    problem.results[user_result_idx][task_idx].dtime = now.getTime()-Date.parse(problem.whenStarts);
+                                    tournament.results[user_result_idx].sumtime -= tournament.results[user_result_idx].tasks[task_idx].dtime;
+                                    tournament.results[user_result_idx].sumtime += now-Date.parse(tournament.whenStarts);
+                                    tournament.results[user_result_idx].tasks[task_idx].dtime = now-Date.parse(tournament.whenStarts);
 
                                 }
                             }
-                            problem.markModified("results");
-                            await problem.save()
+                            tournament.markModified("results");
+                            await tournament.save()
 
 
-                            fs.rmdirSync('public\\processes\\' + req.user.login + '_' + req.params.id, { recursive: true });
+                            fs.rmdirSync(path.normalize('public/processes/' + req.user.login + '_' + req.params.id), { recursive: true });
 
                             res.redirect('/task_tt/' + tour_id + '/' + req.params.id);
                         } else {
@@ -1277,7 +1279,7 @@ app.get('/task_tt/:tour_id/:id', checkAuthenticated, async (req, res) => {
 // Tournament Task Page listener
 app.post('/task_tt/:tour_id/:id', checkAuthenticated, async (req, res) => {
 
-    fs.stat('public\\processes\\' + req.user.login + '_' + req.params.id, async function (err) {
+    fs.stat(path.normalize('public/processes/' + req.user.login + '_' + req.params.id), async function (err) {
         if (!err) {
             res.redirect('/task_tt/' + req.params.tour_id + '/' + req.params.id);
         }
@@ -1302,12 +1304,12 @@ app.post('/task_tt/:tour_id/:id', checkAuthenticated, async (req, res) => {
                 })
                 await req.user.save()
 
-                fs.mkdirSync('public\\processes\\' + req.user.login + '_' + req.params.id);
+                fs.mkdirSync(path.normalize('public/processes/' + req.user.login + '_' + req.params.id));
 
-                fs.writeFileSync('public\\processes\\' + req.user.login + '_' + req.params.id + "\\programText.txt", req.body.code, "utf-8");
+                fs.writeFileSync(path.normalize('public/processes/' + req.user.login + '_' + req.params.id + "/programText.txt"), req.body.code, "utf-8");
 
-                childProcess.exec('node ' + __dirname + '\\public\\checker\\checker3' + language + '.js ' +
-                    __dirname + '\\public\\processes\\' + req.user.login + '_' + req.params.id + " " +
+                childProcess.exec('node ' + path.join(__dirname, '/public/checker/checker3' + language + '.js') + ' ' +
+                    path.join(__dirname, '/public/processes/' + req.user.login + '_' + req.params.id) + " " +
                     'program' + req.user.login + '_' + req.params.id + " " +
                     req.params.id)
 
@@ -1469,35 +1471,6 @@ app.get('*', (req,res) => {
 //---------------------------------------------------------------------------------
 // Functions
 
-/*async function checkTimings() {
-    let Tournaments = await Tournament.find({isEnded:false});
-    let now = new Date()
-    for (let i = 1; i < Tournaments.length; i++){
-        let began = Tournaments[i].isBegan;
-        let ended = Tournaments[i].isEnded;
-        if (!Tournaments[i].isBegan) {
-            Tournaments[i].isBegan = now.getTime() > Date.parse(Tournaments[i].whenStarts)
-            //startTournament();
-        }
-        if (!Tournaments[i].isEnded) {
-            Tournaments[i].isEnded = now.getTime() > Date.parse(Tournaments[i].whenEnds)
-        }
-        if (began != Tournaments[i].isBegan) {
-            Tournaments[i].results.forEach(item => {
-                for (let i = 0; i < item.tasks.length; i++) {
-                    newRes.tasks.push({
-                        score: 0,
-                        dtime: 0,//from start
-                        tries: 0
-                    })
-                }
-            });
-        }
-        if (began != Tournaments[i].isBegan || ended != Tournaments[i].isEnded)
-            await Tournaments[i].save()
-    }
-}*/
-
 async function checkAuthenticated(req, res, next) {
     //await checkTimings();
     if (req.isAuthenticated()) {
@@ -1553,10 +1526,15 @@ function getVerdict(results){
     return 'err';
 }
 
+function getScore(results){
+    return Math.ceil(results.filter(item => item[2]=="ok").length/results.length*100)
+}
+
 //---------------------------------------------------------------------------------
 // Tournirnaments timer checker start
 setInterval(()=>{
-    childProcess.exec('node ' + __dirname + '\\public\\scripts\\Tchecker.js');
+    //console.log('node ' + path.join(__dirname, '/public/scripts/Tchecker.js'));
+    childProcess.exec('node ' + path.join(__dirname, '/public/scripts/Tchecker.js'));
 },1000*60*10)
 
 //---------------------------------------------------------------------------------

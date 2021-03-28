@@ -36,7 +36,7 @@
                   </tr>
                 <% var onPage = 10 %>
                 <% min = function(a,b){ if(a < b) return a; return b} %>
-                <% for (var i = (page-1)*onPage; i < min(page*onPage,attempts.length); i++) { %>
+                <% for (var i = (page-1)*onPage; i < min(page*onPage, attempts.length); i++) { %>
                 <% var attempt = attempts[i]; %>
                 <% var task = tasks[i]; %>
 

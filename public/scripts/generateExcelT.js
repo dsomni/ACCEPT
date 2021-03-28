@@ -25,7 +25,13 @@ async function run() {
 
     results = tournament.results;
 
-    results.sort((a, b) => {return b.sumscore - a.sumscore;});
+    results.sort((a, b) => {
+        if (b.sumscore - a.sumscore == 0) {
+            return a.sumtime - b.sumtime
+        }else{
+            return b.sumscore - a.sumscore
+        }
+    });
 
 
     let realresults = []

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const config = require('../../config/configs');
 const childProcess = require("child_process");
+const path = require('path')
 
 var connectionString
 if (config.mongodbConfigs.User.Username != "" && config.mongodbConfigs.User.Password != "") {
@@ -22,17 +23,16 @@ var now;
 
 async function checkEnd(){
     now = new Date();
-    now = new Date(now.valueOf()+1000*60*60*3);
+    now = new Date(now);
     let b = false;
-    //console.log(to_check_end)
-    //console.log(now)
     for(let i=0;i<to_check_end.length;i++){
         tournament = to_check_end[i];
-        if(now.valueOf() - Date.parse(tournament.whenEnds)-3*60*60*1000>=0){
+        if (now - Date.parse(tournament.whenEnds)>=0){
             b = true;
             tournament.isEnded = true;
+            tournament.markModified('isEnded');
             await tournament.save();
-            childProcess.exec('node ' + __dirname + '\\generateExcelT.js' + ' ' + tournament.identificator);
+            childProcess.exec('node ' + path.join(__dirname, '/generateExcelT.js') + ' ' + tournament.identificator);
         }
     }
     if(b){
@@ -43,13 +43,13 @@ async function checkEnd(){
 
 async function checkBegin(){
     now = new Date();
-    now = new Date(now.valueOf()+1000*60*60*3);
+    now = new Date(now);
+    let b = false;
     //console.log(to_check_begin)
     //console.log(now)
-    let b = false;
     for(let i=0;i<to_check_begin.length;i++){
         tournament = to_check_begin[i];
-        if(now.valueOf() - Date.parse(tournament.whenStarts)-3*60*60*1000>=0){
+        if (now - Date.parse(tournament.whenStarts) >= 0 && !tournament.isBegan){
             b = true;
             tournament.isBegan = true;
             tournament.results.forEach(item => {
@@ -62,6 +62,7 @@ async function checkBegin(){
                 }
             });
             tournament.markModified('results');
+            tournament.markModified('isBegan');
             await tournament.save();
         }
     }
@@ -92,7 +93,7 @@ setInterval(()=>{
 setInterval(()=>{
     fillTo_check_begin();
     fillTo_check_end();
-},5*60*1000)
+},5*1000)
 
 setTimeout(()=>{
     process.exit();
