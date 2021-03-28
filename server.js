@@ -1185,6 +1185,27 @@ app.get('/task_tt/:tour_id/:id', checkAuthenticated, async (req, res) => {
                             })
                             await req.user.save()
 
+                            // tournament results update
+                            let user_result_idx = problem.results.findIndex(item => item.login == req.user.login.toString());
+                            let task_idx = req.params.id;
+                            if(problem.results[user_result_idx][task_idx].score!=100){
+                                problem.results[user_result_idx][task_idx].tries +=1;
+                                let score =  getScore(result); //?
+                                if( problem.results[user_result_idx][task_idx].score < score){
+                                    problem.results[user_result_idx].sumscore-=problem.results[user_result_idx][task_idx].score;
+                                    problem.results[user_result_idx].sumscore+= score;
+                                    problem.results[user_result_idx][task_idx].score = score;
+
+                                    let now = new Date();
+                                    problem.results[user_result_idx].sumtime -= problem.results[user_result_idx][task_idx].dtime;
+                                    problem.results[user_result_idx].sumtime += now.getTime()-Date.parse(problem.whenStarts);
+                                    problem.results[user_result_idx][task_idx].dtime = now.getTime()-Date.parse(problem.whenStarts);
+
+                                }
+                            }
+                            problem.markModified("results");
+                            await problem.save()
+
 
                             fs.rmdirSync('public\\processes\\' + req.user.login + '_' + req.params.id, { recursive: true });
 
