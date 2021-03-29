@@ -33,6 +33,7 @@
                     <th>Вердикт</th>
                     <th>Начало</th>
                     <th>Окончание</th>
+                    <th>Регистрация</th>
                     <th>Статус</th>
                   </tr>
                 <% min = function(a,b){ if(a < b) return a; return b} %>
@@ -49,15 +50,34 @@
                   <td><%= results[i] %></td>
                   <td><%= tournament.whenStarts %></td>
                   <td><%= tournament.whenEnds %></td>
-                  <% if(!tournament.isBegan){ %>
-                    <% let registered = tournament.results.find(item=>item.login==login);%>
+
+                  <% let registered = tournament.results.find(item=>item.login==login);%>
+
+                <% if(!tournament.isBegan){ %>
                     <% if(!registered){ %>
                         <td><a style="text-decoration: none;" href=<%= "/regTournament/" + tournament.identificator %>>Регистрация</a></td>
                     <% } else { %>
                         <td><a style="text-decoration: none; color: rgb(76, 151, 0);">Вы зарегистрированы!</a></td>
                     <% } %>
+                <% } else if(!tournament.isEnded) { %>
+                    <% if(!registered){ %>
+                        <% if(tournament.allowRegAfterStart){ %>
+                            <td><a style="text-decoration: none;" href=<%= "/regTournament/" + tournament.identificator %>>Регистрация</a></td>
+                        <% } else { %>
+                            <td><a style="text-decoration: none; color: rgb(190, 60, 0);">Регистрация окончена</a></td>
+                        <% } %>
+                    <% } else { %>
+                        <td><a style="text-decoration: none; color: rgb(76, 151, 0);">Вы зарегистрированы!</a></td>
+                    <% } %>
+                <% }else{ %>
+                    <td><a style="text-decoration: none; color: rgb(190, 60, 0);">Регистрация окончена</a></td>
+                <% } %>
+                  
+
+                  <% if(!tournament.isBegan){ %>
+                    <td> <a style="color: firebrick;">Ожидается</a> </td>
                   <% } else if(!tournament.isEnded) { %>
-                        <td> <a style="color: firebrick;">Проводится</a> </td>
+                        <td> <a style="color: rgb(34, 178, 65);">Проводится</a> </td>
                     <% }else{ %>
                         <td> <a style="color: Red;">Завершен</a> </td>
                     <% } %>

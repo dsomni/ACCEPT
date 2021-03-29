@@ -53,7 +53,7 @@ async function checkBegin(){
             b = true;
             tournament.isBegan = true;
             tournament.results.forEach(item => {
-                for (let i = 0; i < tournament.tasks.length; i++) {
+                for (let i = item.tasks.length; i < tournament.tasks.length; i++) {
                     item.tasks.push({
                         score: 0,
                         dtime: 0,//from start

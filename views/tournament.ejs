@@ -119,7 +119,7 @@
         var socket = io();
         socket.emit("new user", {id: <%= ID %>, data:''})
         let out = document.getElementById("messages");
-        let input = document.getElementById("sendMessage");
+        let input = document.getElementById("sendMessage").trim();
         if(input){
             input.addEventListener("keyup", (e)=>{
                 if(e.keyCode==13 && !e.shiftKey){

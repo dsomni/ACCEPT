@@ -937,7 +937,9 @@ app.post('/addtournament',checkAuthenticated, checkPermission, async (req, res) 
     let user = req.user;
     let body = req.body;
     let tasks = [];
-    await Adder.addTournament(Tournament, body.title, body.description, tasks, user.name, body.whenStarts.replace('T', ' '), body.whenEnds.replace('T', ' '), []);
+    await Adder.addTournament(Tournament, body.title, body.description,
+        tasks, user.name, body.whenStarts.replace('T', ' '),
+        body.whenEnds.replace('T', ' '), [], body.allowRegAfterStart=="on" );
 
     res.render('addtournament.ejs',{
         login: user.login,
@@ -1037,6 +1039,7 @@ app.post('/edittournament/:id',checkAuthenticated, checkPermission, async (req, 
     if(body.whenStarts)
         tournament.whenStarts = body.whenStarts.replace('T', ' ');
     tournament.whenEnds = body.whenEnds.replace('T', ' ');
+    tournament.allowRegAfterStart = body.allowRegAfterStart=="on";
     await tournament.save();
 
     res.render('edittournament.ejs',{
@@ -1053,13 +1056,22 @@ app.post('/edittournament/:id',checkAuthenticated, checkPermission, async (req, 
 //Register to tournament
 app.get('/regTournament/:tournament_id', checkAuthenticated, async (req, res) => {
     let tournament = await Tournament.findOne({ identificator: req.params.tournament_id }).exec()
-    if (!tournament.isBegan) {
+    if (!tournament.isBegan || tournament.allowRegAfterStart) {
         let newRes = {
             login: req.user.login,
             sumscore: 0,
             sumtime: 0,
             tasks: []
         }
+
+        for (let i = 0; i < tournament.tasks.length; i++) {
+            newRes.tasks.push({
+                score: 0,
+                dtime: 0,//from start
+                tries: 0
+            })
+        }
+
 
         tournament.results.push(newRes);
         tournament.markModified('results');
