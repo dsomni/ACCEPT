@@ -123,8 +123,8 @@
         if(input){
             input.addEventListener("keyup", (e)=>{
                 if(e.keyCode==13 && !e.shiftKey){
-                    if (input.value) {
-                        socket.emit('chat message', {id: <%= ID %>, data: input.value});
+                    if (input.value.trim()) {
+                        socket.emit('chat message', {id: <%= ID %>, data: input.value.trim()});
                         input.value = '';
                     }
                 }

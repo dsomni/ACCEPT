@@ -1,12 +1,12 @@
 exports.addLesson = async function (Lesson, grade, title, description, tasks, author){
     var number = await Lesson.estimatedDocumentCount().exec()
     let lesson = {
-        grade: grade,
+        grade,
         identificator: number,
-        title : title,
-        description: description,
-        tasks: tasks,
-        author: author
+        title,
+        description,
+        tasks,
+        author
     }
     await Lesson.insertMany([lesson]);
 }
@@ -15,58 +15,62 @@ exports.addNews = async function (News, title, text, reference, author){
     var number = await News.estimatedDocumentCount().exec()
     new_news = {
         identificator: number,
-        title : title,
-        text: text,
-        reference: reference,
+        title,
+        text,
+        reference,
         date :  Date.now().toString(),
-        author: author
+        author
     }
     await News.insertMany([new_news]);
     return new_news
 }
 
-exports.addTask = async function (Task, title, statement, examples, tests, topic, grade, hint, author){
+exports.addTask = async function (Task, title, statement, input, output, examples, tests, topic, grade, hint, author){
     var number = await Task.estimatedDocumentCount().exec()
     await Task.insertMany([{
-        grade: grade,
+        grade,
         identificator: '0_'+number,
-        title : title,
-        statement: statement,
-        examples: examples,
-        tests: tests,
-        topic: topic,
-        hint: hint,
-        author: author
+        title,
+        statement,
+        examples,
+        input,
+        output,
+        tests,
+        topic,
+        hint,
+        author
     }]);
 }
 exports.addTournament = async function (Tournament, title, description, tasks, author, whenStarts, whenEnds, participants, allowRegAfterStart) {
     var number = await Tournament.estimatedDocumentCount().exec()
     let tournament = {
         identificator: number,
-        title: title,
-        description: description,
-        tasks: tasks,
-        author: author,
-        participants: participants,
-        whenStarts: whenStarts,
-        whenEnds: whenEnds,
-        allowRegAfterStart: allowRegAfterStart,
+        title,
+        description,
+        tasks,
+        author,
+        participants,
+        whenStarts,
+        whenEnds,
+        allowRegAfterStart,
         isBegan: false,
         isEnded: false
     }
     await Tournament.insertMany([tournament]);
 }
 
-exports.addTaskToTournament = async function (Tournament, tour_id, title, statement, examples, tests) {
+exports.addTaskToTournament = async function (Tournament, tour_id, title, statement, input, output, examples, tests) {
 
     let tournament = await Tournament.findOne({ identificator: tour_id }).exec();
 
     tournament.tasks.push({
         identificator: tour_id + '_' + tournament.tasks.length,
-        title: title,
-        statement: statement,
-        examples: examples,
-        tests: tests,
+        title,
+        statement,
+        input,
+        output,
+        examples,
+        tests,
     });
 
     await tournament.save();

@@ -620,6 +620,10 @@ header input{
 .lessonAdderForm ::placeholder{
     color: #000000aa;
 }
+.lessonAdderForm .switch{
+    margin: 10px;
+    margin-top: -10px;
+}
 
 /*-----------------------------------------------------------------------------*/
 /*about page*/
@@ -690,6 +694,7 @@ header input{
     border: solid black 2px;
     margin: 0;
     white-space: pre-line;
+    overflow-wrap: break-word;
 }
 #sendMessage{
     border: none;

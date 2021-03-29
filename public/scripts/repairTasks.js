@@ -22,10 +22,13 @@ async function run() {
     let tasks = await Task.find({}).exec()
     for (let i = 0; i < tasks.length; i++) {
         let task = tasks[i];
-        if (!task.identificator.split('_')[1]) {
-            task.identificator = '0_' + task.identificator;
-            await task.save();
-        }
+        task.input = '';
+        task.output = '';
+        await task.save()
+        // if (!task.identificator.split('_')[1]) {
+        //     task.identificator = '0_' + task.identificator;
+        //     await task.save();
+        // }
     }
 }
 

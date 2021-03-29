@@ -19,9 +19,13 @@
                 <a class="tlrefs addhref" href="/addtournament">[Добавить турнир]</a>
             <% } %>
             <form class="SearchUI" action= <%= '/tournaments/'+ u_login +'/1/default' %>  method="POST">
-                <input name = "searcharea" rows=1 placeholder="Поиск турнира"></input>
-                <% if(isTeacher){ %>
-                <% } %>
+                <input name = "searcharea" rows=1 placeholder="Поиск турнира">
+                <select name = "typeSelector">
+                    <option value="all" selected>Все</option>
+                    <option value="false_false">Ожидающие начала</option>
+                    <option value="true_true">Завершенные</option>
+                    <option value="true_false">В процессе</option>
+                </select>
                 <button id="submitsearch">Найти</button>
             </form>
 
@@ -43,7 +47,6 @@
                 <% for (var i = (page-1)*onPage+1; i < min(page*onPage+1,tournaments.length); i++) { %>
                 <% var tournament = tournaments[i]; %>
                  <tr>
-                  <!--<td><%= tournament.identificator %></td> -->
                   <td><%= i %></td>
                   <td> <a class="tlrefs" href=<%="/tournament/"+ u_login + "/" + tournament.identificator %>> <%= tournament.title %> </a> </td>
                   <td><%= tournament.author %></td>
@@ -72,14 +75,13 @@
                 <% }else{ %>
                     <td><a style="text-decoration: none; color: rgb(190, 60, 0);">Регистрация окончена</a></td>
                 <% } %>
-                  
 
                   <% if(!tournament.isBegan){ %>
                     <td> <a style="color: firebrick;">Ожидается</a> </td>
                   <% } else if(!tournament.isEnded) { %>
                         <td> <a style="color: rgb(34, 178, 65);">Проводится</a> </td>
                     <% }else{ %>
-                        <td> <a style="color: Red;">Завершен</a> </td>
+                        <td> <a href=<%= "/results/"+tournament.identificator %> style="color: Red;">Завершен</a> </td>
                     <% } %>
                  </tr>
                 <% } %>

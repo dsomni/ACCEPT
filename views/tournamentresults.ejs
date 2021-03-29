@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Результаты турнира</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0,
+              maximum-scale=1.0, minimum-scale=1.0,
+              user-scalable=no, minimal-ui">
+        <meta name="full-screen" content="yes">
+
+        <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
+        </head>
+    <body>
+        <main>
+            <h1>Результаты турнира <%= tournament.title %></h1>
+            <table class='taskslist'>
+                <tr>
+                    <th>LOGIN</th>
+                    <%  tournament.tasks.forEach(task => { %>
+                        <th><%= task.identificator.split('_')[1] %></th>
+                    <% }); %>
+                    <th>Счёт</th>
+                    <th>Время</th>
+                </tr>
+                <% tournament.results.forEach(result => { %>
+                    <tr>
+                        <td><%= result.login %></td>
+                        <% result.tasks.forEach(task => { %>
+                            <td><%= task.score %>(<%= task.tries %>)</td>
+                        <% }); %>
+                        <td><%= result.sumscore %></td>
+                        <td><%= result.sumtime %></td>
+                    </tr>
+                 <%  }); %>
+            </table>
+        </main>
+    </body>
+</html>

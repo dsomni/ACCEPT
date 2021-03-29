@@ -45,15 +45,14 @@ async function checkBegin(){
     now = new Date();
     now = new Date(now);
     let b = false;
-    //console.log(to_check_begin)
-    //console.log(now)
     for(let i=0;i<to_check_begin.length;i++){
         tournament = to_check_begin[i];
         if (now - Date.parse(tournament.whenStarts) >= 0 && !tournament.isBegan){
             b = true;
             tournament.isBegan = true;
             tournament.results.forEach(item => {
-                for (let i = item.tasks.length; i < tournament.tasks.length; i++) {
+                item.tasks = []
+                for (let i = 0; i < tournament.tasks.length; i++) {
                     item.tasks.push({
                         score: 0,
                         dtime: 0,//from start

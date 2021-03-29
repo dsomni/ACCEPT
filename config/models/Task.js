@@ -6,6 +6,8 @@ const TaskSchema = new mongoose.Schema({
     grade: Number,//
     title: String,
     statement: String,
+    input: String,
+    output: String,
     examples: Array,
     tests: Array,
     topic: String,//

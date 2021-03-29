@@ -31,7 +31,17 @@
             <% } %>
         </div>
         <h4>Тема: <%= problem.topic %>         Автор: <%= problem.author %></h4><!-- скрывать тему на турнире -->
-        <div class="statement"><%= problem.statement %></div>
+        <div class="statement">
+            <%= problem.statement %>
+            <% if(problem.input){ %>
+                <h3>Входные данные</h3>
+                <%= problem.input %>
+            <% } %>
+            <% if(problem.output){ %>
+                <h3>Выходные данные</h3>
+                <%= problem.output %>
+            <% } %>
+        </div>
         <% if(problem.hint.doesExist && showHint) { %>
             <button id="HintButton" onclick="ShowHideHint()">Показать/скрыть подсказку</button>
         <% } %>
@@ -55,7 +65,7 @@
         <form action='/task/<%= ID %>'  method="POST">
             <div class="container">
 
-                <select name="languageSelector" id = "languageSelector"> 
+                <select name="languageSelector" id = "languageSelector">
                     <option value="Pascal" <% if (!language || language=="Pascal"){%> selected <%}%>>Pascal ABC.NET</option>
                     <option value="Python" <% if (language=="Python"){%> selected <%}%>>Python</option>
                 </select>
