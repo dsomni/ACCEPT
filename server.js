@@ -992,6 +992,22 @@ app.get('/tournaments/:login/:page/:search', checkAuthenticated, async (req, res
         result = solved + result;
         results.push(result)
     }
+    
+    //?
+    let obj = [];
+    for(let i=0;i<foundTournaments.length;i++){
+        obj.push([foundTournaments[i], results[i]]);
+    }
+    obj.sort(compareTournaments);
+
+    for(let i=0;i<foundTournaments.length;i++){
+        foundTournaments[i] = obj[i][0];
+    }
+    for(let i=0;i<results.length;i++){
+        results[i] = obj[i][1];
+    }
+
+    //?
 
     foundTournaments.sort((a, b) => { return a._id < b._id })
     res.render('tournaments.ejs',{
@@ -1136,11 +1152,12 @@ app.post('/deletetask_tt/:tour_id/:id', checkAuthenticated, checkPermission, asy
 
 //---------------------------------------------------------------------------------
 // Tournament Task Page
-app.get('/task_tt/:tour_id/:id', checkAuthenticated, async (req, res) => {
+app.get('/task_tt/:tour_id/:id', checkTournamentPermission ,checkAuthenticated, async (req, res) => {
     let tour_id = req.params.tour_id
     let tournament = await Tournament.findOne({ identificator: tour_id }).exec();
     let whenEnds = tournament.whenEnds;
     let isBegan = tournament.isBegan;
+
     let language = req.body.languageSelector;
     problem = tournament.tasks.find(item => item.identificator == req.params.id);
     fs.stat(path.normalize('public/processes/' + req.user.login + '_' + req.params.id), function (err, stats) {
@@ -1517,6 +1534,18 @@ function checkTournamentValidation(req, res, next) {
     res.redirect('/tournaments/' + req.user.login + '/1/default&all')
 }
 
+async function checkTournamentPermission(req, res, next){
+    let tour_id = req.params.tour_id
+    let tournament = await Tournament.findOne({ identificator: tour_id }).exec();
+    let isBegan = tournament.isBegan;
+
+    if(req.user.isTeacher || (isBegan && tournament.results.find(item => item.login == req.user.login))){
+        return next();
+
+    }
+    res.redirect('/tournament/' + req.user.login + '/' + tour_id);
+}
+
 async function isLessonAvailable(req, res, next) {
     lesson = await Lesson.findOne({identificator : req.params.id}).exec();
     if (req.user.isTeacher || (req.user.grade == lesson.grade)) {
@@ -1540,6 +1569,35 @@ function getVerdict(results){
 
 function getScore(results){
     return Math.ceil(results.filter(item => item[2]=="ok").length/results.length*100)
+}
+
+function compareTournaments(a,b){
+    let ta = a[0];
+    let tb = b[0];
+    let a_now = !ta.isEnded && ta.isBegan;
+    let a_wait = !ta.isBegan;
+    let a_sDate = Date.parse(ta.whenStarts);
+    let a_fDate = Date.parse(ta.whenEnds);
+    let b_now = !tb.isEnded && tb.isBegan;
+    let b_wait = !tb.isBegan
+    let b_sDate = Date.parse(tb.whenStarts);
+    let b_fDate = Date.parse(tb.whenEnds);
+
+    if(a_now && b_now)
+        return a_fDate - b_fDate;
+    if(a_now && !b_now)
+        return -1;
+    if(!a_now && b_now)
+        return 1;
+
+    if(a_wait && b_wait)
+        return a_sDate - b_sDate;
+    if(a_wait && !b_wait)
+        return -1;
+    if(!a_wait && b_wait)
+        return 1;
+    return b_fDate- a_fDate;
+
 }
 
 //---------------------------------------------------------------------------------
