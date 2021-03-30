@@ -4,6 +4,8 @@ const childProcess = require("child_process");
 const mongoose = require('mongoose');
 const config = require('../../config/configs');
 
+childProcess.exec('chcp 65001 | dir');
+
 let connectionString
 if(config.mongodbConfigs.User.Username!="" && config.mongodbConfigs.User.Password!=""){
     connectionString = "mongodb://"+config.mongodbConfigs.User.Username+":"+config.mongodbConfigs.User.Password+"@"+config.mongodbConfigs.Host+"/"+config.mongodbConfigs.dbName
@@ -16,7 +18,7 @@ mongoose.connect(connectionString, {
 })
 const Task = require('../../config/models/Task');
 const Tournament = require('../../config/models/Tournament');
-childProcess.exec('chcp 65001 | dir');
+
 async function go(){
 
     let path = process.argv[2];
@@ -30,7 +32,7 @@ async function go(){
     fs.writeFileSync(path + '\\'+fileName +'.cpp', programText, "utf8");
 
     try{
-        childProcess.execSync('g++.exe '+ path + '\\'+fileName +'.cpp -o' + path + '\\'+fileName +'.exe');
+        childProcess.execSync('g++ '+ path + '\\'+fileName +'.cpp -o ' + path + '\\'+fileName +'.exe');
     }catch{
         // Compilation Error
 

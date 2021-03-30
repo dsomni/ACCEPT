@@ -1,11 +1,12 @@
 const fs = require('fs');
 const childProcess = require("child_process");
 
+childProcess.exec('chcp 65001 | dir');
+
 var path = process.argv[2];
 var fileName = process.argv[3];
 var i = Number(process.argv[4]);
 
-childProcess.exec('chcp 65001 | dir');
 async function run(){
 
     input = fs.readFileSync(path + '\\input'+i+".txt",'utf8').trim();

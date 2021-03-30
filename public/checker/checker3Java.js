@@ -15,12 +15,12 @@ if(config.mongodbConfigs.User.Username!="" && config.mongodbConfigs.User.Passwor
 mongoose.connect(connectionString, {
     useNewUrlParser: true,
     useUnifiedTopology: true
-});
-
+})
 const Task = require('../../config/models/Task');
 const Tournament = require('../../config/models/Tournament');
-childProcess.exec('chcp 65001 | dir');
+
 async function go(){
+
     let path = process.argv[2];
     let fileName = process.argv[3];
     let taskid = process.argv[4];
@@ -29,18 +29,16 @@ async function go(){
 
     let programText = fs.readFileSync(path+"\\programText.txt", "utf8");
 
-    fs.writeFileSync(path + '\\'+fileName +'.pas', programText, "utf8");
-
-
-    try{
-        childProcess.execSync(__dirname + '\\pascalCompiler\\pabcnetcclear.exe '+ path + '\\'+fileName +'.pas');
+    fs.writeFileSync(path + '\\'+fileName +'.java', programText, "utf8");
+    /*try{
+        let err = childProcess.execSync('javac '+ path + '\\'+fileName +'.java');
     }catch{
         // Compilation Error
 
         fs.writeFileSync(path + '\\result.txt', "Test # 1" + "*" + "Compilation Error" + "*" + "er" , "utf8");
 
         process.exit();
-    }
+    }*/
 
     let task;
 
@@ -63,11 +61,11 @@ async function go(){
     for(let i = 0; i < tests.length; i++){
 
         childProcess.exec('node' + ' ' +
-        __dirname + '\\checker3PascalHelper.js' + ' ' + 
+        __dirname + '\\checker3JavaHelper.js' + ' ' +
         path + ' ' +
         fileName + ' ' +
         i);
-    
+
     }
     setTimeout(()=>{
         process.exit()

@@ -15,10 +15,11 @@ async function run(){
     var pOutput ='';
     var result ="Test #" + (i+1).toString() + "*" + "Wrong Answer" + "*" + "er" +"\n";
 
-    var spawnProcess = childProcess.spawn(__dirname + '\\pythonCompiler\\python.exe', [path + '\\'+fileName +'.py'], {shell: false});
+    var spawnProcess = childProcess.spawn('java', [path + '\\'+fileName+".java"], {shell: false});
 
     spawnProcess.on('error', function (error) {
-        fs.appendFileSync(path + '\\result.txt', "Test #" + (i+1).toString() + "*" + "Compilation Error" + "*" + "er" +"\n",  function(error){ if(error) throw error;});
+        console.log(error);
+        fs.appendFileSync(path + '\\result.txt', "Test #" + (i+1).toString() + "*" + "Wrong Answer" + "*" + "er" +"\n",  function(error){ if(error) throw error;});
         spawnProcess.stdout.removeAllListeners();
         spawnProcess.stderr.removeAllListeners();
         process.exit()
@@ -27,6 +28,7 @@ async function run(){
     spawnProcess.stdout.on('data', function (data){
 
         pOutput +=data.toString('utf8');
+        console.log(pOutput);
         if(pOutput.trim()==output){
             result = "Test #" + (i+1).toString() + "*" + "OK" + "*" + "ok" +"\n";
         }else{
@@ -34,6 +36,7 @@ async function run(){
         }
     });
     spawnProcess.stderr.on('data', function (data) {
+        console.log(data.toString())
         fs.appendFileSync(path + '\\result.txt', "Test #" + (i+1).toString() + "*" + "Runtime error" + "*" + "er" +"\n",  function(error){ if(error) throw error;});
         spawnProcess.stdout.removeAllListeners();
         spawnProcess.stderr.removeAllListeners();
@@ -58,6 +61,6 @@ async function run(){
         spawnProcess.stderr.removeAllListeners();
         spawnProcess.kill('SIGINT');
         process.exit()
-    },1100)
+    },10100)
 }
 run()
