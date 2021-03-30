@@ -17,7 +17,7 @@ mongoose.connect(connectionString, {
 
 const Task = require('../../config/models/Task');
 const Tournament = require('../../config/models/Tournament');
-
+childProcess.exec('chcp 65001 | dir');
 async function go(){
     let path = process.argv[2];
     let fileName = process.argv[3];
@@ -25,7 +25,7 @@ async function go(){
     let tour_id = process.argv[4].split('_')[0];
 
 
-    let programText = fs.readFileSync(path+"\\programText.txt", "utf-8");
+    let programText = fs.readFileSync(path+"\\programText.txt", "utf8");
 
     fs.writeFileSync(path + '\\'+fileName +'.pas', programText, "utf8");
 

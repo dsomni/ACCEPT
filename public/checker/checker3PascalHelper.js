@@ -5,16 +5,18 @@ var path = process.argv[2];
 var fileName = process.argv[3];
 var i = Number(process.argv[4]);
 
+childProcess.exec('chcp 65001 | dir');
 
 async function run(){
 
-    input = fs.readFileSync(path + '\\input'+i+".txt",'utf-8');
-    output = fs.readFileSync(path + '\\output'+i+".txt",'utf-8');
+    input = fs.readFileSync(path + '\\input'+i+".txt",'utf8').trim();
+    output = fs.readFileSync(path + '\\output'+i+".txt",'utf8').trim();
 
     var pOutput ='';
     var result ="Test #" + (i+1).toString() + "*" + "Wrong Answer" + "*" + "er" +"\n";
 
     var spawnProcess = childProcess.spawn(path + '\\'+fileName +'.exe', [], {shell: false});
+    //spawnProcess.stdout.setEncoding('utf8');
 
     spawnProcess.on('error', function (error) {
         fs.appendFileSync(path + '\\result.txt', "Test #" + (i+1).toString() + "*" + "Wrong Answer" + "*" + "er" +"\n",  function(error){ if(error) throw error;});
@@ -23,9 +25,12 @@ async function run(){
         process.exit()
 
     });
+
     spawnProcess.stdout.on('data', function (data){
 
-        pOutput +=data.toString('utf-8');
+        pOutput +=data.toString();
+        //console.log(pOutput)
+
         if(pOutput.trim()==output){
             result = "Test #" + (i+1).toString() + "*" + "OK" + "*" + "ok" +"\n";
         }else{
@@ -59,4 +64,5 @@ async function run(){
         process.exit()
     },1100)
 }
+
 run()
