@@ -28,6 +28,7 @@
                     <% }} %>
                 </div>
                 <h4>Автор: <%= tournament.author %>     Участники: <%= tournament.results.length %> </h4>
+                <h5><a class="tlrefs" href=<%= "/results/"+tournament.identificator +"/1" %>> Таблица результатов </a></h5>
                 <div style="margin-left: 20px;" id="statement">
                     <%= tournament.description %>
                 </div>

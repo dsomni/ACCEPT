@@ -1231,7 +1231,7 @@ app.get('/task_tt/:tour_id/:id', checkTournamentPermission ,checkAuthenticated, 
                             // tournament results update
                             let user_result_idx = tournament.results.findIndex(item => item.login == req.user.login.toString());
                             let task_idx =req.params.id.split('_')[1];
-                            if (tournament.results[user_result_idx].tasks[task_idx].score!=100){
+                            if (!tournament.isEnded && user_result_idx!=-1 && tournament.results[user_result_idx].tasks[task_idx].score!=100){
                                 tournament.results[user_result_idx].tasks[task_idx].tries +=1;
                                 let score =  getScore(result);
                                 if( tournament.results[user_result_idx].tasks[task_idx].score < score){
@@ -1463,16 +1463,23 @@ app.post('/edittask_tt/:tour_id/:id', checkAuthenticated, checkPermission, async
 
 //---------------------------------------------------------------------------------
 // Tournament results page
-app.get('/results/:tour_id', checkAuthenticated, checkPermission, async (req, res) => {
+app.get('/results/:tour_id/:showTeachers/', checkAuthenticated, async (req, res) => {
     let tournament = await Tournament.findOne({ identificator: req.params.tour_id });
     if (tournament) {
+        let results = [];
+        for(let i=0;i<tournament.results.length;i++){
+            let user = await User.findOne({login:tournament.results[i].login})
+            results.push([tournament.results[i], user.isTeacher]);
+        }
         res.render('tournamentresults.ejs', {
             login: req.user.login,
             name: req.user.name,
             title: "Tournament Results",
             isTeacher: req.user.isTeacher,
             ID: req.params.tour_id,
-            tournament: tournament
+            tournament: tournament,
+            results: results,
+            showTeachers: req.params.showTeachers=="1"
         });
     } else {
         res.redirect('/');
@@ -1569,7 +1576,7 @@ async function checkTournamentPermission(req, res, next){
     let tournament = await Tournament.findOne({ identificator: tour_id }).exec();
     let isBegan = tournament.isBegan;
 
-    if(req.user.isTeacher || (isBegan && tournament.results.find(item => item.login == req.user.login))){
+    if(req.user.isTeacher || tournament.isEnded || (isBegan && tournament.results.find(item => item.login == req.user.login))){
         return next();
 
     }

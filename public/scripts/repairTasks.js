@@ -18,7 +18,7 @@ const Task = require('../../config/models/Task');
 async function run() {
 
     //-----------------------------------------------------------------
-    // Repair Hints
+    // Repair Statements
     let tasks = await Task.find({}).exec()
     for (let i = 0; i < tasks.length; i++) {
         let task = tasks[i];

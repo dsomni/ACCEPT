@@ -15,16 +15,39 @@
     <body>
         <main>
             <h1>Результаты турнира <%= tournament.title %></h1>
+            <% if(isTeacher){ %>
+                <h3>Показывать учителей</h3>
+                <label class="switch" >
+                    <input type="checkbox" name="showTeachers" <% if(showTeachers) {%> checked <% } %>
+                    onclick=<%= 'location.href=\"/results/'+ tournament.identificator + "/" + (Number(showTeachers)+1)%2 + "\"" %>>
+                    <span class="slider round"></span>
+                </label>
+            <% } %>    
             <table class='taskslist'>
                 <tr>
                     <th>LOGIN</th>
                     <%  tournament.tasks.forEach(task => { %>
-                        <th><%= task.identificator.split('_')[1] %></th>
+                        <th><a class="tlrefs" href=<%="/task_tt/"+tournament.identificator  + '/' + task.identificator %>> <%= Number(task.identificator.split('_')[1])+1 %> </a></th>
                     <% }); %>
                     <th>Счёт</th>
                     <th>Время</th>
                 </tr>
-                <% tournament.results.forEach(result => { %>
+
+                <% for(let i=0; i < results.length; i++) { %>
+                    <tr>
+                        <% let result = results[i][0]; %>
+                        <% if(!results[i][1] || showTeachers){ %>
+                            <td><%= result.login %></td>
+                            <% for(let j=0; j < result.tasks.length; j++) { %>
+                                <% let task = result.tasks[i]; %>
+                                <td><%= task.score %>(<%= task.tries %>)</td>
+                            <% } %>
+                            <td><%= result.sumscore %></td>
+                            <td><%= result.sumtime %></td>
+                        <% } %>    
+                    </tr>
+                <% } %>
+                <!--<% tournament.results.forEach(result => { %>
                     <tr>
                         <td><%= result.login %></td>
                         <% result.tasks.forEach(task => { %>
@@ -33,7 +56,7 @@
                         <td><%= result.sumscore %></td>
                         <td><%= result.sumtime %></td>
                     </tr>
-                 <%  }); %>
+                 <%  }); %>-->
             </table>
         </main>
     </body>
