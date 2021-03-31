@@ -2,3 +2,4 @@
 node_modules
 public/scripts/users.xlsx
 public/tables/*.xlsx
+config/configs.js

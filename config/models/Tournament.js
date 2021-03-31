@@ -29,7 +29,13 @@ const TournamentSchema = new mongoose.Schema({
             dtime: Number,//from start
             tries: Number
         }]
-    }]
+    }],
+    attempts: [{
+        login: String,
+        AttemptID: String,
+        TaskID: String,
+        score: Number
+        }]
 
 }, { collection: config.mongodbConfigs.CollectionNames.tournaments });
 

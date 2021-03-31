@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Результаты турнира</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0,
+              maximum-scale=1.0, minimum-scale=1.0,
+              user-scalable=no, minimal-ui">
+        <meta name="full-screen" content="yes">
+
+        <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
+        </head>
+    <body>
+        <main>
+            <h1>Посылки турнира "<%= title %>"</h1>
+            <form class="SearchUI" action= <%= `/tournament/attempts/${tourID}/${"all&all&all"}` %>  method="POST">
+                <input name="loginSearch" rows=1 type="text" placeholder="Поиск по логину">
+                <input name="taskSearch" rows=1 placeholder="Поиск по задаче">
+                <select name="selector" id = "selector">
+                    <option value="all" selected>Все посылки</option>
+                    <option value="ok" >Только успешные</option>
+                </select>
+                <button id="submitsearch">Найти</button>
+            </form>
+
+            <table class='taskslist'>
+                <tr>
+                    <th>Login</th>
+                    <th>Attempt</th>
+                    <th>Task</th>
+                    <th>Score</th>
+                </tr>
+                <% for(let i=0; i<attempts.length; i++){%>
+                <tr>
+                    <td><a><%= attempts[i].login  %></a></td>
+                    <td><a>[<%= Посылка  %>]</a></td>
+                    <td><a><%= tasks[i].title %></a></td>
+                    <td><a><%= attempts[i].score  %></a></td>
+                </tr>
+                <% } %>
+            </table>
+            </div>
+        </main>
+    </body>
+</html>

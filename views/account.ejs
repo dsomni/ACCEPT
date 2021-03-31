@@ -20,11 +20,12 @@
                 <p>Группа: <%= user.group %></p>
             </div>
             <form class="SearchUI" action= <%= '/account/'+ u_login +'/1/default' %>  method="POST">
-                <input id="searcharea" name = "searcharea" rows=1 placeholder="Поиск по задаче"></input><button id="submitsearch">Найти</button>
+                <input id="searcharea" name = "searcharea" rows=1 placeholder="Поиск по задаче"></input>
                 <select name="selector" id = "selector">
                     <option value="all" selected>Все посылки</option>
                     <option value="oks" >Только успешные</option>
                 </select>
+                <button id="submitsearch">Найти</button>
             </form>
 
             <table class='taskslist'>

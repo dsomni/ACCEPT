@@ -1228,12 +1228,19 @@ app.get('/task_tt/:tour_id/:id', checkTournamentPermission ,checkAuthenticated, 
                             })
                             await req.user.save()
 
+                            let score =  getScore(result);
+                            tournament.attempts.push({
+                                login: req.user.login,
+                                AttemptID: req.user.attempts[0]._id,
+                                TaskID: req.params.id,
+                                score
+                            });
+
                             // tournament results update
                             let user_result_idx = tournament.results.findIndex(item => item.login == req.user.login.toString());
                             let task_idx =req.params.id.split('_')[1];
                             if (!tournament.isEnded && user_result_idx!=-1 && tournament.results[user_result_idx].tasks[task_idx].score!=100){
                                 tournament.results[user_result_idx].tasks[task_idx].tries +=1;
-                                let score =  getScore(result);
                                 if( tournament.results[user_result_idx].tasks[task_idx].score < score){
                                     tournament.results[user_result_idx].sumscore -= tournament.results[user_result_idx].tasks[task_idx].score;
                                     tournament.results[user_result_idx].sumscore += score;
@@ -1319,7 +1326,6 @@ app.get('/task_tt/:tour_id/:id', checkTournamentPermission ,checkAuthenticated, 
 });
 // Tournament Task Page listener
 app.post('/task_tt/:tour_id/:id', checkAuthenticated, async (req, res) => {
-
     fs.stat(path.normalize('public/processes/' + req.user.login + '_' + req.params.id), async function (err) {
         if (!err) {
             res.redirect('/task_tt/' + req.params.tour_id + '/' + req.params.id);
@@ -1484,6 +1490,51 @@ app.get('/results/:tour_id/:showTeachers/', checkAuthenticated, async (req, res)
     } else {
         res.redirect('/');
     }
+});
+
+//---------------------------------------------------------------------------------
+// Tournament attempts page
+app.get('/tournament/attempts/:tour_id/:toSearch', checkAuthenticated, checkPermission, async (req, res) => {
+    let a = req.params.toSearch.split('&');
+    let loginSearch = a[0] == "all" ? "" : a[0].toUpperCase;
+    let taskSearch = a[1] == "all" ? "" : a[1].toUpperCase;
+    let success = a[2] != "all";
+    let needTasks = a[1] != "all";
+    let needLogin = a[0] != "all";
+
+    let tournament = await Tournament.findOne({ identificator: req.params.tour_id }).exec();
+    let attempts = tournament.attempts;
+
+    let taskIDs = [];//IDs of needed tasks
+    if (needTasks) {
+        //find Tasks
+    }
+    let Logins = [];
+    if (needLogin) {
+        //find Logins
+    }
+    //search
+    attempts.filter(item => (!success || item.score == 100) && (!needTasks || item.taskID in taskIDs)&&(!needLogin || item.login in Logins))
+
+    let tasks = attempts.map(attempt => tournament.taks.findOne(task => task.identificator == attempt.taskID));
+    let globalAttempts = attempts.map(attempt => req.user.attempts.findOne(item => item._id == attempt.AttemptID).date);
+
+    res.render('tournamentattempts.ejs',{
+        login: req.user.login,
+        name: req.user.name,
+        title: tournament.title,
+        isTeacher: req.user.isTeacher,
+        tourID: tournament.identificator,
+        attempts,
+        tasks,
+        realAttempts: globalAttempts
+    });
+});
+app.post('/tournament/attempts/:tour_id/:toSearch', checkAuthenticated, checkPermission, async (req, res) => {
+    let toSearch = req.body.loginSearch.trim() == "" ? "all" : req.body.loginSearch.trim();
+    toSearch += '&' + (req.body.taskSearch.trim() == "" ? "all" : req.body.taskSearch.trim());
+    toSearch += '&' + (req.body.selector);
+    res.redirect(`/tournament/attempts/${req.params.tour_id}/${toSearch}`);
 });
 
 //---------------------------------------------------------------------------------
