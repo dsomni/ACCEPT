@@ -7,8 +7,8 @@
     "start": "node server",
     "dev": "nodemon server",
     "mongo": "sudo systemctl start mongod.service",
-    "postinstall": "public/checker/pythonCompiler/python.exe public/scripts/CreateConfigs.py",
-    "configurate": "public/checker/pythonCompiler/python.exe public/scripts/CreateConfigs.py"
+    "postinstall": "public\\checker\\pythonCompiler\\python.exe public\\scripts\\CreateConfigs.py",
+    "configurate": "public\\checker\\pythonCompiler\\python.exe public\\scripts\\CreateConfigs.py"
   },
   "author": "",
   "license": "ISC",

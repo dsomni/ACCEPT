@@ -1,0 +1,3 @@
+https://www.pypy.org/download.html
+
+and put it in the pypyCompiler directory

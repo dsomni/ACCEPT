@@ -1,22 +1,60 @@
+def parser(text):
+    fin_text = ""
+    tabs = 0
+    colon = False
+    quote = False
+    for el in text:
+        if(el=="{"):
+            if(not quote):
+                tabs+=1
+                colon = False
+            fin_text+="{"
+        elif(el=="}"):
+            if(not quote):
+                tabs-=1
+                colon = False
+                fin_text += "\n"
+                fin_text += "\t" * tabs
+            fin_text += "}"
+        elif (el==":"):
+            if(not quote):
+                colon = True
+            fin_text+=":"
+        elif (el==","):
+            if (not quote):
+                colon = False
+            fin_text+=","
+        elif(el=="\'" or el=="\""):
+            if(not quote and not colon):
+                fin_text+="\n"
+                fin_text += "\t" * tabs
+            quote = not quote
+            if(colon):
+                fin_text+="\""
+        else:
+            fin_text+=el
+
+    return fin_text
+
 config = {
-    "PathToUsersList": "PATH", # Path to users.xlsx file
-    "PathToTeachersList": "PATH", # Path to teachers.xlsx file
-    "port": "3000", # server port
-    "secret": 'secret',
-    "FolderLifeTime": 0.7 * 60 * 1000, # milliseconds
-    "mongodbConfigs": {
-        "dbName": "db", # mongodb data base name
-        "Host": "localhost:27017", # where data base located(default: "localhost:27017")
-        "User": { # mongodb user with Read and Write permissions or leave empty
-                "Username": "username",
-                "Password": "password",
+    'PathToUsersList': "PATH", # Path to users.xlsx file
+    'PathToTeachersList': "PATH", # Path to teachers.xlsx file
+    'port': "3000", # server port
+    'secret': "secret",
+    'FolderLifeTime': 0.7 * 60 * 1000, # milliseconds
+    'mongodbConfigs': {
+        'dbName': "db", # mongodb data base name
+        'Host': "localhost:27017", # where data base located(default: "localhost:27017")
+        'User': { # mongodb user with Read and Write permissions or leave empty
+                'Username': "username",
+                'Password': "password",
                },
-        "CollectionNames": { # names of collections
-                          "users": "users", # with users
-                          "news": "news", # with news
-                          "tasks": "tasks", # with tasks
-                          "lessons": "lessons", # with lessons
-                          "tournament": "tournaments"
+        'CollectionNames': { # names of collections
+                          'users': "users", # with users
+                          'news': "news", # with news
+                          'tasks': "tasks", # with tasks
+                          'lessons': "lessons", # with lessons
+                          'tournament': "tournaments"
                           }
     },
 }
@@ -45,7 +83,7 @@ if answer1.upper() == "Y":
 if (port):
     config["port"] = port
 if (FolderLifeTime):
-    config["FolderLifeTime"] = FolderLifeTime
+    config["FolderLifeTime"] = int(eval(FolderLifeTime))
 if (PathToUsersList):
     config["PathToUsersList"] = PathToUsersList
 if (PathToTeachersList):
@@ -76,4 +114,5 @@ if answer1.upper() == "Y":
 
 f = open("".join(i+'/' for i in __file__.split("/")
                  [:-3])+"config/configs.js", "w+")
-f.write("module.exports = "+str(config).replace("}", "}\n").replace("{", "{\n").replace(",", ",\n"))
+text = str(config)    
+f.write("module.exports = "+parser(text))     
