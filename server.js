@@ -334,13 +334,23 @@ app.post('/addtask',checkAuthenticated, checkPermission, async (req, res) => {
 // Tasks List Page
 app.get('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
     let user = req.user;
-    let tasks = await Task.find({}).exec();
+    let teachers = await User.find({ isTeacher: true });
+    teachers = teachers.map(item => item.name);
     let foundTasks = []
     let a = req.params.search.split('&');
-    if (a[0] != "default" || a[1] != "all" || a[2] != "all") {
+    let tasks;
+    if (a[0] != "default" || a[1] != "all" || a[2] != "all" || a[3] != "false" || a[4] != "all") {
         toSearch = a[0] == "default" ? "" : a[0].toUpperCase();
-        SearchTopic = a[1] == "all" ? "" : a[1].toUpperCase();
-        SearchGrade = a[2] == "all" ? "" : a[2];
+        SearchTopic = a[1].toUpperCase();
+        SearchGrade = a[2]
+        SortByNew = a[3] == "true";
+        author = a[4]
+
+        let properties = {}
+        if (SearchGrade != "all") properties.grade = SearchGrade;
+        if (author != "all") properties.author = author;
+        tasks = await Task.find(properties).exec();
+
 
         const fuse = new Fuse(tasks, {
             includeScore: true,
@@ -349,16 +359,19 @@ app.get('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
 
         if (toSearch == "")
             tasks.forEach(task => {
-                if ((task.topic.split(" ").join("").trim().toUpperCase() == SearchTopic || SearchTopic == "") && (task.grade == SearchGrade || SearchGrade == "")) {
+                if ((task.topic.split(" ").join("").trim().toUpperCase() == SearchTopic || SearchTopic == "")) {
                     foundTasks.push(task);
                 }
             })
         else
             fuse.search(toSearch).forEach(task => {
-                if ((task.score < 0.6 || !task.score) && (task.item.topic.split(" ").join("").trim().toUpperCase() == SearchTopic || SearchTopic == "") && (task.item.grade == SearchGrade || SearchGrade == "")) {
+                if ((task.score < 0.6 || !task.score) && (task.item.topic.split(" ").join("").trim().toUpperCase() == SearchTopic || SearchTopic == "")) {
                     foundTasks.push(task.item);
                 }
             });
+        if (SortByNew) foundTasks = foundTasks.reverse();
+    }else{
+        tasks = await Task.find({}).exec();
     }
     let topics = [];
 
@@ -381,6 +394,7 @@ app.get('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
         }
         verdicts.push(verdict);
     });
+
     res.render('tasks.ejs',{
         login: user.login,
         name: req.user.name,
@@ -390,14 +404,15 @@ app.get('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
         isTeacher: req.user.isTeacher,
         page: req.params.page,
         search: req.params.search,
-        topics: topics
+        topics: topics,
+        teachers
     })
 })
 
 app.post('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
     let toSearch = req.body.searcharea;
     if (!toSearch) toSearch = "default";
-    toSearch += '&' + req.body.TopicSelector +'&' + req.body.GradeSelector
+    toSearch += '&' + req.body.TopicSelector + '&' + req.body.GradeSelector + '&' + req.body.SortByNew + "&" + req.body.Author;
     res.redirect('/tasks/' + req.params.page.toString() +'/' + toSearch )
 })
 
@@ -628,40 +643,42 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) =>
         user = await User.findOne({login : req.params.login}).exec();
     }
 
-    let results = [];
+    let teachers = await User.find({ isTeacher: true });
+    teachers = teachers.map(item => item.name);
+
 
     let a = req.params.search.split('&');
     let toSearch = a[0] == "default" ? "" : a[0].toUpperCase();
-    let SearchGrade = a[1]=="all"? "" : a[1];
+    let SearchGrade = a[1]
+    let SortByNew = a[2] == "false";
+    let author = a[3].replace(/%20/g, " ");
     let usedLessons;
-    let lessons = (await Lesson.find({}).exec()).slice(1);
-    if(user.isTeacher){
-        usedLessons = lessons
-        SearchGrade = SearchGrade;
-    }else{
-        SearchGrade = user.grade;
-        usedLessons = lessons.filter(item => item.grade==SearchGrade)
-    }
+    let properties = {}
+    if (author != "all") properties.author = author;
+    if (SearchGrade != "all" || !user.isTeacher) properties.grade = user.isTeacher ? SearchGrade : user.grade;
+    let lessons = (await Lesson.find(properties).exec());
 
-    const fuse = new Fuse(usedLessons, {
+    if (lessons.length!=0 && lessons[0].identificator == 0) lessons.splice(0, 1);
+
+    // console.log(author + "|");
+
+    const fuse = new Fuse(lessons, {
         includeScore: true,
         keys: ["title"]
     });
 
-    lessons = [];
-
-    if (toSearch == "")
-        lessons = usedLessons.filter(lesson => SearchGrade == lesson.grade || SearchGrade=="");
-    else
+    usedLessons = [];
+    console.log(toSearch);
+    if (toSearch != "")
         fuse.search(toSearch).forEach(lesson => {
-            if (lesson.score < 0.5 && (SearchGrade == lesson.item.grade || SearchGrade=="")) {
-                lessons.push(lesson.item);
+            if (lesson.score < 0.5) {
+                usedLessons.push(lesson.item);
             }
         });
-
-    if (lessons.length == 0)
+    if (usedLessons.length != 0)
         lessons = usedLessons;
 
+    let results = [];
     let result;
     for (let i = 0; i < lessons.length; i++) {
         result = "/" + lessons[i].tasks.length
@@ -672,9 +689,13 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) =>
             if (verdict && verdict.result == "OK") {
                 solved += 1
             }
-            result = solved + result;
-            results.push(result)
         }
+        result = solved + result;
+        results.push(result)
+    }
+    if (SortByNew){
+        lessons = lessons.reverse();
+        results = results.reverse();
     }
 
     res.render('lessons.ejs',{
@@ -683,18 +704,19 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) =>
         login: req.user.login,
         name: req.user.name,
         title : "Lessons List",
-        lessons: lessons,
-        results: results,
+        lessons,
+        results,
         isTeacher: req.user.isTeacher,
         page: req.params.page,
-        search: req.params.search
+        search: req.params.search,
+        teachers
     })
 })
 
 app.post('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) => {
     let toSearch = req.body.searcharea;
     if(!toSearch) toSearch = "default";
-    toSearch += '&' + (req.body.GradeSelector || 'all')
+    toSearch += '&' + (req.body.GradeSelector || 'all') + "&" + req.body.SortByNew + "&" + req.body.Author;
     res.redirect('/lessons/'+ req.params.login + '/' + req.params.page.toString() +'/' + toSearch )
 })
 
@@ -1231,7 +1253,7 @@ app.get('/task_tt/:tour_id/:id', checkTournamentPermission ,checkAuthenticated, 
                             let score =  getScore(result);
                             tournament.attempts.push({
                                 login: req.user.login,
-                                AttemptID: req.user.attempts[0]._id,
+                                AttemptDate: req.user.attempts[0].date,
                                 TaskID: req.params.id,
                                 score
                             });
@@ -1627,9 +1649,9 @@ async function checkTournamentPermission(req, res, next){
     let tournament = await Tournament.findOne({ identificator: tour_id }).exec();
     let isBegan = tournament.isBegan;
 
+    if(!req.user) return res.redirect("/");
     if(req.user.isTeacher || tournament.isEnded || (isBegan && tournament.results.find(item => item.login == req.user.login))){
         return next();
-
     }
     res.redirect('/tournament/' + req.user.login + '/' + tour_id);
 }

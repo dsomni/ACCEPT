@@ -32,7 +32,7 @@ const TournamentSchema = new mongoose.Schema({
     }],
     attempts: [{
         login: String,
-        AttemptID: String,
+        AttemptDate: String,
         TaskID: String,
         score: Number
         }]

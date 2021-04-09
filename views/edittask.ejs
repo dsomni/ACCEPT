@@ -19,8 +19,8 @@
                 <h3>Название задачи</h3>
                 <textarea id="title" name = "title" required cols=2 placeholder="Введите название"><%= problem.title %></textarea>
                 <h3>Тема</h3>
-                <textarea id="topic" name = "topic"  cols=2 placeholder="Введите тему"><%= problem.topic %></textarea>
-                <h3>Класс <input id="grade" name = "grade" value=<%= problem.grade %>> </input></h3>
+                <textarea id="topic" name = "topic"  cols=2 placeholder="Введите тему" required><%= problem.topic %></textarea>
+                <h3>Класс <input id="grade" name = "grade" value=<%= problem.grade %> required></h3>
                 <br>
 
                 <h3>Условие</h3>

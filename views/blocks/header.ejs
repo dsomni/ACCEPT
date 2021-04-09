@@ -4,8 +4,8 @@
         <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstleyVEVO"><img id="Logo" src = "/public/media/Logo.svg" alt="ACCEPT"></a>
         <% if (name){ %>
                 <button onClick='location.href="/"'><img src="/public/media/main.svg">Главная</button>
-                <button onClick='location.href="/tasks/1/default&all&all"'><img src="/public/media/task.svg">Задачи</button>
-                <button onClick=<%='location.href=\"/lessons/' + login + "/1/default&all&all" + "\"" %>> <img src="/public/media/lesson.svg">Уроки</button>
+                <button onClick='location.href="/tasks/1/default&all&all&false&all"'><img src="/public/media/task.svg">Задачи</button>
+                <button onClick=<%='location.href=\"/lessons/' + login + "/1/default&all&true&all" + "\"" %>> <img src="/public/media/lesson.svg">Уроки</button>
                 <button onClick=<%= 'location.href=\"/tournaments/'+ login + "/1/default&all&all" + "\"" %>> <img src="/public/media/tournament.svg">Турниры</button>
             <%if (isTeacher){ %>
                 <button onClick='location.href="/students/1/default&all&all&all"'><img src="/public/media/students.svg">Ученики</button>

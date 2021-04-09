@@ -22,13 +22,23 @@
             <form class="SearchUI" action= <%= '/lessons/'+ u_login +'/1/default' %>  method="POST">
                 <input name = "searcharea" rows=1 placeholder="Поиск урока"></input>
                 <% if(isTeacher){ %>
-                <select name="GradeSelector" id = "GradeSelector">
-                    <option value="all" selected>Все</option>
-                    <% for(var i = 6; i < 12; i++) { %>
-                    <option value=<%= i %> ><%= i %></option>
+                    <select name="GradeSelector" id = "GradeSelector">
+                        <option value="all" selected>Все</option>
+                        <% for(var i = 6; i < 12; i++) { %>
+                        <option value=<%= i %> ><%= i %></option>
+                        <% } %>
+                    </select>
+                <% } %>
+                <select name="SortByNew">
+                    <option value="false" >Сначала старые</option>
+                    <option value="true" selected>Сначала новые</option>
+                </select>
+                <select name="Author">
+                    <option value="all" selected>Все авторы</option>
+                    <% for(var i=0; i < teachers.length; i++) { %>
+                        <option value=<%= teachers[i].replace(/ /g, "%20") %> ><%= teachers[i] %></option>
                     <% } %>
                 </select>
-                <% } %>
                 <button id="submitsearch">Найти</button>
             </form>
 
@@ -47,7 +57,7 @@
                 <% for (var i = (page-1)*onPage+1; i < min(page*onPage+1,lessons.length); i++) { %>
                 <% var lesson = lessons[i]; %>
                  <tr>
-                  <!--<td><%= lesson.identificator %></td> -->
+
                   <td><%= i %></td>
                   <td> <a class="tlrefs" href=<%="/lesson/"+ u_login + "/" + lesson.identificator %>> <%= lesson.title %> </a> </td>
                   <td><%= lesson.grade %></td>

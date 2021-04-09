@@ -114,5 +114,5 @@ if answer1.upper() == "Y":
 
 f = open("".join(i+'/' for i in __file__.split("/")
                  [:-3])+"config/configs.js", "w+")
-text = str(config)    
-f.write("module.exports = "+parser(text))     
+text = str(config)
+f.write("module.exports = "+parser(text))
