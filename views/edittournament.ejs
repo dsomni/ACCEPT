@@ -27,7 +27,7 @@
                 <h3>Дата окончания</h3>
                 <input style="width: 90%;margin-left: auto;margin-right: auto;margin-bottom: 10px;" class="dateChooser" type="datetime-local" name="whenEnds" required value=<%= tournament.whenEnds.replace(' ', 'T')%>>
                 <h3>Заморозить таблицу в:</h3>
-                <input style="width: 90%;margin-left: auto;margin-right: auto;margin-bottom: 10px;" class="dateChooser" type="datetime-local" name="frozeAfter" required value=<%= tournament.frozeAfter.replace(' ', 'T')%>>
+                <input style="width: 90%;margin-left: auto;margin-right: auto;margin-bottom: 10px;" class="dateChooser" type="datetime-local" name="frozeAfter" required value=<%= (tournament.frozeAfter) ? tournament.frozeAfter.replace(' ', 'T'): tournament.whenEnds.replace(' ', 'T')%>>
                 Разрешить регистрацию после начала турнира
                 <%if(tournament.allowRegAfterStart){ %>
                 <label class="switch" >

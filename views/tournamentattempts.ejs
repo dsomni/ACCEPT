@@ -32,12 +32,12 @@
                     <th>Task</th>
                     <th>Score</th>
                 </tr>
-                <% for(let i=0; i<attempts.length; i++){%>
+                <% for(let i=0; i<attempts.length; i++){ let task = tasks.find(item => attempts[i].TaskID == item.identificator) %>
                 <tr>
-                    <td><a><%= attempts[i].login  %></a></td>
-                    <td><a>[<%= Посылка  %>]</a></td>
-                    <td><a><%= tasks[i].title %></a></td>
-                    <td><a><%= attempts[i].score  %></a></td>
+                    <td><a href=<%= "/account/"+attempts[i].login+"/1/default&all" %> ><%= attempts[i].login  %></a></td>
+                    <td><a href=<%= "/attempt/"+attempts[i].login+"/"+attempts[i].AttemptDate %> >[Посылка]</a></td>
+                    <td><a href=<%= "/tournament/task/"+tourID+"/"+tasks[i].identificator %> ><%= tasks[i].title %></a></td>
+                    <td><%= attempts[i].score  %></td>
                 </tr>
                 <% } %>
             </table>

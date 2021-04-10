@@ -960,6 +960,8 @@ app.post('/tournament/add',checkAuthenticated, checkPermission, async (req, res)
     let user = req.user;
     let body = req.body;
     let tasks = [];
+    console.log(body.frozeAfter);
+    let frozeAfter = body.frozeAfter ? body.frozeAfter : body.whenEnds;
     await Adder.addTournament(Tournament, body.title, body.description,
         tasks, user.name, body.whenStarts.replace('T', ' '),
         body.whenEnds.replace('T', ' '), body.frozeAfter.replace('T', ' '), body.allowRegAfterStart=="on" );
@@ -1089,9 +1091,10 @@ app.post('/tournament/edit/:id',checkAuthenticated, checkPermission, async (req,
 
     tournament.title = body.title;
     tournament.description = body.description;
-    if(body.whenStarts)
+    if (body.whenStarts)
         tournament.whenStarts = body.whenStarts.replace('T', ' ');
     tournament.whenEnds = body.whenEnds.replace('T', ' ');
+    tournament.frozeAfter = body.frozeAfter.replace('T', ' ');
     tournament.allowRegAfterStart = body.allowRegAfterStart=="on";
     await tournament.save();
 
@@ -1170,8 +1173,7 @@ app.post('/tournament/task/add/:tour_id',checkAuthenticated, checkPermission, as
         if(tI=="" || tO == "") break;
         tests.push([tI, tO]);
     }
-
-    await Adder.addTaskToTournament(Tournament, req.params.tour_id, body.title, body.statement, examples, tests);
+    await Adder.addTaskToTournament(Tournament, req.params.tour_id, body.title, body.statement, body.input, body.output, examples, tests);
 
     res.redirect('/tournament/task/add/' + req.params.tour_id);
 });
@@ -1480,6 +1482,8 @@ app.post('/tournament/task/edit/:tour_id/:id', checkAuthenticated, checkPermissi
 
     problem.title = body.title;
     problem.statement = body.statement;
+    problem.input = body.input;
+    problem.output = body.output;
     problem.examples = examples;
     problem.tests = tests;
 
@@ -1494,16 +1498,16 @@ app.post('/tournament/task/edit/:tour_id/:id', checkAuthenticated, checkPermissi
 app.get('/tournament/results/:tour_id/:showTeachers/', checkAuthenticated, async (req, res) => {
     let tournament = await Tournament.findOne({ identificator: req.params.tour_id });
     let baza;
-    if (tournament.isFrozen) {
+    if (tournament.isFrozen && !tournament.isEnded) {
         baza = tournament.frozenResults;
     } else {
-        baze = tournament.results;
+        baza = tournament.results;
     }
     let results = [];
     if (tournament) {
-        for(let i=0;i<tournament.results.length;i++){
-            let user = await User.findOne({login:tournament.results[i].login})
-            results.push([tournament.results[i], user.isTeacher]);
+        for(let i=0;i<baza.length;i++){
+            let user = await User.findOne({login: baza[i].login})
+            results.push([baza[i], user.isTeacher]);
         }
         res.render('tournamentresults.ejs', {
             login: req.user.login,
@@ -1544,8 +1548,10 @@ app.get('/tournament/attempts/:tour_id/:toSearch', checkAuthenticated, checkPerm
     //search
     attempts.filter(item => (!success || item.score == 100) && (!needTasks || item.taskID in taskIDs)&&(!needLogin || item.login in Logins))
 
-    let tasks = attempts.map(attempt => tournament.taks.findOne(task => task.identificator == attempt.taskID));
-    let globalAttempts = attempts.map(attempt => req.user.attempts.findOne(item => item._id == attempt.AttemptID).date);
+    let tasks = attempts.map(attempt => tournament.tasks.find(task => task.identificator == attempt.TaskID));
+    let globalAttempts = attempts.map(attempt => req.user.attempts.find(item => item._id == attempt.AttemptID).date);
+
+    console.log(tasks);
 
     res.render('tournamentattempts.ejs',{
         login: req.user.login,

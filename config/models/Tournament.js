@@ -11,6 +11,8 @@ const TournamentSchema = new mongoose.Schema({
         author: String,
         title: String,
         statement: String,
+        input: String,
+        output: String,
         examples: Array,
         tests: Array,
     }],

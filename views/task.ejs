@@ -33,14 +33,10 @@
         <h4>Тема: <%= problem.topic %>         Автор: <%= problem.author %></h4><!-- скрывать тему на турнире -->
         <div class="statement">
             <%= problem.statement %>
-            <% if(problem.input){ %>
-                <h5>Входные данные</h5>
-                <%= problem.input %>
-            <% } %>
-            <% if(problem.output){ %>
-                <h5>Выходные данные</h5>
-                <%= problem.output %>
-            <% } %>
+            <h5>Входные данные</h5>
+            <%= problem.input %>
+            <h5>Выходные данные</h5>
+            <%= problem.output %>
         </div>
         <% if(problem.hint.doesExist && showHint) { %>
             <button id="HintButton" onclick="ShowHideHint()">Показать/скрыть подсказку</button>
@@ -74,8 +70,8 @@
                 </select>
 
                     <div class="imgs">
-                        <img src="..\..\public\media\TopLeft.svg">
-                        <img src="..\..\public\media\TopRight.svg">
+                        <img src="\public\media\TopLeft.svg">
+                        <img src="\public\media\TopRight.svg">
                     </div>
                     <textarea class="taskarea" id="code" name = "code" required placeholder="Place code here"><%= prevCode %></textarea>
                     <div class="taskarea"  id="result" name="result" >
@@ -86,8 +82,8 @@
                         </ul>
                     </div>
                     <div class="imgsbottom">
-                        <img src="..\..\public\media\BottomLeft.svg">
-                        <img src="..\..\public\media\BottomRight.svg">
+                        <img src="\public\media\BottomLeft.svg">
+                        <img src="\public\media\BottomRight.svg">
                     </div>
             </div>
             <div id="submitdiv">

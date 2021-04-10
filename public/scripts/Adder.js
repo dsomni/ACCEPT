@@ -54,7 +54,8 @@ exports.addTournament = async function (Tournament, title, description, tasks, a
         frozeAfter,
         allowRegAfterStart,
         isBegan: false,
-        isEnded: false
+        isEnded: false,
+        isFrozen: false
     }
     await Tournament.insertMany([tournament]);
 }
@@ -62,7 +63,7 @@ exports.addTournament = async function (Tournament, title, description, tasks, a
 exports.addTaskToTournament = async function (Tournament, tour_id, title, statement, input, output, examples, tests) {
 
     let tournament = await Tournament.findOne({ identificator: tour_id }).exec();
-
+    //console.log(input, output);
     tournament.tasks.push({
         identificator: tour_id + '_' + tournament.tasks.length,
         title,
@@ -72,6 +73,6 @@ exports.addTaskToTournament = async function (Tournament, tour_id, title, statem
         examples,
         tests,
     });
-
+    tournament.markModified("tasks");
     await tournament.save();
 }

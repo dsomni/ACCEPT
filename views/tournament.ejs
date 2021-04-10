@@ -23,9 +23,11 @@
                     <% if(isTeacher){ %>
                         <a id="editref" href=<%="/tournament/edit/" + tournament.identificator %> > [Редактировать] </a>
                         <% if(!tournament.isBegan) { %>
-                        <a id="editref" href=<%="/tournament/task/add/" + tournament.identificator %> > [Добавить задачу] </a>
-                        <a id="editref" href=<%="/addparticipant_tt/" + tournament.identificator %> > [Добавить участников] </a>
-                    <% }} %>
+                                <a id="editref" href=<%="/tournament/task/add/" + tournament.identificator %> > [Добавить задачу] </a>
+                                <a id="editref" href=<%="/addparticipant_tt/" + tournament.identificator %> > [Добавить участников] </a>
+                            <% } %>
+                            <h5><a href=<%= "/tournament/attempts/"+ID+"/all&all&all" %> >Посылки</a></h5>
+                        <% } %>
                 </div>
                 <h4>Автор: <%= tournament.author %>     Участники: <%= tournament.results.length %> </h4>
                 <h5><a class="tlrefs" href=<%= "/tournament/results/"+tournament.identificator +"/1" %>> Таблица результатов </a></h5>
@@ -49,7 +51,7 @@
                                 <td>
                                     <%= parseInt(task.identificator.split('_')[1])+1 %>
                                 </td>
-                                <td> <a class="tlrefs" href=<%="/task_tt/"+tournament.identificator  + '/' + task.identificator %>> <%= task.title %> </a> </td>
+                                <td> <a class="tlrefs" href=<%="/tournament/task/"+tournament.identificator  + '/' + task.identificator %>> <%= task.title %> </a> </td>
                                 <td>
                                     <%= results[i] %>
                                 </td>
