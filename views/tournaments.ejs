@@ -16,7 +16,7 @@
         <main>
             <h1>Турниры</h1>
             <% if (isTeacher){ %>
-                <a class="tlrefs addhref" href="/addtournament">[Добавить турнир]</a>
+                <a class="tlrefs addhref" href="/tournament/add">[Добавить турнир]</a>
             <% } %>
             <form class="SearchUI" action= <%= '/tournaments/'+ u_login +'/1/default' %>  method="POST">
                 <input name = "searcharea" rows=1 placeholder="Поиск турнира">
@@ -48,7 +48,7 @@
                 <% var tournament = tournaments[i]; %>
                  <tr>
                   <td><%= i %></td>
-                  <td> <a class="tlrefs" href=<%="/tournament/"+ u_login + "/" + tournament.identificator %>> <%= tournament.title %> </a> </td>
+                  <td> <a class="tlrefs" href=<%="/tournament/page/"+ u_login + "/" + tournament.identificator %>> <%= tournament.title %> </a> </td>
                   <td><%= tournament.author %></td>
                   <td><%= results[i] %></td>
                   <td><%= tournament.whenStarts %></td>

@@ -21,14 +21,14 @@
                 <H1 id="taskname"><%= tournament.title; %></H1>
                 <div style="text-align: center; margin: 10px;">
                     <% if(isTeacher){ %>
-                        <a id="editref" href=<%="/edittournament/" + tournament.identificator %> > [Редактировать] </a>
+                        <a id="editref" href=<%="/tournament/edit/" + tournament.identificator %> > [Редактировать] </a>
                         <% if(!tournament.isBegan) { %>
-                        <a id="editref" href=<%="/addtask_tt/" + tournament.identificator %> > [Добавить задачу] </a>
+                        <a id="editref" href=<%="/tournament/task/add/" + tournament.identificator %> > [Добавить задачу] </a>
                         <a id="editref" href=<%="/addparticipant_tt/" + tournament.identificator %> > [Добавить участников] </a>
                     <% }} %>
                 </div>
                 <h4>Автор: <%= tournament.author %>     Участники: <%= tournament.results.length %> </h4>
-                <h5><a class="tlrefs" href=<%= "/results/"+tournament.identificator +"/1" %>> Таблица результатов </a></h5>
+                <h5><a class="tlrefs" href=<%= "/tournament/results/"+tournament.identificator +"/1" %>> Таблица результатов </a></h5>
                 <div style="margin-left: 20px;" id="statement">
                     <%= tournament.description %>
                 </div>

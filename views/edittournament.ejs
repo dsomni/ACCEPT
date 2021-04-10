@@ -14,7 +14,7 @@
     <body>
         <main>
 
-        <form action=<%= '/edittournament/'+tournament.identificator %>  method="POST">
+        <form action=<%= '/tournament/edit/'+tournament.identificator %>  method="POST">
             <div class="lessonAdderForm">
                 <h3>Название турнира</h3>
                 <textarea id="title" name = "title" required placeholder="Введите название"><%=tournament.title%></textarea>
@@ -26,6 +26,8 @@
                 <% } %>
                 <h3>Дата окончания</h3>
                 <input style="width: 90%;margin-left: auto;margin-right: auto;margin-bottom: 10px;" class="dateChooser" type="datetime-local" name="whenEnds" required value=<%= tournament.whenEnds.replace(' ', 'T')%>>
+                <h3>Заморозить таблицу в:</h3>
+                <input style="width: 90%;margin-left: auto;margin-right: auto;margin-bottom: 10px;" class="dateChooser" type="datetime-local" name="frozeAfter" required value=<%= tournament.frozeAfter.replace(' ', 'T')%>>
                 Разрешить регистрацию после начала турнира
                 <%if(tournament.allowRegAfterStart){ %>
                 <label class="switch" >

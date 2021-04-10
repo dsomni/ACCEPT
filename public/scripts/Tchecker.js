@@ -34,6 +34,13 @@ async function checkEnd(){
             await tournament.save();
             childProcess.exec('node ' + path.join(__dirname, '/generateExcelT.js') + ' ' + tournament.identificator);
         }
+        if (!tournament.isFrozen && now - Date.parse(tournament.frozeAfter) >= 0) {
+            tournament.isFrozen = true;
+            tournament.frozenResults = tournament.results
+            tournament.markModified('isFrozen');
+            tournament.markModified('frozenResults');
+            await tournament.save();
+        }
     }
     if(b){
         fillTo_check_begin();
@@ -62,6 +69,13 @@ async function checkBegin(){
             });
             tournament.markModified('results');
             tournament.markModified('isBegan');
+            await tournament.save();
+        }
+        if (!tournament.isFrozen && now - Date.parse(tournament.frozeAfter) >= 0) {
+            tournament.isFrozen = true;
+            tournament.frozenResults = tournament.results
+            tournament.markModified('isFrozen');
+            tournament.markModified('frozenResults');
             await tournament.save();
         }
     }

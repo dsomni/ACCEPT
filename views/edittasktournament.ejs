@@ -14,7 +14,7 @@
     <body>
         <main>
 
-        <form action=<%='/edittask_tt/' + tour_id + '/' + task.identificator %>  method="POST">
+        <form action=<%='/tournament/task/edit/' + tour_id + '/' + task.identificator %>  method="POST">
             <div class="taskAdderForm">
                 <h3>Название задачи</h3>
                 <textarea id="title" name = "title" required cols=2 placeholder="Введите название"><%=task.title %></textarea>

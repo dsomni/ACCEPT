@@ -270,7 +270,7 @@ app.post('/task/:id',checkAuthenticated, async (req, res) => {
 
 //---------------------------------------------------------------------------------
 // Add Task Page
-app.get('/addtask',checkPermission, async (req, res) => {
+app.get('/task/add',checkPermission, async (req, res) => {
     let user = req.user;
     res.render('addtask.ejs',{
         login: user.login,
@@ -280,7 +280,7 @@ app.get('/addtask',checkPermission, async (req, res) => {
     })
 })
 
-app.post('/addtask',checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/task/add',checkAuthenticated, checkPermission, async (req, res) => {
     let user = req.user;
     let body = req.body;
 
@@ -339,11 +339,11 @@ app.get('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
     let foundTasks = []
     let a = req.params.search.split('&');
     let tasks;
+    SortByNew = a[3] == "true";
     if (a[0] != "default" || a[1] != "all" || a[2] != "all" || a[3] != "false" || a[4] != "all") {
         toSearch = a[0] == "default" ? "" : a[0].toUpperCase();
         SearchTopic = a[1].toUpperCase();
         SearchGrade = a[2]
-        SortByNew = a[3] == "true";
         author = a[4]
 
         let properties = {}
@@ -356,20 +356,22 @@ app.get('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
             includeScore: true,
             keys: ["title"]
         });
-
-        if (toSearch == "")
+        if (toSearch == "") {
             tasks.forEach(task => {
-                if ((task.topic.split(" ").join("").trim().toUpperCase() == SearchTopic || SearchTopic == "")) {
+                if ((task.topic.split(" ").join("").trim().toUpperCase() == SearchTopic || SearchTopic == "ALL")) {
                     foundTasks.push(task);
                 }
             })
-        else
+        } else {
             fuse.search(toSearch).forEach(task => {
-                if ((task.score < 0.6 || !task.score) && (task.item.topic.split(" ").join("").trim().toUpperCase() == SearchTopic || SearchTopic == "")) {
+                if ((task.score < 0.5) && (task.item.topic.split(" ").join("").trim().toUpperCase() == SearchTopic || SearchTopic == "ALL")) {
                     foundTasks.push(task.item);
                 }
             });
+        }
+
         if (SortByNew) foundTasks = foundTasks.reverse();
+
     }else{
         tasks = await Task.find({}).exec();
     }
@@ -382,6 +384,7 @@ app.get('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
     }
     if (foundTasks.length == 0) {
         foundTasks = tasks;
+        if (SortByNew) foundTasks = foundTasks.reverse();
     }
     let verdict;
     let verdicts = [];
@@ -418,7 +421,7 @@ app.post('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
 
 //---------------------------------------------------------------------------------
 // Edit Task Page
-app.get('/edittask/:id',checkPermission, async (req, res) => {
+app.get('/task/edit/:id',checkPermission, async (req, res) => {
     let problem = await Task.findOne({identificator: req.params.id}).exec()
     let user = req.user;
     res.render('edittask.ejs',{
@@ -430,7 +433,7 @@ app.get('/edittask/:id',checkPermission, async (req, res) => {
     })
 })
 
-app.post('/edittask/:id', checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/task/edit/:id', checkAuthenticated, checkPermission, async (req, res) => {
     let body = req.body;
     let problem = await Task.findOne({ identificator: req.params.id }).exec();
 
@@ -478,12 +481,12 @@ app.post('/edittask/:id', checkAuthenticated, checkPermission, async (req, res) 
     problem.tests = tests;
     problem.hint = hint;
     await problem.save();
-    res.redirect('/edittask/'+req.params.id);
+    res.redirect('/task/edit/'+req.params.id);
 });
 
 //---------------------------------------------------------------------------------
 // Delete Task
-app.post('/deletetask/:id',checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/task/delete/:id',checkAuthenticated, checkPermission, async (req, res) => {
 
     childProcess.exec("node " + path.join(__dirname,"/public/scripts/FixAfterDeleteTask.js")+ " "+req.params.id)
 
@@ -515,7 +518,7 @@ app.get('/account/:login/:page/:search',checkAuthenticated, checkValidation, asy
 
         tournaments.forEach(tournament => tournament.tasks.forEach(task => tourTask.push(task)));
         for(let i = 0; i < attempts.length; i++){
-            //verylongresult = attempts[i].result[attempts[i].result.length -1 ][attempts[i].result[attempts[i].result.length -1 ].length - 1];
+            erylongresult = attempts[i].result[attempts[i].result.length -1 ][attempts[i].result[attempts[i].result.length -1 ].length - 1];
             verylongresult = getVerdict(attempts[i].result);
             if ((attempts[i].taskID.split('_')[0] != '0') && ((types=='all') || (verylongresult=='OK'))){
                 let task = tourTask.find(item => item.identificator == attempts[i].taskID);
@@ -660,15 +663,12 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) =>
 
     if (lessons.length!=0 && lessons[0].identificator == 0) lessons.splice(0, 1);
 
-    // console.log(author + "|");
-
     const fuse = new Fuse(lessons, {
         includeScore: true,
         keys: ["title"]
     });
 
     usedLessons = [];
-    console.log(toSearch);
     if (toSearch != "")
         fuse.search(toSearch).forEach(lesson => {
             if (lesson.score < 0.5) {
@@ -946,7 +946,7 @@ app.post('/editnews/:id',checkAuthenticated, checkPermission, async (req, res) =
 
 //---------------------------------------------------------------------------------
 // Add Tournament Page
-app.get('/addtournament',checkAuthenticated,checkPermission, async (req, res) => {
+app.get('/tournament/add',checkAuthenticated,checkPermission, async (req, res) => {
     let user = req.user;
     res.render('addtournament.ejs',{
         login: user.login,
@@ -954,15 +954,15 @@ app.get('/addtournament',checkAuthenticated,checkPermission, async (req, res) =>
         title: "Add Tournament",
         isTeacher: req.user.isTeacher
     })
-})//V
+})
 
-app.post('/addtournament',checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/tournament/add',checkAuthenticated, checkPermission, async (req, res) => {
     let user = req.user;
     let body = req.body;
     let tasks = [];
     await Adder.addTournament(Tournament, body.title, body.description,
         tasks, user.name, body.whenStarts.replace('T', ' '),
-        body.whenEnds.replace('T', ' '), [], body.allowRegAfterStart=="on" );
+        body.whenEnds.replace('T', ' '), body.frozeAfter.replace('T', ' '), body.allowRegAfterStart=="on" );
 
     res.render('addtournament.ejs',{
         login: user.login,
@@ -970,7 +970,7 @@ app.post('/addtournament',checkAuthenticated, checkPermission, async (req, res) 
         title: "Add Tournament",
         isTeacher: req.user.isTeacher
     })
-})//V
+})
 
 //---------------------------------------------------------------------------------
 // Tournaments List Page
@@ -1051,7 +1051,7 @@ app.get('/tournaments/:login/:page/:search', checkAuthenticated, async (req, res
         page: req.params.page,
         search: req.params.search
     })
-})//V
+})
 
 app.post('/tournaments/:login/:page/:search', checkAuthenticated, async (req, res) => {
     let toSearch = req.body.searcharea;
@@ -1065,12 +1065,12 @@ app.post('/tournaments/:login/:page/:search', checkAuthenticated, async (req, re
         toSearch += '&all';
     }
     res.redirect('/tournaments/'+ req.params.login + '/' + req.params.page.toString() +'/' + toSearch )
-})//V
+})
 
 
 //---------------------------------------------------------------------------------
 // Edit Tournament Page
-app.get('/edittournament/:id',checkAuthenticated, checkPermission, async (req, res) => {
+app.get('/tournament/edit/:id',checkAuthenticated, checkPermission, async (req, res) => {
     let tournament = await Tournament.findOne({ identificator: req.params.id }).exec();
     let user = req.user;
     res.render('edittournament.ejs',{
@@ -1080,9 +1080,9 @@ app.get('/edittournament/:id',checkAuthenticated, checkPermission, async (req, r
         isTeacher: req.user.isTeacher,
         tournament: tournament
     })
-})//V
+})
 
-app.post('/edittournament/:id',checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/tournament/edit/:id',checkAuthenticated, checkPermission, async (req, res) => {
     let user = req.user;
     let body = req.body;
     let tournament = await Tournament.findOne({identificator: req.params.id}).exec()
@@ -1102,7 +1102,7 @@ app.post('/edittournament/:id',checkAuthenticated, checkPermission, async (req, 
         isTeacher: req.user.isTeacher,
         tournament: tournament
     })
-})//V
+})
 
 
 //---------------------------------------------------------------------------------
@@ -1136,7 +1136,7 @@ app.get('/regTournament/:tournament_id', checkAuthenticated, async (req, res) =>
 
 //---------------------------------------------------------------------------------
 // Add Task to Tournament Page
-app.get('/addtask_tt/:tour_id', checkPermission, async (req, res) => {
+app.get('/tournament/task/add/:tour_id', checkPermission, async (req, res) => {
     let user = req.user;
     let tournament = await Tournament.findOne({ identificator: req.params.tour_id }).exec()
     res.render('addtasktournament.ejs', {
@@ -1148,7 +1148,7 @@ app.get('/addtask_tt/:tour_id', checkPermission, async (req, res) => {
     });
 });
 
-app.post('/addtask_tt/:tour_id',checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/tournament/task/add/:tour_id',checkAuthenticated, checkPermission, async (req, res) => {
     let user = req.user;
     let body = req.body;
 
@@ -1173,12 +1173,12 @@ app.post('/addtask_tt/:tour_id',checkAuthenticated, checkPermission, async (req,
 
     await Adder.addTaskToTournament(Tournament, req.params.tour_id, body.title, body.statement, examples, tests);
 
-    res.redirect('/addtask_tt/' + req.params.tour_id);
+    res.redirect('/tournament/task/add/' + req.params.tour_id);
 });
 
 //---------------------------------------------------------------------------------
 // Delete Task from Tournament
-app.post('/deletetask_tt/:tour_id/:id', checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/tournament/task/delete/:tour_id/:id', checkAuthenticated, checkPermission, async (req, res) => {
 
     childProcess.exec("node " + path.join(__dirname, "/public/scripts/FixAfterDeleteTournamentTask.js") + " " +
         req.params.tour_id + " " + req.params.id)
@@ -1189,7 +1189,7 @@ app.post('/deletetask_tt/:tour_id/:id', checkAuthenticated, checkPermission, asy
 
 //---------------------------------------------------------------------------------
 // Tournament Task Page
-app.get('/task_tt/:tour_id/:id', checkTournamentPermission ,checkAuthenticated, async (req, res) => {
+app.get('/tournament/task/:tour_id/:id', checkTournamentPermission ,checkAuthenticated, async (req, res) => {
     let tour_id = req.params.tour_id
     let tournament = await Tournament.findOne({ identificator: tour_id }).exec();
     let whenEnds = tournament.whenEnds;
@@ -1202,7 +1202,7 @@ app.get('/task_tt/:tour_id/:id', checkTournamentPermission ,checkAuthenticated, 
             if (Date.now() - stats.birthtimeMs >= config.FolderLifeTime) {
                 fs.rmdirSync(path.normalize('public/processes/' + req.user.login + '_' + req.params.id), { recursive: true });
 
-                res.redirect('/task_tt/' + tour_id + '/' + req.params.id);
+                res.redirect('/tournament/task/' + tour_id + '/' + req.params.id);
             } else {
                 fs.stat(path.normalize('public/processes/' + req.user.login + '_' + req.params.id + "/result.txt"), async function (err, stats2) {
                     if (!err) {
@@ -1281,7 +1281,7 @@ app.get('/task_tt/:tour_id/:id', checkTournamentPermission ,checkAuthenticated, 
 
                             fs.rmdirSync(path.normalize('public/processes/' + req.user.login + '_' + req.params.id), { recursive: true });
 
-                            res.redirect('/task_tt/' + tour_id + '/' + req.params.id);
+                            res.redirect('/tournament/task/' + tour_id + '/' + req.params.id);
                         } else {
                             res.render('tournamenttask.ejs', {
                                 login: req.user.login,
@@ -1347,10 +1347,10 @@ app.get('/task_tt/:tour_id/:id', checkTournamentPermission ,checkAuthenticated, 
     });
 });
 // Tournament Task Page listener
-app.post('/task_tt/:tour_id/:id', checkAuthenticated, async (req, res) => {
+app.post('/tournament/task/:tour_id/:id', checkAuthenticated, async (req, res) => {
     fs.stat(path.normalize('public/processes/' + req.user.login + '_' + req.params.id), async function (err) {
         if (!err) {
-            res.redirect('/task_tt/' + req.params.tour_id + '/' + req.params.id);
+            res.redirect('/tournament/task/' + req.params.tour_id + '/' + req.params.id);
         }
         else if (err.code === 'ENOENT') {
 
@@ -1383,7 +1383,7 @@ app.post('/task_tt/:tour_id/:id', checkAuthenticated, async (req, res) => {
                     req.params.id)
 
             }
-            res.redirect('/task_tt/' + req.params.tour_id + '/' + req.params.id);
+            res.redirect('/tournament/task/' + req.params.tour_id + '/' + req.params.id);
         }
     });
 
@@ -1391,7 +1391,7 @@ app.post('/task_tt/:tour_id/:id', checkAuthenticated, async (req, res) => {
 
 //---------------------------------------------------------------------------------
 // Tournament Page
-app.get('/tournament/:login/:id', checkAuthenticated, checkTournamentValidation, async (req, res) => {
+app.get('/tournament/page/:login/:id', checkAuthenticated, checkTournamentValidation, async (req, res) => {
     let user;
     if (req.user.login == req.params.login) {
         user = req.user;
@@ -1436,12 +1436,12 @@ app.get('/tournament/:login/:id', checkAuthenticated, checkTournamentValidation,
             registered: registered
         });
     }
-})//V
+})
 
 //---------------------------------------------------------------------------------
 // Edit tournament task
 
-app.get('/edittask_tt/:tour_id/:id', checkAuthenticated, checkPermission, async (req, res) => {
+app.get('/tournament/task/edit/:tour_id/:id', checkAuthenticated, checkPermission, async (req, res) => {
     let tournament = await Tournament.findOne({ identificator: req.params.tour_id });
     let task = tournament.tasks.find(item => item.identificator == req.params.id);
     res.render('edittasktournament.ejs', {
@@ -1454,7 +1454,7 @@ app.get('/edittask_tt/:tour_id/:id', checkAuthenticated, checkPermission, async 
     })
 });
 
-app.post('/edittask_tt/:tour_id/:id', checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/tournament/task/edit/:tour_id/:id', checkAuthenticated, checkPermission, async (req, res) => {
     let body = req.body;
     let user = req.user;
     let tournament = await Tournament.findOne({ identificator: req.params.tour_id });
@@ -1486,15 +1486,21 @@ app.post('/edittask_tt/:tour_id/:id', checkAuthenticated, checkPermission, async
     tournament.markModified('tasks');
     await tournament.save();
 
-    res.redirect('/edittask_tt/'+req.params.tour_id + '/' + req.params.id);
+    res.redirect('/tournament/task/edit/'+req.params.tour_id + '/' + req.params.id);
 });
 
 //---------------------------------------------------------------------------------
 // Tournament results page
-app.get('/results/:tour_id/:showTeachers/', checkAuthenticated, async (req, res) => {
+app.get('/tournament/results/:tour_id/:showTeachers/', checkAuthenticated, async (req, res) => {
     let tournament = await Tournament.findOne({ identificator: req.params.tour_id });
+    let baza;
+    if (tournament.isFrozen) {
+        baza = tournament.frozenResults;
+    } else {
+        baze = tournament.results;
+    }
+    let results = [];
     if (tournament) {
-        let results = [];
         for(let i=0;i<tournament.results.length;i++){
             let user = await User.findOne({login:tournament.results[i].login})
             results.push([tournament.results[i], user.isTeacher]);

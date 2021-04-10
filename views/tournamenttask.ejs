@@ -16,11 +16,11 @@
         <div id="task">
         <H1 id="taskname"><%= problem.title %></H1>
         <div style="text-align: center;">
-            <% if(isTeacher){ %> <a id="editref" href=<%= "/edittask_tt/" + TUR_ID +'/' + problem.identificator %> > [Редактировать] </a>
+            <% if(isTeacher){ %> <a id="editref" href=<%= "/tournament/task/edit/" + TUR_ID +'/' + problem.identificator %> > [Редактировать] </a>
                 <% if(!isBegan){ %>
                 <span class="taskPopup">
                     <dialog  id='dialog_delete'>
-                    <form action= <%="/deletetask_tt/" + TUR_ID +'/'  + problem.identificator %>  method="POST">
+                    <form action= <%="/tournament/task/delete/" + TUR_ID +'/'  + problem.identificator %>  method="POST">
                         Вы действительно хотите удалить задачу "<%= problem.title %>" ?
                         <button>Да</button>
                     </form>
@@ -47,7 +47,7 @@
         </table>
 
 
-        <form action=<%='/task_tt/' + TUR_ID + '/' + problem.identificator %>  method="POST">
+        <form action=<%='/tournament/task/' + TUR_ID + '/' + problem.identificator %>  method="POST">
             <div class="container">
 
                 <select name="languageSelector" id = "languageSelector">

@@ -16,7 +16,7 @@
         <main>
             <h1>Задачи</h1>
             <% if (isTeacher){ %>
-                <a class="tlrefs addhref" href="/addtask">[Добавить задачу]</a>
+                <a class="tlrefs addhref" href="/task/add">[Добавить задачу]</a>
             <% } %>
             <form class="SearchUI" action= '/tasks/1/default'  method="POST">
                 <input name = "searcharea" rows=1 placeholder="Поиск задачи"></input>

@@ -30,6 +30,18 @@ const TournamentSchema = new mongoose.Schema({
             tries: Number
         }]
     }],
+    frozeAfter: String,
+    isFrozen: Boolean,
+    frozenResults: [{
+        login: String,
+        sumscore: Number,
+        sumtime: Number,//sum from start
+        tasks: [{
+            score: Number,
+            dtime: Number,//from start
+            tries: Number
+        }]
+    }],
     attempts: [{
         login: String,
         AttemptDate: String,
