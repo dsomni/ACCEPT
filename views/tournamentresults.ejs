@@ -19,7 +19,7 @@
                 <h3>Показывать учителей</h3>
                 <label class="switch" >
                     <input type="checkbox" name="showTeachers" <% if(showTeachers) {%> checked <% } %>
-                    onclick=<%= 'location.href=\"/results/'+ tournament.identificator + "/" + (Number(showTeachers)+1)%2 + "\"" %>>
+                    onclick=<%= 'location.href=\"/tournament/results/'+ tournament.identificator + "/" + (Number(showTeachers)+1)%2 + "\"" %>>
                     <span class="slider round"></span>
                 </label>
             <% } %>

@@ -40,6 +40,12 @@
                         <span class="slider round"></span>
                     </label>
                 <% } %>
+                <% if(!tournament.isBegan){ %>
+                    <select name="allOrNothing" id = "selector">
+                        <option value="1" <% if (tournament.allOrNothing) { %>selected <%}%> >Оценка по полность зданой задаче</option>
+                        <option value="0" <% if (!tournament.allOrNothing) { %>selected <%}%> >Потестовая оценка</option>
+                    </select>
+                <% } %>
                 <button id="submit2">Сохранить турнир</button>
             </div>
         </form>

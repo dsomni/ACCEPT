@@ -22,6 +22,7 @@ const TournamentSchema = new mongoose.Schema({
     isBegan: Boolean,
     isEnded: Boolean,
     allowRegAfterStart: Boolean,
+    allOrNothing: Boolean,
     results: [{
         login: String,
         sumscore: Number,

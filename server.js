@@ -960,11 +960,12 @@ app.post('/tournament/add',checkAuthenticated, checkPermission, async (req, res)
     let user = req.user;
     let body = req.body;
     let tasks = [];
-    console.log(body.frozeAfter);
+    //console.log(body.frozeAfter);
     let frozeAfter = body.frozeAfter ? body.frozeAfter : body.whenEnds;
     await Adder.addTournament(Tournament, body.title, body.description,
         tasks, user.name, body.whenStarts.replace('T', ' '),
-        body.whenEnds.replace('T', ' '), body.frozeAfter.replace('T', ' '), body.allowRegAfterStart=="on" );
+        body.whenEnds.replace('T', ' '), body.frozeAfter.replace('T', ' '), body.allowRegAfterStart=="on",
+        body.allOrNothing=="1" );
 
     res.render('addtournament.ejs',{
         login: user.login,
@@ -1096,6 +1097,7 @@ app.post('/tournament/edit/:id',checkAuthenticated, checkPermission, async (req,
     tournament.whenEnds = body.whenEnds.replace('T', ' ');
     tournament.frozeAfter = body.frozeAfter.replace('T', ' ');
     tournament.allowRegAfterStart = body.allowRegAfterStart=="on";
+    tournament.allOrNothing = body.allOrNothing == "1";
     await tournament.save();
 
     res.render('edittournament.ejs',{
@@ -1253,6 +1255,9 @@ app.get('/tournament/task/:tour_id/:id', checkTournamentPermission ,checkAuthent
                             await req.user.save()
 
                             let score =  getScore(result);
+                            if(score!=100 && tournament.allOrNothing){
+                                score = 0;
+                            }
                             tournament.attempts.push({
                                 login: req.user.login,
                                 AttemptDate: req.user.attempts[0].date,
@@ -1526,7 +1531,7 @@ app.get('/tournament/results/:tour_id/:showTeachers/', checkAuthenticated, async
 
 //---------------------------------------------------------------------------------
 // Tournament attempts page
-app.get('/tournament/attempts/:tour_id/:toSearch', checkAuthenticated, checkPermission, async (req, res) => {
+app.get('/tournament/attempts/:tour_id/:page/:toSearch', checkAuthenticated, checkPermission, async (req, res) => {
     let a = req.params.toSearch.split('&');
     let loginSearch = a[0] == "all" ? "" : a[0].toUpperCase;
     let taskSearch = a[1] == "all" ? "" : a[1].toUpperCase;
@@ -1551,7 +1556,7 @@ app.get('/tournament/attempts/:tour_id/:toSearch', checkAuthenticated, checkPerm
     let tasks = attempts.map(attempt => tournament.tasks.find(task => task.identificator == attempt.TaskID));
     let globalAttempts = attempts.map(attempt => req.user.attempts.find(item => item._id == attempt.AttemptID).date);
 
-    console.log(tasks);
+    //console.log(tasks);
 
     res.render('tournamentattempts.ejs',{
         login: req.user.login,
@@ -1561,14 +1566,16 @@ app.get('/tournament/attempts/:tour_id/:toSearch', checkAuthenticated, checkPerm
         tourID: tournament.identificator,
         attempts,
         tasks,
-        realAttempts: globalAttempts
+        page :  req.params.page,
+        realAttempts: globalAttempts,
+        search: req.params.toSearch
     });
 });
-app.post('/tournament/attempts/:tour_id/:toSearch', checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/tournament/attempts/:tour_id/:page/:toSearch', checkAuthenticated, checkPermission, async (req, res) => {
     let toSearch = req.body.loginSearch.trim() == "" ? "all" : req.body.loginSearch.trim();
     toSearch += '&' + (req.body.taskSearch.trim() == "" ? "all" : req.body.taskSearch.trim());
     toSearch += '&' + (req.body.selector);
-    res.redirect(`/tournament/attempts/${req.params.tour_id}/${toSearch}`);
+    res.redirect(`/tournament/attempts/${req.params.tour_id}/${req.params.page}/${toSearch}`);
 });
 
 //---------------------------------------------------------------------------------

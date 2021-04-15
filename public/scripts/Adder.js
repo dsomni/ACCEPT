@@ -41,7 +41,8 @@ exports.addTask = async function (Task, title, statement, input, output, example
         author
     }]);
 }
-exports.addTournament = async function (Tournament, title, description, tasks, author, whenStarts, whenEnds, frozeAfter, allowRegAfterStart) {
+exports.addTournament = async function (Tournament, title, description, tasks,
+     author, whenStarts, whenEnds, frozeAfter, allowRegAfterStart, allOrNothing) {
     var number = await Tournament.estimatedDocumentCount().exec()
     let tournament = {
         identificator: number,
@@ -53,6 +54,7 @@ exports.addTournament = async function (Tournament, title, description, tasks, a
         whenEnds,
         frozeAfter,
         allowRegAfterStart,
+        allOrNothing,
         isBegan: false,
         isEnded: false,
         isFrozen: false
