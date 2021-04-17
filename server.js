@@ -270,7 +270,7 @@ app.post('/task/:id',checkAuthenticated, async (req, res) => {
 
 //---------------------------------------------------------------------------------
 // Add Task Page
-app.get('/task/add',checkPermission, async (req, res) => {
+app.get('/task/add',checkAuthenticated, checkPermission, async (req, res) => {
     let user = req.user;
     res.render('addtask.ejs',{
         login: user.login,
@@ -322,12 +322,7 @@ app.post('/task/add',checkAuthenticated, checkPermission, async (req, res) => {
 
     await Adder.addTask(Task, body.title, body.statement, body.input, body.output, examples, tests, body.topic, body.grade, hint, user.name);
 
-    res.render('addtask.ejs',{
-        login: user.login,
-        name: req.user.name,
-        title : "Add Task",
-        isTeacher: req.user.isTeacher
-    })
+    res.redirect(`/tasks/1/default&all&all&false&all`)
 })
 
 //---------------------------------------------------------------------------------
@@ -421,7 +416,7 @@ app.post('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
 
 //---------------------------------------------------------------------------------
 // Edit Task Page
-app.get('/task/edit/:id',checkPermission, async (req, res) => {
+app.get('/task/edit/:id', checkAuthenticated, checkPermission, async (req, res) => {
     let problem = await Task.findOne({identificator: req.params.id}).exec()
     let user = req.user;
     res.render('edittask.ejs',{
@@ -481,12 +476,12 @@ app.post('/task/edit/:id', checkAuthenticated, checkPermission, async (req, res)
     problem.tests = tests;
     problem.hint = hint;
     await problem.save();
-    res.redirect('/task/edit/'+req.params.id);
+    res.redirect('/task/'+req.params.id);
 });
 
 //---------------------------------------------------------------------------------
 // Delete Task
-app.post('/task/delete/:id',checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/task/delete/:id', checkAuthenticated, checkPermission, async (req, res) => {
 
     childProcess.exec("node " + path.join(__dirname,"/public/scripts/FixAfterDeleteTask.js")+ " "+req.params.id)
 
@@ -495,7 +490,7 @@ app.post('/task/delete/:id',checkAuthenticated, checkPermission, async (req, res
 
 //---------------------------------------------------------------------------------
 // Account Page
-app.get('/account/:login/:page/:search',checkAuthenticated, checkValidation, async (req, res) => {
+app.get('/account/:login/:page/:search', checkAuthenticated, checkValidation, async (req, res) => {
     let user;
     if(req.user.login == req.params.login){
         user = req.user;
@@ -614,7 +609,7 @@ app.get('/attempt/:login/:date',checkAuthenticated, checkValidation, async (req,
 
 //---------------------------------------------------------------------------------
 // Add Lesson Page
-app.get('/addlesson',checkAuthenticated,checkPermission, async (req, res) => {
+app.get('/addlesson', checkAuthenticated, checkPermission, async (req, res) => {
     let user = req.user;
     res.render('addlesson.ejs',{
         login: user.login,
@@ -765,7 +760,7 @@ app.get('/lesson/:login/:id',checkAuthenticated, isLessonAvailable, async (req, 
 
 //---------------------------------------------------------------------------------
 // Delete Lesson
-app.post('/deletelesson/:id',checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/deletelesson/:id', checkAuthenticated, checkPermission, async (req, res) => {
     childProcess.exec("node " + path.join(__dirname,"/public/scripts/FixAfterDeleteLesson.js") + " "+req.params.id)
     res.redirect('/lessons/0/1/default&all&all');
 })
@@ -796,7 +791,7 @@ app.post('/editlesson/:id', checkAuthenticated, checkPermission, async (req, res
     lesson.tasks = body.tasks.split(' ').map(item => '0_'+(parseInt(item)-1));
     await lesson.save();
 
-    res.redirect('/editlesson/'+req.params.id);
+    res.redirect(`/lesson/${user.login}/${req.params.id}`);
 });
 
 //---------------------------------------------------------------------------------
@@ -889,17 +884,12 @@ app.post('/addnews',checkAuthenticated, checkPermission, async (req, res) => {
     let new_news = await Adder.addNews(News, body.title, body.text, body.reference, user.name);
     news.push(new_news);
 
-    res.render('addnews.ejs',{
-        login: user.login,
-        name: req.user.name,
-        title : "Add News",
-        isTeacher: req.user.isTeacher
-    })
+    res.redirect("/")
 })
 
 //---------------------------------------------------------------------------------
 // Delete News
-app.post('/deletenews/:id',checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/deletenews/:id', checkAuthenticated, checkPermission, async (req, res) => {
     await News.deleteOne({identificator: req.params.id}).exec();
     news.splice(news.findIndex(item => item.identificator==req.params.id),1)
     res.redirect('/');
@@ -907,7 +897,7 @@ app.post('/deletenews/:id',checkAuthenticated, checkPermission, async (req, res)
 
 //---------------------------------------------------------------------------------
 // Edit News Pages
-app.get('/editnews/:id',checkAuthenticated, checkPermission, async (req, res) => {
+app.get('/editnews/:id', checkAuthenticated, checkPermission, async (req, res) => {
     one_news = news.find(item => item.identificator==req.params.id)
     let user = req.user;
     res.render('editnews.ejs',{
@@ -920,7 +910,6 @@ app.get('/editnews/:id',checkAuthenticated, checkPermission, async (req, res) =>
 })
 
 app.post('/editnews/:id',checkAuthenticated, checkPermission, async (req, res) => {
-    let user = req.user;
     let body = req.body;
     let newsDB = await News.findOne({identificator: req.params.id}).exec()
 
@@ -934,19 +923,13 @@ app.post('/editnews/:id',checkAuthenticated, checkPermission, async (req, res) =
     news[idx].text = body.text;
     news[idx].reference = body.reference;
 
-    res.render('editnews.ejs',{
-        login: user.login,
-        name: req.user.name,
-        title : "Edit News",
-        isTeacher: req.user.isTeacher,
-        news: newsDB
-    })
+    res.redirect('/');
 })
 
 
 //---------------------------------------------------------------------------------
 // Add Tournament Page
-app.get('/tournament/add',checkAuthenticated,checkPermission, async (req, res) => {
+app.get('/tournament/add', checkAuthenticated, checkPermission, async (req, res) => {
     let user = req.user;
     res.render('addtournament.ejs',{
         login: user.login,
@@ -956,23 +939,18 @@ app.get('/tournament/add',checkAuthenticated,checkPermission, async (req, res) =
     })
 })
 
-app.post('/tournament/add',checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/tournament/add', checkAuthenticated, checkPermission, async (req, res) => {
     let user = req.user;
     let body = req.body;
     let tasks = [];
-    //console.log(body.frozeAfter);
+    let mods = [user.login].concat(body.mods.split(' '));
     let frozeAfter = body.frozeAfter ? body.frozeAfter : body.whenEnds;
     await Adder.addTournament(Tournament, body.title, body.description,
         tasks, user.name, body.whenStarts.replace('T', ' '),
-        body.whenEnds.replace('T', ' '), body.frozeAfter.replace('T', ' '), body.allowRegAfterStart=="on",
-        body.allOrNothing=="1" );
+        body.whenEnds.replace('T', ' '), frozeAfter.replace('T', ' '), mods, body.allowRegAfterStart=="on",
+        body.allOrNothing=="1");
 
-    res.render('addtournament.ejs',{
-        login: user.login,
-        name: req.user.name,
-        title: "Add Tournament",
-        isTeacher: req.user.isTeacher
-    })
+    res.redirect("/tournament/add")
 })
 
 //---------------------------------------------------------------------------------
@@ -1073,8 +1051,8 @@ app.post('/tournaments/:login/:page/:search', checkAuthenticated, async (req, re
 
 //---------------------------------------------------------------------------------
 // Edit Tournament Page
-app.get('/tournament/edit/:id',checkAuthenticated, checkPermission, async (req, res) => {
-    let tournament = await Tournament.findOne({ identificator: req.params.id }).exec();
+app.get('/tournament/edit/:tour_id', checkAuthenticated, isModerator, async (req, res) => {
+    let tournament = await Tournament.findOne({ identificator: req.params.tour_id }).exec();
     let user = req.user;
     res.render('edittournament.ejs',{
         login: user.login,
@@ -1085,10 +1063,9 @@ app.get('/tournament/edit/:id',checkAuthenticated, checkPermission, async (req, 
     })
 })
 
-app.post('/tournament/edit/:id',checkAuthenticated, checkPermission, async (req, res) => {
-    let user = req.user;
+app.post('/tournament/edit/:tour_id', checkAuthenticated, isModerator, async (req, res) => {
     let body = req.body;
-    let tournament = await Tournament.findOne({identificator: req.params.id}).exec()
+    let tournament = await Tournament.findOne({identificator: req.params.tour_id}).exec()
 
     tournament.title = body.title;
     tournament.description = body.description;
@@ -1100,20 +1077,14 @@ app.post('/tournament/edit/:id',checkAuthenticated, checkPermission, async (req,
     tournament.allOrNothing = body.allOrNothing == "1";
     await tournament.save();
 
-    res.render('edittournament.ejs',{
-        login: user.login,
-        name: req.user.name,
-        title: "Edit Tournament",
-        isTeacher: req.user.isTeacher,
-        tournament: tournament
-    })
+    res.redirect(`/tournament/page/${req.user.login}/${req.params.tour_id}/`)
 })
 
 
 //---------------------------------------------------------------------------------
 //Register to tournament
-app.get('/regTournament/:tournament_id', checkAuthenticated, async (req, res) => {
-    let tournament = await Tournament.findOne({ identificator: req.params.tournament_id }).exec()
+app.get('/regTournament/:tour_id', checkAuthenticated, async (req, res) => {
+    let tournament = await Tournament.findOne({ identificator: req.params.tour_id }).exec()
     if (!tournament.isBegan || tournament.allowRegAfterStart) {
         let newRes = {
             login: req.user.login,
@@ -1141,7 +1112,7 @@ app.get('/regTournament/:tournament_id', checkAuthenticated, async (req, res) =>
 
 //---------------------------------------------------------------------------------
 // Add Task to Tournament Page
-app.get('/tournament/task/add/:tour_id', checkPermission, async (req, res) => {
+app.get('/tournament/task/add/:tour_id', checkAuthenticated, isModerator, async (req, res) => {
     let user = req.user;
     let tournament = await Tournament.findOne({ identificator: req.params.tour_id }).exec()
     res.render('addtasktournament.ejs', {
@@ -1153,7 +1124,7 @@ app.get('/tournament/task/add/:tour_id', checkPermission, async (req, res) => {
     });
 });
 
-app.post('/tournament/task/add/:tour_id',checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/tournament/task/add/:tour_id', checkAuthenticated, isModerator, async (req, res) => {
     let user = req.user;
     let body = req.body;
 
@@ -1182,7 +1153,7 @@ app.post('/tournament/task/add/:tour_id',checkAuthenticated, checkPermission, as
 
 //---------------------------------------------------------------------------------
 // Delete Task from Tournament
-app.post('/tournament/task/delete/:tour_id/:id', checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/tournament/task/delete/:tour_id/:id', checkAuthenticated, isModerator, async (req, res) => {
 
     childProcess.exec("node " + path.join(__dirname, "/public/scripts/FixAfterDeleteTournamentTask.js") + " " +
         req.params.tour_id + " " + req.params.id)
@@ -1193,7 +1164,7 @@ app.post('/tournament/task/delete/:tour_id/:id', checkAuthenticated, checkPermis
 
 //---------------------------------------------------------------------------------
 // Tournament Task Page
-app.get('/tournament/task/:tour_id/:id', checkTournamentPermission ,checkAuthenticated, async (req, res) => {
+app.get('/tournament/task/:tour_id/:id', checkAuthenticated, checkTournamentPermission, async (req, res) => {
     let tour_id = req.params.tour_id
     let tournament = await Tournament.findOne({ identificator: tour_id }).exec();
     let whenEnds = tournament.whenEnds;
@@ -1354,7 +1325,7 @@ app.get('/tournament/task/:tour_id/:id', checkTournamentPermission ,checkAuthent
     });
 });
 // Tournament Task Page listener
-app.post('/tournament/task/:tour_id/:id', checkAuthenticated, async (req, res) => {
+app.post('/tournament/task/:tour_id/:id', checkAuthenticated, checkTournamentPermission, async (req, res) => {
     fs.stat(path.normalize('public/processes/' + req.user.login + '_' + req.params.id), async function (err) {
         if (!err) {
             res.redirect('/tournament/task/' + req.params.tour_id + '/' + req.params.id);
@@ -1423,7 +1394,7 @@ app.get('/tournament/page/:login/:id', checkAuthenticated, checkTournamentValida
             verdicts.push(verdict)
         }
         let registered = false;
-        if (!(req.user.isTeacher || tournament.isEnded || tournament.isBegan && tournament.results.find(item => item.login == req.params.login))) {
+        if (!(tournament.mods.find(item => item == req.user.login) || tournament.isEnded || tournament.isBegan && tournament.results.find(item => item.login == req.params.login))) {
             tasks = [];
         }
         if(!tournament.isBegan && tournament.results.find(item => item.login == req.params.login)){
@@ -1448,7 +1419,7 @@ app.get('/tournament/page/:login/:id', checkAuthenticated, checkTournamentValida
 //---------------------------------------------------------------------------------
 // Edit tournament task
 
-app.get('/tournament/task/edit/:tour_id/:id', checkAuthenticated, checkPermission, async (req, res) => {
+app.get('/tournament/task/edit/:tour_id/:id', checkAuthenticated, isModerator, async (req, res) => {
     let tournament = await Tournament.findOne({ identificator: req.params.tour_id });
     let task = tournament.tasks.find(item => item.identificator == req.params.id);
     res.render('edittasktournament.ejs', {
@@ -1461,7 +1432,7 @@ app.get('/tournament/task/edit/:tour_id/:id', checkAuthenticated, checkPermissio
     })
 });
 
-app.post('/tournament/task/edit/:tour_id/:id', checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/tournament/task/edit/:tour_id/:id', checkAuthenticated, isModerator, async (req, res) => {
     let body = req.body;
     let user = req.user;
     let tournament = await Tournament.findOne({ identificator: req.params.tour_id });
@@ -1531,32 +1502,27 @@ app.get('/tournament/results/:tour_id/:showTeachers/', checkAuthenticated, async
 
 //---------------------------------------------------------------------------------
 // Tournament attempts page
-app.get('/tournament/attempts/:tour_id/:page/:toSearch', checkAuthenticated, checkPermission, async (req, res) => {
+app.get('/tournament/attempts/:tour_id/:page/:toSearch', checkAuthenticated, isModerator, async (req, res) => {
     let a = req.params.toSearch.split('&');
-    let loginSearch = a[0] == "all" ? "" : a[0].toUpperCase;
-    let taskSearch = a[1] == "all" ? "" : a[1].toUpperCase;
+    let loginSearch = a[0] == "all" ? "" : a[0].toUpperCase();
+    let taskSearch = a[1] == "all" ? "" : a[1].toUpperCase();
     let success = a[2] != "all";
     let needTasks = a[1] != "all";
     let needLogin = a[0] != "all";
+    let bynew = a[3] == "true";
 
     let tournament = await Tournament.findOne({ identificator: req.params.tour_id }).exec();
     let attempts = tournament.attempts;
 
-    let taskIDs = [];//IDs of needed tasks
-    if (needTasks) {
-        //find Tasks
-    }
-    let Logins = [];
-    if (needLogin) {
-        //find Logins
-    }
     //search
-    attempts.filter(item => (!success || item.score == 100) && (!needTasks || item.taskID in taskIDs)&&(!needLogin || item.login in Logins))
+    attempts.filter(item => (!success || item.score == 100) && (!needTasks || item.taskID == taskSearch) && (!needLogin || item.login == loginSearch))
+
+    if (!bynew) {
+        attempts.sort((a, b) => a.AttemptDate > b.AttemptDate);
+    }
 
     let tasks = attempts.map(attempt => tournament.tasks.find(task => task.identificator == attempt.TaskID));
-    let globalAttempts = attempts.map(attempt => req.user.attempts.find(item => item._id == attempt.AttemptID).date);
 
-    //console.log(tasks);
 
     res.render('tournamentattempts.ejs',{
         login: req.user.login,
@@ -1566,16 +1532,40 @@ app.get('/tournament/attempts/:tour_id/:page/:toSearch', checkAuthenticated, che
         tourID: tournament.identificator,
         attempts,
         tasks,
-        page :  req.params.page,
-        realAttempts: globalAttempts,
+        page: req.params.page,
         search: req.params.toSearch
     });
 });
-app.post('/tournament/attempts/:tour_id/:page/:toSearch', checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/tournament/attempts/:tour_id/:page/:toSearch', checkAuthenticated, isModerator, async (req, res) => {
     let toSearch = req.body.loginSearch.trim() == "" ? "all" : req.body.loginSearch.trim();
     toSearch += '&' + (req.body.taskSearch.trim() == "" ? "all" : req.body.taskSearch.trim());
     toSearch += '&' + (req.body.selector);
     res.redirect(`/tournament/attempts/${req.params.tour_id}/${req.params.page}/${toSearch}`);
+});
+
+// Tournament disqualification
+app.get("/tournament/disqualAttempt/:tour_id/:AttemptDate", checkAuthenticated, isModerator, async (req, res) => {
+    let AttemptDate = req.params.AttemptDate;
+    let tournament = await Tournament.findOne({ identificator: req.params.tour_id }).exec();
+    tournament.attempts.splice(tournament.attempts.findIndex(item => item.AttemptDate == AttemptDate), 1);
+    tournament.markModified("attempts");
+    await tournament.save()
+
+    res.redirect(`/tournament/attempts/${req.params.tour_id}/1/all&all&all&true`)
+});
+
+app.get("/tournament/disqualUser/:tour_id/:login", checkAuthenticated, isModerator, async (req, res) => {
+    let login = req.params.login;
+    let tournament = await Tournament.findOne({ identificator: req.params.tour_id }).exec();
+    tournament.results.splice(tournament.results.findIndex(item => item.login == login));
+    tournament.frozenResults.splice(tournament.frozenResults.findIndex(item => item.login == login));
+    tournament.attempts = tournament.attempts.filter(item => item.login == login);
+    tournament.markModified("results");
+    tournament.markModified("frozenResults");
+    tournament.markModified("attempts");
+    await tournament.save()
+
+    res.redirect(`/tournament/attempts/${req.params.tour_id}/1/all&all&all&true`)
 });
 
 //---------------------------------------------------------------------------------
@@ -1591,7 +1581,7 @@ app.get('/about',checkAuthenticated, async (req, res) => {
 
 //---------------------------------------------------------------------------------
 // Edit Group
-app.post('/editgroup/:login/:page/:search',checkAuthenticated,checkPermission, async (req, res) => {
+app.post('/editgroup/:login/:page/:search', checkAuthenticated, checkPermission, async (req, res) => {
     let student = await User.findOne({login: req.params.login})
     if(req.body.groupEditor){
         student.group = req.body.groupEditor;
@@ -1664,15 +1654,25 @@ function checkTournamentValidation(req, res, next) {
 }
 
 async function checkTournamentPermission(req, res, next){
-    let tour_id = req.params.tour_id
+    let tour_id = req.params.tour_id;
     let tournament = await Tournament.findOne({ identificator: tour_id }).exec();
     let isBegan = tournament.isBegan;
 
-    if(!req.user) return res.redirect("/");
-    if(req.user.isTeacher || tournament.isEnded || (isBegan && tournament.results.find(item => item.login == req.user.login))){
+    if(tournament.mods.find(item => item==req.user.login) || tournament.isEnded || (isBegan && tournament.results.find(item => item.login == req.user.login))){
         return next();
     }
-    res.redirect('/tournament/' + req.user.login + '/' + tour_id);
+    res.redirect('/tournament/page/' + req.user.login + '/' + tour_id);
+}
+
+async function isModerator(req, res, next) {
+    let tour_id = req.params.tour_id;
+    let login = req.user.login;
+    let tournament = await Tournament.findOne({ identificator: tour_id }).exec();
+
+    if (tournament.mods.find(item => item == login)) {
+        return next();
+    }
+    res.redirect('/tournament/page/' + req.user.login + '/' + tour_id);
 }
 
 async function isLessonAvailable(req, res, next) {

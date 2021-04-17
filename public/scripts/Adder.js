@@ -42,7 +42,7 @@ exports.addTask = async function (Task, title, statement, input, output, example
     }]);
 }
 exports.addTournament = async function (Tournament, title, description, tasks,
-     author, whenStarts, whenEnds, frozeAfter, allowRegAfterStart, allOrNothing) {
+     author, whenStarts, whenEnds, frozeAfter, mods, allowRegAfterStart, allOrNothing) {
     var number = await Tournament.estimatedDocumentCount().exec()
     let tournament = {
         identificator: number,
@@ -53,6 +53,7 @@ exports.addTournament = async function (Tournament, title, description, tasks,
         whenStarts,
         whenEnds,
         frozeAfter,
+        mods,
         allowRegAfterStart,
         allOrNothing,
         isBegan: false,

@@ -48,11 +48,11 @@
                 <% var tournament = tournaments[i]; %>
                  <tr>
                   <td><%= i %></td>
-                  <td> <a class="tlrefs" href=<%="/tournament/page/"+ u_login + "/" + tournament.identificator %>> <%= tournament.title %> </a> </td>
+                  <td> <a class="tlrefs" href=<%="/tournament/page/"+ u_login + "/" + tournament.identificator %>><%=tournament.title%></a> </td>
                   <td><%= tournament.author %></td>
                   <td><%= results[i] %></td>
-                  <td><%= tournament.whenStarts %></td>
-                  <td><%= tournament.whenEnds %></td>
+                  <td class = "time"><%= tournament.whenStarts %></td>
+                  <td class = "time"><%= tournament.whenEnds %></td>
 
                   <% let registered = tournament.results.find(item=>item.login==login);%>
 

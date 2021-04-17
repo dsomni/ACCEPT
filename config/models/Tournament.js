@@ -6,6 +6,7 @@ const TournamentSchema = new mongoose.Schema({
     title: String,
     description: String,
     messages: [String],
+    mods: [String],
     tasks: [{
         identificator: String,
         author: String,
@@ -50,7 +51,7 @@ const TournamentSchema = new mongoose.Schema({
         AttemptDate: String,
         TaskID: String,
         score: Number
-        }]
+    }]
 
 }, { collection: config.mongodbConfigs.CollectionNames.tournaments });
 

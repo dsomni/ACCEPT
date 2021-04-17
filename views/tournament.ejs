@@ -14,23 +14,23 @@
 
     <body>
         <main>
-            <h2>
+            <h2 style = "top: 1rem">
                 <%= u_name %>
             </h2>
             <div id="task">
                 <H1 id="taskname"><%= tournament.title; %></H1>
-                <div style="text-align: center; margin: 10px;">
-                    <% if(isTeacher){ %>
-                        <a id="editref" href=<%="/tournament/edit/" + tournament.identificator %> > [Редактировать] </a>
+                <div style="text-align: center;">
+                    <% if(tournament.mods.find(item => item == login)){ %>
+                        <a class="EditButtons" href=<%="/tournament/edit/" + tournament.identificator %> >Редактировать</a>
                         <% if(!tournament.isBegan) { %>
-                                <a id="editref" href=<%="/tournament/task/add/" + tournament.identificator %> > [Добавить задачу] </a>
-                                <a id="editref" href=<%="/addparticipant_tt/" + tournament.identificator %> > [Добавить участников] </a>
-                            <% } %>
-                            <h5><a href=<%= "/tournament/attempts/1/"+ID+"/all&all&all" %> >Посылки</a></h5>
+                                <a class="EditButtons" href=<%="/tournament/task/add/" + tournament.identificator %> >Добавить задачу</a>
+                                <a class="EditButtons" href=<%="/addparticipant_tt/" + tournament.identificator %> >Добавить участников</a>
                         <% } %>
+                        <a class="EditButtons" href=<%= "/tournament/attempts/"+ID+"/1/all&all&all" %> >Посылки</a>
+                    <% } %>
+                    <a class="EditButtons" href=<%= "/tournament/results/"+tournament.identificator +"/1" %>>Таблица результатов</a>
                 </div>
                 <h4>Автор: <%= tournament.author %>     Участники: <%= tournament.results.length %> </h4>
-                <h5><a class="tlrefs" href=<%= "/tournament/results/"+tournament.identificator +"/1" %>> Таблица результатов </a></h5>
                 <div style="margin-left: 20px;" id="statement">
                     <%= tournament.description %>
                 </div>
@@ -55,13 +55,12 @@
                                 <td>
                                     <%= results[i] %>
                                 </td>
-                                <td><a class="tlrefs" href=<%="/account/" + u_login + "/1/" + task.title.replace(' ',' %20')
-                                        + "&all" %> >[все попытки]</a></td>
+                                <td><a class="tlrefs" href=<%="/account/" + u_login + "/1/" + task.title.replace(' ',' %20') + "&all" %> >[все попытки]</a></td>
                             </tr>
                             <% }} %>
                 </table>
             <% }else{ %>
-                <% if(isTeacher){ %>
+                <% if(tournament.mods.find(item => item == login)){ %>
                     <h1 style="text-align: center;color:Red">Добавьте задачу</h1>
                 <% }else if(registered){ %>
                         <h1 style="text-align: center;color:Red">Турнир ещё не начался</h1>
@@ -71,11 +70,11 @@
         </main>
         <div id="chat">
             <div id = "messages"></div>
-            <% if(isTeacher){%>
+            <% if(tournament.mods.find(item => item == login)){%>
                 <textarea type="text" id="sendMessage" placeholder="Введите сообщение"></textarea>
             <% } %>
         </div>
-        <p class="countDownTimer" id="countDownTimer" style="left: 40%; right: auto;"></p>
+        <p class="countDownTimer" id="countDownTimer" style="left: 5rem; right:auto; top:4rem"></p>
     </body>
     <script src="/socket.io/socket.io.js"></script>
     <script>
@@ -91,8 +90,12 @@
                 var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                 var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-                document.getElementById("countDownTimer").innerHTML = "Начало через: "+ days + "d " + hours + "h "
-                    + minutes + "m " + seconds + "s ";
+                if (days>0)
+                    document.getElementById("countDownTimer").innerHTML = "Начало через "+ days + " дней "+ ("0"+hours).slice(-2) + ":"
+                        + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
+                else
+                    document.getElementById("countDownTimer").innerHTML = "Начало через "+ ("0"+hours).slice(-2) + ":"
+                        + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
                 if (distance < 0) {
                         clearInterval(x);
                         document.getElementById("countDownTimer").innerHTML = "Турнир начался! Обновите страницу";
@@ -110,8 +113,12 @@
                     var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                     var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-                    document.getElementById("countDownTimer").innerHTML = "Окончание через: "+ days + "d " + hours + "h "
-                    + minutes + "m " + seconds + "s ";
+                    if (days>0)
+                        document.getElementById("countDownTimer").innerHTML = "Окончание через "+ days + " дней " + ("0"+hours).slice(-2) + ":"
+                            + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
+                    else
+                        document.getElementById("countDownTimer").innerHTML = "Окончание через "+ ("0"+hours).slice(-2) + ":"
+                            + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
 
                     if (distance < 0) {
                         clearInterval(x);

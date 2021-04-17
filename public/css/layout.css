@@ -55,59 +55,51 @@ ul{
     display: inline-block;
     width: 60px;
     height: 34px;
-  }
-  
-  .switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-  
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    -webkit-transition: .4s;
-    transition: .4s;
-  }
-  
-  .slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    -webkit-transition: .4s;
-    transition: .4s;
-  }
-  
-  input:checked + .slider {
-    background-color: #2196F3;
-  }
-  
-  input:focus + .slider {
-    box-shadow: 0 0 1px #2196F3;
-  }
-  
-  input:checked + .slider:before {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
-    transform: translateX(26px);
-  }
-  
-  .slider.round {
-    border-radius: 34px;
-  }
-  
-  .slider.round:before {
-    border-radius: 50%;
-  }
+}
+.switch input {
+opacity: 0;
+width: 0;
+height: 0;
+}
+.slider {
+position: absolute;
+cursor: pointer;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-color: #ccc;
+-webkit-transition: .4s;
+transition: .4s;
+}
+.slider:before {
+position: absolute;
+content: "";
+height: 26px;
+width: 26px;
+left: 4px;
+bottom: 4px;
+background-color: white;
+-webkit-transition: .4s;
+transition: .4s;
+}
+input:checked + .slider {
+background-color: #2196F3;
+}
+input:focus + .slider {
+box-shadow: 0 0 1px #2196F3;
+}
+input:checked + .slider:before {
+-webkit-transform: translateX(26px);
+-ms-transform: translateX(26px);
+transform: translateX(26px);
+}
+.slider.round {
+border-radius: 34px;
+}
+.slider.round:before {
+border-radius: 50%;
+}
 
 
 /*-----------------------------------------------------------------------------*/
@@ -261,18 +253,34 @@ header input{
 }
 /*-----------------------------------------------------------------------------*/
 /*Lesson page*/
-#editref{
+.EditButtons, .tlrefs{
     text-decoration: none;
     font-size: medium;
+    border: solid .1rem #00000011;
     color: #000000;
     margin-left: 10px;
+    margin-bottom: 1rem;
+    white-space: pre;
+    transition: ease-in-out .3s;
 }
 
-#editref:hover{
-    text-decoration: underline;
-    color: #0422a7;
+.EditButtons:hover, .tlrefs:hover{
+    font-size: large;
     cursor: pointer;
 }
+.tlrefs{
+    font-size: 1.3rem;
+    border:none
+}
+.tlrefs:hover{
+    font-size: 1.3rem;
+    text-decoration: underline blue 1px;
+}
+
+.time{
+    white-space: nowrap;
+}
+
 /*-----------------------------------------------------------------------------*/
 /*editlesson page*/
 #grade{
@@ -422,16 +430,6 @@ header input{
     border: 1px solid #e3eef7;
     padding: 10px 15px;
     transition: all 0.5s ease;
-}
-.tlrefs{
-    text-decoration: none;
-    color: #000000;
-    font-weight: bold;
-}
-.tlrefs:hover{
-    cursor: pointer;
-    color: #220bf3;
-    text-decoration: underline;
 }
 .addhref{
     margin-left: 120px;
@@ -680,46 +678,54 @@ header input{
 }
 .countDownTimer{
     position: fixed;
-    top: 10px;
-    right: 10px;
+    top: 1rem;
+    right: 1rem;
     min-width: 10%;
-    min-height: 5vh;
-    border: solid 2px black;
-    border-radius: 5px;
+    min-height: 1rem;
+    border: solid 1px black;
+    border-radius: 10px;
     background-color: #e4e1e1aa;
-    font-size: 2rem;
+    font-size: 1.5rem;
+    padding: .3rem;
 }
 .ChatMessage{
     width: calc(100%-2px);
-    border: solid black 2px;
+    border-bottom: solid #00000077 .1em;
     margin: 0;
     white-space: pre-line;
     overflow-wrap: break-word;
+    padding: .2em;
 }
 #sendMessage{
+    position: absolute;
+    bottom: 0px;
     border: none;
-    border-top: solid green 2px;
+    border-top: solid blue .1em;
     width: 100%;
-    height: 40px;
-    padding: 0px;
-    margin: 0px;
+    height: 10%;
+    padding: .5em;
+}
+#sendMessage:focus{
+    outline: none;
 }
 #chat{
     position: absolute;
-    width: 350px;
-    height: 350px;
+    width: 20%;
+    height: 40%;
     top: 0px;
     right: 0px;
-    background-color: white;
+    background-color: lightblue;
     overflow: hidden;
-    margin: 0px;
-    padding: 0px;
+    border-color: #aaaaaa;
+    border-radius: 0% 0% 0% 5%;
 }
 #messages{
     width: 100%;
     height: 310px;
-    background-color: white;
+    background-color: lightblue;
     overflow: scroll;
-    margin: 0px;
+}
+.statement h5{
     padding: 0px;
+    margin: -15px;
 }

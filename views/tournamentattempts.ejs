@@ -15,12 +15,16 @@
     <body>
         <main>
             <h1>Посылки турнира "<%= title %>"</h1>
-            <form class="SearchUI" action= <%= `/tournament/attempts/${tourID}/${"all&all&all"}` %>  method="POST">
+            <form class="SearchUI" action= <%= `/tournament/attempts/${tourID}/1/all&all&all&true` %>  method="POST">
                 <input name="loginSearch" rows=1 type="text" placeholder="Поиск по логину">
-                <input name="taskSearch" rows=1 placeholder="Поиск по задаче">
+                <input name="taskSearch" rows=1 placeholder="Поиск по ID задачи">
                 <select name="selector" id = "selector">
                     <option value="all" selected>Все посылки</option>
                     <option value="ok" >Только успешные</option>
+                </select>
+                <select name="selector" id = "selector">
+                    <option value="true" selected>Сначала новые</option>
+                    <option value="false" >Сначала старые</option>
                 </select>
                 <button id="submitsearch">Найти</button>
             </form>
@@ -29,7 +33,7 @@
                 <tr>
                     <th>Login</th>
                     <th>Attempt</th>
-                    <th>Task</th>
+                    <th>TaskID</th>
                     <th>Score</th>
                 </tr>
                 <% min = function(a,b){ if(a < b) return a; return b} %>
@@ -38,7 +42,7 @@
                 <tr>
                     <td><a href=<%= "/account/"+attempts[i].login+"/1/default&all" %> ><%= attempts[i].login  %></a></td>
                     <td><a href=<%= "/attempt/"+attempts[i].login+"/"+attempts[i].AttemptDate %> >[Посылка]</a></td>
-                    <td><a href=<%= "/tournament/task/"+tourID+"/"+tasks[i].identificator %> ><%= tasks[i].title %></a></td>
+                    <td><a href=<%= "/tournament/task/"+tourID+"/"+tasks[i].identificator %> ><%= tasks[i].identificator %></a></td>
                     <td><%= attempts[i].score  %></td>
                 </tr>
                 <% } %>
