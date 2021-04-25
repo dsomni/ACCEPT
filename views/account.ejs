@@ -17,7 +17,11 @@
             <h1>Личный кабинет <%= n_name %></h1>
             <div class="student_info">
                 <p>Класс: <%= user.grade + user.gradeLetter %></p>
-                <p>Группа: <%= user.group %></p>
+                <% if(user.group.length<5){ %>
+                    <p>Группа: <%= user.group %></p>
+                <% }else{ %>
+                    <p>Почта: <%= user.group %></p>
+                <% } %>
             </div>
             <form class="SearchUI" action= <%= '/account/'+ u_login +'/1/default' %>  method="POST">
                 <input id="searcharea" name = "searcharea" rows=1 placeholder="Поиск по задаче"></input>

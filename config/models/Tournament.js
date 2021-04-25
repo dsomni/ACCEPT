@@ -7,6 +7,7 @@ const TournamentSchema = new mongoose.Schema({
     description: String,
     messages: [String],
     mods: [String],
+    penalty: Number,
     tasks: [{
         identificator: String,
         author: String,

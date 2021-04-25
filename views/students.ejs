@@ -55,11 +55,15 @@
                                 </form>
                                 <button onClick=<%='c(' + i + ');' %> >Назад</button>
                             </dialog>
-                                <button onClick=<%='o(' + i + ');' %> class="show" ><%=student.group|| 'Edit'%></button>
+                                <% if(student.group.length<5){ %>
+                                    <button onClick=<%='o(' + i + ');' %> class="show" ><%=student.group|| 'Edit' %></button>
+                                <% }else{ %>
+                                    <button disabled="disabled"></button>
+                                <% } %>
                         </span>
                     </td>
 
-                    <td><a class="tablerefs" href=<%="/lessons/" + student.login + "/1/default&all&all" %>>[открыть] </a></td>
+                    <td><a class="tablerefs" href=<%="/lessons/" + student.login + "/1/default&all&true&all" %>>[открыть] </a></td>
                     <td><a class="tablerefs" href=<%="/account/" + student.login + "/1/default&all" %>>[открыть] </a></td>
                  </tr>
                 <% } %>

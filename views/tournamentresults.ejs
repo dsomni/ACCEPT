@@ -32,7 +32,14 @@
                     <th>Счёт</th>
                     <th>Время</th>
                 </tr>
-
+                <%results.sort((a, b) => {
+                    if ((a[0].sumscore > b[0].sumscore)||((a[0].sumscore=b[0].sumscore)&&(a[0].sumtime<b[0].sumtime))) {
+                        return -1;
+                    }
+                    else {
+                        return 1;
+                    }
+                }); %>
                 <% for(let i=0; i < results.length; i++) { %>
                     <tr>
                         <% let result = results[i][0]; %>
@@ -59,5 +66,4 @@
                  <%  }); %>-->
             </table>
         </main>
-    </body>
 </html>

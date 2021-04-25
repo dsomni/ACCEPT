@@ -13,6 +13,7 @@ const Adder = require(__dirname + '/public/scripts/Adder.js');
 const Fuse = require('fuse.js');
 const socketIo = require('socket.io');
 const path = require('path');
+const bcrypt = require("bcryptjs")
 const app = express();
 //---------------------------------------------------------------------------------
 // MongoDB connecting
@@ -112,7 +113,7 @@ app.post('/', passport.authenticate('local', {
 
 //---------------------------------------------------------------------------------
 // Task Page
-app.get('/task/:id', checkAuthenticated, async (req, res) => {
+app.get('/task/:id', checkAuthenticated, checkNletter, async (req, res) => {
     let language = req.body.languageSelector;
     let problem = await Task.findOne({identificator: req.params.id}).exec();
     let showHint = req.user.attempts.filter(item => item.taskID == req.params.id).length >= problem.hint.attemptsForHint;
@@ -226,7 +227,7 @@ app.get('/task/:id', checkAuthenticated, async (req, res) => {
     });
 })
 // Task Page listener
-app.post('/task/:id',checkAuthenticated, async (req, res) => {
+app.post('/task/:id',checkAuthenticated, checkNletter, async (req, res) => {
 
     fs.stat(path.normalize('public/processes/'+req.user.login+"_"+req.params.id), async function(err) {
         if (!err) {
@@ -270,7 +271,7 @@ app.post('/task/:id',checkAuthenticated, async (req, res) => {
 
 //---------------------------------------------------------------------------------
 // Add Task Page
-app.get('/task/add',checkAuthenticated, checkPermission, async (req, res) => {
+app.get('/task/add',checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
     let user = req.user;
     res.render('addtask.ejs',{
         login: user.login,
@@ -280,7 +281,7 @@ app.get('/task/add',checkAuthenticated, checkPermission, async (req, res) => {
     })
 })
 
-app.post('/task/add',checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/task/add',checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
     let user = req.user;
     let body = req.body;
 
@@ -327,7 +328,7 @@ app.post('/task/add',checkAuthenticated, checkPermission, async (req, res) => {
 
 //---------------------------------------------------------------------------------
 // Tasks List Page
-app.get('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
+app.get('/tasks/:page/:search', checkAuthenticated, checkNletter, async (req, res) => {
     let user = req.user;
     let teachers = await User.find({ isTeacher: true });
     teachers = teachers.map(item => item.name);
@@ -407,7 +408,7 @@ app.get('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
     })
 })
 
-app.post('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
+app.post('/tasks/:page/:search', checkAuthenticated, checkNletter, async (req, res) => {
     let toSearch = req.body.searcharea;
     if (!toSearch) toSearch = "default";
     toSearch += '&' + req.body.TopicSelector + '&' + req.body.GradeSelector + '&' + req.body.SortByNew + "&" + req.body.Author;
@@ -416,7 +417,7 @@ app.post('/tasks/:page/:search', checkAuthenticated, async (req, res) => {
 
 //---------------------------------------------------------------------------------
 // Edit Task Page
-app.get('/task/edit/:id', checkAuthenticated, checkPermission, async (req, res) => {
+app.get('/task/edit/:id', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
     let problem = await Task.findOne({identificator: req.params.id}).exec()
     let user = req.user;
     res.render('edittask.ejs',{
@@ -428,7 +429,7 @@ app.get('/task/edit/:id', checkAuthenticated, checkPermission, async (req, res) 
     })
 })
 
-app.post('/task/edit/:id', checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/task/edit/:id', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
     let body = req.body;
     let problem = await Task.findOne({ identificator: req.params.id }).exec();
 
@@ -481,7 +482,7 @@ app.post('/task/edit/:id', checkAuthenticated, checkPermission, async (req, res)
 
 //---------------------------------------------------------------------------------
 // Delete Task
-app.post('/task/delete/:id', checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/task/delete/:id', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
 
     childProcess.exec("node " + path.join(__dirname,"/public/scripts/FixAfterDeleteTask.js")+ " "+req.params.id)
 
@@ -609,7 +610,7 @@ app.get('/attempt/:login/:date',checkAuthenticated, checkValidation, async (req,
 
 //---------------------------------------------------------------------------------
 // Add Lesson Page
-app.get('/addlesson', checkAuthenticated, checkPermission, async (req, res) => {
+app.get('/addlesson', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
     let user = req.user;
     res.render('addlesson.ejs',{
         login: user.login,
@@ -619,7 +620,7 @@ app.get('/addlesson', checkAuthenticated, checkPermission, async (req, res) => {
     })
 })
 
-app.post('/addlesson', checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/addlesson', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
     let user = req.user;
     let body = req.body;
 
@@ -631,7 +632,7 @@ app.post('/addlesson', checkAuthenticated, checkPermission, async (req, res) => 
 
 //---------------------------------------------------------------------------------
 // Lessons List Page
-app.get('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) => {
+app.get('/lessons/:login/:page/:search', checkAuthenticated, checkNletter, async (req, res) => {
 
     let user;
     if(req.user.login == req.params.login || !req.user.isTeacher){
@@ -708,7 +709,7 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) =>
     })
 })
 
-app.post('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) => {
+app.post('/lessons/:login/:page/:search', checkAuthenticated, checkNletter, async (req, res) => {
     let toSearch = req.body.searcharea;
     if(!toSearch) toSearch = "default";
     toSearch += '&' + (req.body.GradeSelector || 'all') + "&" + req.body.SortByNew + "&" + req.body.Author;
@@ -717,7 +718,7 @@ app.post('/lessons/:login/:page/:search', checkAuthenticated, async (req, res) =
 
 //---------------------------------------------------------------------------------
 // Lesson Page
-app.get('/lesson/:login/:id',checkAuthenticated, isLessonAvailable, async (req, res) => {
+app.get('/lesson/:login/:id',checkAuthenticated, checkNletter, isLessonAvailable, async (req, res) => {
 
     let user;
     if(req.user.login == req.params.login){
@@ -760,14 +761,14 @@ app.get('/lesson/:login/:id',checkAuthenticated, isLessonAvailable, async (req, 
 
 //---------------------------------------------------------------------------------
 // Delete Lesson
-app.post('/deletelesson/:id', checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/deletelesson/:id', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
     childProcess.exec("node " + path.join(__dirname,"/public/scripts/FixAfterDeleteLesson.js") + " "+req.params.id)
     res.redirect('/lessons/0/1/default&all&all');
 })
 
 //---------------------------------------------------------------------------------
 // Edit Lesson Page
-app.get('/editlesson/:id', checkAuthenticated, checkPermission, async (req, res) => {
+app.get('/editlesson/:id', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
     let lesson = await Lesson.findOne({ identificator: req.params.id }).exec();
     lesson.tasks = lesson.tasks.map(item => parseInt(item.split('_')[1])+1);
     let user = req.user;
@@ -780,7 +781,7 @@ app.get('/editlesson/:id', checkAuthenticated, checkPermission, async (req, res)
     });
 });
 
-app.post('/editlesson/:id', checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/editlesson/:id', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
     let user = req.user;
     let body = req.body;
     let lesson = await Lesson.findOne({ identificator: req.params.id }).exec()
@@ -796,7 +797,7 @@ app.post('/editlesson/:id', checkAuthenticated, checkPermission, async (req, res
 
 //---------------------------------------------------------------------------------
 // Students List Page
-app.get('/students/:page/:search', checkAuthenticated, checkPermission,async (req, res) => {
+app.get('/students/:page/:search', checkAuthenticated, checkNletter, checkPermission,async (req, res) => {
     let user = req.user;
     let foundStudents;
     let students;
@@ -845,7 +846,7 @@ app.get('/students/:page/:search', checkAuthenticated, checkPermission,async (re
     })
 })
 
-app.post('/students/:page/:search', checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/students/:page/:search', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
     let toSearch = req.body.searcharea;
     if(!toSearch) toSearch = "default";
     toSearch += '&' + req.body.GradeSelector  +
@@ -867,7 +868,7 @@ app.post('/students/:page/:search', checkAuthenticated, checkPermission, async (
 
 //---------------------------------------------------------------------------------
 // Add News Page
-app.get('/addnews',checkAuthenticated,checkPermission, async (req, res) => {
+app.get('/addnews',checkAuthenticated, checkNletter,checkPermission, async (req, res) => {
     let user = req.user;
     res.render('addnews.ejs',{
         login: user.login,
@@ -877,7 +878,7 @@ app.get('/addnews',checkAuthenticated,checkPermission, async (req, res) => {
     })
 })
 
-app.post('/addnews',checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/addnews',checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
     let user = req.user;
     let body = req.body;
 
@@ -889,7 +890,7 @@ app.post('/addnews',checkAuthenticated, checkPermission, async (req, res) => {
 
 //---------------------------------------------------------------------------------
 // Delete News
-app.post('/deletenews/:id', checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/deletenews/:id', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
     await News.deleteOne({identificator: req.params.id}).exec();
     news.splice(news.findIndex(item => item.identificator==req.params.id),1)
     res.redirect('/');
@@ -897,7 +898,7 @@ app.post('/deletenews/:id', checkAuthenticated, checkPermission, async (req, res
 
 //---------------------------------------------------------------------------------
 // Edit News Pages
-app.get('/editnews/:id', checkAuthenticated, checkPermission, async (req, res) => {
+app.get('/editnews/:id', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
     one_news = news.find(item => item.identificator==req.params.id)
     let user = req.user;
     res.render('editnews.ejs',{
@@ -909,7 +910,7 @@ app.get('/editnews/:id', checkAuthenticated, checkPermission, async (req, res) =
     })
 })
 
-app.post('/editnews/:id',checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/editnews/:id',checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
     let body = req.body;
     let newsDB = await News.findOne({identificator: req.params.id}).exec()
 
@@ -948,7 +949,7 @@ app.post('/tournament/add', checkAuthenticated, checkPermission, async (req, res
     await Adder.addTournament(Tournament, body.title, body.description,
         tasks, user.name, body.whenStarts.replace('T', ' '),
         body.whenEnds.replace('T', ' '), frozeAfter.replace('T', ' '), mods, body.allowRegAfterStart=="on",
-        body.allOrNothing=="1");
+        body.allOrNothing=="1", body.penalty*1000);
 
     res.redirect("/tournament/add")
 })
@@ -1075,6 +1076,7 @@ app.post('/tournament/edit/:tour_id', checkAuthenticated, isModerator, async (re
     tournament.frozeAfter = body.frozeAfter.replace('T', ' ');
     tournament.allowRegAfterStart = body.allowRegAfterStart=="on";
     tournament.allOrNothing = body.allOrNothing == "1";
+    tournament.penalty = body.penalty*1000;
     await tournament.save();
 
     res.redirect(`/tournament/page/${req.user.login}/${req.params.tour_id}/`)
@@ -1238,9 +1240,11 @@ app.get('/tournament/task/:tour_id/:id', checkAuthenticated, checkTournamentPerm
 
                             // tournament results update
                             let user_result_idx = tournament.results.findIndex(item => item.login == req.user.login.toString());
-                            let task_idx =req.params.id.split('_')[1];
+                            let task_idx = req.params.id.split('_')[1];
                             if (!tournament.isEnded && user_result_idx!=-1 && tournament.results[user_result_idx].tasks[task_idx].score!=100){
-                                tournament.results[user_result_idx].tasks[task_idx].tries +=1;
+                                tournament.results[user_result_idx].tasks[task_idx].tries += 1;
+                                if (score != 100)
+                                    tournament.results[user_result_idx].sumtime += tournament.penalty;
                                 if( tournament.results[user_result_idx].tasks[task_idx].score < score){
                                     tournament.results[user_result_idx].sumscore -= tournament.results[user_result_idx].tasks[task_idx].score;
                                     tournament.results[user_result_idx].sumscore += score;
@@ -1324,6 +1328,7 @@ app.get('/tournament/task/:tour_id/:id', checkAuthenticated, checkTournamentPerm
         }
     });
 });
+
 // Tournament Task Page listener
 app.post('/tournament/task/:tour_id/:id', checkAuthenticated, checkTournamentPermission, async (req, res) => {
     fs.stat(path.normalize('public/processes/' + req.user.login + '_' + req.params.id), async function (err) {
@@ -1581,7 +1586,7 @@ app.get('/about',checkAuthenticated, async (req, res) => {
 
 //---------------------------------------------------------------------------------
 // Edit Group
-app.post('/editgroup/:login/:page/:search', checkAuthenticated, checkPermission, async (req, res) => {
+app.post('/editgroup/:login/:page/:search', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
     let student = await User.findOne({login: req.params.login})
     if(req.body.groupEditor){
         student.group = req.body.groupEditor;
@@ -1589,6 +1594,55 @@ app.post('/editgroup/:login/:page/:search', checkAuthenticated, checkPermission,
     }
     res.redirect('/students' + '/' +req.params.page +'/' + req.params.search);
 })
+
+//---------------------------------------------------------------------------------
+// Registration Page
+app.get("/registration", async (req, res) => {
+    res.render('registration.ejs',{
+            login: "",
+            name : "",
+            title: "Registration Page",
+            isTeacher: false,
+            msg : ""
+    });
+});
+
+app.post("/registration", async (req, res) => {
+    let new_user = {
+        login: "n_"+req.body.login,
+        password: req.body.password,
+        name: req.body.name,
+        isTeacher:false,
+
+        grade: 0,
+        gradeLetter: "Я",
+        group: req.body.email
+    };
+    if(new_user.password.length <5){
+        res.render('registration.ejs',{
+            login: "",
+            name : "",
+            title: "Registration Page",
+            isTeacher: false,
+            msg : "Пароль должен содержать как минимум 5 символов!"
+        });
+        return;
+    }
+    let user = await User.findOne({ login: new_user.login }).exec();
+    if (user) {
+        res.render('registration.ejs',{
+            login: "",
+            name : "",
+            title: "Registration Page",
+            isTeacher: false,
+            msg : "Логин уже занят!"
+        });
+        return;
+    }
+    new_user.password = bcrypt.hashSync(new_user.password, 10);
+    await User.insertMany([new_user]);
+    res.redirect("/");
+});
 
 //---------------------------------------------------------------------------------
 // ??? toDo
@@ -1619,8 +1673,14 @@ app.get('*', (req,res) => {
 //---------------------------------------------------------------------------------
 // Functions
 
+function checkNletter(req, res, next) {
+    if(req.user.isTeacher || req.user.login.slice(0, 2) != "n_"){
+        return next();
+    }
+    res.redirect('/');
+}
+
 async function checkAuthenticated(req, res, next) {
-    //await checkTimings();
     if (req.isAuthenticated()) {
         return next()
     }
@@ -1652,7 +1712,6 @@ function checkTournamentValidation(req, res, next) {
     }
     res.redirect('/tournaments/' + req.user.login + '/1/default&all')
 }
-
 async function checkTournamentPermission(req, res, next){
     let tour_id = req.params.tour_id;
     let tournament = await Tournament.findOne({ identificator: tour_id }).exec();

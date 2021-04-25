@@ -467,6 +467,9 @@ header input{
 .loginInterface button{
     margin-left: -5px;
 }
+.login{
+    width: 100px;
+}
 
 /*-----------------------------------------------------------------------------*/
 /*main page*/
