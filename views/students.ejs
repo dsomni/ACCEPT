@@ -55,7 +55,7 @@
                                 </form>
                                 <button onClick=<%='c(' + i + ');' %> >Назад</button>
                             </dialog>
-                                <% if(student.group.length<5){ %>
+                                <% if(student.group && student.group.length<5){ %>
                                     <button onClick=<%='o(' + i + ');' %> class="show" ><%=student.group|| 'Edit' %></button>
                                 <% }else{ %>
                                     <button disabled="disabled"></button>

@@ -10,6 +10,9 @@ body{
     min-width: 1000px;
     scrollbar-width: thin;
 }
+body{
+    margin-top: 30px;
+}
 ::-webkit-scrollbar{
     width: 5px;
 }
@@ -414,7 +417,8 @@ header input{
     text-align: left;
     margin-top: 20px;
     margin-left: 120px;
-    width: 70%;
+    min-width: 70%;
+    table-layout: fixed;
 }
 .taskslist th {
     border-top: 1px solid #6695fa;

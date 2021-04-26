@@ -1,21 +1,21 @@
 module.exports = {
-	PathToUsersList: "PATH",
-	PathToTeachersList: "PATH",
-	port: "3000",
-	secret: "secret",
-	FolderLifeTime: 42000.0,
+	PathToUsersList: "PATH", 
+	PathToTeachersList: "PATH", 
+	port: "3000", 
+	secret: "secret", 
+	FolderLifeTime: 42000.0, 
 	mongodbConfigs: {
-		dbName: "db",
-		Host: "localhost:27017",
+		dbName: "db", 
+		Host: "localhost:27017", 
 		User: {
-			Username: "username",
+			Username: "username", 
 			Password: "password"
-		},
+		}, 
 		CollectionNames: {
-			users: "users",
-			news: "news",
-			tasks: "tasks",
-			lessons: "lessons",
+			users: "users", 
+			news: "news", 
+			tasks: "tasks", 
+			lessons: "lessons", 
 			tournament: "tournaments"
 		}
 	}

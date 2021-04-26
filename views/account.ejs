@@ -17,9 +17,9 @@
             <h1>Личный кабинет <%= n_name %></h1>
             <div class="student_info">
                 <p>Класс: <%= user.grade + user.gradeLetter %></p>
-                <% if(user.group.length<5){ %>
+                <% if(user.group && user.group.length<5){ %>
                     <p>Группа: <%= user.group %></p>
-                <% }else{ %>
+                <% }else if (!user.isTeacher){ %>
                     <p>Почта: <%= user.group %></p>
                 <% } %>
             </div>

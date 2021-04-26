@@ -416,7 +416,7 @@ app.get('/tasks/:page/:search', checkAuthenticated, checkNletter, async (req, re
         search: req.params.search,
         topics: topics,
         teachers,
-        location: "/"
+        location: undefined
     })
 })
 
@@ -1148,7 +1148,7 @@ app.get('/tournament/task/add/:tour_id', checkAuthenticated, isModerator, async 
         title: "Add Task",
         tournament: tournament,
         isTeacher: req.user.isTeacher,
-        location: '/tournament/' + req.user.login + '/' + req.params.tour_id
+        location: '/tournament/page/' + req.user.login + '/' + req.params.tour_id
     });
 });
 
@@ -1186,7 +1186,7 @@ app.post('/tournament/task/delete/:tour_id/:id', checkAuthenticated, isModerator
     childProcess.exec("node " + path.join(__dirname, "/public/scripts/FixAfterDeleteTournamentTask.js") + " " +
         req.params.tour_id + " " + req.params.id)
 
-    res.redirect('/tournament/' + req.user.login + '/' + req.params.tour_id);
+    res.redirect('/tournament/page/' + req.user.login + '/' + req.params.tour_id);
 });
 
 
@@ -1304,7 +1304,7 @@ app.get('/tournament/task/:tour_id/:id', checkAuthenticated, checkTournamentPerm
                                 language: language,
                                 whenEnds: whenEnds,
                                 isBegan: isBegan,
-                                location: '/tournament/' + req.user.login + '/' + req.params.tour_id
+                                location: '/tournament/page/' + req.user.login + '/' + req.params.tour_id
                             });
                         }
                     } else {
@@ -1321,7 +1321,7 @@ app.get('/tournament/task/:tour_id/:id', checkAuthenticated, checkTournamentPerm
                             language: req.user.attempts[0].language,
                             whenEnds: whenEnds,
                             isBegan: isBegan,
-                            location: '/tournament/' + req.user.login + '/' + req.params.tour_id
+                            location: '/tournament/page/' + req.user.login + '/' + req.params.tour_id
                         });
                     }
                 });
@@ -1352,7 +1352,7 @@ app.get('/tournament/task/:tour_id/:id', checkAuthenticated, checkTournamentPerm
                 language: language,
                 whenEnds: whenEnds,
                 isBegan: isBegan,
-                location: '/tournament/' + req.user.login + '/' + req.params.tour_id
+                location: '/tournament/page/' + req.user.login + '/' + req.params.tour_id
             });
         }
     });
@@ -1582,22 +1582,53 @@ app.post('/tournament/attempts/:tour_id/:page/:toSearch', checkAuthenticated, is
 });
 
 // Tournament disqualification
-app.get("/tournament/disqualAttempt/:tour_id/:AttemptDate", checkAuthenticated, isModerator, async (req, res) => {
+app.post("/tournament/disqualAttempt/:tour_id/:AttemptDate", checkAuthenticated, isModerator, async (req, res) => {
     let AttemptDate = req.params.AttemptDate;
     let tournament = await Tournament.findOne({ identificator: req.params.tour_id }).exec();
-    tournament.attempts.splice(tournament.attempts.findIndex(item => item.AttemptDate == AttemptDate), 1);
-    tournament.markModified("attempts");
-    await tournament.save()
+    let idx = tournament.attempts.findIndex(item => item.AttemptDate == AttemptDate);
+    let login = tournament.attempts[idx].login;
+    let score = tournament.attempts[idx].score;
+    let TaskID = tournament.attempts[idx].TaskID.split('_')[1];
+    tournament.attempts.splice(idx, 1);
+    let resUserIndx = tournament.results.findIndex(item => item.login == login);
+    console.log(TaskID);
+    if (score == tournament.results[resUserIndx].tasks[TaskID].score) {
+        let mx = -1;
+        let mx_ind;
+        for (let i = 0; i < tournament.attempts.length; i++){
+            if (tournament.attempts[i].login == login && tournament.attempts[i].TaskID.split('_')[1] == TaskID && mx < tournament.attempts[i].score) {
+                mx = tournament.attempts[i].score;
+                mx_ind = i;
+            }
+        }
+        if (mx != -1) {
+            tournament.results[resUserIndx].sumscore += tournament.attempts[mx_ind].score - score;
+            tournament.results[resUserIndx].sumtime += (tournament.attempts[mx_ind].AttemptDate - Date.parse(tournament.whenStarts)) - tournament.results[resUserIndx].tasks[TaskID].dtime;
 
+            tournament.results[resUserIndx].tasks[TaskID].dtime = (tournament.attempts[mx_ind].AttemptDate - Date.parse(tournament.whenStarts));
+            tournament.results[resUserIndx].tasks[TaskID].score = tournament.attempts[mx_ind].score;
+        } else {
+            console.log(mx, mx_ind);
+            tournament.results[resUserIndx].sumscore -= score;
+            tournament.results[resUserIndx].sumtime -= tournament.results[resUserIndx].tasks[TaskID].dtime;
+
+            tournament.results[resUserIndx].tasks[TaskID].dtime = 0;
+            tournament.results[resUserIndx].tasks[TaskID].score = 0;
+        }
+    }
+    tournament.markModified("attempts");
+    tournament.markModified("results");
+
+    await tournament.save()
     res.redirect(`/tournament/attempts/${req.params.tour_id}/1/all&all&all&true`)
 });
 
-app.get("/tournament/disqualUser/:tour_id/:login", checkAuthenticated, isModerator, async (req, res) => {
+app.post("/tournament/disqualUser/:tour_id/:login", checkAuthenticated, isModerator, async (req, res) => {
     let login = req.params.login;
     let tournament = await Tournament.findOne({ identificator: req.params.tour_id }).exec();
-    tournament.results.splice(tournament.results.findIndex(item => item.login == login));
-    tournament.frozenResults.splice(tournament.frozenResults.findIndex(item => item.login == login));
-    tournament.attempts = tournament.attempts.filter(item => item.login == login);
+    tournament.results.splice(tournament.results.findIndex(item => item.login == login), 1);
+    tournament.frozenResults.splice(tournament.frozenResults.findIndex(item => item.login == login), 1);
+    tournament.attempts = tournament.attempts.filter(item => item.login != login);
     tournament.markModified("results");
     tournament.markModified("frozenResults");
     tournament.markModified("attempts");

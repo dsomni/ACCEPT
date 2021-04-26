@@ -21,8 +21,8 @@
                 <div>Дата: <%= Completedate %> </div>
                 <div><a class="tlrefs" href=<%="/account/" + login + "/1/default" %>>Пользователь <%= n_name %> </a> </div>
                 <% if(parseInt(taskID.split('_')[0])!=0){ %>
-                    <a class="tlrefs" href=<%="/tournament/" + login + '/' + taskID.split('_')[0] %>>Турнир #<%= parseInt(taskID.split('_')[0]) %> </a>
-                    <a class="tlrefs" href=<%="/task_tt/" + taskID.split('_')[0] + '/' + taskID %>>Задача #<%= parseInt(taskID.split('_')[1])+1 %> </a>
+                    <a class="tlrefs" href=<%="/tournament/page/" + login + '/' + taskID.split('_')[0] %>>Турнир #<%= parseInt(taskID.split('_')[0]) %> </a>
+                    <a class="tlrefs" href=<%="/tournament/task/" + taskID.split('_')[0] + '/' + taskID %>>Задача #<%= parseInt(taskID.split('_')[1])+1 %> </a>
                 <% }else{ %>
                     <a class="tlrefs" href=<%="/task/" + taskID %>>Задача #<%= parseInt(taskID.split('_')[1])+1 %> </a>
                 <% } %>
