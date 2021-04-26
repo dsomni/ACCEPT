@@ -61,7 +61,7 @@
                 <% var task = tasks[i]; %>
                  <tr>
                   <td><%= parseInt(task.identificator.split('_')[1])+ 1 %></td>
-                  <td> <a class="tlrefs" href=<%="/task/" + task.identificator %>> <%= task.title %> </a> </td>
+                  <td> <a class="tlrefs" href=<%="/task/page/" + task.identificator %>> <%= task.title %> </a> </td>
                   <td><%= task.topic %></td>
                   <td><%= task.grade %></td>
                   <td><%= task.author %></td>

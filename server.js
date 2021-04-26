@@ -13,7 +13,8 @@ const Adder = require(__dirname + '/public/scripts/Adder.js');
 const Fuse = require('fuse.js');
 const socketIo = require('socket.io');
 const path = require('path');
-const bcrypt = require("bcryptjs")
+const bcrypt = require("bcryptjs");
+const morgan = require("morgan");
 const app = express();
 //---------------------------------------------------------------------------------
 // MongoDB connecting
@@ -55,6 +56,10 @@ initializePassport(
 //---------------------------------------------------------------------------------
 // Settings
 app.set('view-engine', 'ejs');
+app.use(morgan(':method   :date[web]   :url   :status', {
+    skip: function (req, res) { return (req.url.slice(-4) == ".svg" || req.url.slice(-4) == ".css" || req.url.slice(-3) == ".ng") || (req.user && !req.user.isTeacher) },
+    stream: fs.createWriteStream(path.join(__dirname, 'public/logs/access.log'), { flags: 'a' })
+}));
 app.use(express.urlencoded({ extended: false }));
 app.use('/public',express.static('public')); //where search for static files
 
@@ -91,7 +96,8 @@ app.get('/', (req, res) =>  {
             name : req.user.name,
             title: "Main Page",
             isTeacher: req.user.isTeacher,
-            news: news
+            news: news,
+            location: undefined
         });
     }else{
         res.render('main.ejs',{
@@ -99,7 +105,8 @@ app.get('/', (req, res) =>  {
             name : "",
             title: "Main Page",
             isTeacher: false,
-            news: news
+            news: news,
+            location: undefined
         });
     };
 });
@@ -113,7 +120,7 @@ app.post('/', passport.authenticate('local', {
 
 //---------------------------------------------------------------------------------
 // Task Page
-app.get('/task/:id', checkAuthenticated, checkNletter, async (req, res) => {
+app.get('/task/page/:id', checkAuthenticated, checkNletter, async (req, res) => {
     let language = req.body.languageSelector;
     let problem = await Task.findOne({identificator: req.params.id}).exec();
     let showHint = req.user.attempts.filter(item => item.taskID == req.params.id).length >= problem.hint.attemptsForHint;
@@ -179,7 +186,8 @@ app.get('/task/:id', checkAuthenticated, checkNletter, async (req, res) => {
                                 problem: problem,
                                 prevCode: "",
                                 showHint: showHint,
-                                language: language
+                                language: language,
+                                location: "/tasks/1/default&all&all&false&all"
                             });
                         }
                     }else{
@@ -193,7 +201,8 @@ app.get('/task/:id', checkAuthenticated, checkNletter, async (req, res) => {
                             problem: problem,
                             prevCode: "",
                             showHint: showHint,
-                            language: req.user.attempts[0].language
+                            language: req.user.attempts[0].language,
+                            location: "/tasks/1/default&all&all&false&all"
                         });
                     }
                 });
@@ -221,13 +230,14 @@ app.get('/task/:id', checkAuthenticated, checkNletter, async (req, res) => {
                 problem: problem,
                 prevCode: prevCode,
                 showHint: showHint,
-                language: language
+                language: language,
+                location: "/tasks/1/default&all&all&false&all"
             });
         }
     });
 })
 // Task Page listener
-app.post('/task/:id',checkAuthenticated, checkNletter, async (req, res) => {
+app.post('/task/page/:id',checkAuthenticated, checkNletter, async (req, res) => {
 
     fs.stat(path.normalize('public/processes/'+req.user.login+"_"+req.params.id), async function(err) {
         if (!err) {
@@ -277,7 +287,8 @@ app.get('/task/add',checkAuthenticated, checkNletter, checkPermission, async (re
         login: user.login,
         name: req.user.name,
         title : "Add Task",
-        isTeacher: req.user.isTeacher
+        isTeacher: req.user.isTeacher,
+        location: "/tasks/1/default&all&all&false&all"
     })
 })
 
@@ -404,7 +415,8 @@ app.get('/tasks/:page/:search', checkAuthenticated, checkNletter, async (req, re
         page: req.params.page,
         search: req.params.search,
         topics: topics,
-        teachers
+        teachers,
+        location: "/"
     })
 })
 
@@ -425,7 +437,8 @@ app.get('/task/edit/:id', checkAuthenticated, checkNletter, checkPermission, asy
         name: req.user.name,
         title : "Edit Task",
         isTeacher: req.user.isTeacher,
-        problem: problem
+        problem: problem,
+        location: "/task/page/"+req.params.id
     })
 })
 
@@ -548,7 +561,8 @@ app.get('/account/:login/:page/:search', checkAuthenticated, checkValidation, as
             tasks: foundTasks,
             search: req.params.search,
             n_name: user.name,
-            user: user
+            user: user,
+            location: undefined
         })
 
     } else{
@@ -596,7 +610,8 @@ app.get('/attempt/:login/:date',checkAuthenticated, checkValidation, async (req,
                 taskID : attempt.taskID,
                 date : attempt.date,
                 n_name: user.name,
-                language: attempt.language
+                language: attempt.language,
+               location: `/account/${req.params.login}/1/default&all`
             })
         } else{
             res.redirect('/account/' + req.user.login + '/1/default&all')
@@ -616,7 +631,8 @@ app.get('/addlesson', checkAuthenticated, checkNletter, checkPermission, async (
         login: user.login,
         name: req.user.name,
         title : "Add Lesson",
-        isTeacher: req.user.isTeacher
+        isTeacher: req.user.isTeacher,
+        location: `/lessons/${user.login}/1/default&all&true&all`
     })
 })
 
@@ -705,7 +721,8 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, checkNletter, async
         isTeacher: req.user.isTeacher,
         page: req.params.page,
         search: req.params.search,
-        teachers
+        teachers,
+        location: undefined
     })
 })
 
@@ -754,7 +771,8 @@ app.get('/lesson/:login/:id',checkAuthenticated, checkNletter, isLessonAvailable
             isTeacher: req.user.isTeacher,
             lesson : lesson,
             tasks : tasks,
-            results : verdicts,
+            results: verdicts,
+            location: `/lessons/${user.login}/1/default&all&true&all`
         })
     }
 })
@@ -777,7 +795,8 @@ app.get('/editlesson/:id', checkAuthenticated, checkNletter, checkPermission, as
         name: req.user.name,
         title: "Edit Lesson",
         isTeacher: req.user.isTeacher,
-        lesson: lesson
+        lesson: lesson,
+        location: `/lesson/${user.login}/${req.params.id}`
     });
 });
 
@@ -842,7 +861,8 @@ app.get('/students/:page/:search', checkAuthenticated, checkNletter, checkPermis
         isTeacher: req.user.isTeacher,
         page: max(req.params.page, 1),
         search: req.params.search,
-        students : foundStudents
+        students: foundStudents,
+        location: undefined
     })
 })
 
@@ -874,7 +894,8 @@ app.get('/addnews',checkAuthenticated, checkNletter,checkPermission, async (req,
         login: user.login,
         name: req.user.name,
         title : "Add News",
-        isTeacher: req.user.isTeacher
+        isTeacher: req.user.isTeacher,
+        location: "/"
     })
 })
 
@@ -906,7 +927,8 @@ app.get('/editnews/:id', checkAuthenticated, checkNletter, checkPermission, asyn
         name: req.user.name,
         title : "Edit News",
         isTeacher: req.user.isTeacher,
-        news: one_news
+        news: one_news,
+        location: "/"
     })
 })
 
@@ -936,7 +958,8 @@ app.get('/tournament/add', checkAuthenticated, checkPermission, async (req, res)
         login: user.login,
         name: req.user.name,
         title: "Add Tournament",
-        isTeacher: req.user.isTeacher
+        isTeacher: req.user.isTeacher,
+        location: `/tournaments/${user.login}/1/default&all&all`
     })
 })
 
@@ -1031,7 +1054,8 @@ app.get('/tournaments/:login/:page/:search', checkAuthenticated, async (req, res
         results: results,
         isTeacher: req.user.isTeacher,
         page: req.params.page,
-        search: req.params.search
+        search: req.params.search,
+        location: undefined
     })
 })
 
@@ -1060,7 +1084,8 @@ app.get('/tournament/edit/:tour_id', checkAuthenticated, isModerator, async (req
         name: req.user.name,
         title: "Edit Tournament",
         isTeacher: req.user.isTeacher,
-        tournament: tournament
+        tournament: tournament,
+        location: '/tournament/' + req.user.login + '/' + req.params.tour_id
     })
 })
 
@@ -1122,7 +1147,8 @@ app.get('/tournament/task/add/:tour_id', checkAuthenticated, isModerator, async 
         name: req.user.name,
         title: "Add Task",
         tournament: tournament,
-        isTeacher: req.user.isTeacher
+        isTeacher: req.user.isTeacher,
+        location: '/tournament/' + req.user.login + '/' + req.params.tour_id
     });
 });
 
@@ -1277,7 +1303,8 @@ app.get('/tournament/task/:tour_id/:id', checkAuthenticated, checkTournamentPerm
                                 prevCode: "",
                                 language: language,
                                 whenEnds: whenEnds,
-                                isBegan: isBegan
+                                isBegan: isBegan,
+                                location: '/tournament/' + req.user.login + '/' + req.params.tour_id
                             });
                         }
                     } else {
@@ -1293,7 +1320,8 @@ app.get('/tournament/task/:tour_id/:id', checkAuthenticated, checkTournamentPerm
                             prevCode: "",
                             language: req.user.attempts[0].language,
                             whenEnds: whenEnds,
-                                isBegan: isBegan
+                            isBegan: isBegan,
+                            location: '/tournament/' + req.user.login + '/' + req.params.tour_id
                         });
                     }
                 });
@@ -1323,7 +1351,8 @@ app.get('/tournament/task/:tour_id/:id', checkAuthenticated, checkTournamentPerm
                 prevCode: prevCode,
                 language: language,
                 whenEnds: whenEnds,
-                isBegan: isBegan
+                isBegan: isBegan,
+                location: '/tournament/' + req.user.login + '/' + req.params.tour_id
             });
         }
     });
@@ -1416,7 +1445,8 @@ app.get('/tournament/page/:login/:id', checkAuthenticated, checkTournamentValida
             tournament: tournament,
             tasks: tasks,
             results: verdicts,
-            registered: registered
+            registered: registered,
+            location: `/tournaments/${req.params.login}/1/default&all&all`
         });
     }
 })
@@ -1433,7 +1463,8 @@ app.get('/tournament/task/edit/:tour_id/:id', checkAuthenticated, isModerator, a
         title: "Edit Tournament Task",
         isTeacher: req.user.isTeacher,
         task: task,
-        tour_id: req.params.tour_id
+        tour_id: req.params.tour_id,
+        location: `/tournament/task/${req.params.tour_id}/${req.params.id}`
     })
 });
 
@@ -1498,7 +1529,8 @@ app.get('/tournament/results/:tour_id/:showTeachers/', checkAuthenticated, async
             ID: req.params.tour_id,
             tournament: tournament,
             results: results,
-            showTeachers: req.params.showTeachers=="1"
+            showTeachers: req.params.showTeachers == "1",
+            location: `/tournament/page/${req.user.login}/${req.params.tour_id}`
         });
     } else {
         res.redirect('/');
@@ -1538,7 +1570,8 @@ app.get('/tournament/attempts/:tour_id/:page/:toSearch', checkAuthenticated, isM
         attempts,
         tasks,
         page: req.params.page,
-        search: req.params.toSearch
+        search: req.params.toSearch,
+        location: `/tournament/page/${req.user.login}/${req.params.tour_id}`
     });
 });
 app.post('/tournament/attempts/:tour_id/:page/:toSearch', checkAuthenticated, isModerator, async (req, res) => {
@@ -1580,7 +1613,8 @@ app.get('/about',checkAuthenticated, async (req, res) => {
         login: req.user.login,
         name: req.user.name,
         title: "About",
-        isTeacher: req.user.isTeacher
+        isTeacher: req.user.isTeacher,
+        location: undefined
     });
 });
 
@@ -1603,7 +1637,8 @@ app.get("/registration", async (req, res) => {
             name : "",
             title: "Registration Page",
             isTeacher: false,
-            msg : ""
+            msg: "",
+            location: undefined
     });
 });
 
@@ -1624,7 +1659,8 @@ app.post("/registration", async (req, res) => {
             name : "",
             title: "Registration Page",
             isTeacher: false,
-            msg : "Пароль должен содержать как минимум 5 символов!"
+            msg: "Пароль должен содержать как минимум 5 символов!",
+            location: undefined
         });
         return;
     }
@@ -1635,7 +1671,8 @@ app.post("/registration", async (req, res) => {
             name : "",
             title: "Registration Page",
             isTeacher: false,
-            msg : "Логин уже занят!"
+            msg: "Логин уже занят!",
+            location: undefined
         });
         return;
     }
