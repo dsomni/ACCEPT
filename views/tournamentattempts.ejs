@@ -22,7 +22,7 @@
                     <option value="all" selected>Все посылки</option>
                     <option value="ok" >Только успешные</option>
                 </select>
-                <select name="selector" id = "selector">
+                <select name="selector_new" id = "selector">
                     <option value="true" selected>Сначала новые</option>
                     <option value="false" >Сначала старые</option>
                 </select>
@@ -43,7 +43,7 @@
                 <tr>
                     <td><a href=<%= "/account/"+attempts[i].login+"/1/default&all" %> ><%= attempts[i].login  %></a></td>
                     <td><a href=<%= "/attempt/"+attempts[i].login+"/"+attempts[i].AttemptDate %> >[Посылка]</a></td>
-                    <td><a href=<%= "/tournament/task/"+tourID+"/"+tasks[i].identificator %> ><%= tasks[i].identificator %></a></td>
+                    <td><a href=<%= "/tournament/task/"+tourID+"/"+tasks[i].identificator %> ><%= parseInt(tasks[i].identificator.split("_")[1])+1 %></a></td>
                     <td><%= attempts[i].score  %></td>
                     <td style="width: 200px;">
 

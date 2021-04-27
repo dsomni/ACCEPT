@@ -128,7 +128,7 @@ app.get('/task/page/:id', checkAuthenticated, checkNletter, async (req, res) => 
         if (!err && Date.now()) {
             if(Date.now() - stats.birthtimeMs >= config.FolderLifeTime){
                 fs.rmdirSync(path.normalize('public/processes/' + req.user.login+'_'+req.params.id),{recursive: true});
-                res.redirect('/task/'+req.params.id);
+                res.redirect('/task/page/'+req.params.id);
             }else{
                 fs.stat(path.join('public/processes/' + req.user.login+'_'+req.params.id + "/result.txt"), async function(err,stats2) {
                     if (!err) {
@@ -174,7 +174,7 @@ app.get('/task/page/:id', checkAuthenticated, checkNletter, async (req, res) => 
 
                             fs.rmdirSync(path.normalize('public/processes/'+req.user.login+'_'+req.params.id),{recursive: true});
 
-                            res.redirect('/task/'+req.params.id);
+                            res.redirect('/task/page/'+req.params.id);
                         }else{
                             res.render('task.ejs',{
                                 login: req.user.login,
@@ -241,7 +241,7 @@ app.post('/task/page/:id',checkAuthenticated, checkNletter, async (req, res) => 
 
     fs.stat(path.normalize('public/processes/'+req.user.login+"_"+req.params.id), async function(err) {
         if (!err) {
-            res.redirect('/task/'+req.params.id);
+            res.redirect('/task/page/'+req.params.id);
         }
         else if (err.code === 'ENOENT') {
 
@@ -272,7 +272,7 @@ app.post('/task/page/:id',checkAuthenticated, checkNletter, async (req, res) => 
                 req.params.id)
 
             }
-            res.redirect('/task/'+req.params.id);
+            res.redirect('/task/page/'+req.params.id);
         }
     });
 
@@ -490,7 +490,7 @@ app.post('/task/edit/:id', checkAuthenticated, checkNletter, checkPermission, as
     problem.tests = tests;
     problem.hint = hint;
     await problem.save();
-    res.redirect('/task/'+req.params.id);
+    res.redirect('/task/page/'+req.params.id);
 });
 
 //---------------------------------------------------------------------------------
@@ -781,7 +781,7 @@ app.get('/lesson/:login/:id',checkAuthenticated, checkNletter, isLessonAvailable
 // Delete Lesson
 app.post('/deletelesson/:id', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
     childProcess.exec("node " + path.join(__dirname,"/public/scripts/FixAfterDeleteLesson.js") + " "+req.params.id)
-    res.redirect('/lessons/0/1/default&all&all');
+    res.redirect('/lessons/'+req.user.login+'/1/default&all&true&all');
 })
 
 //---------------------------------------------------------------------------------
@@ -876,7 +876,7 @@ app.post('/students/:page/:search', checkAuthenticated, checkNletter, checkPermi
     let student;
     for(let i = 0; i<keys.length; i++){
         if(keys[i].slice(0, 6)=="login:"){
-            student = await User.findOne({login: keys[i].slice(6)})
+            student = await User.findOne({login: keys[i].slice(6)}).exec()
             if(student.group != req.body[keys[i]]){
                 student.group = req.body[keys[i]]
                 await student.save()
@@ -969,10 +969,41 @@ app.post('/tournament/add', checkAuthenticated, checkPermission, async (req, res
     let tasks = [];
     let mods = [user.login].concat(body.mods.split(' '));
     let frozeAfter = body.frozeAfter ? body.frozeAfter : body.whenEnds;
-    await Adder.addTournament(Tournament, body.title, body.description,
-        tasks, user.name, body.whenStarts.replace('T', ' '),
-        body.whenEnds.replace('T', ' '), frozeAfter.replace('T', ' '), mods, body.allowRegAfterStart=="on",
-        body.allOrNothing=="1", body.penalty*1000);
+
+    let emtpy_tournament = await Tournament.findOne({title: ""}).exec();
+    if(emtpy_tournament){
+        emtpy_tournament.title = body.title;
+        emtpy_tournament.description = body.description;
+        emtpy_tournament.tasks = body.tasks;
+        emtpy_tournament.author = user.name;
+        emtpy_tournament.whenStarts = body.whenStarts.replace('T', ' ');
+        emtpy_tournament.whenEnds = body.whenEnds.replace('T', ' ');
+        emtpy_tournament.frozeAfter = frozeAfter.replace('T', ' ');
+        emtpy_tournament.mods = mods;
+        emtpy_tournament.allowRegAfterStart = body.allowRegAfterStart=="on";
+        emtpy_tournament.allOrNothing = body.allOrNothing=="1";
+        emtpy_tournament.penalty = body.penalty*1000;
+        emtpy_tournament.isBegan = false;
+        emtpy_tournament.isEnded = false;
+        emtpy_tournament.isFrozen = false;
+        emtpy_tournament.results = [];
+        emtpy_tournament.attempts = [];
+        emtpy_tournament.frozenResults = [];
+        emtpy_tournament.disqualificated = [];
+
+        emtpy_tournament.markModified('disqualificated');
+        emtpy_tournament.markModified('results');
+        emtpy_tournament.markModified('attempts');
+        emtpy_tournament.markModified('frozenResults');
+        emtpy_tournament.markModified('mods');
+        emtpy_tournament.markModified('tasks');
+        emtpy_tournament.save();
+    }else{
+        await Adder.addTournament(Tournament, body.title, body.description,
+            tasks, user.name, body.whenStarts.replace('T', ' '),
+            body.whenEnds.replace('T', ' '), frozeAfter.replace('T', ' '), mods, body.allowRegAfterStart=="on",
+            body.allOrNothing=="1", body.penalty*1000);
+    }
 
     res.redirect("/tournament/add")
 })
@@ -995,7 +1026,7 @@ app.get('/tournaments/:login/:page/:search', checkAuthenticated, async (req, res
     let isBegan = a[1] == 'true';
     let isEnded = a[2] == 'true';
 
-    let Tournaments = (await Tournament.find({}).exec()).slice(1);
+    let Tournaments = (await Tournament.find({}).exec()).slice(1).filter(item => item.title!="");
 
     const fuse = new Fuse(Tournaments, {
         includeScore: true,
@@ -1102,9 +1133,21 @@ app.post('/tournament/edit/:tour_id', checkAuthenticated, isModerator, async (re
     tournament.allowRegAfterStart = body.allowRegAfterStart=="on";
     tournament.allOrNothing = body.allOrNothing == "1";
     tournament.penalty = body.penalty*1000;
+    tournament.mods = [req.user.login].concat(body.mods.split(' ')).filter(item=>item!="");
+    tournament.markModified('mods');
     await tournament.save();
 
     res.redirect(`/tournament/page/${req.user.login}/${req.params.tour_id}/`)
+})
+
+//---------------------------------------------------------------------------------
+// Delete Tournament Page
+app.post('/deletetournament/:tour_id', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
+    let tournament = await Tournament.findOne({identificator: req.params.tour_id}).exec();
+    tournament.title = "";
+    tournament.save();
+    childProcess.exec("node " + path.join(__dirname,"/public/scripts/FixAfterDeleteTournament.js") + " "+req.params.tour_id)
+    res.redirect('/tournaments/'+req.user.login+'/1/default&all&all');
 })
 
 
@@ -1267,6 +1310,15 @@ app.get('/tournament/task/:tour_id/:id', checkAuthenticated, checkTournamentPerm
                             // tournament results update
                             let user_result_idx = tournament.results.findIndex(item => item.login == req.user.login.toString());
                             let task_idx = req.params.id.split('_')[1];
+                            if(!tournament.isEnded && user_result_idx!=-1 && task_idx>=tournament.results[user_result_idx].tasks.length){
+                                while(tournament.results[user_result_idx].tasks.length<=task_idx){
+                                    tournament.results[user_result_idx].tasks.push({
+                                        score: 0,
+                                        dtime:0,
+                                        tries:0
+                                    })
+                                }
+                            }
                             if (!tournament.isEnded && user_result_idx!=-1 && tournament.results[user_result_idx].tasks[task_idx].score!=100){
                                 tournament.results[user_result_idx].tasks[task_idx].tries += 1;
                                 if (score != 100)
@@ -1412,7 +1464,7 @@ app.get('/tournament/page/:login/:id', checkAuthenticated, checkTournamentValida
     }
 
     let tournament = await Tournament.findOne({identificator:req.params.id}).exec();
-    if (!tournament) {
+    if (!tournament || tournament.title=="") {
         res.redirect("/tournaments/" + req.params.login + "/1/default&all&all")
     } else {
         let tasks = tournament.tasks;
@@ -1453,7 +1505,6 @@ app.get('/tournament/page/:login/:id', checkAuthenticated, checkTournamentValida
 
 //---------------------------------------------------------------------------------
 // Edit tournament task
-
 app.get('/tournament/task/edit/:tour_id/:id', checkAuthenticated, isModerator, async (req, res) => {
     let tournament = await Tournament.findOne({ identificator: req.params.tour_id });
     let task = tournament.tasks.find(item => item.identificator == req.params.id);
@@ -1530,6 +1581,7 @@ app.get('/tournament/results/:tour_id/:showTeachers/', checkAuthenticated, async
             tournament: tournament,
             results: results,
             showTeachers: req.params.showTeachers == "1",
+            isModerator : tournament.mods.includes(req.user.login),
             location: `/tournament/page/${req.user.login}/${req.params.tour_id}`
         });
     } else {
@@ -1552,10 +1604,17 @@ app.get('/tournament/attempts/:tour_id/:page/:toSearch', checkAuthenticated, isM
     let attempts = tournament.attempts;
 
     //search
-    attempts.filter(item => (!success || item.score == 100) && (!needTasks || item.taskID == taskSearch) && (!needLogin || item.login == loginSearch))
+    attempts = attempts.filter(item => (!success || item.score == 100) && (!needTasks || parseInt(item.TaskID.split("_")[1])+1 == parseInt(taskSearch)) && (!needLogin || item.login == loginSearch))
 
-    if (!bynew) {
-        attempts.sort((a, b) => a.AttemptDate > b.AttemptDate);
+    if (bynew) { // sorry for reverse logic :)
+        attempts.sort((a, b) => {
+            if (parseInt(a.AttemptDate)>parseInt(b.AttemptDate)) {
+                return -1;
+            }
+            else {
+                return 1;
+            }
+        });
     }
 
     let tasks = attempts.map(attempt => tournament.tasks.find(task => task.identificator == attempt.TaskID));
@@ -1578,9 +1637,11 @@ app.post('/tournament/attempts/:tour_id/:page/:toSearch', checkAuthenticated, is
     let toSearch = req.body.loginSearch.trim() == "" ? "all" : req.body.loginSearch.trim();
     toSearch += '&' + (req.body.taskSearch.trim() == "" ? "all" : req.body.taskSearch.trim());
     toSearch += '&' + (req.body.selector);
+    toSearch += '&' + (req.body.selector_new);
     res.redirect(`/tournament/attempts/${req.params.tour_id}/${req.params.page}/${toSearch}`);
 });
 
+//---------------------------------------------------------------------------------
 // Tournament disqualification
 app.post("/tournament/disqualAttempt/:tour_id/:AttemptDate", checkAuthenticated, isModerator, async (req, res) => {
     let AttemptDate = req.params.AttemptDate;
@@ -1591,7 +1652,6 @@ app.post("/tournament/disqualAttempt/:tour_id/:AttemptDate", checkAuthenticated,
     let TaskID = tournament.attempts[idx].TaskID.split('_')[1];
     tournament.attempts.splice(idx, 1);
     let resUserIndx = tournament.results.findIndex(item => item.login == login);
-    console.log(TaskID);
     if (score == tournament.results[resUserIndx].tasks[TaskID].score) {
         let mx = -1;
         let mx_ind;
@@ -1608,7 +1668,6 @@ app.post("/tournament/disqualAttempt/:tour_id/:AttemptDate", checkAuthenticated,
             tournament.results[resUserIndx].tasks[TaskID].dtime = (tournament.attempts[mx_ind].AttemptDate - Date.parse(tournament.whenStarts));
             tournament.results[resUserIndx].tasks[TaskID].score = tournament.attempts[mx_ind].score;
         } else {
-            console.log(mx, mx_ind);
             tournament.results[resUserIndx].sumscore -= score;
             tournament.results[resUserIndx].sumtime -= tournament.results[resUserIndx].tasks[TaskID].dtime;
 
@@ -1629,7 +1688,9 @@ app.post("/tournament/disqualUser/:tour_id/:login", checkAuthenticated, isModera
     tournament.results.splice(tournament.results.findIndex(item => item.login == login), 1);
     tournament.frozenResults.splice(tournament.frozenResults.findIndex(item => item.login == login), 1);
     tournament.attempts = tournament.attempts.filter(item => item.login != login);
+    tournament.disqualificated.push(req.params.login);
     tournament.markModified("results");
+    tournament.markModified("disqualificated");
     tournament.markModified("frozenResults");
     tournament.markModified("attempts");
     await tournament.save()
@@ -1723,7 +1784,12 @@ app.get('/MazeByMalveetha&Dsomni',checkAuthenticated, checkNotPermission, async 
 app.get('/emojiegg',checkAuthenticated, checkNotPermission, async (req, res) => {
     res.sendFile(__dirname+'/views/19012021.html')
 })
-
+app.get('/patrikegg',checkAuthenticated, checkNotPermission, async (req, res) => {
+    res.sendFile(__dirname+'/views/20012021.html')
+})
+app.get('/beee',checkAuthenticated, checkNotPermission, async (req, res) => {
+    res.sendFile(__dirname+'/views/25012021.html')
+})
 //---------------------------------------------------------------------------------
 // Log Out
 app.delete('/logout', (req, res) => {

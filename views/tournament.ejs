@@ -22,11 +22,23 @@
                 <div style="text-align: center;">
                     <% if(tournament.mods.find(item => item == login)){ %>
                         <a class="EditButtons" href=<%="/tournament/edit/" + tournament.identificator %> >Редактировать</a>
+                        <% if(tournament.identificator!=0){ %>
+                        <span class="tourPopup">
+                            <dialog  id='dialog'>
+                                <form action= <%="/deletetournament/" + tournament.identificator %>  method="POST">
+                                    Вы действительно хотите удалить турнир "<%= tournament.title %>" ?
+                                    <button>Да</button>
+                                </form>
+                                <button onClick='c();'>Назад</button>
+                            </dialog>
+                        <button onClick='o();' class="show" >[Удалить]</button>
+                        <% } %>
                         <% if(!tournament.isBegan) { %>
+                            </span>
                                 <a class="EditButtons" href=<%="/tournament/task/add/" + tournament.identificator %> >Добавить задачу</a>
                                 <a class="EditButtons" href=<%="/addparticipant_tt/" + tournament.identificator %> >Добавить участников</a>
                         <% } %>
-                        <a class="EditButtons" href=<%= "/tournament/attempts/"+ID+"/1/all&all&all" %> >Посылки</a>
+                        <a class="EditButtons" href=<%= "/tournament/attempts/"+ID+"/1/all&all&all&true" %> >Посылки</a>
                     <% } %>
                     <a class="EditButtons" href=<%= "/tournament/results/"+tournament.identificator +"/1" %>>Таблица результатов</a>
                 </div>
@@ -60,11 +72,14 @@
                             <% }} %>
                 </table>
             <% }else{ %>
-                <% if(tournament.mods.find(item => item == login)){ %>
+
+                <% if(tournament.disqualificated.includes(login)){ %>
+                    <h1 style="text-align: center;color:Red">Вы дисквалифицированы!</h1>
+                <% }else if(tournament.mods.find(item => item == login)){ %>
                     <h1 style="text-align: center;color:Red">Добавьте задачу</h1>
                 <% }else if(registered){ %>
                         <h1 style="text-align: center;color:Red">Турнир ещё не начался</h1>
-                <% }else{ %>
+               <% }else{ %>
                     <h1 style="text-align: center;color:Red">Вы не зарегистрированы!</h1>
                 <% }} %>
         </main>
@@ -147,5 +162,12 @@
             messages.appendChild(p);
             messages.scrollTo(0, messages.scrollHeight);
         });
+
+        function o() {
+            document.getElementById('dialog').showModal();
+        }
+        function c() {
+            document.getElementById('dialog').close();
+        }
     </script>
 </html>

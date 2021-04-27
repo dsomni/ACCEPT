@@ -16,6 +16,7 @@ mongoose.connect(connectionString, {
 })
 
 const Tournament = require('../../config/models/Tournament');
+const User = require('../../config/models/User');
 
 var identificator = process.argv[2];
 
@@ -35,9 +36,12 @@ async function run() {
 
 
     let realresults = []
-
+    let user;
     for (let i = 0; i <results.length; i++){
-        realresults.push([results[i].login])
+        user = await User.findOne({ login: results[i].login });
+        if(!user)
+            continue;
+        realresults.push([results[i].login, user.name])
         for (let j = 0; j < results[i].tasks.length; j++){
             realresults[i].push([
                 {
@@ -63,11 +67,13 @@ async function run() {
 
 
     ws.cell(1, 1).string("LOGIN").style({ font: { bold: true } });
+    ws.cell(1, 2).string("NAME").style({ font: { bold: true } });
     for (let i = 0; i < tasks.length; i++) {
-        ws.cell(1, i + 2).string((i + 1).toString() + " " + tasks[i].title).style({ font: { bold: true } });
+        // + " " + tasks[i].title
+        ws.cell(1, i + 3).string((i + 1).toString() ).style({ font: { bold: true } });
     }
-    ws.cell(1, tasks.length+2).string("SCORE").style({font:{ bold: true }});
-    ws.cell(1, tasks.length + 3).string("TIME").style({ font: { bold: true } });
+    ws.cell(1, tasks.length+3).string("SCORE").style({font:{ bold: true }});
+    ws.cell(1, tasks.length + 4).string("TIME").style({ font: { bold: true } });
     for (let i = 0; i < realresults.length; i++) {
         for (let j = 0; j < realresults[0].length; j++) {
             if(j==realresults[0].length-2){

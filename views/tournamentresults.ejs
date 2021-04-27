@@ -15,7 +15,7 @@
     <body>
         <main>
             <h1>Результаты турнира <%= tournament.title %></h1>
-            <% if(isTeacher){ %>
+            <% if(isModerator){ %>
                 <h3>Показывать учителей</h3>
                 <label class="switch" >
                     <input type="checkbox" name="showTeachers" <% if(showTeachers) {%> checked <% } %>
@@ -33,7 +33,7 @@
                     <th>Время</th>
                 </tr>
                 <%results.sort((a, b) => {
-                    if ((a[0].sumscore > b[0].sumscore)||((a[0].sumscore=b[0].sumscore)&&(a[0].sumtime<b[0].sumtime))) {
+                    if ((a[0].sumscore > b[0].sumscore)||((a[0].sumscore==b[0].sumscore)&&(a[0].sumtime<b[0].sumtime))) {
                         return -1;
                     }
                     else {
@@ -44,7 +44,7 @@
                     <tr>
                         <% let result = results[i][0]; %>
                         <% if(!results[i][1] || showTeachers){ %>
-                            <td><%= result.login %></td>
+                            <td><a class="tlrefs" href=<%="/account/"+ result.login  + '/1/default&all'%>><%= result.login %></a></td>
                             <% for(let j=0; j < result.tasks.length; j++) { %>
                                 <% let task = result.tasks[j]; %>
                                 <td><%= task.score %>(<%= task.tries %>)</td>

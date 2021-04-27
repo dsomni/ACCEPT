@@ -56,7 +56,9 @@
 
                   <% let registered = tournament.results.find(item=>item.login==login);%>
 
-                <% if(!tournament.isBegan){ %>
+                <% if(tournament.disqualificated.includes(login)){ %>
+                    <td><a style="text-decoration: none; color: rgb(190, 60, 0);">Вы дисквалифицированы</a></td>
+                <% }else if(!tournament.isBegan){ %>
                     <% if(!registered){ %>
                         <td><a style="text-decoration: none;" href=<%= "/regTournament/" + tournament.identificator %>>Регистрация</a></td>
                     <% } else { %>
