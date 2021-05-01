@@ -3,4 +3,4 @@ node_modules
 public/scripts/users.xlsx
 public/tables/*.xlsx
 config/configs.js
-public/logs/*
+public/logs/*.log

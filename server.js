@@ -47,7 +47,6 @@ const Tournament = require('./config/models/Tournament');
 //---------------------------------------------------------------------------------
 
 const initializePassport = require('./config/passport');
-const { log, Console } = require('console');
 initializePassport(
     passport,
     User
@@ -58,7 +57,7 @@ initializePassport(
 app.set('view-engine', 'ejs');
 app.use(morgan(':method   :date[web]   :url   :status', {
     skip: function (req, res) { return (req.url.slice(-4) == ".svg" || req.url.slice(-4) == ".css" || req.url.slice(-3) == ".ng") || (req.user && !req.user.isTeacher) },
-    stream: fs.createWriteStream(path.join(__dirname, 'public/logs/access.log'), { flags: 'a' })
+    stream: fs.createWriteStream(path.join(__dirname, 'public/logs/'+Date.now()+'.log'), { flags: 'a' })
 }));
 app.use(express.urlencoded({ extended: false }));
 app.use('/public',express.static('public')); //where search for static files
@@ -89,7 +88,7 @@ childProcess.exec('node ' + path.join(__dirname, '/public/scripts/Tchecker.js'))
 
 //---------------------------------------------------------------------------------
 // Main Page
-app.get('/', (req, res) =>  {
+app.get('/', (req, res) => {
     if(req.user){
         res.render('main.ejs',{
             login: req.user.login,
@@ -416,7 +415,7 @@ app.get('/tasks/:page/:search', checkAuthenticated, checkNletter, async (req, re
         search: req.params.search,
         topics: topics,
         teachers,
-        location: undefined
+        location: req.header('Referer')
     })
 })
 
@@ -562,7 +561,7 @@ app.get('/account/:login/:page/:search', checkAuthenticated, checkValidation, as
             search: req.params.search,
             n_name: user.name,
             user: user,
-            location: undefined
+            location: req.header('Referer')
         })
 
     } else{
@@ -722,7 +721,7 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, checkNletter, async
         page: req.params.page,
         search: req.params.search,
         teachers,
-        location: undefined
+        location: req.header('Referer')
     })
 })
 
@@ -862,7 +861,7 @@ app.get('/students/:page/:search', checkAuthenticated, checkNletter, checkPermis
         page: max(req.params.page, 1),
         search: req.params.search,
         students: foundStudents,
-        location: undefined
+        location: req.header('Referer')
     })
 })
 
@@ -1086,7 +1085,7 @@ app.get('/tournaments/:login/:page/:search', checkAuthenticated, async (req, res
         isTeacher: req.user.isTeacher,
         page: req.params.page,
         search: req.params.search,
-        location: undefined
+        location: req.header('Referer')
     })
 })
 
@@ -1706,7 +1705,7 @@ app.get('/about',checkAuthenticated, async (req, res) => {
         name: req.user.name,
         title: "About",
         isTeacher: req.user.isTeacher,
-        location: undefined
+        location: req.header('Referer')
     });
 });
 
@@ -1730,7 +1729,7 @@ app.get("/registration", async (req, res) => {
             title: "Registration Page",
             isTeacher: false,
             msg: "",
-            location: undefined
+            location: req.header('Referer')
     });
 });
 

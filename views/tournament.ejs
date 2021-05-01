@@ -31,7 +31,7 @@
                                 </form>
                                 <button onClick='c();'>Назад</button>
                             </dialog>
-                        <button onClick='o();' class="show" >[Удалить]</button>
+                        <button onClick='o();' class="show EditButtons" style="background-color: transparent;">Удалить</button>
                         <% } %>
                         <% if(!tournament.isBegan) { %>
                             </span>
@@ -63,7 +63,7 @@
                                 <td>
                                     <%= parseInt(task.identificator.split('_')[1])+1 %>
                                 </td>
-                                <td> <a class="tlrefs" href=<%="/tournament/task/"+tournament.identificator  + '/' + task.identificator %>> <%= task.title %> </a> </td>
+                                <td> <a class="tlrefs" href=<%="/tournament/task/"+tournament.identificator  + '/' + task.identificator %>><%= task.title %></a> </td>
                                 <td>
                                     <%= results[i] %>
                                 </td>
@@ -89,7 +89,7 @@
                 <textarea type="text" id="sendMessage" placeholder="Введите сообщение"></textarea>
             <% } %>
         </div>
-        <p class="countDownTimer" id="countDownTimer" style="left: 5rem; right:auto; top:4rem"></p>
+        <p class="countDownTimer" id="countDownTimer" style="left: 5rem; right:auto; top:6rem"></p>
     </body>
     <script src="/socket.io/socket.io.js"></script>
     <script>
