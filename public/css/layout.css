@@ -32,6 +32,7 @@ main{
 h3{
     color: #4e4e4e;
     margin: 5px;
+    font-size: 1.5rem;
 }
 
 h4{
@@ -503,11 +504,19 @@ header input{
 }
 
 .newsPage{
+    margin: 20px;
+    background-color: #e4e1e1aa;
     margin-top: 5rem;
     display: flex;
+    padding: 10px;
     align-items: center;
     flex-direction:column;
 }
+
+.newsPage *{
+    flex-basis: content;
+}
+
 .newsPage .newsTitle{
     font-size: 3rem;
 }
@@ -603,7 +612,7 @@ header input{
     outline: none;
     background-color: var(--header-color);
     margin: 5px;
-    font-size: 12pt;
+    font-size: 10pt;
 }
 .taskAdderForm ::placeholder{
     color: #000000aa;
@@ -618,7 +627,7 @@ header input{
     margin-top: 100px;
     margin-left: auto;
     margin-right: auto;
-    width: 400px;
+    width: 550px;
     font-size: 22pt;
     font-weight: 600;
 }
@@ -639,7 +648,7 @@ header input{
     outline: none;
     background-color: var(--header-color);
     margin: 10px;
-    font-size: 20pt;
+    font-size: 15pt;
 }
 .lessonAdderForm ::placeholder{
     color: #000000aa;

@@ -15,7 +15,21 @@ const socketIo = require('socket.io');
 const path = require('path');
 const bcrypt = require("bcryptjs");
 const morgan = require("morgan");
+const multer = require("multer");
 const app = express();
+
+// Multer setup
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './public/media/newsImages/')
+    },
+    filename: function (req, file, cb) {
+         cb(null, Date.now() + "." + file.mimetype.split("/")[1])
+    }
+});
+const upload = multer({ dest: 'public/media/newsImages', storage, limits: { fieldSize: 10 * 1024 * 1024 }});
+
 //---------------------------------------------------------------------------------
 // MongoDB connecting
 let connectionString;
@@ -894,15 +908,17 @@ app.get('/addnews', checkAuthenticated, checkNletter, checkPermission, async (re
         name: req.user.name,
         title: "Add News",
         isTeacher: req.user.isTeacher,
-        location: "/"
+        location: req.header('Referer')
     })
 });
 
-app.post('/addnews', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
+app.post('/addnews', checkAuthenticated, checkNletter, checkPermission, upload.single('image'), async (req, res) => {
     let user = req.user;
     let body = req.body;
+    let filename = "";
+    if (req.file) filename = req.file.filename
 
-    let new_news = await Adder.addNews(News, body.title, body.text, body.reference, user.name);
+    let new_news = await Adder.addNews(News, body.title, body.description, body.text, filename, user.name);
     news.push(new_news);
 
     res.redirect("/")
@@ -911,15 +927,15 @@ app.post('/addnews', checkAuthenticated, checkNletter, checkPermission, async (r
 //---------------------------------------------------------------------------------
 // Delete News
 app.post('/deletenews/:id', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
-    await News.deleteOne({identificator: req.params.id}).exec();
-    news.splice(news.findIndex(item => item.identificator==req.params.id),1)
+    await News.findByIdAndDelete(req.params.id);
+    news.splice(news.findIndex(item => item._id==req.params.id),1)
     res.redirect('/');
 })
 
 //---------------------------------------------------------------------------------
 // Edit News Pages
 app.get('/editnews/:id', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
-    one_news = news.find(item => item.identificator==req.params.id)
+    one_news = news.find(item => item._id==req.params.id)
     let user = req.user;
     res.render('editnews.ejs',{
         login: user.login,
@@ -927,20 +943,22 @@ app.get('/editnews/:id', checkAuthenticated, checkNletter, checkPermission, asyn
         title : "Edit News",
         isTeacher: req.user.isTeacher,
         news: one_news,
-        location: "/"
+        location: req.header('Referer')
     })
 })
 
-app.post('/editnews/:id',checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
+app.post('/editnews/:id', checkAuthenticated, checkNletter, checkPermission, upload.single('image'), async (req, res) => {
     let body = req.body;
-    let newsDB = await News.findOne({identificator: req.params.id}).exec()
+    let newsDB = await News.findById(req.params.id).exec()
 
     newsDB.title = body.title;
     newsDB.text = body.text;
-    newsDB.reference = body.reference;
+    newsDB.description = body.description;
+    if(req.file)
+        newsDB.imageName = req.file.filename;
     await newsDB.save();
 
-    let idx = news.findIndex(item => item.identificator==req.params.id)
+    let idx = news.findIndex(item => item._id==req.params.id)
     news[idx].title = body.title;
     news[idx].text = body.text;
     news[idx].reference = body.reference;
@@ -1795,22 +1813,27 @@ app.delete('/logout', (req, res) => {
     req.logOut()
     res.redirect('/')
 })
+
 app.get("/news/:id", (req, res) => {
-    let currentNew = news.find(item => item.identificator = req.params.id);
-    let render = {
-        login: '',
-        name: '',
-        title: currentNew.title,
-        isTeacher: false,
-        location: "/",
-        news: currentNew
-    };
-    if (req.user) {
-        render.login = req.user.login;
-        render.name = req.user.name;
-        render.isTeacher = req.user.isTeacher;
+    let currentNew = news.find(item => item._id == req.params.id);
+    if (currentNew) {
+        let render = {
+            login: '',
+            name: '',
+            title: currentNew.title,
+            isTeacher: false,
+            location: "/",
+            news: currentNew
+        };
+        if (req.user) {
+            render.login = req.user.login;
+            render.name = req.user.name;
+            render.isTeacher = req.user.isTeacher;
+        }
+        res.render("news.ejs", render);
+    } else {
+        res.redirect('/')
     }
-    res.render("news.ejs", render)
 });
 
 //---------------------------------------------------------------------------------

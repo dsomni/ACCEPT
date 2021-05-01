@@ -15,10 +15,14 @@ mongoose.connect(connectionString, {
 });
 
 const User = require('../../config/models/User');
+const News = require('../../config/models/News');
 
 async function run() {
     mongoose.connection.collections['users'].drop( function(err) {
-        console.log('collection dropped');
+        console.log('collection \"users\" dropped');
+    });
+    mongoose.connection.collections['news'].drop( function(err) {
+        console.log('collection \"news\" dropped');
     });
     childProcess.exec('node repairLessons.js');
     childProcess.exec('node repairTasks.js');

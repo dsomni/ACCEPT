@@ -5,3 +5,4 @@ public/tables/*.xlsx
 config/configs.js
 public/logs/*.log
 public/processes/*
+public/media/newsImages/*

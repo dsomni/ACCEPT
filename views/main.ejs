@@ -21,16 +21,16 @@
                 <a style="margin-left: 10px;" class="tlrefs" href="/addnews">[Добавить новость]</a>
             <% } %>
             <br>
-            <% for(var i = news.length -1 ; i >=0; i--){ %>
-            <div class="news">
-                <% var maxDate = new Date(Number(news[i].date)); %>
-                <% var isoDate = maxDate.toISOString(); %>
-                <% var date = isoDate.substr(0, 10) ; %>
-                <a class="newsTitle" href="/news/<%= news[i].identificator %>" style=""><b><%= news[i].title %></b></a>
-                <br>
-                <span class="date"> <%= date %> </span>
-                <%= news[i].text %>
-            </div>
+            <% for(var i = news.length -1 ; i >= 0; i--){ %>
+                <div class="news">
+                    <% var maxDate = new Date(Number(news[i].date)); %>
+                    <% var isoDate = maxDate.toISOString(); %>
+                    <% var date = isoDate.substr(0, 10) ; %>
+                    <a class="newsTitle" href=<%="/news/" + news[i]._id %>><b><%= news[i].title %></b></a>
+                    <br>
+                    <span class="date"> <%= date %> </span>
+                    <%= news[i].description %>
+                </div>
             <% }%>
         </main>
     </body>

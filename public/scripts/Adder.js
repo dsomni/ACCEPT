@@ -11,14 +11,15 @@ exports.addLesson = async function (Lesson, grade, title, description, tasks, au
     await Lesson.insertMany([lesson]);
 }
 
-exports.addNews = async function (News, title, text, reference, author){
+exports.addNews = async function (News, title, description, text, imageName, author){
     var number = await News.estimatedDocumentCount().exec()
     new_news = {
         identificator: number,
         title,
+        description,
         text,
-        reference,
-        date :  Date.now().toString(),
+        imageName,
+        date: Date.now().toString(),
         author
     }
     await News.insertMany([new_news]);

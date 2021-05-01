@@ -4,11 +4,10 @@ const config = require('../configs');
 const NewsSchema = new mongoose.Schema({
     identificator: Number,
     title: String,
-    textOnMain: String,
+    description: String,
     text: String,
-    reference: String,
     date: String,
-    image: String,
+    imageName: String,
     author: String
 
 }, { collection: config.mongodbConfigs.CollectionNames.news });
