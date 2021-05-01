@@ -29,7 +29,7 @@ const User = require('../../config/models/User');
 async function addTeacher (login, password, name){
     await User.insertMany([{
         login: login,
-        password: bcrypt.hashSync(password, 10),
+        password: bcrypt.hashSync(password.toString(), 10).toString(),
         name: name,
 
         attempts: [],
@@ -41,10 +41,13 @@ async function addTeacher (login, password, name){
 async function toDo(){
 
     const workSheetsFromFile = await xlsx.parse(config.PathToTeachersList);
+
     var data = workSheetsFromFile[0].data
     var teacher, check;
     for(var i = 1; i < data.length; i++){
         teacher = data[i];
+        if(teacher.length==0)
+            break;
         check = await User.findOne({login:teacher[0]})
         if(check){
             check.password = teacher[2]

@@ -33,9 +33,9 @@
                 <a href=<%= news[i].reference %>>Ссылка</a>
             <% }%>
             <% if (isTeacher){ %>
-                <a id="editref" href=<%="/editnews/" + news[i].identificator %>>[редактировать]</a>
 
                 <span class="newsPopup">
+                    <button onclick='location.href="<%="/editnews/" + news[i].identificator %>"' class="show" >[редактировать]</button>
                 <dialog  id='dialog'>
                 <form action= <%="/deletenews/" + news[i].identificator %>  method="POST">
                     Вы действительно хотите удалить новость "<%= news[i].title %>" ?

@@ -1,6 +1,6 @@
 module.exports = {
-	PathToUsersList: "PATH", 
-	PathToTeachersList: "PATH", 
+	PathToUsersList: "D:\\Code\\TestSystemPack\\TestSystem\\public\\scripts\\users.xlsx", 
+	PathToTeachersList: "D:\\Code\\TestSystemPack\\TestSystem\\public\\scripts\\teachers.xlsx", 
 	port: "3000", 
 	secret: "secret", 
 	FolderLifeTime: 42000.0, 

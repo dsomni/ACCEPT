@@ -29,7 +29,7 @@ const User = require('../../config/models/User');
 async function addStudent (login, password, name, grade, gradeLetter, group){
     await User.insertMany([{
         login: login,
-        password: bcrypt.hashSync(password, 10),
+        password: bcrypt.hashSync(password.toString(), 10).toString(),
         name: name,
 
         grade: grade,
@@ -48,6 +48,8 @@ async function toDo(){
     var student, grade, gradeLetter, check;
     for(var i = 1; i < data.length; i++){
         student = data[i];
+        if(student.length==0)
+            break;
         check = await User.findOne({login:student[0]})
         grade = student[3].slice(0,student[3].length-1);
         gradeLetter = student[3][student[3].length-1];

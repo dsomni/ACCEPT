@@ -52,6 +52,9 @@ ul{
 }
 
 /*-----------------------------------------------------------------------------*/
+/*Cool Buttons*/
+
+/*-----------------------------------------------------------------------------*/
 /*Cool Switcher*/
 .switch {
     position: relative;
@@ -631,6 +634,23 @@ header input{
 }
 
 /*-----------------------------------------------------------------------------*/
+/*tournament attempts page*/
+.t_attempts{
+    text-decoration: none;
+    color: black;
+}
+.t_attempts:hover{
+    color: rgb(32, 148, 226);
+    text-decoration: none;
+}
+.t_attempts:visited{
+    color: black;
+}
+
+
+
+
+/*-----------------------------------------------------------------------------*/
 /*about page*/
 .about{
     margin-left: 10px;
@@ -652,14 +672,15 @@ header input{
 #highlighting{
     font-weight: bold;
 }
+
 /*-----------------------------------------------------------------------------*/
 .SearchUI{
     margin: 20px;
     margin-left: 120px;
     width: 40%;
     display: grid;
-    grid-template-columns: 1fr 1fr 0.5fr 0.5fr 0.5fr;
-    gap: 2px;
+    grid-template-columns: 1fr 1fr 0.5fr 0.5fr 0.5fr 1fr;
+    gap: 3px;
 }
 #Acronim-container{
     width: 100%;

@@ -41,32 +41,30 @@
                 <% var onPage = 20 %>
                 <% for(let i=(page-1)*onPage; i<min(page*onPage+1,attempts.length); i++){ let task = tasks.find(item => attempts[i].TaskID == item.identificator) %>
                 <tr>
-                    <td><a href=<%= "/account/"+attempts[i].login+"/1/default&all" %> ><%= attempts[i].login  %></a></td>
-                    <td><a href=<%= "/attempt/"+attempts[i].login+"/"+attempts[i].AttemptDate %> >[Посылка]</a></td>
-                    <td><a href=<%= "/tournament/task/"+tourID+"/"+tasks[i].identificator %> ><%= parseInt(tasks[i].identificator.split("_")[1])+1 %></a></td>
+                    <td><a class="t_attempts" href=<%= "/account/"+attempts[i].login+"/1/default&all" %> ><%= attempts[i].login  %></a></td>
+                    <td><a class="t_attempts" href=<%= "/attempt/"+attempts[i].login+"/"+attempts[i].AttemptDate %> >[Посылка]</a></td>
+                    <td><a class="t_attempts" href=<%= "/tournament/task/"+tourID+"/"+tasks[i].identificator %> ><%= parseInt(tasks[i].identificator.split("_")[1])+1 %></a></td>
                     <td><%= attempts[i].score  %></td>
                     <td style="width: 200px;">
 
-
-                        <span class="disqual">
-                            <dialog  id=<%='attempt' + i%>>
-                                <form action= <%= `/tournament/disqualAttempt/${tourID}/${attempts[i].AttemptDate}` %>  method="POST">
-                                    <p>Вы уверены что хотите дисквалифицировань посылку?</p>
-                                    <button>Уверен(а)</button>
-                                </form>
-                                <button onClick=<%='c(\"attempt' + i + '\");' %>>Отмена</button>
-                            </dialog>
-                            <button onclick=<%='o(\"attempt'+ i + '\");'%> class="show">Посылка</button>
-                            <dialog  id=<%='user' + i%>>
-                                <form action= <%= `/tournament/disqualUser/${tourID}/${attempts[i].login}` %>  method="POST">
-                                    <p>Вы уверены что хотите дисквалифицировань участника?</p>
-                                    <button>Уверен(а)</button>
-                                </form>
-                                <button onClick=<%='c(\"user' + i + '\");' %> >Отмена</button>
-                            </dialog>
-                            <button onclick=<%='o(\"user' + i + '\");'%> class="show">Участник</button>
-                        </span>
-
+                    <span class="disqual">
+                        <dialog  id=<%='attempt' + i%>>
+                            <form action= <%= `/tournament/disqualAttempt/${tourID}/${attempts[i].AttemptDate}` %>  method="POST">
+                                <p>Вы уверены что хотите дисквалифицировань посылку?</p>
+                                <button>Уверен(а)</button>
+                            </form>
+                            <button onClick=<%='c(\"attempt' + i + '\");' %>>Отмена</button>
+                        </dialog>
+                        <button onclick=<%='o(\"attempt'+ i + '\");'%> class="show">Посылка</button>
+                        <dialog  id=<%='user' + i%>>
+                            <form action= <%= `/tournament/disqualUser/${tourID}/${attempts[i].login}` %>  method="POST">
+                                <p>Вы уверены что хотите дисквалифицировань участника?</p>
+                                <button>Уверен(а)</button>
+                            </form>
+                            <button onClick=<%='c(\"user' + i + '\");' %> >Отмена</button>
+                        </dialog>
+                        <button onclick=<%='o(\"user' + i + '\");'%> class="show">Участник</button>
+                    </span>
 
                     </td>
                 </tr>
