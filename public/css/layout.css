@@ -485,7 +485,7 @@ header input{
     padding-bottom: 15px;
     padding-left: 25px;
     padding-right: 30px;
-    padding-top: 1px;
+    padding-top: 10px;
     margin-top: 20px;
     margin-right: 50px;
     border: none;
@@ -493,9 +493,25 @@ header input{
     background-color: #ffffffa6;
     font-size: 600;
 }
+.newsTitle{
+    text-decoration: none;
+    color: black;
+    font-size: 2rem;
+}
 .date{
     font-weight: bold;
 }
+
+.newsPage{
+    margin-top: 5rem;
+    display: flex;
+    align-items: center;
+    flex-direction:column;
+}
+.newsPage .newsTitle{
+    font-size: 3rem;
+}
+
 .newsPopup dialog{
     align-items: center;
     border: 2px solid #000000;

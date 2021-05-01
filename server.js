@@ -887,18 +887,18 @@ app.post('/students/:page/:search', checkAuthenticated, checkNletter, checkPermi
 
 //---------------------------------------------------------------------------------
 // Add News Page
-app.get('/addnews',checkAuthenticated, checkNletter,checkPermission, async (req, res) => {
+app.get('/addnews', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
     let user = req.user;
-    res.render('addnews.ejs',{
+    res.render('addnews.ejs', {
         login: user.login,
         name: req.user.name,
-        title : "Add News",
+        title: "Add News",
         isTeacher: req.user.isTeacher,
         location: "/"
     })
-})
+});
 
-app.post('/addnews',checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
+app.post('/addnews', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
     let user = req.user;
     let body = req.body;
 
@@ -906,7 +906,7 @@ app.post('/addnews',checkAuthenticated, checkNletter, checkPermission, async (re
     news.push(new_news);
 
     res.redirect("/")
-})
+});
 
 //---------------------------------------------------------------------------------
 // Delete News
@@ -1795,7 +1795,23 @@ app.delete('/logout', (req, res) => {
     req.logOut()
     res.redirect('/')
 })
-
+app.get("/news/:id", (req, res) => {
+    let currentNew = news.find(item => item.identificator = req.params.id);
+    let render = {
+        login: '',
+        name: '',
+        title: currentNew.title,
+        isTeacher: false,
+        location: "/",
+        news: currentNew
+    };
+    if (req.user) {
+        render.login = req.user.login;
+        render.name = req.user.name;
+        render.isTeacher = req.user.isTeacher;
+    }
+    res.render("news.ejs", render)
+});
 
 //---------------------------------------------------------------------------------
 // Redirect from empty pages

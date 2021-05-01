@@ -12,43 +12,26 @@
         </head>
     <body>
         <main>
-        <% if(name && name.slice(0,5).toUpperCase() == "БАГИН" ) { %>
-            <h1 style="background-image: url(../public/media/asdf.hg); background-size: 100px;">Добро пожаловать, <img style="transform: scale(2)" src="../public/media/thdk.ng"> <%= name  %>!<img style="transform: scale(2)" src="../public/media/thdk.ng"></h1>
-        <% } else{  %>
-            <h1>Добро пожаловать, <%= name || "незнакомец" %>!</h1>
-        <% } %>
-        <% if (isTeacher){ %>
-            <a style="margin-left: 10px;" class="tlrefs" href="/addnews">[Добавить новость]</a>
-        <% } %>
-        <br>
-        <% for(var i = news.length -1 ; i >=0; i--){ %>
-        <div class="news">
-            <% var maxDate = new Date(Number(news[i].date)); %>
-            <% var isoDate = maxDate.toISOString(); %>
-            <% var date = isoDate.substr(0, 10) ; %>
-            <h2><%= news[i].title %></h2>
-            <span class="date"> <%= date %> </span>
-            <%= news[i].text %>
-            <% if(news[i].reference!="") { %>
-                <a href=<%= news[i].reference %>>Ссылка</a>
-            <% }%>
-            <% if (isTeacher){ %>
-
-                <span class="newsPopup">
-                    <button onclick='location.href="<%="/editnews/" + news[i].identificator %>"' class="show" >[редактировать]</button>
-                <dialog  id='dialog'>
-                <form action= <%="/deletenews/" + news[i].identificator %>  method="POST">
-                    Вы действительно хотите удалить новость "<%= news[i].title %>" ?
-                    <button>Да</button>
-                  </form>
-                  <button onClick='c();'>Назад</button>
-                </dialog>
-              <button onClick='o();' class="show" >[удалить]</button>
-              </span>
-
+            <% if(name && name.slice(0,5).toUpperCase() == "БАГИН" ) { %>
+                <h1 style="background-image: url(../public/media/asdf.hg); background-size: 100px;">Добро пожаловать, <img style="transform: scale(2)" src="../public/media/thdk.ng"> <%= name  %>!<img style="transform: scale(2)" src="../public/media/thdk.ng"></h1>
+            <% } else{  %>
+                <h1>Добро пожаловать, <%= name || "незнакомец" %>!</h1>
             <% } %>
-        </div>
-        <% }%>
+            <% if (isTeacher){ %>
+                <a style="margin-left: 10px;" class="tlrefs" href="/addnews">[Добавить новость]</a>
+            <% } %>
+            <br>
+            <% for(var i = news.length -1 ; i >=0; i--){ %>
+            <div class="news">
+                <% var maxDate = new Date(Number(news[i].date)); %>
+                <% var isoDate = maxDate.toISOString(); %>
+                <% var date = isoDate.substr(0, 10) ; %>
+                <a class="newsTitle" href="/news/<%= news[i].identificator %>" style=""><b><%= news[i].title %></b></a>
+                <br>
+                <span class="date"> <%= date %> </span>
+                <%= news[i].text %>
+            </div>
+            <% }%>
         </main>
     </body>
     <script type = text/javascript>
