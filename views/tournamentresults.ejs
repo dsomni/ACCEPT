@@ -16,7 +16,7 @@
         <main>
             <h1>Результаты турнира <%= tournament.title %></h1>
             <% if(isModerator){ %>
-                <h3>Показывать учителей</h3>
+                <h3 class="h3">Показывать учителей</h3>
                 <label class="switch" >
                     <input type="checkbox" name="showTeachers" <% if(showTeachers) {%> checked <% } %>
                     onclick=<%= 'location.href=\"/tournament/results/'+ tournament.identificator + "/" + (Number(showTeachers)+1)%2 + "\"" %>>

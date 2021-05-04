@@ -30,7 +30,7 @@
                 </span>
             <% } %>
         </div>
-        <h4>Тема: <%= problem.topic %>         Автор: <%= problem.author %></h4><!-- скрывать тему на турнире -->
+        <h4 class="h4">Тема: <%= problem.topic %>         Автор: <%= problem.author %></h4><!-- скрывать тему на турнире -->
         <div class="statement">
             <%= problem.statement %>
             <h5>Входные данные</h5>
@@ -58,7 +58,7 @@
         </table>
 
 
-        <form action='/task/page/<%= ID %>'  method="POST">
+        <form action='/task/page/<%= ID %>'  method="POST" enctype="multipart/form-data">
             <div class="container">
 
                 <select name="languageSelector" id = "languageSelector">
@@ -74,6 +74,7 @@
                         <img src="\public\media\TopRight.svg">
                     </div>
                     <textarea class="taskarea" id="code" name = "code" required placeholder="Place code here"><%= prevCode %></textarea>
+                    <input name="file" id="dragdrop" type="file" style="display: none;" accept=".pas, .java, .cpp, .py">
                     <div class="taskarea"  id="result" name="result" >
                         <ul>
                             <% RESULT.forEach(function(item){ %>
@@ -109,6 +110,17 @@
             } else {
                 x.style.display = "none";
             }
+        }
+        let drop = document.getElementById("code");
+        let fileInput = document.getElementById("dragdrop");
+        drop.ondragover = drop.ondragenter = (evt) => {
+            evt.preventDefault();
+        }
+        drop.ondrop = (evt)=>{
+            fileInput.files = evt.dataTransfer.files;
+            drop.value = fileInput.files[0].name;
+            drop.readOnly = true;
+            evt.preventDefault();
         }
     </script>
 </html>

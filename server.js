@@ -20,7 +20,7 @@ const app = express();
 
 // Multer setup
 
-const storage = multer.diskStorage({
+const storageImage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, './public/media/newsImages/')
     },
@@ -28,8 +28,29 @@ const storage = multer.diskStorage({
          cb(null, Date.now() + "." + file.mimetype.split("/")[1])
     }
 });
-const upload = multer({ dest: 'public/media/newsImages', storage, limits: { fieldSize: 10 * 1024 * 1024 }});
+const uploadImage = multer({ dest: 'public/media/newsImages', storageImage, limits: { fieldSize: 10 * 1024 * 1024 }});
 
+const storageCode = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './public/codeFiles')
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + "." + file.originalname.split(".")[-1])
+    }
+});
+
+const uploadCode = multer({ dest: "public/codeFiles", storageCode });
+
+const storageTests = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './public/Tests')
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + "." + file.originalname.split(".")[-1])
+    }
+});
+
+const uploadTests = multer({ dest: "public/Tests", storageTests });
 //---------------------------------------------------------------------------------
 // MongoDB connecting
 let connectionString;
@@ -61,6 +82,8 @@ const Tournament = require('./config/models/Tournament');
 //---------------------------------------------------------------------------------
 
 const initializePassport = require('./config/passport');
+const { log } = require('console');
+const { throws } = require('assert');
 initializePassport(
     passport,
     User
@@ -135,7 +158,10 @@ app.post('/', passport.authenticate('local', {
 // Task Page
 app.get('/task/page/:id', checkAuthenticated, checkNletter, async (req, res) => {
     let language = req.body.languageSelector;
-    let problem = await Task.findOne({identificator: req.params.id}).exec();
+    let problem = await Task.findOne({ identificator: req.params.id }).exec();
+    if (!problem) {
+        return res.redirect("/tasks/1/default&all&all&false&all")
+    }
     let showHint = req.user.attempts.filter(item => item.taskID == req.params.id).length >= problem.hint.attemptsForHint;
     fs.stat(path.normalize('public/processes/') + req.user.login +'_'+req.params.id, function(err,stats) {
         if (!err && Date.now()) {
@@ -250,8 +276,7 @@ app.get('/task/page/:id', checkAuthenticated, checkNletter, async (req, res) => 
     });
 })
 // Task Page listener
-app.post('/task/page/:id',checkAuthenticated, checkNletter, async (req, res) => {
-
+app.post('/task/page/:id', checkAuthenticated, checkNletter, uploadCode.single("file"), async (req, res) => {
     fs.stat(path.normalize('public/processes/'+req.user.login+"_"+req.params.id), async function(err) {
         if (!err) {
             res.redirect('/task/page/'+req.params.id);
@@ -263,28 +288,54 @@ app.post('/task/page/:id',checkAuthenticated, checkNletter, async (req, res) => 
             for(let i = 0; i < attempts.length; i++){
                 if( attempts[i].taskID == req.params.id){
                     prevCode = attempts[i].programText;
-                    result =attempts[i].result;
+                    result = attempts[i].result;
                     break;
                 }
             }
-            if(prevCode == "" || prevCode != req.body.code ){
+            let language, programText;
+            if (req.file) {
+                let ext = req.file.originalname.split(".")[-1];
+                switch (ext) {
+                    case "pas":
+                        language = "Pascal"; break;
+                    case "cpp":
+                        language = "Cpp"; break;
+                    case "py":
+                        language = "Python"; break;
+                    case "java":
+                        language = "Java"; break;
+                }
+                if (ext == "py" && req.body.languageSelector == "PyPy") {
+                    language = "PyPy";
+                }
+                programText = fs.readFileSync(req.file.path, "utf-8");
 
-                let language = req.body.languageSelector;
+                fs.rm(req.file.path, (err) => {
+                    if (err)
+                        throw err;
+                });
+
+            } else {
+                language = req.body.languageSelector;
+                programText = req.body.code;
+            }
+            if (prevCode == "" || prevCode != programText) {
 
                 req.user.attempts.unshift({taskID: req.params.id, date: Date.now().toString(),
-                    programText: req.body.code, result: [], language: language})
+                    programText: programText, result: [], language: language})
                 await req.user.save()
 
-                fs.mkdirSync(path.normalize(__dirname + '/public/processes/'+req.user.login+"_"+req.params.id));
+                fs.mkdirSync(path.normalize(__dirname + '/public/processes/' + req.user.login + "_" + req.params.id));
 
-                fs.writeFileSync(path.normalize('public/processes/'+req.user.login+"_"+req.params.id+"/programText.txt"),req.body.code,"utf-8");
+                fs.writeFileSync(path.normalize('public/processes/' + req.user.login + "_" + req.params.id + "/programText.txt"), programText, "utf-8");
 
-                childProcess.exec('node ' + path.join(__dirname, '/public/checker/checker3'+language+'.js ') + ' ' +
-                    path.join(__dirname, '/public/processes/'+req.user.login+"_"+req.params.id) + " " +
-                'program'+req.user.login+"_"+req.params.id + " " +
-                req.params.id)
 
+                childProcess.exec('node ' + path.join(__dirname, '/public/checker/checker3' + language + '.js ') + ' ' +
+                    path.join(__dirname, '/public/processes/' + req.user.login + "_" + req.params.id) + " " +
+                    'program' + req.user.login + "_" + req.params.id + " " +
+                    req.params.id);
             }
+
             res.redirect('/task/page/'+req.params.id);
         }
     });
@@ -305,7 +356,7 @@ app.get('/task/add',checkAuthenticated, checkNletter, checkPermission, async (re
     })
 })
 
-app.post('/task/add',checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
+app.post('/task/add', checkAuthenticated, checkNletter, checkPermission, uploadTests.single("file"), async (req, res) => {
     let user = req.user;
     let body = req.body;
 
@@ -319,14 +370,19 @@ app.post('/task/add',checkAuthenticated, checkNletter, checkPermission, async (r
     }
 
     let tests = [];
-    let tI, tO ;
-    for(let i =0; i < 20; i++){
-        eval("tI = body.testIn" + i)
-        eval("tO = body.testOut" + i)
-        if(tI=="" || tO == "") break;
-        tests.push([tI, tO]);
+    if (req.file) {
+        var number = await Task.estimatedDocumentCount().exec();
+        console.log("node " + path.join(__dirname, "/public/scripts/ReadTests.js") + " \"" + path.join(__dirname, req.file.path) + "\" " + "0_" + number);
+        childProcess.exec("node " + path.join(__dirname, "/public/scripts/ReadTests.js") + " \"" + path.join(__dirname, req.file.path)  + "\" " + "0_" + number);
+    } else {
+        let tI, tO ;
+        for(let i =0; i < 20; i++){
+            eval("tI = body.testIn" + i)
+            eval("tO = body.testOut" + i)
+            if(tI=="" || tO == "") break;
+            tests.push([tI, tO]);
+        }
     }
-
 
     let hint;
     let hintText = body.hint;
@@ -469,12 +525,18 @@ app.post('/task/edit/:id', checkAuthenticated, checkNletter, checkPermission, as
     }
 
     let tests = [];
-    let tI, tO;
-    for (let i = 0; i < 20; i++) {
-        eval("tI = body.testIn" + i)
-        eval("tO = body.testOut" + i)
-        if (tI == "" || tO == "") break;
-        tests.push([tI, tO]);
+    if (req.file) {
+        var number = await Task.estimatedDocumentCount().exec();
+        console.log("node " + path.join(__dirname, "/public/scripts/ReadTests.js") + " \"" + path.join(__dirname, req.file.path) + "\" " + "0_" + number);
+        childProcess.exec("node " + path.join(__dirname, "/public/scripts/ReadTests.js") + " \"" + path.join(__dirname, req.file.path) + "\" " + "0_" + number);
+    } else {
+        let tI, tO;
+        for (let i = 0; i < 20; i++) {
+            eval("tI = body.testIn" + i)
+            eval("tO = body.testOut" + i)
+            if (tI == "" || tO == "") break;
+            tests.push([tI, tO]);
+        }
     }
 
     let hint;
@@ -512,7 +574,7 @@ app.post('/task/delete/:id', checkAuthenticated, checkNletter, checkPermission, 
 
     childProcess.exec("node " + path.join(__dirname,"/public/scripts/FixAfterDeleteTask.js")+ " "+req.params.id)
 
-    res.redirect('/tasks/1/default&all&all')
+    res.redirect('/tasks/1/default&all&all&false&all')
 })
 
 //---------------------------------------------------------------------------------
@@ -912,7 +974,7 @@ app.get('/addnews', checkAuthenticated, checkNletter, checkPermission, async (re
     })
 });
 
-app.post('/addnews', checkAuthenticated, checkNletter, checkPermission, upload.single('image'), async (req, res) => {
+app.post('/addnews', checkAuthenticated, checkNletter, checkPermission, uploadImage.single('image'), async (req, res) => {
     let user = req.user;
     let body = req.body;
     let filename = "";
@@ -947,7 +1009,7 @@ app.get('/editnews/:id', checkAuthenticated, checkNletter, checkPermission, asyn
     })
 })
 
-app.post('/editnews/:id', checkAuthenticated, checkNletter, checkPermission, upload.single('image'), async (req, res) => {
+app.post('/editnews/:id', checkAuthenticated, checkNletter, checkPermission, uploadImage.single('image'), async (req, res) => {
     let body = req.body;
     let newsDB = await News.findById(req.params.id).exec()
 
@@ -1227,12 +1289,18 @@ app.post('/tournament/task/add/:tour_id', checkAuthenticated, isModerator, async
     }
 
     let tests = [];
-    let tI, tO ;
-    for(let i =0; i < 20; i++){
-        eval("tI = body.testIn" + i)
-        eval("tO = body.testOut" + i)
-        if(tI=="" || tO == "") break;
-        tests.push([tI, tO]);
+    if (req.file) {
+        var number = await Task.estimatedDocumentCount().exec();
+        console.log("node " + path.join(__dirname, "/public/scripts/ReadTests.js") + " \"" + path.join(__dirname, req.file.path) + "\" " + "0_" + number);
+        childProcess.exec("node " + path.join(__dirname, "/public/scripts/ReadTests.js") + " \"" + path.join(__dirname, req.file.path) + "\" " + "0_" + number);
+    } else {
+        let tI, tO;
+        for (let i = 0; i < 20; i++) {
+            eval("tI = body.testIn" + i)
+            eval("tO = body.testOut" + i)
+            if (tI == "" || tO == "") break;
+            tests.push([tI, tO]);
+        }
     }
     await Adder.addTaskToTournament(Tournament, req.params.tour_id, body.title, body.statement, body.input, body.output, examples, tests);
 
@@ -1252,7 +1320,7 @@ app.post('/tournament/task/delete/:tour_id/:id', checkAuthenticated, isModerator
 
 //---------------------------------------------------------------------------------
 // Tournament Task Page
-app.get('/tournament/task/:tour_id/:id', checkAuthenticated, checkTournamentPermission, async (req, res) => {
+app.get('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTournamentPermission, async (req, res) => {
     let tour_id = req.params.tour_id
     let tournament = await Tournament.findOne({ identificator: tour_id }).exec();
     let whenEnds = tournament.whenEnds;
@@ -1265,7 +1333,7 @@ app.get('/tournament/task/:tour_id/:id', checkAuthenticated, checkTournamentPerm
             if (Date.now() - stats.birthtimeMs >= config.FolderLifeTime) {
                 fs.rmdirSync(path.normalize('public/processes/' + req.user.login + '_' + req.params.id), { recursive: true });
 
-                res.redirect('/tournament/task/' + tour_id + '/' + req.params.id);
+                res.redirect('/tournament/task/page/' + tour_id + '/' + req.params.id);
             } else {
                 fs.stat(path.normalize('public/processes/' + req.user.login + '_' + req.params.id + "/result.txt"), async function (err, stats2) {
                     if (!err) {
@@ -1358,7 +1426,7 @@ app.get('/tournament/task/:tour_id/:id', checkAuthenticated, checkTournamentPerm
 
                             fs.rmdirSync(path.normalize('public/processes/' + req.user.login + '_' + req.params.id), { recursive: true });
 
-                            res.redirect('/tournament/task/' + tour_id + '/' + req.params.id);
+                            res.redirect('/tournament/task/page/' + tour_id + '/' + req.params.id);
                         } else {
                             res.render('tournamenttask.ejs', {
                                 login: req.user.login,
@@ -1428,10 +1496,10 @@ app.get('/tournament/task/:tour_id/:id', checkAuthenticated, checkTournamentPerm
 });
 
 // Tournament Task Page listener
-app.post('/tournament/task/:tour_id/:id', checkAuthenticated, checkTournamentPermission, async (req, res) => {
+app.post('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTournamentPermission, async (req, res) => {
     fs.stat(path.normalize('public/processes/' + req.user.login + '_' + req.params.id), async function (err) {
         if (!err) {
-            res.redirect('/tournament/task/' + req.params.tour_id + '/' + req.params.id);
+            res.redirect('/tournament/task/page/' + req.params.tour_id + '/' + req.params.id);
         }
         else if (err.code === 'ENOENT') {
 
@@ -1443,6 +1511,33 @@ app.post('/tournament/task/:tour_id/:id', checkAuthenticated, checkTournamentPer
                     result = attempts[i].result;
                     break;
                 }
+            }
+            let language, programText;
+            if (req.file) {
+                let ext = req.file.originalname.split(".")[-1];
+                switch (ext) {
+                    case "pas":
+                        language = "Pascal"; break;
+                    case "cpp":
+                        language = "Cpp"; break;
+                    case "py":
+                        language = "Python"; break;
+                    case "java":
+                        language = "Java"; break;
+                }
+                if (ext == "py" && req.body.languageSelector == "PyPy") {
+                    language = "PyPy";
+                }
+                programText = fs.readFileSync(req.file.path, "utf-8");
+
+                fs.rm(req.file.path, (err) => {
+                    if (err)
+                        throw err;
+                });
+
+            } else {
+                language = req.body.languageSelector;
+                programText = req.body.code;
             }
             if (prevCode == "" || prevCode != req.body.code) {
 
@@ -1464,7 +1559,7 @@ app.post('/tournament/task/:tour_id/:id', checkAuthenticated, checkTournamentPer
                     req.params.id)
 
             }
-            res.redirect('/tournament/task/' + req.params.tour_id + '/' + req.params.id);
+            res.redirect('/tournament/task/page/' + req.params.tour_id + '/' + req.params.id);
         }
     });
 
@@ -1532,7 +1627,7 @@ app.get('/tournament/task/edit/:tour_id/:id', checkAuthenticated, isModerator, a
         isTeacher: req.user.isTeacher,
         task: task,
         tour_id: req.params.tour_id,
-        location: `/tournament/task/${req.params.tour_id}/${req.params.id}`
+        location: `/tournament/task/page/${req.params.tour_id}/${req.params.id}`
     })
 });
 
@@ -1552,12 +1647,18 @@ app.post('/tournament/task/edit/:tour_id/:id', checkAuthenticated, isModerator, 
     }
 
     let tests = [];
-    let tI, tO;
-    for (let i = 0; i < 20; i++) {
-        eval("tI = body.testIn" + i)
-        eval("tO = body.testOut" + i)
-        if (tI == "" || tO == "") break;
-        tests.push([tI, tO]);
+    if (req.file) {
+        var number = await Task.estimatedDocumentCount().exec();
+        console.log("node " + path.join(__dirname, "/public/scripts/ReadTests.js") + " \"" + path.join(__dirname, req.file.path) + "\" " + "0_" + number);
+        childProcess.exec("node " + path.join(__dirname, "/public/scripts/ReadTests.js") + " \"" + path.join(__dirname, req.file.path) + "\" " + "0_" + number);
+    } else {
+        let tI, tO;
+        for (let i = 0; i < 20; i++) {
+            eval("tI = body.testIn" + i)
+            eval("tO = body.testOut" + i)
+            if (tI == "" || tO == "") break;
+            tests.push([tI, tO]);
+        }
     }
 
     problem.title = body.title;

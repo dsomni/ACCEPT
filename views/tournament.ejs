@@ -42,7 +42,7 @@
                     <% } %>
                     <a class="EditButtons" href=<%= "/tournament/results/"+tournament.identificator +"/1" %>>Таблица результатов</a>
                 </div>
-                <h4>Автор: <%= tournament.author %>     Участники: <%= tournament.results.length %> </h4>
+                <h4 class="h4">Автор: <%= tournament.author %>     Участники: <%= tournament.results.length %> </h4>
                 <div style="margin-left: 20px;" id="statement">
                     <%= tournament.description %>
                 </div>
@@ -63,7 +63,7 @@
                                 <td>
                                     <%= parseInt(task.identificator.split('_')[1])+1 %>
                                 </td>
-                                <td> <a class="tlrefs" href=<%="/tournament/task/"+tournament.identificator  + '/' + task.identificator %>><%= task.title %></a> </td>
+                                <td> <a class="tlrefs" href=<%="/tournament/task/page/"+tournament.identificator  + '/' + task.identificator %>><%= task.title %></a></td>
                                 <td>
                                     <%= results[i] %>
                                 </td>

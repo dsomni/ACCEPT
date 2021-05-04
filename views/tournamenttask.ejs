@@ -69,6 +69,7 @@
                         <img src="\public\media\TopRight.svg">
                     </div>
                     <textarea class="taskarea" id="code" name = "code" required placeholder="Place code here"><%= prevCode %></textarea>
+                    <input name="file" id="dragdrop" type="file" style="display: none;" accept=".pas, .java, .cpp, .py">
                     <div class="taskarea"  id="result" name="result" >
                         <ul>
                             <% RESULT.forEach(function(item){ %>
@@ -126,5 +127,16 @@
                     document.getElementById("countDownTimer").innerHTML = "Окончен";
                 }
             }, 1000);
+        let drop = document.getElementById("code");
+        let fileInput = document.getElementById("dragdrop");
+        drop.ondragover = drop.ondragenter = (evt) => {
+            evt.preventDefault();
+        }
+        drop.ondrop = (evt)=>{
+            fileInput.files = evt.dataTransfer.files;
+            drop.value = fileInput.files[0].name;
+            drop.readOnly = true;
+            evt.preventDefault();
+        }
     </script>
 </html>

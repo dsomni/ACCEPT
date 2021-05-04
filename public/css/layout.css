@@ -29,13 +29,13 @@ main{
     padding: 10px;
     cursor: default;
 }
-h3{
+.h3{
     color: #4e4e4e;
     margin: 5px;
     font-size: 1.5rem;
 }
 
-h4{
+.h4{
     color: #4e4e4e;
     margin: 5px;
     margin-left: 15px;
@@ -781,4 +781,12 @@ header input{
 .statement h5{
     padding: 0px;
     margin: -15px;
+}
+
+.fileChooser{
+    width: 100%;
+    border: solid black 1px;
+    text-align: center;
+    padding: .5rem;
+    cursor: pointer;
 }

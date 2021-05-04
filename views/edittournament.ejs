@@ -16,20 +16,20 @@
 
         <form action=<%= '/tournament/edit/'+tournament.identificator %>  method="POST">
             <div class="lessonAdderForm">
-                <h3>Название турнира</h3>
+                <h3 class="h3">Название турнира</h3>
                 <textarea id="title" name = "title" required placeholder="Введите название"><%=tournament.title%></textarea>
-                <h3>Описание</h3>
+                <h3 class="h3">Описание</h3>
                 <textarea id="description" name = "description" placeholder="Введите описание"><%=tournament.description%></textarea>
                 <% if(!tournament.isBegan){ %>
-                <h3>Дата начала</h3>
+                <h3 class="h3">Дата начала</h3>
                 <input style="width: 90%;margin-left: auto;margin-right: auto;margin-bottom: 10px;" class="dateChooser" type="datetime-local" name="whenStarts" required value=<%= tournament.whenStarts.replace(' ', 'T')%>>
                 <% } %>
-                <h3>Дата окончания</h3>
+                <h3 class="h3">Дата окончания</h3>
                 <input style="width: 90%;margin-left: auto;margin-right: auto;margin-bottom: 10px;" class="dateChooser" type="datetime-local" name="whenEnds" required value=<%= tournament.whenEnds.replace(' ', 'T')%>>
-                <h3>Заморозить таблицу в:</h3>
+                <h3 class="h3">Заморозить таблицу в:</h3>
                 <input style="width: 90%;margin-left: auto;margin-right: auto;margin-bottom: 10px;" class="dateChooser" type="datetime-local" name="frozeAfter" required value=<%= (tournament.frozeAfter) ? tournament.frozeAfter.replace(' ', 'T'): tournament.whenEnds.replace(' ', 'T')%>>
                 <% if(isTeacher) { %>
-                <h3>Модераторы</h3>
+                <h3 class="h3">Модераторы</h3>
                 <textarea id="mods" name = "mods" placeholder="Введите логины модераторов через пробел"><%= tournament.mods.filter(item=> item!=login).join(" ") %></textarea>
                 <% } %>
                 Разрешить регистрацию после начала турнира
@@ -50,7 +50,7 @@
                         <option value="0" <% if (!tournament.allOrNothing) { %>selected <%}%> >Потестовая оценка</option>
                     </select>
                 <% } %>
-                <h3>Штраф за попытку(s)</h3>
+                <h3 class="h3">Штраф за попытку(s)</h3>
                 <input style="width: 10rem" name="penalty" type="number" value=<%= tournament.penalty/1000 %>>
                 <button id="submit2">Сохранить турнир</button>
             </div>

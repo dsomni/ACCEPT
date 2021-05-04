@@ -16,13 +16,13 @@
 
         <form action='/addnews' enctype="multipart/form-data" method="POST">
             <div class="lessonAdderForm">
-                <h3>Заголовок новости</h3>
+                <h3 class="h3">Заголовок новости</h3>
                 <textarea id="title" name = "title" required placeholder="Введите заголовок" maxlength="70"></textarea>
-                <h3>Описание</h3>
+                <h3 class="h3">Описание</h3>
                 <textarea style="height:200px;" id="description" name = "description" placeholder="Введите краткое описание" maxlength="200"></textarea>
-                <h3>Новость (html формат)</h3>
+                <h3 class="h3">Новость (html формат)</h3>
                 <textarea style="height:500px;" id="text" name = "text" placeholder="Введите новость"></textarea>
-                <h3>Картинка (опционально)</h3>
+                <h3 class="h3">Картинка (опционально)</h3>
                 <input type="file" name="image" id="image" accept="image/*">
                 <br>
                 <button id="submit2">Добавить новость</button>
