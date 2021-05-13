@@ -80,6 +80,7 @@ async function toDo(){
                     }
                 }
                 check.verdicts = verdicts;
+                check.markModified(verdicts)
             }
 
             await check.save()
