@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Результаты урока</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0,
+              maximum-scale=1.0, minimum-scale=1.0,
+              user-scalable=no, minimal-ui">
+        <meta name="full-screen" content="yes">
+
+        <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
+        </head>
+    <body>
+        <main>
+            <h1>Результаты урока <%= lesson.title %></h1>
+            <form class="SearchUI" action=<%= "/lessonresults/" + lesson.identificator + "/default" %>  method="POST">
+                <select name="GradeSelector" id = "GradeSelector">
+                    <option value="all" selected>Все</option>
+                    <% for(var i = 6; i < 12; i++) { %>
+                    <option value=<%= i %> ><%= i %></option>
+                    <% } %>
+                </select>
+                <input id="gradeLetter" name="gradeLetter" placeholder="Литера">
+                <input id="gradeLetter" name="Group" placeholder="Группа">
+                <button id="submitsearch">Найти</button>
+            </form>
+
+            <table class='taskslist'>
+                <tr>
+                    <th>Логин</th>
+                    <th>Имя</th>
+                    <th>Класс</th>
+                    <th>Группа</th>
+                    <th>Вердикт</th>
+                </tr>
+
+                <% for (var i = 0; i < results.length; i++) { 
+                    let student = results[i][0];%>
+                     <tr>
+                      <td><a class="tlrefs" href=<%="/account/" + student.login + "/1/" + "default&all" %> > <%=student.login%></a></td>
+                      <td><%= student.name %></td>
+                      <td><%= student.grade.toString()+student.gradeLetter.toString() %></td>
+                      <td><%= student.group %></td>
+                      <td><a class="tlrefs" href=<%="/lesson/" + student.login + "/" + ID %> ><%= results[i][1] %></a></td>
+                     </tr>
+                <% } %>
+            </table>
+        </main>
+</html>

@@ -16,7 +16,7 @@
         <div id="task">
         <H1 id="taskname"><%= problem.title %></H1>
         <div style="text-align: center;">
-            <% if(isTeacher){ %> <a id="editref" href=<%= "/tournament/task/edit/" + TUR_ID +'/' + problem.identificator %> > [Редактировать] </a>
+            <% if(isTeacher){ %> <a id="editref" class="editref" href=<%= "/tournament/task/edit/" + TUR_ID +'/' + problem.identificator %> >[Редактировать]</a>
                 <% if(!isBegan){ %>
                 <span class="taskPopup">
                     <dialog  id='dialog_delete'>
@@ -100,34 +100,55 @@
         }
     </script>
     <script>
-        let countDownDate = new Date('<%= whenEnds.replace(' ', 'T') %>').getTime();
-        var x = setInterval(function() {
-                // Get today's date and time
+        if(!<%= tournament.isBegan %>){
+            let countDownDate = new Date('<%= tournament.whenStarts.replace(' ', 'T') %>').getTime();
+            var x = setInterval(function () {
                 var now = new Date().getTime();
 
-                // Find the distance between now and the count down date
                 var distance = countDownDate - now;
 
-                // Time calculations for days, hours, minutes and seconds
                 var days = Math.floor(distance / (1000 * 60 * 60 * 24));
                 var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                 var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-                // Display the result in the element with id="demo"
                 if (days>0)
-                    document.getElementById("countDownTimer").innerHTML = days + " дней " + ("0"+hours).slice(-2) + ":"
+                    document.getElementById("countDownTimer").innerHTML = "Начало через "+ days + " дней "+ ("0"+hours).slice(-2) + ":"
                         + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
                 else
-                    document.getElementById("countDownTimer").innerHTML = ("0"+hours).slice(-2) + ":"
+                    document.getElementById("countDownTimer").innerHTML = "Начало через "+ ("0"+hours).slice(-2) + ":"
                         + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
-
-                // If the count down is finished, write some text
                 if (distance < 0) {
-                    clearInterval(x);
-                    document.getElementById("countDownTimer").innerHTML = "Окончен";
+                        clearInterval(x);
+                        document.getElementById("countDownTimer").innerHTML = "Турнир начался! Обновите страницу";
                 }
             }, 1000);
+        }else{
+            let countDownDate = new Date('<%= tournament.whenEnds.replace(' ', 'T') %>').getTime();
+            var x = setInterval(function() {
+                    var now = new Date().getTime();
+
+                    var distance = countDownDate - now;
+
+                    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    if (days>0)
+                        document.getElementById("countDownTimer").innerHTML = "Окончание через "+ days + " дней " + ("0"+hours).slice(-2) + ":"
+                            + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
+                    else
+                        document.getElementById("countDownTimer").innerHTML = "Окончание через "+ ("0"+hours).slice(-2) + ":"
+                            + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
+
+                    if (distance < 0) {
+                        clearInterval(x);
+                        document.getElementById("countDownTimer").innerHTML = "Окончен";
+                    }
+                }, 1000);
+        }
+
         let drop = document.getElementById("code");
         let fileInput = document.getElementById("dragdrop");
         drop.ondragover = drop.ondragenter = (evt) => {

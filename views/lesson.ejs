@@ -17,7 +17,9 @@
         <div id="task">
             <H1 id="taskname"><%= lesson.title; %></H1>
             <div style="text-align: center;margin: 10px;">
-                <% if(isTeacher){ %> <a id="editref" href=<%= "/editlesson/" + lesson.identificator %> > [Редактировать] </a>
+                <% if(isTeacher){ %>
+                    <a id="editref" class="editref" href=<%= "/lessonresults/" + lesson.identificator + "/default" %> >[Таблица]</a>
+                    <a id="editref" class="editref" href=<%= "/editlesson/" + lesson.identificator %> >[Редактировать]</a>
                     <span class="lessonPopup">
                         <dialog  id='dialog'>
                             <form action= <%="/deletelesson/" + lesson.identificator %>  method="POST">

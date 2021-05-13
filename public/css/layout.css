@@ -191,6 +191,17 @@ header input{
 
 /*-----------------------------------------------------------------------------*/
 /*task page*/
+.editref{
+    color: #000000;
+    font-size: medium;
+    text-decoration: none;
+}
+.editref:hover{
+    cursor: pointer;
+    color: #2d2aee;
+    text-decoration: underline;
+}
+
 #submit {
     margin-top: 10px;
     width: 100%;

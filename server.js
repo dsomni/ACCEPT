@@ -915,6 +915,91 @@ app.post('/editlesson/:id', checkAuthenticated, checkNletter, checkPermission, a
 });
 
 //---------------------------------------------------------------------------------
+// Lesson Results Page
+app.get('/lessonresults/:id/:search', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
+    lesson = await Lesson.findOne({identificator: req.params.id}).exec();
+
+    if (!lesson) {
+        res.redirect("/lessons/"+req.params.login+"/1/default&all&all")
+    }else{
+        let results = [];
+        let foundStudents;
+        let students;
+
+        let a = req.params.search.split('&');
+        if (a!="default"){
+            let SearchGrade = a[1] == "all" ? '' : a[1];
+            if (SearchGrade != "") {
+                students = await User.find({ grade: SearchGrade, isTeacher: false }).exec();
+            } else {
+                students = await User.find({ isTeacher: false }).exec();
+            }
+            if (a[0] != "default" || a[2] != "all" || a[3] != "all") {
+                let toSearch = a[0] == "default" ? '' : a[0];
+                let SearchLetter = a[2] == "all" ? '' : a[2].toUpperCase();
+                let SearchGroup = a[3] == "all" ? '' : a[3];
+                foundStudents = []
+                const fuse = new Fuse(students, {
+                    includeScore: true,
+                    keys: ['name']
+                });
+                if (toSearch == "")
+                    students.forEach(student => {
+                        if((student.gradeLetter == SearchLetter || SearchLetter == "") && (student.group == SearchGroup || SearchGroup == "")) {
+                            foundStudents.push(student);
+                        }
+                    });
+                else
+                    fuse.search(toSearch).forEach(student => {
+                        if((student.score < 0.5) && (student.item.gradeLetter == SearchLetter || SearchLetter == "") && (student.item.group == SearchGroup || SearchGroup == "")) {
+                            foundStudents.push(student.item);
+                        }
+                    });
+            } else {
+                foundStudents = students;
+            }
+        }
+        foundStudents = await User.find({ isTeacher: false }).exec();
+        foundStudents.sort((a, b) => { return a.name > b.name });
+
+        let result;
+        for (let i = 0; i < foundStudents.length; i++) {
+            result = "/" + lesson.tasks.length
+            let solved = 0;
+            for (let k = 0; k < lesson.tasks.length; k++) {
+                let verdict = foundStudents[i].verdicts.find(item => item.taskID == lesson.tasks[k])
+                if (verdict && verdict.result == "OK") {
+                    solved += 1
+                }
+            }
+            result = solved + result;
+            results.push([foundStudents[i],result])
+        }
+
+        res.render('lessonresults.ejs',{
+            ID : lesson.identificator,
+            login: req.user.login,
+            name: req.user.name,
+            title : "Lesson Results",
+            isTeacher: req.user.isTeacher,
+            lesson : lesson,
+            results,
+            location: `/lessons/${req.user.login}/1/default&all&true&all`
+        })
+    }
+});
+
+app.post('/lessonresults/:id/:search', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
+    let toSearch = req.body.searcharea;
+    if(!toSearch) toSearch = "default";
+    toSearch += '&' + req.body.GradeSelector  +
+        '&' + (req.body.gradeLetter || "all") +
+        '&' + (req.body.Group || "all")
+    res.redirect('/lessonresults/' + req.params.id +'/' + toSearch )
+});
+
+
+//---------------------------------------------------------------------------------
 // Students List Page
 app.get('/students/:page/:search', checkAuthenticated, checkNletter, checkPermission,async (req, res) => {
     let user = req.user;
@@ -1015,6 +1100,9 @@ app.post('/addnews', checkAuthenticated, checkNletter, checkPermission, uploadIm
 // Delete News
 app.post('/deletenews/:id', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
     await News.findByIdAndDelete(req.params.id);
+    let filename = news[news.findIndex(item => item._id==req.params.id)].imageName;
+    filepath = path.join(__dirname, "./public/media/newsImages/"+filename)
+    childProcess.exec('del /q \"'+filepath+'\"');
     news.splice(news.findIndex(item => item._id==req.params.id),1)
     res.redirect('/');
 })
@@ -1376,7 +1464,8 @@ app.post('/tournament/task/delete/:tour_id/:id', checkAuthenticated, isModerator
 
     childProcess.exec("node " + path.join(__dirname, "/public/scripts/FixAfterDeleteTournamentTask.js") + " " +
         req.params.tour_id + " " + req.params.id)
-
+    console.log("node " + path.join(__dirname, "/public/scripts/FixAfterDeleteTournamentTask.js") + " " +
+    req.params.tour_id + " " + req.params.id)
     res.redirect('/tournament/page/' + req.user.login + '/' + req.params.tour_id);
 });
 
@@ -1551,6 +1640,7 @@ app.get('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTournamen
                 language: language,
                 whenEnds: whenEnds,
                 isBegan: isBegan,
+                tournament,
                 location: '/tournament/page/' + req.user.login + '/' + req.params.tour_id
             });
         }
@@ -1744,7 +1834,7 @@ app.post('/tournament/task/edit/:tour_id/:id', checkAuthenticated, isModerator,u
 app.get('/tournament/results/:tour_id/:showTeachers/', checkAuthenticated, async (req, res) => {
     let tournament = await Tournament.findOne({ identificator: req.params.tour_id });
     let baza;
-    if (tournament.isFrozen && !tournament.isEnded) {
+    if (tournament.isFrozen && !tournament.isEnded && !tournament.mods.includes(req.user.login)) {
         baza = tournament.frozenResults;
     } else {
         baza = tournament.results;
