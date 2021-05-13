@@ -16,41 +16,46 @@ const path = require('path');
 const bcrypt = require("bcryptjs");
 const morgan = require("morgan");
 const multer = require("multer");
+const StreamZip = require('node-stream-zip');
 const app = express();
 
+
+//---------------------------------------------------------------------------------
 // Multer setup
-
-const storageImage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, './public/media/newsImages/')
-    },
-    filename: function (req, file, cb) {
-         cb(null, Date.now() + "." + file.mimetype.split("/")[1])
-    }
-});
-const uploadImage = multer({ dest: 'public/media/newsImages', storageImage, limits: { fieldSize: 10 * 1024 * 1024 }});
-
-const storageCode = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, './public/codeFiles')
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + "." + file.originalname.split(".")[-1])
-    }
+const uploadImage = multer({
+    storage: multer.diskStorage({
+        destination: (req, file, callback) => {
+            callback(null, './public/media/newsImages');
+        },
+        filename: (req, file, callback) => {
+            callback(null,  Date.now() + "." + file.originalname.split('.')[file.originalname.split('.').length-1]);
+        }
+    })
 });
 
-const uploadCode = multer({ dest: "public/codeFiles", storageCode });
-
-const storageTests = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, './public/Tests')
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + "." + file.originalname.split(".")[-1])
-    }
+const uploadCode = multer({
+    storage: multer.diskStorage({
+        destination: (req, file, callback) => {
+            callback(null, './public/codes');
+        },
+        filename: (req, file, callback) => {
+            callback(null,  Date.now() + "." + file.originalname.split('.')[file.originalname.split('.').length-1]);
+        }
+    })
 });
 
-const uploadTests = multer({ dest: "public/Tests", storageTests });
+const uploadTests = multer({
+    storage: multer.diskStorage({
+        destination: (req, file, callback) => {
+            callback(null, './public/tests');
+        },
+        filename: (req, file, callback) => {
+            callback(null,  Date.now() + "." + file.originalname.split('.')[file.originalname.split('.').length-1]);
+        }
+    })
+});
+
+
 //---------------------------------------------------------------------------------
 // MongoDB connecting
 let connectionString;
@@ -110,6 +115,8 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(methodOverride('_method'));
+
+childProcess.exec('chcp 65001 | dir');
 
 //---------------------------------------------------------------------------------
 // Loading from DB
@@ -276,7 +283,7 @@ app.get('/task/page/:id', checkAuthenticated, checkNletter, async (req, res) => 
     });
 })
 // Task Page listener
-app.post('/task/page/:id', checkAuthenticated, checkNletter, uploadCode.single("file"), async (req, res) => {
+app.post('/task/page/:id', checkAuthenticated, checkNletter, uploadCode.single('file'), async (req, res) => {
     fs.stat(path.normalize('public/processes/'+req.user.login+"_"+req.params.id), async function(err) {
         if (!err) {
             res.redirect('/task/page/'+req.params.id);
@@ -293,33 +300,21 @@ app.post('/task/page/:id', checkAuthenticated, checkNletter, uploadCode.single("
                 }
             }
             let language, programText;
+            language = req.body.languageSelector;
             if (req.file) {
-                let ext = req.file.originalname.split(".")[-1];
-                switch (ext) {
-                    case "pas":
-                        language = "Pascal"; break;
-                    case "cpp":
-                        language = "Cpp"; break;
-                    case "py":
-                        language = "Python"; break;
-                    case "java":
-                        language = "Java"; break;
-                }
-                if (ext == "py" && req.body.languageSelector == "PyPy") {
-                    language = "PyPy";
-                }
-                programText = fs.readFileSync(req.file.path, "utf-8");
+                try{
+                    let filepath = path.join(__dirname,'/public/codes/'+req.file.filename);
+                    programText = fs.readFileSync(filepath, "utf8");
+                    childProcess.exec('del /q \"'+filepath+'\"');
 
-                fs.rm(req.file.path, (err) => {
-                    if (err)
-                        throw err;
-                });
+                } catch(err){
+                    console.log(err)
+                }
 
             } else {
-                language = req.body.languageSelector;
                 programText = req.body.code;
             }
-            if (prevCode == "" || prevCode != programText) {
+            if (prevCode == "" || prevCode != programText || req.file) {
 
                 req.user.attempts.unshift({taskID: req.params.id, date: Date.now().toString(),
                     programText: programText, result: [], language: language})
@@ -356,7 +351,7 @@ app.get('/task/add',checkAuthenticated, checkNletter, checkPermission, async (re
     })
 })
 
-app.post('/task/add', checkAuthenticated, checkNletter, checkPermission, uploadTests.single("file"), async (req, res) => {
+app.post('/task/add', checkAuthenticated, checkNletter, checkPermission, uploadTests.single('file'), async (req, res) => {
     let user = req.user;
     let body = req.body;
 
@@ -371,9 +366,24 @@ app.post('/task/add', checkAuthenticated, checkNletter, checkPermission, uploadT
 
     let tests = [];
     if (req.file) {
-        var number = await Task.estimatedDocumentCount().exec();
-        console.log("node " + path.join(__dirname, "/public/scripts/ReadTests.js") + " \"" + path.join(__dirname, req.file.path) + "\" " + "0_" + number);
-        childProcess.exec("node " + path.join(__dirname, "/public/scripts/ReadTests.js") + " \"" + path.join(__dirname, req.file.path)  + "\" " + "0_" + number);
+        try{
+            let filepath = path.join(__dirname,'/public/tests/'+req.file.filename)
+            const zip = new StreamZip.async({ file: filepath });
+
+            const entriesCount = await zip.entriesCount;
+
+            for (let i=0; i<entriesCount/2;i++){
+                let inp = await zip.entryData("input"+i+".txt");
+                let out = await zip.entryData("output"+i+".txt");
+                tests.push([inp.toString('utf8'),out.toString('utf8')])
+            }
+
+            await zip.close();
+            childProcess.exec('del /q \"'+filepath+'\"');
+
+        } catch(err){
+            console.log(err)
+        }
     } else {
         let tI, tO ;
         for(let i =0; i < 20; i++){
@@ -511,7 +521,7 @@ app.get('/task/edit/:id', checkAuthenticated, checkNletter, checkPermission, asy
     })
 })
 
-app.post('/task/edit/:id', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
+app.post('/task/edit/:id', checkAuthenticated, checkNletter, checkPermission, uploadTests.single('file'), async (req, res) => {
     let body = req.body;
     let problem = await Task.findOne({ identificator: req.params.id }).exec();
 
@@ -526,9 +536,24 @@ app.post('/task/edit/:id', checkAuthenticated, checkNletter, checkPermission, as
 
     let tests = [];
     if (req.file) {
-        var number = await Task.estimatedDocumentCount().exec();
-        console.log("node " + path.join(__dirname, "/public/scripts/ReadTests.js") + " \"" + path.join(__dirname, req.file.path) + "\" " + "0_" + number);
-        childProcess.exec("node " + path.join(__dirname, "/public/scripts/ReadTests.js") + " \"" + path.join(__dirname, req.file.path) + "\" " + "0_" + number);
+        try{
+            let filepath = path.join(__dirname,'/public/tests/'+req.file.filename)
+            const zip = new StreamZip.async({ file: filepath });
+
+            const entriesCount = await zip.entriesCount;
+
+            for (let i=0; i<entriesCount/2;i++){
+                let inp = await zip.entryData("input"+i+".txt");
+                let out = await zip.entryData("output"+i+".txt");
+                tests.push([inp.toString('utf8'),out.toString('utf8')])
+            }
+
+            await zip.close();
+            childProcess.exec('del /q \"'+filepath+'\"');
+
+        } catch(err){
+            console.log(err)
+        }
     } else {
         let tI, tO;
         for (let i = 0; i < 20; i++) {
@@ -982,7 +1007,7 @@ app.post('/addnews', checkAuthenticated, checkNletter, checkPermission, uploadIm
 
     let new_news = await Adder.addNews(News, body.title, body.description, body.text, filename, user.name);
     news.push(new_news);
-
+    load();
     res.redirect("/")
 });
 
@@ -1028,6 +1053,29 @@ app.post('/editnews/:id', checkAuthenticated, checkNletter, checkPermission, upl
     res.redirect('/');
 })
 
+//---------------------------------------------------------------------------------
+// News Page
+app.get("/news/:id", (req, res) => {
+    let currentNew = news.find(item => item._id == req.params.id);
+    if (currentNew) {
+        let render = {
+            login: '',
+            name: '',
+            title: currentNew.title,
+            isTeacher: false,
+            location: "/",
+            news: currentNew
+        };
+        if (req.user) {
+            render.login = req.user.login;
+            render.name = req.user.name;
+            render.isTeacher = req.user.isTeacher;
+        }
+        res.render("news.ejs", render);
+    } else {
+        res.redirect('/')
+    }
+});
 
 //---------------------------------------------------------------------------------
 // Add Tournament Page
@@ -1274,7 +1322,7 @@ app.get('/tournament/task/add/:tour_id', checkAuthenticated, isModerator, async 
     });
 });
 
-app.post('/tournament/task/add/:tour_id', checkAuthenticated, isModerator, async (req, res) => {
+app.post('/tournament/task/add/:tour_id', checkAuthenticated, isModerator, uploadTests.single('file'), async (req, res) => {
     let user = req.user;
     let body = req.body;
 
@@ -1290,9 +1338,24 @@ app.post('/tournament/task/add/:tour_id', checkAuthenticated, isModerator, async
 
     let tests = [];
     if (req.file) {
-        var number = await Task.estimatedDocumentCount().exec();
-        console.log("node " + path.join(__dirname, "/public/scripts/ReadTests.js") + " \"" + path.join(__dirname, req.file.path) + "\" " + "0_" + number);
-        childProcess.exec("node " + path.join(__dirname, "/public/scripts/ReadTests.js") + " \"" + path.join(__dirname, req.file.path) + "\" " + "0_" + number);
+        try{
+            let filepath = path.join(__dirname,'/public/tests/'+req.file.filename)
+            const zip = new StreamZip.async({ file: filepath });
+
+            const entriesCount = await zip.entriesCount;
+
+            for (let i=0; i<entriesCount/2;i++){
+                let inp = await zip.entryData("input"+i+".txt");
+                let out = await zip.entryData("output"+i+".txt");
+                tests.push([inp.toString('utf8'),out.toString('utf8')])
+            }
+
+            await zip.close();
+            childProcess.exec('del /q \"'+filepath+'\"');
+
+        } catch(err){
+            console.log(err)
+        }
     } else {
         let tI, tO;
         for (let i = 0; i < 20; i++) {
@@ -1316,7 +1379,6 @@ app.post('/tournament/task/delete/:tour_id/:id', checkAuthenticated, isModerator
 
     res.redirect('/tournament/page/' + req.user.login + '/' + req.params.tour_id);
 });
-
 
 //---------------------------------------------------------------------------------
 // Tournament Task Page
@@ -1496,7 +1558,7 @@ app.get('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTournamen
 });
 
 // Tournament Task Page listener
-app.post('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTournamentPermission, async (req, res) => {
+app.post('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTournamentPermission, uploadCode.single('file'), async (req, res) => {
     fs.stat(path.normalize('public/processes/' + req.user.login + '_' + req.params.id), async function (err) {
         if (!err) {
             res.redirect('/tournament/task/page/' + req.params.tour_id + '/' + req.params.id);
@@ -1513,33 +1575,21 @@ app.post('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTourname
                 }
             }
             let language, programText;
+            language = req.body.languageSelector;
             if (req.file) {
-                let ext = req.file.originalname.split(".")[-1];
-                switch (ext) {
-                    case "pas":
-                        language = "Pascal"; break;
-                    case "cpp":
-                        language = "Cpp"; break;
-                    case "py":
-                        language = "Python"; break;
-                    case "java":
-                        language = "Java"; break;
-                }
-                if (ext == "py" && req.body.languageSelector == "PyPy") {
-                    language = "PyPy";
-                }
-                programText = fs.readFileSync(req.file.path, "utf-8");
+                try{
+                    let filepath = path.join(__dirname,'/public/codes/'+req.file.filename);
+                    programText = fs.readFileSync(filepath, "utf8");
+                    childProcess.exec('del /q \"'+filepath+'\"');
 
-                fs.rm(req.file.path, (err) => {
-                    if (err)
-                        throw err;
-                });
+                } catch(err){
+                    console.log(err)
+                }
 
             } else {
-                language = req.body.languageSelector;
                 programText = req.body.code;
             }
-            if (prevCode == "" || prevCode != req.body.code) {
+            if (prevCode == "" || prevCode != programText || req.file) {
 
                 let language = req.body.languageSelector;
 
@@ -1631,7 +1681,7 @@ app.get('/tournament/task/edit/:tour_id/:id', checkAuthenticated, isModerator, a
     })
 });
 
-app.post('/tournament/task/edit/:tour_id/:id', checkAuthenticated, isModerator, async (req, res) => {
+app.post('/tournament/task/edit/:tour_id/:id', checkAuthenticated, isModerator,uploadTests.single('file'), async (req, res) => {
     let body = req.body;
     let user = req.user;
     let tournament = await Tournament.findOne({ identificator: req.params.tour_id });
@@ -1648,9 +1698,24 @@ app.post('/tournament/task/edit/:tour_id/:id', checkAuthenticated, isModerator, 
 
     let tests = [];
     if (req.file) {
-        var number = await Task.estimatedDocumentCount().exec();
-        console.log("node " + path.join(__dirname, "/public/scripts/ReadTests.js") + " \"" + path.join(__dirname, req.file.path) + "\" " + "0_" + number);
-        childProcess.exec("node " + path.join(__dirname, "/public/scripts/ReadTests.js") + " \"" + path.join(__dirname, req.file.path) + "\" " + "0_" + number);
+        try{
+            let filepath = path.join(__dirname,'/public/tests/'+req.file.filename)
+            const zip = new StreamZip.async({ file: filepath });
+
+            const entriesCount = await zip.entriesCount;
+
+            for (let i=0; i<entriesCount/2;i++){
+                let inp = await zip.entryData("input"+i+".txt");
+                let out = await zip.entryData("output"+i+".txt");
+                tests.push([inp.toString('utf8'),out.toString('utf8')])
+            }
+
+            await zip.close();
+            childProcess.exec('del /q \"'+filepath+'\"');
+
+        } catch(err){
+            console.log(err)
+        }
     } else {
         let tI, tO;
         for (let i = 0; i < 20; i++) {
@@ -1671,7 +1736,7 @@ app.post('/tournament/task/edit/:tour_id/:id', checkAuthenticated, isModerator, 
     tournament.markModified('tasks');
     await tournament.save();
 
-    res.redirect('/tournament/task/edit/'+req.params.tour_id + '/' + req.params.id);
+    res.redirect('/tournament/task/page/'+req.params.tour_id + '/' + req.params.id);
 });
 
 //---------------------------------------------------------------------------------
@@ -1914,28 +1979,6 @@ app.delete('/logout', (req, res) => {
     req.logOut()
     res.redirect('/')
 })
-
-app.get("/news/:id", (req, res) => {
-    let currentNew = news.find(item => item._id == req.params.id);
-    if (currentNew) {
-        let render = {
-            login: '',
-            name: '',
-            title: currentNew.title,
-            isTeacher: false,
-            location: "/",
-            news: currentNew
-        };
-        if (req.user) {
-            render.login = req.user.login;
-            render.name = req.user.name;
-            render.isTeacher = req.user.isTeacher;
-        }
-        res.render("news.ejs", render);
-    } else {
-        res.redirect('/')
-    }
-});
 
 //---------------------------------------------------------------------------------
 // Redirect from empty pages

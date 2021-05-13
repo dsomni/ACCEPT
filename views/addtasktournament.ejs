@@ -14,7 +14,7 @@
     <body>
         <main>
 
-        <form action=<%='/tournament/task/add/' + tournament.identificator %>  method="POST">
+        <form action=<%='/tournament/task/add/' + tournament.identificator %>  method="POST" enctype="multipart/form-data">
             <div class="taskAdderForm">
                 <h3 class="h3">Название задачи</h3>
                 <textarea id="title" name = "title" required cols=2 placeholder="Введите название"></textarea>
@@ -37,7 +37,12 @@
                     <% } %>
                 <% } %>
                 <br>
-
+                <h3 class="h3">Передать тесты архивом</h3>
+                <label class="switch">
+                    <input type="checkbox" id="checker" onclick="check();">
+                    <span class="slider round"></span>
+                </label>
+                <br>
                 <div id="manual" style="display: contents;">
                     <h3 class="h3">Тесты</h3>
                     <%for (var i =0; i < 20; i++){  %>

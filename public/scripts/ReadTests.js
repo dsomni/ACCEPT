@@ -19,7 +19,6 @@ mongoose.connect(connectionString, {
 
 let filepath = process.argv[2];
 let taskId = process.argv[3];
-console.log(filepath);
 async function go() {
     let files = filepath.split("/").slice(0, -1).join("/") + "/" + Date.now();
     fs.mkdirSync(files);

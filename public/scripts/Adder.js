@@ -1,3 +1,5 @@
+
+
 exports.addLesson = async function (Lesson, grade, title, description, tasks, author){
     var number = await Lesson.estimatedDocumentCount().exec()
     let lesson = {
@@ -28,6 +30,7 @@ exports.addNews = async function (News, title, description, text, imageName, aut
 
 exports.addTask = async function (Task, title, statement, input, output, examples, tests, topic, grade, hint, author){
     var number = await Task.estimatedDocumentCount().exec()
+
     await Task.insertMany([{
         grade,
         identificator: '0_'+number,
@@ -42,6 +45,7 @@ exports.addTask = async function (Task, title, statement, input, output, example
         author
     }]);
 }
+
 exports.addTournament = async function (Tournament, title, description, tasks,
      author, whenStarts, whenEnds, frozeAfter, mods, allowRegAfterStart, allOrNothing, penalty) {
     var number = await Tournament.estimatedDocumentCount().exec()

@@ -14,7 +14,7 @@
     <body>
         <main>
 
-        <form action=<%= '/task/edit/'+problem.identificator %>  method="POST">
+        <form action=<%= '/task/edit/'+problem.identificator %>  method="POST" enctype="multipart/form-data">
             <div class="taskAdderForm">
                 <h3 class="h3">Название задачи</h3>
                 <textarea id="title" name = "title" required cols=2 placeholder="Введите название"><%= problem.title %></textarea>
@@ -64,12 +64,16 @@
                 </label>
                 <br>
                 <div id="manual" style="display: contents;">
-                    <h3 class="h3">Тесты</h3>
+                    <% var len = problem.tests.length %>
                     <%for (var i =0; i < 20; i++){  %>
-                        <h4 class="h4">Тест <%= i+1 %></h4>
-                        <textarea id=<%= "testIn" +i %> name = <%= "testIn" + i %>  cols=1 rows=3 placeholder="Тест <%=i+1%> INPUT"></textarea>
-                        <textarea id=<%= "testOut" +i %> name = <%= "testOut" + i %>  cols=1 rows=3 placeholder="Тест <%=i+1%> OUTPUT"></textarea>
-                        <br>
+                        <h4>Тест <%= i+1 %></h4>
+                        <% if (i<len){ %>
+                            <textarea id=<%= "testIn" +i %> name = <%= "testIn" + i %>  cols=1 rows=3 placeholder="Тест <%=i+1%> INPUT"><%= problem.tests[i][0] %></textarea>
+                            <textarea id=<%= "testOut" +i %> name = <%= "testOut" + i %>  cols=1 rows=3 placeholder="Тест <%=i+1%> OUTPUT"><%= problem.tests[i][1] %></textarea>
+                        <% } else { %>
+                            <textarea id=<%= "testIn" +i %> name = <%= "testIn" + i %>  cols=1 rows=3 placeholder="Тест <%=i+1%> INPUT"></textarea>
+                            <textarea id=<%= "testOut" +i %> name = <%= "testOut" + i %>  cols=1 rows=3 placeholder="Тест <%=i+1%> OUTPUT"></textarea>
+                        <% } %>
                     <% } %>
                 </div>
                 <div id="archive" class="fileChooser">

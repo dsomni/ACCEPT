@@ -14,7 +14,7 @@
     <body>
         <main>
 
-        <form action=<%='/tournament/task/edit/' + tour_id + '/' + task.identificator %>  method="POST">
+        <form action=<%='/tournament/task/edit/' + tour_id + '/' + task.identificator %>  method="POST" enctype="multipart/form-data">
             <div class="taskAdderForm">
                 <h3 class="h3">Название задачи</h3>
                 <textarea id="title" name = "title" required cols=2 placeholder="Введите название"><%=task.title %></textarea>
@@ -38,13 +38,24 @@
                 <% } %>
                 <br>
 
+
+                <h3 class="h3">Передать тесты архивом</h3>
+                <label class="switch">
+                    <input type="checkbox" id="checker" onclick="check();">
+                    <span class="slider round"></span>
+                </label>
+                <br>
                 <div id="manual" style="display: contents;">
-                    <h3 class="h3">Тесты</h3>
+                    <% var len = task.tests.length %>
                     <%for (var i =0; i < 20; i++){  %>
-                        <h4 class="h4">Тест <%= i+1 %></h4>
-                        <textarea id=<%= "testIn" +i %> name = <%= "testIn" + i %>  cols=1 rows=3 placeholder="Тест <%=i+1%> INPUT"></textarea>
-                        <textarea id=<%= "testOut" +i %> name = <%= "testOut" + i %>  cols=1 rows=3 placeholder="Тест <%=i+1%> OUTPUT"></textarea>
-                        <br>
+                        <h4>Тест <%= i+1 %></h4>
+                        <% if (i<len){ %>
+                            <textarea id=<%= "testIn" +i %> name = <%= "testIn" + i %>  cols=1 rows=3 placeholder="Тест <%=i+1%> INPUT"><%= task.tests[i][0] %></textarea>
+                            <textarea id=<%= "testOut" +i %> name = <%= "testOut" + i %>  cols=1 rows=3 placeholder="Тест <%=i+1%> OUTPUT"><%= task.tests[i][1] %></textarea>
+                        <% } else { %>
+                            <textarea id=<%= "testIn" +i %> name = <%= "testIn" + i %>  cols=1 rows=3 placeholder="Тест <%=i+1%> INPUT"></textarea>
+                            <textarea id=<%= "testOut" +i %> name = <%= "testOut" + i %>  cols=1 rows=3 placeholder="Тест <%=i+1%> OUTPUT"></textarea>
+                        <% } %>
                     <% } %>
                 </div>
                 <div id="archive" class="fileChooser">

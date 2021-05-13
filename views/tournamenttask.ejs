@@ -53,7 +53,7 @@
         </table>
 
 
-        <form action=<%='/tournament/task/' + TUR_ID + '/' + problem.identificator %>  method="POST">
+        <form action=<%='/tournament/task/page/' + TUR_ID + '/' + problem.identificator %>  method="POST" enctype="multipart/form-data">
             <div class="container">
 
                 <select name="languageSelector" id = "languageSelector">
@@ -68,7 +68,7 @@
                         <img src="\public\media\TopLeft.svg">
                         <img src="\public\media\TopRight.svg">
                     </div>
-                    <textarea class="taskarea" id="code" name = "code" required placeholder="Place code here"><%= prevCode %></textarea>
+                    <textarea class="taskarea" id="code" name = "code" placeholder="Place code here"><%= prevCode %></textarea>
                     <input name="file" id="dragdrop" type="file" style="display: none;" accept=".pas, .java, .cpp, .py">
                     <div class="taskarea"  id="result" name="result" >
                         <ul>
@@ -81,6 +81,7 @@
                         <img src="\public\media\BottomLeft.svg">
                         <img src="\public\media\BottomRight.svg">
                     </div>
+                 <input type="file" name="file" id="codefile">
             </div>
             <div id="submitdiv">
                 <button id="submit">Отправить</button>
