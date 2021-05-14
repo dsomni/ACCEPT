@@ -7,3 +7,4 @@ public/logs/*.log
 public/processes/*
 public/media/newsImages/*
 public/media/codeFiles/*
+*.pyc

@@ -2049,6 +2049,49 @@ app.post("/registration", async (req, res) => {
 });
 
 //---------------------------------------------------------------------------------
+// Edit Accaunt Page
+app.get("/EditAccount", checkAuthenticated, async (req, res) => {
+    let rendered = {
+        login: req.user.login,
+        name: req.user.name,
+        title: "Edit Account Page",
+        isTeacher: req.user.isTeacher,
+        user: req.user,
+        msg: "",
+        location: req.header('Referer')
+    };
+
+    res.render("EditAccount.ejs", rendered)
+});
+
+app.post("/EditAccount", checkAuthenticated, async (req, res) => {
+    let user = await User.findOne({ login: req.user.login });
+    if (req.body.password.length < 5 && req.body.password.trim().length != 0) {
+        return res.render('EditAccount.ejs', {
+            login: req.user.login,
+            name: req.user.name,
+            title: "Edit Account Page",
+            isTeacher: req.user.isTeacher,
+            user: req.user,
+            msg: "Пароль должен содержать как минимум 5 символов!",
+            location: undefined
+        });
+    }
+    if (req.user.login.slice(0, 2) == "n_") {
+        user.name = req.body.name;
+        user.group = req.body.email;
+    }
+    if (req.body.password.trim().length != 0) {
+        user.password = bcrypt.hashSync(req.body.password, 10);
+    }
+    user.markModified("name");
+    user.markModified("group");
+    user.markModified("password");
+    await user.save();
+    res.redirect("/");
+});
+
+//---------------------------------------------------------------------------------
 // ??? toDo
 app.get('/egg1',checkAuthenticated, checkNotPermission, async (req, res) => {
     res.sendFile(__dirname+'/views/20122020.html')
