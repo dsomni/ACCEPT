@@ -17,8 +17,6 @@ const Lesson = require('../../config/models/Lesson');
 
 async function run() {
 
-    //-----------------------------------------------------------------
-    // Repair Hints
     let lessons = await Lesson.find({}).exec()
     for (let i = 0; i < lessons.length; i++) {
         let lesson = lessons[i];

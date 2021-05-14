@@ -361,7 +361,7 @@ app.post('/task/add', checkAuthenticated, checkNletter, checkPermission, uploadT
         eval("exI = body.exampleIn" + i)
         eval("exO = body.exampleOut" + i)
         if(exI=="" || exO == "") break;
-        examples.push([exI, exO]);
+        examples.push([exI.trim(), exO.trim()]);
     }
 
     let tests = [];
@@ -375,7 +375,7 @@ app.post('/task/add', checkAuthenticated, checkNletter, checkPermission, uploadT
             for (let i=0; i<entriesCount/2;i++){
                 let inp = await zip.entryData("input"+i+".txt");
                 let out = await zip.entryData("output"+i+".txt");
-                tests.push([inp.toString('utf8'),out.toString('utf8')])
+                tests.push([inp.toString('utf8').trim(),out.toString('utf8').trim()])
             }
 
             await zip.close();
@@ -390,7 +390,7 @@ app.post('/task/add', checkAuthenticated, checkNletter, checkPermission, uploadT
             eval("tI = body.testIn" + i)
             eval("tO = body.testOut" + i)
             if(tI=="" || tO == "") break;
-            tests.push([tI, tO]);
+            tests.push([tI.trim(), tO.trim()]);
         }
     }
 
@@ -411,7 +411,7 @@ app.post('/task/add', checkAuthenticated, checkNletter, checkPermission, uploadT
         }
     }
 
-    await Adder.addTask(Task, body.title, body.statement, body.input, body.output, examples, tests, body.topic, body.grade, hint, user.name);
+    await Adder.addTask(Task, body.title.trim(), body.statement.trim(), body.input.trim(), body.output.trim(), examples, tests, body.topic.trim(), body.grade, hint, user.name);
 
     res.redirect(`/tasks/1/default&all&all&false&all`)
 })
@@ -531,7 +531,7 @@ app.post('/task/edit/:id', checkAuthenticated, checkNletter, checkPermission, up
         eval("exI = body.exampleIn" + i)
         eval("exO = body.exampleOut" + i)
         if (exI == "" || exO == "") break;
-        examples.push([exI, exO]);
+        examples.push([exI.trim(), exO.trim()]);
     }
 
     let tests = [];
@@ -545,7 +545,7 @@ app.post('/task/edit/:id', checkAuthenticated, checkNletter, checkPermission, up
             for (let i=0; i<entriesCount/2;i++){
                 let inp = await zip.entryData("input"+i+".txt");
                 let out = await zip.entryData("output"+i+".txt");
-                tests.push([inp.toString('utf8'),out.toString('utf8')])
+                tests.push([inp.toString('utf8').trim(),out.toString('utf8').trim()])
             }
 
             await zip.close();
@@ -560,7 +560,7 @@ app.post('/task/edit/:id', checkAuthenticated, checkNletter, checkPermission, up
             eval("tI = body.testIn" + i)
             eval("tO = body.testOut" + i)
             if (tI == "" || tO == "") break;
-            tests.push([tI, tO]);
+            tests.push([tI.trim(), tO.trim()]);
         }
     }
 
@@ -581,11 +581,11 @@ app.post('/task/edit/:id', checkAuthenticated, checkNletter, checkPermission, up
         }
     }
 
-    problem.title = body.title;
-    problem.statement = body.statement;
-    problem.input = body.input;
-    problem.output = body.output;
-    problem.topic = body.topic;
+    problem.title = body.title.trim();
+    problem.statement = body.statement.trim();
+    problem.input = body.input.trim();
+    problem.output = body.output.trim();
+    problem.topic = body.topic.trim();
     problem.examples = examples;
     problem.tests = tests;
     problem.hint = hint;
@@ -847,7 +847,7 @@ app.get('/lesson/:login/:id',checkAuthenticated, checkNletter, isLessonAvailable
     lesson = await Lesson.findOne({identificator: req.params.id}).exec();
 
     if (!lesson) {
-        res.redirect("/lessons/"+req.params.login+"/1/default&all&all")
+        res.redirect("/lessons/"+req.params.login+"/1/default&all&true&all")
     }else{
         let tasks = await Task.find({identificator : {$in : lesson.tasks}});
         let verdicts = [];
@@ -984,7 +984,7 @@ app.get('/lessonresults/:id/:search', checkAuthenticated, checkNletter, checkPer
             isTeacher: req.user.isTeacher,
             lesson : lesson,
             results,
-            location: `/lessons/${req.user.login}/1/default&all&true&all`
+            location: `/lesson/${req.user.login}/${req.params.id}`
         })
     }
 });
@@ -1421,7 +1421,7 @@ app.post('/tournament/task/add/:tour_id', checkAuthenticated, isModerator, uploa
         eval("exI = body.exampleIn" + i)
         eval("exO = body.exampleOut" + i)
         if(exI=="" || exO == "") break;
-        examples.push([exI, exO]);
+        examples.push([exI.trim(), exO.trim()]);
     }
 
     let tests = [];
@@ -1435,7 +1435,7 @@ app.post('/tournament/task/add/:tour_id', checkAuthenticated, isModerator, uploa
             for (let i=0; i<entriesCount/2;i++){
                 let inp = await zip.entryData("input"+i+".txt");
                 let out = await zip.entryData("output"+i+".txt");
-                tests.push([inp.toString('utf8'),out.toString('utf8')])
+                tests.push([inp.toString('utf8').trim(),out.toString('utf8').trim()])
             }
 
             await zip.close();
@@ -1450,10 +1450,10 @@ app.post('/tournament/task/add/:tour_id', checkAuthenticated, isModerator, uploa
             eval("tI = body.testIn" + i)
             eval("tO = body.testOut" + i)
             if (tI == "" || tO == "") break;
-            tests.push([tI, tO]);
+            tests.push([tI.trim(), tO.trim()]);
         }
     }
-    await Adder.addTaskToTournament(Tournament, req.params.tour_id, body.title, body.statement, body.input, body.output, examples, tests);
+    await Adder.addTaskToTournament(Tournament, req.params.tour_id, body.title.trim(), body.statement.trim(), body.input.trim(), body.output.trim(), examples, tests);
 
     res.redirect('/tournament/task/add/' + req.params.tour_id);
 });
@@ -1592,6 +1592,7 @@ app.get('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTournamen
                                 language: language,
                                 whenEnds: whenEnds,
                                 isBegan: isBegan,
+                                tournament,
                                 location: '/tournament/page/' + req.user.login + '/' + req.params.tour_id
                             });
                         }
@@ -1609,6 +1610,7 @@ app.get('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTournamen
                             language: req.user.attempts[0].language,
                             whenEnds: whenEnds,
                             isBegan: isBegan,
+                            tournament,
                             location: '/tournament/page/' + req.user.login + '/' + req.params.tour_id
                         });
                     }
@@ -1783,7 +1785,7 @@ app.post('/tournament/task/edit/:tour_id/:id', checkAuthenticated, isModerator,u
         eval("exI = body.exampleIn" + i)
         eval("exO = body.exampleOut" + i)
         if (exI == "" || exO == "") break;
-        examples.push([exI, exO]);
+        examples.push([exI.trim(), exO.trim()]);
     }
 
     let tests = [];
@@ -1797,7 +1799,7 @@ app.post('/tournament/task/edit/:tour_id/:id', checkAuthenticated, isModerator,u
             for (let i=0; i<entriesCount/2;i++){
                 let inp = await zip.entryData("input"+i+".txt");
                 let out = await zip.entryData("output"+i+".txt");
-                tests.push([inp.toString('utf8'),out.toString('utf8')])
+                tests.push([inp.toString('utf8').trim(),out.toString('utf8').trim()])
             }
 
             await zip.close();
@@ -1812,14 +1814,14 @@ app.post('/tournament/task/edit/:tour_id/:id', checkAuthenticated, isModerator,u
             eval("tI = body.testIn" + i)
             eval("tO = body.testOut" + i)
             if (tI == "" || tO == "") break;
-            tests.push([tI, tO]);
+            tests.push([tI.trim(), tO.trim()]);
         }
     }
 
-    problem.title = body.title;
-    problem.statement = body.statement;
-    problem.input = body.input;
-    problem.output = body.output;
+    problem.title = body.title.trim();
+    problem.statement = body.statement.trim();
+    problem.input = body.input.trim();
+    problem.output = body.output.trim();
     problem.examples = examples;
     problem.tests = tests;
 

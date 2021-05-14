@@ -758,7 +758,7 @@ header input{
     margin: 0;
     white-space: pre-line;
     overflow-wrap: break-word;
-    padding: .2em;
+    padding: 3%;
 }
 #sendMessage{
     position: absolute;
@@ -785,8 +785,9 @@ header input{
 }
 #messages{
     width: 100%;
-    height: 310px;
-    background-color: lightblue;
+    height: 88%;
+    padding-bottom: 30%;
+    background-color: rgb(192, 229, 241);
     overflow: scroll;
 }
 .statement h5{
