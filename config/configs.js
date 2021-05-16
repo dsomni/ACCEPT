@@ -1,6 +1,6 @@
 module.exports = {
-	PathToUsersList: "PATH", 
-	PathToTeachersList: "PATH", 
+	PathToUsersList: "/home/rostislav/Downloads/users.xlsx",
+	PathToTeachersList: "PATH",
 	port: "3000", 
 	secret: "secret", 
 	FolderLifeTime: 42000.0, 

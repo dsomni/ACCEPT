@@ -54,34 +54,34 @@ async function toDo(){
         grade = student[3].slice(0,student[3].length-1);
         gradeLetter = student[3][student[3].length-1];
         if(check){
-            check.password = student[2]
+            check.password = bcrypt.hashSync(student[2], 10).toString()
             check.name = student[1]
             check.grade = grade
             check.gradeLetter = gradeLetter
             if(!check.group){
                 check.group = 1;
             }
-            if(check.verdicts.length==0){
-                let attempts = check.attempts
-                verdicts = []
-                for(var j = attempts.length-1; j >= 0; j--){
-                    let verdict = verdicts.find(item => item.taskID == attempts[j].taskID)
-                    if(!verdict){
-                        verdicts.push({
-                            taskID: attempts[j].taskID,
-                            result: attempts[j].result[attempts[j].result.length - 1][1]
-                        })
-                    } else if(verdict.result!="OK"){
-                        let idx = verdicts.findIndex(item => item.taskID == attempts[j].taskID)
-                        verdicts[idx] = {
-                            taskID: attempts[j].taskID,
-                            result: attempts[j].result[attempts[j].result.length - 1][1]
-                        }
-                    }
-                }
-                check.verdicts = verdicts;
-                check.markModified(verdicts)
-            }
+            // if (check.verdicts.length == 0) {
+            //     let attempts = check.attempts
+            //     verdicts = []
+            //     for (var j = attempts.length - 1; j >= 0; j--) {
+            //         let verdict = verdicts.find(item => item.taskID == attempts[j].taskID)
+            //         if (!verdict) {
+            //             verdicts.push({
+            //                 taskID: attempts[j].taskID,
+            //                 result: attempts[j].result[attempts[j].result.length - 1][1]
+            //             })
+            //         } else if (verdict.result != "OK") {
+            //             let idx = verdicts.findIndex(item => item.taskID == attempts[j].taskID)
+            //             verdicts[idx] = {
+            //                 taskID: attempts[j].taskID,
+            //                 result: attempts[j].result[attempts[j].result.length - 1][1]
+            //             }
+            //         }
+            //     }
+            //     check.verdicts = verdicts;
+            //     check.markModified(verdicts)
+            // }
 
             await check.save()
         }else{
@@ -90,9 +90,4 @@ async function toDo(){
     }
 }
 
-toDo()
-
-
-setTimeout(() => {
-    process.exit()
-}, 10000)
+toDo().then(() => { console.log(1); process.exit() });
