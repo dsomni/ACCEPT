@@ -8,7 +8,11 @@
     "dev": "nodemon server",
     "mongo": "sudo systemctl start mongod.service",
     "postinstall": "public\\checker\\pythonCompiler\\python.exe public\\scripts\\CreateConfigs.py",
-    "configurate": "public\\checker\\pythonCompiler\\python.exe public\\scripts\\CreateConfigs.py"
+    "configurate": "public\\checker\\pythonCompiler\\python.exe public\\scripts\\CreateConfigs.py",
+    "fix": "node public\\scripts\\FixDBv3.js",
+    "addUsers": "node public\\scripts\\addUser.js",
+    "addTeachers": "node public\\scripts\\addTeacher.js",
+    "deleteUsers": "node public\\scripts\\delUser.js"
   },
   "author": "",
   "license": "ISC",

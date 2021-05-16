@@ -61,28 +61,6 @@ async function toDo(){
             if(!check.group){
                 check.group = 1;
             }
-            // if (check.verdicts.length == 0) {
-            //     let attempts = check.attempts
-            //     verdicts = []
-            //     for (var j = attempts.length - 1; j >= 0; j--) {
-            //         let verdict = verdicts.find(item => item.taskID == attempts[j].taskID)
-            //         if (!verdict) {
-            //             verdicts.push({
-            //                 taskID: attempts[j].taskID,
-            //                 result: attempts[j].result[attempts[j].result.length - 1][1]
-            //             })
-            //         } else if (verdict.result != "OK") {
-            //             let idx = verdicts.findIndex(item => item.taskID == attempts[j].taskID)
-            //             verdicts[idx] = {
-            //                 taskID: attempts[j].taskID,
-            //                 result: attempts[j].result[attempts[j].result.length - 1][1]
-            //             }
-            //         }
-            //     }
-            //     check.verdicts = verdicts;
-            //     check.markModified(verdicts)
-            // }
-
             await check.save()
         }else{
             await addStudent(student[0], student[2], student[1], grade, gradeLetter, 1)
@@ -90,4 +68,4 @@ async function toDo(){
     }
 }
 
-toDo().then(() => { console.log(1); process.exit() });
+toDo().then(() => { console.log("Done"); process.exit() });

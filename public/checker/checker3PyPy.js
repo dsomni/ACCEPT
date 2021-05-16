@@ -1,6 +1,6 @@
 const fs = require('fs');
 const childProcess = require("child_process");
-
+const pathConst = require("path");
 const mongoose = require('mongoose');
 const config = require('../../config/configs');
 
@@ -18,8 +18,22 @@ mongoose.connect(connectionString, {
     useUnifiedTopology: true
 });
 
+function max(a, b) {
+    if (a > b) return a
+    return b
+}
+
+function countProcesses() {
+    return fs.readdirSync(pathConst.join(__dirname + '/../processes')).length;
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 const Task = require('../../config/models/Task');
 const Tournament = require('../../config/models/Tournament');
+
 
 async function go(){
     let path = process.argv[2];
@@ -50,8 +64,10 @@ async function go(){
     }
 
     fs.writeFileSync(path + '\\result.txt', "");
-
     for(let i = 0; i < tests.length; i++){
+        if (i % max(1, Math.trunc(config.parallelCoefficient - 0.7 * countProcesses())) == 0) {
+            await sleep(1000);
+        }
 
         childProcess.exec('node' + ' ' +
         __dirname + '\\checker3PyPyHelper.js' + ' ' +
@@ -62,7 +78,6 @@ async function go(){
     }
     setTimeout(()=>{
         process.exit()
-    },1000)
-
+    },2000)
 }
 go();

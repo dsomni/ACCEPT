@@ -1,9 +1,11 @@
 module.exports = {
-	PathToUsersList: "/home/rostislav/Downloads/users.xlsx",
-	PathToTeachersList: "PATH",
+	PathToUsersList: "D:\\Code\\TestSystemPack\\TestSystem\\public\\scripts\\users.xlsx", 
+	PathToDeleteUsersList: "D:\\Code\\TestSystemPack\\TestSystem\\public\\scripts\\deleteUsers.xlsx", 
+	PathToTeachersList: "D:\\Code\\TestSystemPack\\TestSystem\\public\\scripts\\teachers.xlsx", 
 	port: "3000", 
 	secret: "secret", 
 	FolderLifeTime: 42000.0, 
+	parallelCoefficient: 5, 
 	mongodbConfigs: {
 		dbName: "db", 
 		Host: "localhost:27017", 

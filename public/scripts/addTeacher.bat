@@ -1,1 +1,0 @@
-node addTeacher.js

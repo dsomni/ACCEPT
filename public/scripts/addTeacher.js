@@ -53,27 +53,6 @@ async function toDo(){
             check.password = teacher[2]
             check.name = teacher[1]
 
-            if(check.verdicts.length==0){
-                let attempts = check.attempts
-                verdicts = []
-                for(var j = attempts.length-1; j >= 0; j--){
-                    let verdict = verdicts.find(item => item.taskID == attempts[j].taskID)
-                    if(!verdict){
-                        verdicts.push({
-                            taskID: attempts[j].taskID,
-                            result: attempts[j].result[attempts[j].result.length - 1][1]
-                        })
-                    } else if(verdict.result!="OK"){
-                        let idx = verdicts.findIndex(item => item.taskID == attempts[j].taskID)
-                        verdicts[idx] = {
-                            taskID: attempts[j].taskID,
-                            result: attempts[j].result[attempts[j].result.length - 1][1]
-                        }
-                    }
-                }
-                check.verdicts = verdicts;
-            }
-
             await check.save()
         }else{
             await addTeacher(teacher[0], teacher[2], teacher[1])
@@ -81,8 +60,4 @@ async function toDo(){
     }
 }
 
-toDo()
-
-setTimeout(() => {
-    process.exit()
-}, 10000)
+toDo().then(() => { console.log("Done"); process.exit() });

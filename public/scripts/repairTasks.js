@@ -22,15 +22,11 @@ async function run() {
     let tasks = await Task.find({}).exec()
     for (let i = 0; i < tasks.length; i++) {
         let task = tasks[i];
-        if (!task.identificator.split('_')[1]) {
+        if (!task.identificator.includes('_')) {
             task.identificator = '0_' + task.identificator;
             await task.save();
         }
     }
 }
 
-run()
-
-setTimeout(() => {
-    process.exit()
-}, 10000)
+run().then(() => { console.log("Done"); process.exit() });

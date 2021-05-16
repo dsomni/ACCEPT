@@ -21,7 +21,7 @@ async function run() {
     for (let i = 0; i < lessons.length; i++) {
         let lesson = lessons[i];
         for (let j = 0; j < lesson.tasks.length; j++){
-            if (!String(lesson.tasks[j]).split('_')[1]) {
+            if (!String(lesson.tasks[j]).includes('_')) {
                 lesson.tasks[j] = '0_' + lesson.tasks[j];
             }
         }
@@ -30,8 +30,4 @@ async function run() {
     }
 }
 
-run()
-
-setTimeout(() => {
-    process.exit()
-}, 10000)
+run().then(() => { console.log("Done"); process.exit() });

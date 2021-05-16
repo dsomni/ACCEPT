@@ -31,7 +31,11 @@
             <% } %>
         </div>
         <h4 class="h4">Тема: <%= problem.topic %>         Автор: <%= problem.author %></h4><!-- скрывать тему на турнире -->
-        <div class="statement"><%= problem.statement %><h5>Входные данные</h5><%= problem.input %><h5>Выходные данные</h5><%= problem.output %></div>
+        <div class="statement"><%= problem.statement %>
+            <h5>Входные данные</h5>
+<%= problem.input %>
+            <h5>Выходные данные</h5>
+<%= problem.output %></div>
         <% if(problem.hint.doesExist && showHint) { %>
             <button id="HintButton" onclick="ShowHideHint()">Показать/скрыть подсказку</button>
         <% } %>

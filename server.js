@@ -324,7 +324,6 @@ app.post('/task/page/:id', checkAuthenticated, checkNletter, uploadCode.single('
 
                 fs.writeFileSync(path.normalize('public/processes/' + req.user.login + "_" + req.params.id + "/programText.txt"), programText, "utf-8");
 
-
                 childProcess.exec('node ' + path.join(__dirname, '/public/checker/checker3' + language + '.js ') + ' ' +
                     path.join(__dirname, '/public/processes/' + req.user.login + "_" + req.params.id) + " " +
                     'program' + req.user.login + "_" + req.params.id + " " +
@@ -627,7 +626,6 @@ app.get('/account/:login/:page/:search', checkAuthenticated, checkValidation, as
 
         tournaments.forEach(tournament => tournament.tasks.forEach(task => tourTask.push(task)));
         for(let i = 0; i < attempts.length; i++){
-            erylongresult = attempts[i].result[attempts[i].result.length -1 ][attempts[i].result[attempts[i].result.length -1 ].length - 1];
             verylongresult = getVerdict(attempts[i].result);
             if ((attempts[i].taskID.split('_')[0] != '0') && ((types=='all') || (verylongresult=='OK'))){
                 let task = tourTask.find(item => item.identificator == attempts[i].taskID);

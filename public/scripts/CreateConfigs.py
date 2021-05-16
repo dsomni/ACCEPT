@@ -38,16 +38,18 @@ def parser(text):
 
 config = {
     'PathToUsersList': "PATH", # Path to users.xlsx file
+    'PathToDeleteUsersList': "PATH", # Path to deleteUsers.xlsx file
     'PathToTeachersList': "PATH", # Path to teachers.xlsx file
     'port': "3000", # server port
     'secret': "secret",
     'FolderLifeTime': 0.7 * 60 * 1000, # milliseconds
+    'parallelCoefficient': 10, #number of streams
     'mongodbConfigs': {
         'dbName': "db", # mongodb data base name
         'Host': "localhost:27017", # where data base located(default: "localhost:27017")
         'User': { # mongodb user with Read and Write permissions or leave empty
-                'Username': "username",
-                'Password': "password",
+                'Username': "",
+                'Password': "",
                },
         'CollectionNames': { # names of collections
                           'users': "users", # with users
@@ -60,8 +62,10 @@ config = {
 }
 port = input("Port(number): ")
 FolderLifeTime = input("FolderLifeTime: ")
+parallelCoefficient = input("parallelCoefficient: ")
 secret = input("secret: ")
 PathToUsersList = input("PathToUsersList: ")
+PathToDeleteUsersList = input("PathToDeleteUsersList: ")
 PathToTeachersList = input("PathToTeachersList: ")
 answer1 = input("Do you want to configure DB?(y/n): ")
 if answer1.upper() == "Y":
@@ -84,8 +88,12 @@ if (port):
     config["port"] = port
 if (FolderLifeTime):
     config["FolderLifeTime"] = int(eval(FolderLifeTime))
+if (parallelCoefficient):
+    config["parallelCoefficient"] = int(eval(parallelCoefficient))
 if (PathToUsersList):
     config["PathToUsersList"] = PathToUsersList
+if (PathToDeleteUsersList):
+    config["PathToDeleteUsersList"] = PathToDeleteUsersList
 if (PathToTeachersList):
     config["PathToTeachersList"] = PathToTeachersList
 if (secret):

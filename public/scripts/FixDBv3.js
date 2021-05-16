@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const config = require('../../config/configs');
 const childProcess = require("child_process");
+const path = require('path');
 
 var connectionString;
 if (config.mongodbConfigs.User.Username != "" && config.mongodbConfigs.User.Password != "") {
@@ -18,20 +19,20 @@ const User = require('../../config/models/User');
 const News = require('../../config/models/News');
 
 async function run() {
-    mongoose.connection.collections['users'].drop( function(err) {
+    mongoose.connection.collections[config.mongodbConfigs.CollectionNames.users].drop( function(err) {
         console.log('collection \"users\" dropped');
     });
-    mongoose.connection.collections['news'].drop( function(err) {
+    mongoose.connection.collections[config.mongodbConfigs.CollectionNames.news].drop( function(err) {
         console.log('collection \"news\" dropped');
     });
-    childProcess.exec('node repairLessons.js');
-    childProcess.exec('node repairTasks.js');
-    childProcess.exec('node addUser.js');
-    childProcess.exec('node addTeacher.js');
+    childProcess.exec('node '+ path.join(__dirname, 'repairLessons.js'));
+    childProcess.exec('node '+ path.join(__dirname, 'repairTasks.js'));
+    childProcess.exec('node '+ path.join(__dirname, 'addTeacher.js'));
+    childProcess.exec('node '+ path.join(__dirname, 'addUser.js'));
 }
 
-run()
+run();
 
 setTimeout(() => {
-    process.exit()
-}, 10000)
+    process.exit();
+}, 5000);
