@@ -61,7 +61,16 @@
                   <td><%= i %></td>
                   <td> <a class="tlrefs" href=<%="/lesson/"+ u_login + "/" + lesson.identificator %>><%= lesson.title %> </a> </td>
                   <td><%= lesson.grade %></td>
-                  <td><%= lesson.author %></td>
+                  <%
+                    let authorArray = lesson.author.split(' ');
+                    let author = authorArray[0];
+                    for(let i=1;i< authorArray.length;i++){
+                        if(authorArray[i].length!=0){
+                            author += ' '+ authorArray[i][0]+'.';
+                        }
+                    }
+                  %>
+                  <td><%= author %></td>
                   <td><%= results[i] %></td>
                  </tr>
                 <% } %>

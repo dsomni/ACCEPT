@@ -64,7 +64,16 @@
                   <td><a class="tlrefs" href=<%="/task/page/" + task.identificator %>><%= task.title %></a></td>
                   <td><%= task.topic %></td>
                   <td><%= task.grade %></td>
-                  <td><%= task.author %></td>
+                  <%
+                  let authorArray = task.author.split(' ');
+                  let author = authorArray[0];
+                  for(let i=1;i< authorArray.length;i++){
+                      if(authorArray[i].length!=0){
+                          author += ' '+ authorArray[i][0]+'.';
+                      }
+                  }
+                %>
+                <td><%= author %></td>
                   <td><%= results[i] %></td>
                  </tr>
                 <% } %>

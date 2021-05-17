@@ -3,7 +3,12 @@ const bcrypt = require('bcryptjs');
 
 function initialize(passport, User) {
   const authenticateUser = async (login, password, done) => {
-    const user = await User.findOne({ login: login }).exec();
+    var user1 = await User.findOne({ login: login }).exec();
+    var user2 = await User.findOne({ login: "n_"+login }).exec();
+    var user  = user1;
+    if(user1==null){
+      user = user2;
+    }
 
     if (user == null) {
       return done(null, false, { message: 'No user with that login' });

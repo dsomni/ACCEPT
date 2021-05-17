@@ -4,7 +4,7 @@ module.exports = {
 	PathToTeachersList: "D:\\Code\\TestSystemPack\\TestSystem\\public\\scripts\\teachers.xlsx", 
 	port: "3000", 
 	secret: "secret", 
-	FolderLifeTime: 42000.0, 
+	FolderLifeTime: 4200.0, 
 	parallelCoefficient: 5, 
 	mongodbConfigs: {
 		dbName: "db", 

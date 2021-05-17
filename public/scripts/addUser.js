@@ -54,7 +54,7 @@ async function toDo(){
         grade = student[3].slice(0,student[3].length-1);
         gradeLetter = student[3][student[3].length-1];
         if(check){
-            check.password = bcrypt.hashSync(student[2], 10).toString()
+            check.password = bcrypt.hashSync(student[2].toString(), 10).toString()
             check.name = student[1]
             check.grade = grade
             check.gradeLetter = gradeLetter

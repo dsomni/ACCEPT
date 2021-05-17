@@ -50,7 +50,7 @@ async function toDo(){
             break;
         check = await User.findOne({login:teacher[0]})
         if(check){
-            check.password = teacher[2]
+            check.password = bcrypt.hashSync(teacher[2].toString(), 10).toString()
             check.name = teacher[1]
 
             await check.save()

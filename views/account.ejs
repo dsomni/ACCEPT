@@ -14,7 +14,7 @@
         </head>
     <body>
         <main>
-            <h1 class="h1">Личный кабинет <a href="/EditAccount" class="editref" style="font-size: 2.5rem;"><%= n_name %></a></h1>
+            <h1 class="h1">Личный кабинет <%= n_name %> <a href="/EditAccount" class="editref">[изменить данные]</a></h1>
             <div class="student_info">
                 <p>Класс: <%= user.grade + user.gradeLetter %></p>
                 <% if(user.group && user.group.length<5){ %>
