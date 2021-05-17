@@ -13,8 +13,24 @@
         <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
         </head>
     <body>
+    <script>
+        function myFunction(event){
+            const verify = document.getElementById("checkpassword");
+            const par = document.getElementById("diff");
+            const password = document.getElementById("password");
+            const button = document.getElementById("submit2");
+            if(password.value != verify.value){
+                par.style.visibility = "visible";
+                button.disabled = true;
+            }else{
+                par.style.visibility = "hidden";
+                button.disabled = false;
+            }
+        };
+    </script>
         <main style="display: flex; justify-content:center">
             <form class="reg" action= '/registration'  method="POST">
+                <p id="diff" style="color: red;">Пароли не совпадают</p>
                 <h3 class="h3">Ф.И.О.</h3>
                 <input name = "name" placeholder="Ф.И.О." required>
                 <h3 class="h3">Логин</h3>
@@ -23,6 +39,8 @@
                 <input id="email" name="email" type="email" placeholder="example@example.com" required>
                 <h3 class="h3">Пароль</h3>
                 <input id="password" name="password" type="password" placeholder="Пароль" required>
+                <h3 class="h3">Подтвердите пароль</h3>
+                <input id="checkpassword" name="checkpassword" type="password" placeholder="Пароль" required oninput="myFunction()">
                 <br>
                 <button id="submit2">Зарегистрироваться</button>
             </form>
@@ -30,4 +48,8 @@
         </main>
         <h3 style="text-align: center;color:Red"><%= msg %></h3>
     </body>
+    <script>
+        const par = document.getElementById("diff");
+        par.style.visibility = "hidden";
+    </script>
 </html>

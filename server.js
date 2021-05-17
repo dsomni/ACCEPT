@@ -433,7 +433,7 @@ app.get('/tasks/:page/:search', checkAuthenticated, checkNletter, async (req, re
 
         let properties = {}
         if (SearchGrade != "all") properties.grade = SearchGrade;
-        if (author != "all") properties.author = author;
+        if (author != "all") properties.author = author.replace("%20", ' ');
         tasks = await Task.find(properties).exec();
 
 
@@ -925,7 +925,7 @@ app.get('/lessonresults/:id/:search', checkAuthenticated, checkNletter, checkPer
         let students;
 
         let a = req.params.search.split('&');
-        if (a!="default"){
+        if (a[1].toLowerCase()!="default"){
             let SearchGrade = a[1] == "all" ? '' : a[1];
             if (SearchGrade != "") {
                 students = await User.find({ grade: SearchGrade, isTeacher: false }).exec();
@@ -933,31 +933,20 @@ app.get('/lessonresults/:id/:search', checkAuthenticated, checkNletter, checkPer
                 students = await User.find({ isTeacher: false }).exec();
             }
             if (a[0] != "default" || a[2] != "all" || a[3] != "all") {
-                let toSearch = a[0] == "default" ? '' : a[0];
                 let SearchLetter = a[2] == "all" ? '' : a[2].toUpperCase();
                 let SearchGroup = a[3] == "all" ? '' : a[3];
-                foundStudents = []
-                const fuse = new Fuse(students, {
-                    includeScore: true,
-                    keys: ['name']
+                foundStudents = [];
+                students.forEach(student => {
+                    if ((student.gradeLetter.toUpperCase() == SearchLetter || SearchLetter == "") && (student.group == SearchGroup || SearchGroup == "")) {
+                        foundStudents.push(student);
+                    }
                 });
-                if (toSearch == "")
-                    students.forEach(student => {
-                        if((student.gradeLetter == SearchLetter || SearchLetter == "") && (student.group == SearchGroup || SearchGroup == "")) {
-                            foundStudents.push(student);
-                        }
-                    });
-                else
-                    fuse.search(toSearch).forEach(student => {
-                        if((student.score < 0.5) && (student.item.gradeLetter == SearchLetter || SearchLetter == "") && (student.item.group == SearchGroup || SearchGroup == "")) {
-                            foundStudents.push(student.item);
-                        }
-                    });
             } else {
                 foundStudents = students;
             }
         }
-        foundStudents = await User.find({ isTeacher: false }).exec();
+        if(foundStudents.length == 0)
+            foundStudents = await User.find({ isTeacher: false }).exec();
         foundStudents.sort((a, b) => { return a.name > b.name });
 
         let result;
