@@ -175,7 +175,7 @@ app.get('/task/page/:id', checkAuthenticated, checkNletter, async (req, res) => 
             fs.stat(path.join('public/processes/' + req.user.login+'_'+req.params.id + "/result.txt"), async function(err,stats2) {
                 if (!err) {
                     let resultStrings = fs.readFileSync(path.normalize('public/processes/' + req.user.login+'_'+req.params.id + "/result.txt"),"utf-8").trim().split("\n");
-                    if(resultStrings[0] == 'Test # 1*Compilation Error*er' || resultStrings.length == problem.tests.length){
+                    if(resultStrings[0].length >0 && (resultStrings[0] == 'Test # 1*Compilation Error*er' || resultStrings.length == problem.tests.length)){
 
                         let result = [];
                         for(let i = 0; i < resultStrings.length; i++){
@@ -1469,10 +1469,11 @@ app.get('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTournamen
     problem = tournament.tasks.find(item => item.identificator == req.params.id);
     fs.stat(path.normalize('public/processes/' + req.user.login + '_' + req.params.id), function (err, stats) {
         if (!err && Date.now()) {
+
             fs.stat(path.normalize('public/processes/' + req.user.login + '_' + req.params.id + "/result.txt"), async function (err, stats2) {
                 if (!err) {
                     let resultStrings = fs.readFileSync(path.normalize('public/processes/' + req.user.login + '_' + req.params.id + "/result.txt"), "utf-8").trim().split("\n");
-                    if (resultStrings[0] == 'Test # 1*Compilation Error*er' || resultStrings.length == problem.tests.length) {
+                    if (resultStrings[0].length >0 && (resultStrings[0] == 'Test # 1*Compilation Error*er' || resultStrings.length == problem.tests.length)) {
 
                         let result = [];
                         for (let i = 0; i < resultStrings.length; i++) {
@@ -1582,7 +1583,7 @@ app.get('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTournamen
                 } else {
                     if (Date.now() - stats.birthtimeMs >= config.FolderLifeTime) {
                         fs.rmdirSync(path.normalize('public/processes/' + req.user.login + '_' + req.params.id), { recursive: true });
-        
+
                         res.redirect('/tournament/task/page/' + tour_id + '/' + req.params.id);
                     } 
                     res.render('tournamenttask.ejs', {
@@ -1674,13 +1675,13 @@ app.post('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTourname
 
                 req.user.attempts.unshift({
                     taskID: req.params.id, date: Date.now().toString(),
-                    programText: req.body.code, result: [], language: language
+                    programText: programText, result: [], language: language
                 })
                 await req.user.save()
 
                 fs.mkdirSync(path.normalize('public/processes/' + req.user.login + '_' + req.params.id));
 
-                fs.writeFileSync(path.normalize('public/processes/' + req.user.login + '_' + req.params.id + "/programText.txt"), req.body.code, "utf-8");
+                fs.writeFileSync(path.normalize('public/processes/' + req.user.login + '_' + req.params.id + "/programText.txt"), programText, "utf-8");
 
                 childProcess.exec('node ' + path.join(__dirname, '/public/checker/checker3' + language + '.js') + ' ' +
                     path.join(__dirname, '/public/processes/' + req.user.login + '_' + req.params.id) + " " +
@@ -1693,6 +1694,7 @@ app.post('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTourname
     });
 
 });
+
 
 //---------------------------------------------------------------------------------
 // Tournament Page
