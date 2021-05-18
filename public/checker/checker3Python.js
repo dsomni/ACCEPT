@@ -42,6 +42,7 @@ async function go(){
 
 
     let programText = fs.readFileSync(path+"\\programText.txt", "utf8");
+    programText = '# -*- coding: cp1251 -*-' + '\n' + programText
 
     fs.writeFileSync(path + '\\'+fileName +'.py', programText, "utf8");
 

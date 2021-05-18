@@ -42,7 +42,12 @@
                 <% for (var i = (page-1)*onPage+1; i < min(page*onPage+1,students.length); i++) { %>
                 <% var student = students[i]; %>
                  <tr>
-                    <td><%= student.login %></td>
+                    <% let loginToShow = student.login;
+                    if(loginToShow.length > 2 && loginToShow.slice(0,2)=="n_"){
+                        loginToShow = loginToShow.slice(2);
+                    }
+                    %>
+                    <td><%= loginToShow %></td>
                     <td><%= student.name %> </td>
                     <td><%= student.grade + student.gradeLetter %></td>
 

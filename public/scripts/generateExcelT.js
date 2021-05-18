@@ -41,7 +41,11 @@ async function run() {
         user = await User.findOne({ login: results[i].login });
         if(!user)
             continue;
-        realresults.push([results[i].login, user.name])
+        let loginToShow = results[i].login;
+        if(loginToShow.length > 2 && loginToShow.slice(0,2)=="n_"){
+            loginToShow = loginToShow.slice(2);
+        }
+        realresults.push([loginToShow, user.name])
         for (let j = 0; j < results[i].tasks.length; j++){
             realresults[i].push([
                 {

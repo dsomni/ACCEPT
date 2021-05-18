@@ -19,7 +19,7 @@
             </h2>
             <div id="task">
                 <H1 id="taskname"><%= tournament.title; %></H1>
-                <div style="text-align: center;">
+                <div style="text-align: center;margin: 5%;">
                     <% if(tournament.mods.find(item => item == login)){ %>
                         <a class="EditButtons" href=<%="/tournament/edit/" + tournament.identificator %> >Редактировать</a>
                         <% if(tournament.identificator!=0){ %>
@@ -67,7 +67,7 @@
                                 <td>
                                     <%= results[i] %>
                                 </td>
-                                <td><a class="tlrefs" href=<%="/account/" + u_login + "/1/" + task.title.replace(' ',' %20') + "&all" %> >[все попытки]</a></td>
+                                <td><a class="tlrefs" href=<%="/account/" + u_login + "/1/" + task.title.replace(' ','%20') + "&all" %> >[все попытки]</a></td>
                             </tr>
                             <% }} %>
                 </table>

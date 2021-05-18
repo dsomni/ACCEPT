@@ -29,11 +29,12 @@ async function checkEnd(){
     for(let i=0;i<to_check_end.length;i++){
         tournament = to_check_end[i];
         if (now - Date.parse(tournament.whenEnds)>=0){
+            let t_i = tournament.identificator;
             b = true;
             tournament.isEnded = true;
             tournament.markModified('isEnded');
             await tournament.save();
-            childProcess.exec('node ' + path.join(__dirname, '/generateExcelT.js') + ' ' + tournament.identificator);
+            childProcess.exec('node ' + path.join(__dirname, '/generateExcelT.js') + ' ' + t_i);
         }
     }
     if(b){
@@ -54,6 +55,8 @@ async function checkBegin(){
             tournament.isBegan = true;
             tournament.results.forEach(item => {
                 item.tasks = []
+                item.sumscore = 0;
+                item.sumtime = 0;
                 for (let i = 0; i < tournament.tasks.length; i++) {
                     item.tasks.push({
                         score: 0,
@@ -62,6 +65,8 @@ async function checkBegin(){
                     })
                 }
             });
+            tournament.attempts = [];
+            tournament.markModified('attempts');
             tournament.markModified('results');
             tournament.markModified('isBegan');
             await tournament.save();

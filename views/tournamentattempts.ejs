@@ -41,9 +41,14 @@
                 <% var onPage = 20 %>
                 <% for(let i=(page-1)*onPage; i<min(page*onPage+1,attempts.length); i++){ let task = tasks.find(item => attempts[i].TaskID == item.identificator) %>
                 <tr>
-                    <td><a class="t_attempts" href=<%= "/account/"+attempts[i].login+"/1/default&all" %> ><%= attempts[i].login  %></a></td>
+                    <% let loginToShow = attempts[i].login;
+                    if(loginToShow.length > 2 && loginToShow.slice(0,2)=="n_"){
+                        loginToShow = loginToShow.slice(2);
+                    }
+                    %>
+                    <td><a class="t_attempts" href=<%= "/account/"+attempts[i].login+"/1/default&all" %> ><%= loginToShow  %></a></td>
                     <td><a class="t_attempts" href=<%= "/attempt/"+attempts[i].login+"/"+attempts[i].AttemptDate %> >[Посылка]</a></td>
-                    <td><a class="t_attempts" href=<%= "/tournament/task/"+tourID+"/"+tasks[i].identificator %> ><%= parseInt(tasks[i].identificator.split("_")[1])+1 %></a></td>
+                    <td><a class="t_attempts" href=<%= "/tournament/task/page/"+tourID+"/"+tasks[i].identificator %> ><%= parseInt(tasks[i].identificator.split("_")[1])+1 %></a></td>
                     <td><%= attempts[i].score  %></td>
                     <td style="width: 200px;">
 

@@ -1834,7 +1834,8 @@ app.get('/tournament/results/:tour_id/:showTeachers/', checkAuthenticated, async
     if (tournament) {
         for(let i=0;i<baza.length;i++){
             let user = await User.findOne({login: baza[i].login})
-            results.push([baza[i], user.isTeacher]);
+            if(user)
+                results.push([baza[i], user.isTeacher]);
         }
         res.render('tournamentresults.ejs', {
             login: req.user.login,
@@ -2059,13 +2060,13 @@ app.get("/EditAccount", checkAuthenticated, async (req, res) => {
         location: req.header('Referer')
     };
 
-    res.render("EditAccount.ejs", rendered)
+    res.render("editaccount.ejs", rendered)
 });
 
 app.post("/EditAccount", checkAuthenticated, async (req, res) => {
     let user = await User.findOne({ login: req.user.login });
     if (req.body.password.length < 5 && req.body.password.trim().length != 0) {
-        return res.render('EditAccount.ejs', {
+        return res.render('editaccount.ejs', {
             login: req.user.login,
             name: req.user.name,
             title: "Edit Account Page",

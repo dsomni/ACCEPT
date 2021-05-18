@@ -25,7 +25,6 @@ async function run(){
 
     });
     spawnProcess.stdout.on('data', function (data){
-
         pOutput +=data.toString('utf8');
         if(pOutput.trim()==output){
             result = "Test #" + (i+1).toString() + "*" + "OK" + "*" + "ok" +"\n";

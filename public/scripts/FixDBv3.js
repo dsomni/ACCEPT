@@ -25,6 +25,9 @@ async function run() {
     mongoose.connection.collections[config.mongodbConfigs.CollectionNames.news].drop( function(err) {
         console.log('collection \"news\" dropped');
     });
+    mongoose.connection.collections[config.mongodbConfigs.CollectionNames.tournaments].drop( function(err) {
+        console.log('collection \"tournaments\" dropped');
+    });
     childProcess.exec('node '+ path.join(__dirname, 'repairLessons.js'));
     childProcess.exec('node '+ path.join(__dirname, 'repairTasks.js'));
     childProcess.exec('node '+ path.join(__dirname, 'addTeacher.js'));
