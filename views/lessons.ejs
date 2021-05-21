@@ -81,6 +81,20 @@
                 <% var nextPage = page + 1 %>
 
                 <div class='pageinfo'>
+                    <div><%= ((page-1)*onPage+1).toString() + "-" +  min(page*onPage,lessons.length-1).toString() + " из " +  (lessons.length-1).toString() %> </div>
+                    </div>
+                    <% var displayPages = 10; %>
+                    <% var displayFrom = Math.trunc(page/displayPages)*displayPages +1; %>
+                    <div style="margin-left: 25% ;margin-right: 25%; margin-top: 5px;">
+                    <% for (let i=1;i <= lessons.length/onPage +1;i++){ 
+                        if(i==page){ %>
+                        <a class="tablerefs" style="font-size: 23px; margin: 2px;font-weight:900;" href=<%="/lessons/"+ u_login + "/" + i + "/" + search %>><%= i %></a>
+                        <% }else{ %>
+                        <a class="tablerefs" style="font-size: 20px; margin: 2px;" href=<%="/lessons/"+ u_login + "/" + i + "/" + search %>><%= i %></a>
+                    <% }} %>
+                </div>
+
+                <!--<div class='pageinfo'>
                 <div><%= ((page-1)*onPage+1).toString() + " - " +  min(page*onPage,max(0, lessons.length-1)).toString() + " из " +  max(0, lessons.length-1).toString() %> </div>
 
                 <% if(page>1) { %>
@@ -93,7 +107,7 @@
                 <% }else { %>
                     <button>&gt;&gt;&gt;</button>
                 <% } %>
-                </div>
+                </div>-->
         </main>
     </body>
 </html>

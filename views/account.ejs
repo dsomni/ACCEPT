@@ -39,7 +39,7 @@
                   <th>Вердикт</th>
                   <th>Язык</th>
                   </tr>
-                <% var onPage = 10 %>
+                <% var onPage = 25 %>
                 <% min = function(a,b){ if(a < b) return a; return b} %>
                 <% for (var i = (page-1)*onPage; i < min(page*onPage, attempts.length); i++) { %>
                 <% var attempt = attempts[i]; %>
@@ -70,7 +70,21 @@
                 <% var prevPage = page - 1 %>
                 <% var nextPage = page + 1 %>
 
-                <div class="pageinfo">
+                <div class='pageinfo'>
+                    <div><%= ((page-1)*onPage+1).toString() + "-" +  min(page*onPage,attempts.length-1).toString() + " из " +  (attempts.length-1).toString() %> </div>
+                    </div>
+                    <% var displayPages = 10; %>
+                    <% var displayFrom = Math.trunc(page/displayPages)*displayPages +1; %>
+                    <div style="margin-left: 25% ;margin-right: 25%; margin-top: 5px;">
+                    <% for (let i=1;i <= attempts.length/onPage +1;i++){ 
+                        if(i==page){ %>
+                        <a class="tablerefs" style="font-size: 23px; margin: 2px;font-weight:900;" href=<%="/account/"+ u_login + "/" + i + "/" + search %>><%= i %></a>
+                        <% }else{ %>
+                        <a class="tablerefs" style="font-size: 20px; margin: 2px;" href=<%="/account/"+ u_login + "/" + i + "/" + search %>><%= i %></a>
+                    <% }} %>
+                </div>
+
+                <!--<div class="pageinfo">
                 <div><%= ((page-1)*onPage+1).toString() + " - " +  min(page*onPage,attempts.length).toString() + " из " +  attempts.length.toString() %> </div>
 
                 <% if(page>1) { %>
@@ -83,7 +97,7 @@
                 <% }else { %>
                     <button>&gt;&gt;&gt;</button>
                 <% } %>
-                </div>
+                </div>-->
         </main>
     </body>
 </html>

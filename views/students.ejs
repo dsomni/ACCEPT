@@ -37,7 +37,7 @@
                   <th>Кабинет</th>
                   </tr>
                 <% min = function(a,b){ if(a < b) return a; return b} %>
-                <% var onPage = 20 %>
+                <% var onPage = 50 %>
                 <% if(students.length>0){ if(students[0].identificator!=0){ students.unshift([0]); } } %>
                 <% for (var i = (page-1)*onPage+1; i < min(page*onPage+1,students.length); i++) { %>
                 <% var student = students[i]; %>
@@ -80,7 +80,19 @@
 
                 <div class='pageinfo'>
                 <div><%= ((page-1)*onPage+1).toString() + "-" +  min(page*onPage,students.length-1).toString() + " из " +  (students.length-1).toString() %> </div>
+                </div>
+                <% var displayPages = 10; %>
+                <% var displayFrom = Math.trunc(page/displayPages)*displayPages +1; %>
+                <div style="margin-left: 25% ;margin-right: 25%; margin-top: 5px;">
+                <% for (let i=1;i <= students.length/onPage +1;i++){ 
+                    if(i==page){ %>
+                    <a class="tablerefs" style="font-size: 23px; margin: 2px;font-weight:900;" href=<%="/students/"+ i + "/" + search %>><%= i %></a>
+                    <% }else{ %>
+                    <a class="tablerefs" style="font-size: 20px; margin: 2px;" href=<%="/students/"+ i + "/" + search %>><%= i %></a>
+                <% }} %>
 
+
+                <!--<div class='pageinfo'></div>
                 <% if(page>1) { %>
                     <button onClick=<%= 'location.href=\"/students/'+prevPage + "/" + search + "\"" %>>&lt;&lt;&lt;</button>
                 <% }else { %>
@@ -91,7 +103,8 @@
                 <% }else { %>
                     <button>&gt;&gt;&gt;</button>
                 <% } %>
-                </div>
+                </div> -->
+
         </main>
     </body>
     <script type = text/javascript>
