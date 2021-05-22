@@ -27,7 +27,7 @@
                 <tr>
                     <th>LOGIN</th>
                     <%  tournament.tasks.forEach(task => { %>
-                        <th><a class="tlrefs" href=<%="/task_tt/"+tournament.identificator  + '/' + task.identificator %>> <%= Number(task.identificator.split('_')[1])+1 %> </a></th>
+                        <th><a class="tlrefs" href=<%="/tournament/task/page/"+tournament.identificator  + '/' + task.identificator %>> <%= Number(task.identificator.split('_')[1])+1 %> </a></th>
                     <% }); %>
                     <th>Счёт</th>
                     <th>Время</th>
