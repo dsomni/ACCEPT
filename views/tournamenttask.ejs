@@ -86,9 +86,39 @@
             <div id="submitdiv">
                 <button id="submit">Отправить</button>
             </div>
-
         </form>
-        <p class="countDownTimer" id="countDownTimer"></p>
+        <p class="countDownTimer" id="countDownTimer" style="left: 5rem; right:auto; top:20px"></p>
+        <div id="chat" style="margin-right: 10px;">
+            <div id = "messages" style="padding-left: 5px; font-size: 25px; font-weight: 500; ">
+            <% for (let i=0;i < tournament.tasks.length;i++){
+                let task = tournament.tasks[i];
+                var verdict = 0;
+                if (task.identificator == ID){%>
+                <div style="outline: 1px solid #000;margin-top: 10px;background-color: rgb(140, 190, 255); padding-left: 5px;padding-bottom: 10px; "><a href=<%="/tournament/task/page/"+tournament.identificator+"/" + task.identificator%> style="margin-bottom: 10px; font-weight:bolder;" class="tablerefs"><%= task.title %></a></div>
+                <% } else {
+                    let user = tournament.results.find(item=> item.login == login);
+                    if(user){
+                        let tsks = user.tasks;
+                        let idx = parseInt(task.identificator.split('_')[1]); %>
+                        <%if(!tsks || idx>=tsks.length){ %>
+                            <div style="outline: 1px solid #000;margin-top: 10px;padding-left: 5px;padding-bottom: 10px; "><a href=<%="/tournament/task/page/"+tournament.identificator+"/" + task.identificator%> style="margin-bottom: 10px;" class="tablerefs"><%= task.title %></a></div>
+                       <% }else{ %>
+                            <%let verdict = tsks[idx];
+                            if(verdict.score == 100){ %>
+                                <div style="outline: 1px solid #000;margin-top: 10px;background-color: rgb(150, 255, 129); padding-left: 5px;padding-bottom: 10px; "><a href=<%="/tournament/task/page/"+tournament.identificator+"/" + task.identificator%> style="margin-bottom: 10px;" class="tablerefs"><%= task.title %></a></div>
+                            <%} else if(verdict.tries >0){ %>
+                                <div style="outline: 1px solid #000;margin-top: 10px;background-color: rgb(255, 148, 129); padding-left: 5px;padding-bottom: 10px; "><a href=<%="/tournament/task/page/"+tournament.identificator+"/" + task.identificator%> style="margin-bottom: 10px;" class="tablerefs"><%= task.title %></a></div>
+                            <% } else{ %>
+                                <div style="outline: 1px solid #000;margin-top: 10px;padding-left: 5px;padding-bottom: 10px; "><a href=<%="/tournament/task/page/"+tournament.identificator+"/" + task.identificator%> style="margin-bottom: 10px;" class="tablerefs"><%= task.title %></a></div>
+                            <% } %>
+                       <% } %>
+                    <%}else{ %>
+                        <div style="outline: 1px solid #000;margin-top: 10px;padding-left: 5px;padding-bottom: 10px; "><a href=<%="/tournament/task/page/"+tournament.identificator+"/" + task.identificator%> style="margin-bottom: 10px;" class="tablerefs"><%= task.title %></a></div>
+                    <% } %>
+                <% } %>
+            <% } %>
+            </div>
+        </div>
     </main>
     </body>
     <script type = text/javascript>
