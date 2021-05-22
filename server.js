@@ -131,6 +131,10 @@ load();
 childProcess.exec('node ' + path.join(__dirname, '/public/scripts/Tchecker.js'));
 
 //---------------------------------------------------------------------------------
+// Checking tasks
+childProcess.exec('node ' + path.join(__dirname, '/public/scripts/TaskAutoChecker.js'));
+
+//---------------------------------------------------------------------------------
 // Main Page
 app.get('/', (req, res) => {
     if(req.user){
@@ -2239,9 +2243,15 @@ function compareTournaments(a,b){
 }
 
 //---------------------------------------------------------------------------------
-// Tournirnaments timer checker start
+// Tournaments timer checker start
 setInterval(()=>{
     childProcess.exec('node ' + path.join(__dirname, '/public/scripts/Tchecker.js'));
+},1000*60*10)
+
+//---------------------------------------------------------------------------------
+// Tasks auto checker
+setInterval(()=>{
+    childProcess.exec('node ' + path.join(__dirname, '/public/scripts/TaskAutoChecker.js'));
 },1000*60*10)
 
 //---------------------------------------------------------------------------------
