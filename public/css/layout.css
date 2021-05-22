@@ -228,6 +228,7 @@ header input{
     text-align: center;
     margin: 10px;
     padding: 10px;
+    overflow:hidden;
 }
 
 #examples{
@@ -244,7 +245,7 @@ header input{
     background-color: #e4e1e1aa;
     margin-left: auto;
     margin-right: auto;
-    width: 640px;
+    width: 50%;
     padding: 10px;
 }
 #task h4{
