@@ -21,7 +21,9 @@
                 <a style="margin-left: 10px;" class="tlrefs" href="/addnews">[Добавить новость]</a>
             <% } %>
             <br>
-            <% for(var i = news.length -1 ; i >= 0; i--){ %>
+            <% min = function(a,b){ if(a < b) return a; return b} %>
+            <% let toDisplay = 10; %>
+            <% for(var i = 0 ; i < min(news.length, toDisplay); i++){ %>
                 <div class="news">
                     <% var maxDate = new Date(Number(news[i].date)); %>
                     <% var isoDate = maxDate.toISOString(); %>
@@ -32,6 +34,7 @@
                     <%= news[i].description %>
                 </div>
             <% }%>
+            <a style="font-size: 30px;margin-left: 10px;" class="editref" href="/newslist/1">Перейти ко всем новостям</a>
         </main>
     </body>
     <script type = text/javascript>

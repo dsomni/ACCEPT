@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Нововсти</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0,
+              maximum-scale=1.0, minimum-scale=1.0,
+              user-scalable=no, minimal-ui">
+        <meta name="full-screen" content="yes">
+
+        <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
+        </head>
+    <body>
+        <main>
+            <h1>Все нововсти</h1>
+            <% if (isTeacher){ %>
+                <a style="margin-left: 10px;" class="tlrefs" href="/addnews">[Добавить новость]</a>
+            <% } %>
+            <br>
+            <% min = function(a,b){ if(a < b) return a; return b} %>
+            <% var onPage = 15; %>
+            <% for(var i = (page-1)*onPage; i < min(page*onPage,news.length); i++){ %>
+                <div class="news">
+                    <% var maxDate = new Date(Number(news[i].date)); %>
+                    <% var isoDate = maxDate.toISOString(); %>
+                    <% var date = isoDate.substr(0, 10) ; %>
+                    <a class="newsTitle" href=<%="/news/" + news[i]._id %>><b><%= news[i].title %></b></a>
+                    <br>
+                    <span class="date"> <%= date %> </span>
+                    <%= news[i].description %>
+                </div>
+            <% }%>
+                <% var page = Number(page) %>
+                <% var prevPage = page - 1 %>
+                <% var nextPage = page + 1 %>
+
+                <div class='pageinfo'>
+                    <div><%= ((page-1)*onPage+1).toString() + "-" +  min(page*onPage,news.length).toString() + " из " +  (news.length).toString() %> </div>
+                    </div>
+                    <% var displayPages = 10; %>
+                    <% var displayFrom = Math.trunc(page/displayPages)*displayPages +1; %>
+                    <div style="margin-left: 25% ;margin-right: 25%; margin-top: 5px;">
+                    <% for (let i=1;i <= news.length/onPage +1;i++){ 
+                        if(i==page){ %>
+                        <a class="tablerefs" style="font-size: 23px; margin: 2px;font-weight:900;" href=<%="/newslist/"+ i  %>><%= i %></a>
+                        <% }else{ %>
+                        <a class="tablerefs" style="font-size: 20px; margin: 2px;" href=<%="/newslist/"+ i  %>><%= i %></a>
+                    <% }} %>
+                </div>
+
+        </main>
+    </body>
+</html>

@@ -133,6 +133,7 @@ childProcess.exec('chcp 65001 | dir');
 let news;
 async function load(){
     news = await News.find({}).exec();
+    news.reverse();
 }
 load();
 
@@ -1093,7 +1094,6 @@ app.post('/addnews', checkAuthenticated, checkNletter, checkPermission, uploadIm
     if (req.file) filename = req.file.filename
 
     let new_news = await Adder.addNews(News, body.title, body.description, body.text, filename, user.name);
-    news.push(new_news);
     load();
     res.redirect("/")
 });
@@ -1105,7 +1105,7 @@ app.post('/deletenews/:id', checkAuthenticated, checkNletter, checkPermission, a
     let filename = news[news.findIndex(item => item._id==req.params.id)].imageName;
     filepath = path.join(__dirname, "./public/media/newsImages/"+filename)
     childProcess.exec('del /q \"'+filepath+'\"');
-    news.splice(news.findIndex(item => item._id==req.params.id),1)
+    load();
     res.redirect('/');
 })
 
@@ -2129,6 +2129,25 @@ app.post("/report", checkAuthenticated, async (req, res) => {
           });
     }
     res.redirect("/report");
+});
+
+//---------------------------------------------------------------------------------
+// News List Page
+app.get("/newslist/:page", async (req, res) => {
+
+    newslist = await News.find({}).exec();
+    newslist.reverse();
+    let rendered = {
+        login: (req.user) ? req.user.login : "",
+        name: (req.user) ? req.user.name : "",
+        title: "News List Page",
+        isTeacher: (req.user) ? req.user.isTeacher : false,
+        page: req.params.page,
+        news: newslist,
+        location: req.header('Referer')
+    };
+
+    res.render("newslist.ejs", rendered)
 });
 
 //---------------------------------------------------------------------------------
