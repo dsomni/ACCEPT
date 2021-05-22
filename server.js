@@ -17,8 +17,18 @@ const bcrypt = require("bcryptjs");
 const morgan = require("morgan");
 const multer = require("multer");
 const StreamZip = require('node-stream-zip');
+const nodemailer = require("nodemailer");
 const app = express();
 
+//---------------------------------------------------------------------------------
+// Gmail setup
+let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'accept.report@gmail.com',
+      pass: 'accept3!',
+    },
+})
 
 //---------------------------------------------------------------------------------
 // Multer setup
@@ -2052,7 +2062,7 @@ app.post("/registration", async (req, res) => {
 });
 
 //---------------------------------------------------------------------------------
-// Edit Accaunt Page
+// Edit Account Page
 app.get("/EditAccount", checkAuthenticated, async (req, res) => {
     let rendered = {
         login: req.user.login,
@@ -2092,6 +2102,33 @@ app.post("/EditAccount", checkAuthenticated, async (req, res) => {
     user.markModified("password");
     await user.save();
     res.redirect("/");
+});
+
+//---------------------------------------------------------------------------------
+// Report Page
+app.get("/report", checkAuthenticated, async (req, res) => {
+    let rendered = {
+        login: req.user.login,
+        name: req.user.name,
+        title: "Report Page",
+        isTeacher: req.user.isTeacher,
+        location: req.header('Referer')
+    };
+
+    res.render("report.ejs", rendered)
+});
+
+app.post("/report", checkAuthenticated, async (req, res) => {
+    if (req.body.report) {
+        let sign = "\n" + req.user.name + "\n" + req.user.login
+        let info = await transporter.sendMail({
+            from: '"ACCEPT report collector" <accept.report@gmail.com>', // sender address
+            to: "pro100pro10010@gmail.com", // list of receivers
+            subject: req.body.type_selector, // Subject line
+            text: req.body.report + sign // plain text body
+          });
+    }
+    res.redirect("/report");
 });
 
 //---------------------------------------------------------------------------------
