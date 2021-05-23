@@ -14,7 +14,7 @@
     <body>
         <main>
         <form>
-            <% var maxDate = new Date(Number(date)); %>
+            <% var maxDate = new Date(Number(date)+3*60*60*1000); %>
             <% var isoDate = maxDate.toISOString(); %>
             <% var Completedate = isoDate.substr(0, 10) + " " + isoDate.substr(11, 8) ; %>
             <div>

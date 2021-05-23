@@ -50,7 +50,7 @@
                 <% item = attempt.result[attempt.result.length - 1]; %>
                 <% }%>
                 <% if(!item || item[0]=='') item = ["😡","Don't spam F5 during testing!!!", "er"]; %>
-                <% var maxDate = new Date(Number(attempt.date)); %>
+                <% var maxDate = new Date(Number(attempt.date) +3*60*60*1000); %>
                 <% var isoDate = maxDate.toISOString(); %>
                 <% var date = isoDate.substr(0, 10) + " " + isoDate.substr(11, 8) ; %>
                  <tr>
