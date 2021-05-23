@@ -2202,7 +2202,7 @@ setInterval(()=>{
 //---------------------------------------------------------------------------------
 // Queue Manager
 setInterval(async ()=>{
-    let processesPath = path.normalize(__dirname + "\\public\\processes");
+    let processesPath = path.join(__dirname, "/public/processes");
     let files = await fs.readdirSync(processesPath);
     if (files.length >= configs.maxThreadsTasks) {
         return;
