@@ -186,89 +186,20 @@ app.get('/task/page/:id', checkAuthenticated, checkNletter, async (req, res) => 
     }
     let showHint = req.user.attempts.filter(item => item.taskID == req.params.id).length >= problem.hint.attemptsForHint;
     fs.stat(path.normalize('public/processes/') + req.user.login +'_'+req.params.id, function(err,stats) {
-        if (!err && Date.now()) {
-            fs.stat(path.join('public/processes/' + req.user.login+'_'+req.params.id + "/result.txt"), async function(err,stats2) {
-                if (!err) {
-                    let resultStrings = fs.readFileSync(path.normalize('public/processes/' + req.user.login+'_'+req.params.id + "/result.txt"),"utf-8").trim().split("\n");
-                    if(resultStrings[0].length >0 && (resultStrings[0] == 'Test # 1*Compilation Error*er' || resultStrings.length == problem.tests.length)){
-
-                        let result = [];
-                        for(let i = 0; i < resultStrings.length; i++){
-                            result.push(resultStrings[i].split('*'));
-                        }
-                        result.sort((a,b)=>{
-                            return Number(a[0].split('#')[1]) -  Number(b[0].split('#')[1])
-                        })
-
-                        let idx = req.user.verdicts.findIndex(item => item.taskID == req.params.id)
-                        if(idx==-1){
-                            req.user.verdicts.push({
-                                taskID: req.params.id,
-                                result: getVerdict(result)
-                            })
-                        } else if(req.user.verdicts[idx].result!="OK"){
-                            req.user.verdicts.splice(idx,1);
-                            req.user.verdicts.push({
-                                taskID: req.params.id,
-                                result: getVerdict(result)
-                            })
-                        }
-
-                        let attempts = req.user.attempts;
-                        let idxx = 0;
-                        let obj = {};
-                        for(let k = 0; k < attempts.length; k++){
-                            if( attempts[k].taskID == req.params.id){
-                                obj = req.user.attempts[k];
-                                idxx = k;
-                                break;
-                            }
-                        }
-                        req.user.attempts.splice(idxx,1,{taskID: obj.taskID, date: obj.date,
-                            programText: obj.programText, result: result, language: obj.language})
-                        await req.user.save()
-
-
-                        fs.rmdirSync(path.normalize('public/processes/'+req.user.login+'_'+req.params.id),{recursive: true});
-
-                        res.redirect('/task/page/'+req.params.id);
-                    }else{
-                        res.render('task.ejs',{
-                            login: req.user.login,
-                            RESULT: [["","Testing..","er"]],
-                            ID: req.params.id,
-                            name: req.user.name,
-                            title: "Task " + req.params.id,
-                            isTeacher: req.user.isTeacher,
-                            problem: problem,
-                            prevCode: "",
-                            showHint: showHint,
-                            language: language,
-                            location: "/tasks/1/default&all&all&false&all"
-                        });
-                    }
-                }else{
-                    if(Date.now() - stats.birthtimeMs >= config.FolderLifeTime){
-                        fs.rmdirSync(path.normalize('public/processes/' + req.user.login+'_'+req.params.id),{recursive: true});
-                        res.redirect('/task/page/'+req.params.id);
-                    }
-                    res.render('task.ejs',{
-                        login: req.user.login,
-                        RESULT: [["","Testing..","er"]],
-                        ID: req.params.id,
-                        name: req.user.name,
-                        title: "Task " + req.params.id,
-                        isTeacher: req.user.isTeacher,
-                        problem: problem,
-                        prevCode: "",
-                        showHint: showHint,
-                        language: req.user.attempts[0].language,
-                        location: "/tasks/1/default&all&all&false&all"
-                });
-                }
+        if (!err) {
+            res.render('task.ejs',{
+                login: req.user.login,
+                RESULT: [["","Testing..","er"]],
+                ID: req.params.id,
+                name: req.user.name,
+                title: "Task " + req.params.id,
+                isTeacher: req.user.isTeacher,
+                problem: problem,
+                prevCode: "",
+                showHint: showHint,
+                language: req.user.attempts[0].language,
+                location: "/tasks/1/default&all&all&false&all"
             });
-
-
         }else {
             let attempts = req.user.attempts;
             let result = []
@@ -276,7 +207,7 @@ app.get('/task/page/:id', checkAuthenticated, checkNletter, async (req, res) => 
             let language = "";
             for(let i = 0; i < attempts.length; i++){
                 if( attempts[i].taskID == req.params.id){
-                    result =attempts[i].result;
+                    result = attempts[i].result;
                     prevCode = attempts[i].programText;
                     language = attempts[i].language;
                     break;
@@ -298,6 +229,7 @@ app.get('/task/page/:id', checkAuthenticated, checkNletter, async (req, res) => 
         }
     });
 })
+
 // Task Page listener
 app.post('/task/page/:id', checkAuthenticated, checkNletter, uploadCode.single('file'), async (req, res) => {
     fs.stat(path.normalize('public/processes/'+req.user.login+"_"+req.params.id), async function(err) {
@@ -349,7 +281,6 @@ app.post('/task/page/:id', checkAuthenticated, checkNletter, uploadCode.single('
             res.redirect('/task/page/'+req.params.id);
         }
     });
-
 })
 
 
@@ -1479,144 +1410,28 @@ app.get('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTournamen
     let whenEnds = tournament.whenEnds;
     let isBegan = tournament.isBegan;
 
-    let language = req.body.languageSelector;
     problem = tournament.tasks.find(item => item.identificator == req.params.id);
+    if(!problem){
+        res.redirect('/tournament/page/' + req.user.login + '/' + req.params.tour_id);
+    }
+
     fs.stat(path.normalize('public/processes/' + req.user.login + '_' + req.params.id), function (err, stats) {
-        if (!err && Date.now()) {
-
-            fs.stat(path.normalize('public/processes/' + req.user.login + '_' + req.params.id + "/result.txt"), async function (err, stats2) {
-                if (!err) {
-                    let resultStrings = fs.readFileSync(path.normalize('public/processes/' + req.user.login + '_' + req.params.id + "/result.txt"), "utf-8").trim().split("\n");
-                    if (resultStrings[0].length >0 && (resultStrings[0] == 'Test # 1*Compilation Error*er' || resultStrings.length == problem.tests.length)) {
-
-                        let result = [];
-                        for (let i = 0; i < resultStrings.length; i++) {
-                            result.push(resultStrings[i].split('*'));
-                        }
-                        result.sort((a, b) => {
-                            return Number(a[0].split('#')[1]) - Number(b[0].split('#')[1])
-                        })
-
-                        let idx = req.user.verdicts.findIndex(item => item.taskID == req.params.id)
-                        if (idx == -1) {
-                            req.user.verdicts.push({
-                                taskID: req.params.id,
-                                result: getVerdict(result)
-                            })
-                        } else if (req.user.verdicts[idx].result != "OK") {
-                            req.user.verdicts.splice(idx, 1);
-                            req.user.verdicts.push({
-                                taskID: req.params.id,
-                                result: getVerdict(result)
-                            })
-                        }
-
-                        let attempts = req.user.attempts;
-                        let idxx = 0;
-                        let obj = {};
-                        for (let k = 0; k < attempts.length; k++) {
-                            if (attempts[k].taskID == req.params.id) {
-                                obj = req.user.attempts[k];
-                                idxx = k;
-                                break;
-                            }
-                        }
-                        req.user.attempts.splice(idxx, 1, {
-                            taskID: obj.taskID,
-                            date: obj.date,
-                            programText: obj.programText,
-                            result: result,
-                            language: obj.language
-                        })
-                        await req.user.save()
-
-                        let score =  getScore(result);
-                        if(score!=100 && tournament.allOrNothing){
-                            score = 0;
-                        }
-                        tournament.attempts.push({
-                            login: req.user.login,
-                            AttemptDate: req.user.attempts[0].date,
-                            TaskID: req.params.id,
-                            score
-                        });
-
-                        // tournament results update
-                        let user_result_idx = tournament.results.findIndex(item => item.login == req.user.login.toString());
-                        let task_idx = req.params.id.split('_')[1];
-                        if(!tournament.isEnded && user_result_idx!=-1 && task_idx>=tournament.results[user_result_idx].tasks.length){
-                            while(tournament.results[user_result_idx].tasks.length<=task_idx){
-                                tournament.results[user_result_idx].tasks.push({
-                                    score: 0,
-                                    dtime:0,
-                                    tries:0
-                                })
-                            }
-                        }
-                        if (!tournament.isEnded && user_result_idx!=-1 && tournament.results[user_result_idx].tasks[task_idx].score!=100){
-                            tournament.results[user_result_idx].tasks[task_idx].tries += 1;
-                            if (score != 100)
-                                tournament.results[user_result_idx].sumtime += tournament.penalty;
-                            if( tournament.results[user_result_idx].tasks[task_idx].score < score){
-                                tournament.results[user_result_idx].sumscore -= tournament.results[user_result_idx].tasks[task_idx].score;
-                                tournament.results[user_result_idx].sumscore += score;
-                                tournament.results[user_result_idx].tasks[task_idx].score = score;
-
-                                let now = new Date();
-                                tournament.results[user_result_idx].sumtime -= tournament.results[user_result_idx].tasks[task_idx].dtime;
-                                tournament.results[user_result_idx].sumtime += now-Date.parse(tournament.whenStarts);
-                                tournament.results[user_result_idx].tasks[task_idx].dtime = now-Date.parse(tournament.whenStarts);
-
-                            }
-                        }
-                        tournament.markModified("results");
-                        await tournament.save()
-
-
-                        fs.rmdirSync(path.normalize('public/processes/' + req.user.login + '_' + req.params.id), { recursive: true });
-
-                        res.redirect('/tournament/task/page/' + tour_id + '/' + req.params.id);
-                    } else {
-                        res.render('tournamenttask.ejs', {
-                            login: req.user.login,
-                            RESULT: [["", "Testing..", "er"]],
-                            ID: req.params.id,
-                            TUR_ID: req.params.tour_id,
-                            name: req.user.name,
-                            title: "Task " + req.params.id,
-                            isTeacher: req.user.isTeacher,
-                            problem: problem,
-                            prevCode: "",
-                            language: language,
-                            whenEnds: whenEnds,
-                            isBegan: isBegan,
-                            tournament,
-                            location: '/tournament/page/' + req.user.login + '/' + req.params.tour_id
-                        });
-                    }
-                } else {
-                    if (Date.now() - stats.birthtimeMs >= config.FolderLifeTime) {
-                        fs.rmdirSync(path.normalize('public/processes/' + req.user.login + '_' + req.params.id), { recursive: true });
-
-                        res.redirect('/tournament/task/page/' + tour_id + '/' + req.params.id);
-                    } 
-                    res.render('tournamenttask.ejs', {
-                        login: req.user.login,
-                        RESULT: [["", "Testing..", "er"]],
-                        ID: req.params.id,
-                        TUR_ID: req.params.tour_id,
-                        name: req.user.name,
-                        title: "Task " + req.params.id,
-                        isTeacher: req.user.isTeacher,
-                        problem: problem,
-                        prevCode: "",
-                        language: req.user.attempts[0].language,
-                        whenEnds: whenEnds,
-                        isBegan: isBegan,
-                        tournament,
-                        location: '/tournament/page/' + req.user.login + '/' + req.params.tour_id
-                    });
-                }
+        if (!err) {
+            res.render('tournamenttask.ejs', {
+                login: req.user.login,
+                RESULT: [["", "Testing..", "er"]],
+                ID: req.params.id,
+                TUR_ID: req.params.tour_id,
+                name: req.user.name,
+                title: "Task " + req.params.id,
+                isTeacher: req.user.isTeacher,
+                problem: problem,
+                prevCode: "",
+                language: req.user.attempts[0].language,
+                whenEnds: whenEnds,
+                isBegan: isBegan,
+                tournament,
+                location: '/tournament/page/' + req.user.login + '/' + req.params.tour_id
             });
         } else {
             let attempts = req.user.attempts;
@@ -1706,7 +1521,6 @@ app.post('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTourname
             res.redirect('/tournament/task/page/' + req.params.tour_id + '/' + req.params.id);
         }
     });
-
 });
 
 
