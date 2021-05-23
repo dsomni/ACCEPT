@@ -135,12 +135,12 @@ header{
     transition-delay: 0s;
 }
 header:hover{
-    transition-delay: .5s;
+    transition-delay: .75s;
     width: 220px;
     word-wrap: normal;
 }
 header:hover input{
-    width: 180px;
+    width: 80px;
 }
 header button{
     display: flex;
@@ -167,7 +167,6 @@ header button:hover{
     color: #75b5ff;
 }
 header input{
-    width: 50px;
     border: none;
     outline: none;
     margin-bottom: 10px;
@@ -487,6 +486,7 @@ header input{
 }
 .loginInterface input{
     display: block;
+    width: 60px;
 }
 .loginInterface button{
     margin-left: -5px;

@@ -26,12 +26,14 @@
         </div>
         <div class = 'loginInterface'>
             <% if (!name){ %>
-                <form action="/" method="POST" style="float: left;">
-                    <input type="login" name="login" placeholder="Логин" required>
-                    <input type="password" name="password" placeholder="Пароль" required>
-                    <button type="submit">Войти</button>
-                </form>
-                <button onclick='location.href="/registration"' style="margin-top: 100px;"> Новый&nbsp;&nbsp; пользователь</button>
+                <div style="display: flex; justify-content: flex-end; flex-direction: row; align-items: flex-end;">
+                    <form action="/" method="POST">
+                        <input type="login" name="login" placeholder="Логин" required>
+                        <input type="password" name="password" placeholder="Пароль" required>
+                        <button type="submit">Войти</button>
+                    </form>
+                    <button onclick='location.href="/registration"' >Регистрация</button>
+                </div>
             <% } else { %>
                 <% if(name.indexOf(" ")!=-1){%>
                     <% var arrname = name.split(" ")%>
