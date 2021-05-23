@@ -43,7 +43,8 @@ config = {
     'port': "3000", # server port
     'secret': "secret",
     'FolderLifeTime': 0.7 * 60 * 1000, # milliseconds
-    'parallelCoefficient': 10, #number of streams
+    'maxThreadsTests': 10, #number of test managing simultaneously
+    'maxThreadsTasks': 1, #number of tasks managing simultaneously
     'mongodbConfigs': {
         'dbName': "db", # mongodb data base name
         'Host': "localhost:27017", # where data base located(default: "localhost:27017")
@@ -62,7 +63,8 @@ config = {
 }
 port = input("Port(number): ")
 FolderLifeTime = input("FolderLifeTime: ")
-parallelCoefficient = input("parallelCoefficient: ")
+maxThreadsTests = input("maxThreadsTests: ")
+maxThreadsTasks = input("maxThreadsTasks: ")
 secret = input("secret: ")
 PathToUsersList = input("PathToUsersList: ")
 PathToDeleteUsersList = input("PathToDeleteUsersList: ")
@@ -88,8 +90,10 @@ if (port):
     config["port"] = port
 if (FolderLifeTime):
     config["FolderLifeTime"] = int(eval(FolderLifeTime))
-if (parallelCoefficient):
-    config["parallelCoefficient"] = int(eval(parallelCoefficient))
+if (maxThreadsTests):
+    config["maxThreadsTests"] = int(eval(maxThreadsTests))
+if (maxThreadsTasks):
+    config["maxThreadsTasks"] = int(eval(maxThreadsTasks))
 if (PathToUsersList):
     config["PathToUsersList"] = PathToUsersList
 if (PathToDeleteUsersList):

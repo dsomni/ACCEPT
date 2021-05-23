@@ -214,8 +214,6 @@ async function check(){
             }
         }
         isBusy = false;
-
-        isBusy = false;
     }
 
 }

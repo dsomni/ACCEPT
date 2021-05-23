@@ -5,7 +5,8 @@ module.exports = {
 	port: "3000", 
 	secret: "secret", 
 	FolderLifeTime: 42000.0, 
-	parallelCoefficient: 5, 
+	maxThreadsTasks: 3, 
+	maxThreadsTests: 10, 
 	mongodbConfigs: {
 		dbName: "db", 
 		Host: "localhost:27017", 

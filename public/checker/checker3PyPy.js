@@ -66,7 +66,7 @@ async function go(){
 
     fs.writeFileSync(path + '\\result.txt', "");
     for(let i = 0; i < tests.length; i++){
-        if (i % max(1, Math.trunc(config.parallelCoefficient - 0.7 * countProcesses())) == 0) {
+        if (i % max(1, Math.trunc(config.maxThreadsTests - 0.7 * countProcesses())) == 0) {
             await sleep(1000);
         }
 
