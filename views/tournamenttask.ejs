@@ -9,7 +9,8 @@
               maximum-scale=1.0, minimum-scale=1.0,
               user-scalable=no, minimal-ui">
         <meta name="full-screen" content="yes">
-
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
         </head>
     <body>
         <main>
@@ -68,7 +69,7 @@
                         <img src="\public\media\TopLeft.svg">
                         <img src="\public\media\TopRight.svg">
                     </div>
-                    <textarea class="taskarea" id="code" name = "code" placeholder="Place code here"><%= prevCode %></textarea>
+                    <textarea class="taskarea" id="code" name = "code" placeholder="Place code here" style="font-family: 'Source Code Pro', monospace;"><%= prevCode %></textarea>
                     <input name="file" id="dragdrop" type="file" style="display: none;" accept=".pas, .java, .cpp, .py">
                     <div class="taskarea"  id="result" name="result" >
                         <ul>

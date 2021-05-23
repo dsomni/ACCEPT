@@ -1,5 +1,6 @@
 const fs = require('fs');
 const childProcess = require("child_process");
+const compilers = require('../../config/compilers');
 
 childProcess.exec('chcp 65001 | dir');
 
@@ -55,14 +56,14 @@ async function run(){
     spawnProcess.stdin.write(input);
     spawnProcess.stdin.end();
 
-    setTimeout(()=>{
-        result = "Test #" + (i+1).toString() + "*" + "Time limit exceeded" + "*" + "er" +"\n"
-        fs.appendFileSync(path + '\\result.txt', result, function(error){ if(error) throw error;});
+    setTimeout(() => {
+        result = "Test #" + (i + 1).toString() + "*" + "Time limit exceeded" + "*" + "er" + "\n"
+        fs.appendFileSync(path + '\\result.txt', result, function (error) { if (error) throw error; });
         spawnProcess.stdout.removeAllListeners();
         spawnProcess.stderr.removeAllListeners();
         spawnProcess.kill('SIGINT');
         process.exit()
-    },1100)
+    }, 1100 + compilers.pascal);
 }
 
 run()

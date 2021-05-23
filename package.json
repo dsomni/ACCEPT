@@ -11,7 +11,8 @@
     "addUsers": "node public\\scripts\\addUser.js",
     "addTeachers": "node public\\scripts\\addTeacher.js",
     "deleteUsers": "node public\\scripts\\delUser.js",
-    "fix": "node public\\scripts\\FixDBv3.js"
+    "fix": "node public\\scripts\\FixDBv3.js",
+    "configureCompilers": "node public\\scripts\\CheckCompilers\\Checker.js"
   },
   "author": "",
   "license": "ISC",
@@ -20,6 +21,7 @@
     "nodemon": "^2.0.6"
   },
   "dependencies": {
+    "await-spawn": "^4.0.2",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "confirm-dialog": "^0.1.2",

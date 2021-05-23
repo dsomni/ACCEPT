@@ -1,5 +1,7 @@
 const fs = require('fs');
 const childProcess = require("child_process");
+const compilers = require('../../config/compilers');
+
 
 childProcess.exec('chcp 65001 | dir');
 
@@ -58,6 +60,6 @@ async function run(){
         spawnProcess.stderr.removeAllListeners();
         spawnProcess.kill('SIGINT');
         process.exit()
-    },1100)
+    },1100 + compilers.pypy)
 }
 run()
