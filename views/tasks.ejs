@@ -45,72 +45,27 @@
                 </select>
                 <button>Найти</button>
             </form>
-            <table class='taskslist'>
-                <tr>
-                  <th>ID</th>
-                  <th>Задача</th>
-                  <th>Тема</th>
-                  <th>Класс</th>
-                  <th>Автор</th>
-                  <th>Вердикт</th>
-                  </tr>
-                <% min = function(a,b){ if(a < b) return a; return b} %>
-                <% var onPage = 50 %>
-                <% if(tasks.length>0){ if(tasks[0].identificator!=0){ tasks.unshift([0]);results.unshift([0]) } } %>
-                <% for (var i = (page-1)*onPage+1; i < min(page*onPage+1,tasks.length); i++) { %>
-                <% var task = tasks[i]; %>
-                 <tr>
-                  <td><%= parseInt(task.identificator.split('_')[1])+ 1 %></td>
-                  <td><a class="tlrefs" href=<%="/task/page/" + task.identificator %>><%= task.title %></a></td>
-                  <td><%= task.topic %></td>
-                  <td><%= task.grade %></td>
-                  <%
-                  let authorArray = task.author.split(' ');
-                  let author = authorArray[0];
-                  for(let i=1;i< authorArray.length;i++){
-                      if(authorArray[i].length!=0){
-                          author += ' '+ authorArray[i][0]+'.';
-                      }
-                  }
-                %>
-                <td><%= author %></td>
-                  <td><%= results[i] %></td>
-                 </tr>
-                <% } %>
-            </table>
-
-                <% var page = Number(page) %>
-                <% var prevPage = page - 1 %>
-                <% var nextPage = page + 1 %>
-
-                <div class='pageinfo'>
-                    <div><%= ((page-1)*onPage+1).toString() + "-" +  min(page*onPage,tasks.length-1).toString() + " из " +  (tasks.length-1).toString() %> </div>
-                    </div>
-                    <% var displayPages = 10; %>
-                    <% var displayFrom = Math.trunc(page/displayPages)*displayPages +1; %>
-                    <div style="margin-left: 25% ;margin-right: 25%; margin-top: 5px;">
-                    <% for (let i=1;i <= tasks.length/onPage +1;i++){ 
-                        if(i==page){ %>
-                        <a class="tablerefs" style="font-size: 23px; margin: 2px;font-weight:900;" href=<%="/tasks/"+ i + "/" + search %>><%= i %></a>
-                        <% }else{ %>
-                        <a class="tablerefs" style="font-size: 20px; margin: 2px;" href=<%="/tasks/"+ i + "/" + search %>><%= i %></a>
-                    <% }} %>
-                </div>
-
-                <!--<div class='pageinfo'>
-                <div><%= ((page-1)*onPage+1).toString() + "-" +  min(page*onPage,tasks.length-1).toString() + " из " +  (tasks.length-1).toString() %> </div>
-
-                <% if(page>1) { %>
-                    <button onClick=<%= 'location.href=\"/tasks/'+prevPage + "/" + search + "\"" %>>&lt;&lt;&lt;</button>
-                <% }else { %>
-                    <button>&lt;&lt;&lt;</button>
-                <% } %>
-                <% if(page*onPage<tasks.length-1) { %>
-                    <button onClick=<%= 'location.href=\"/tasks/'+nextPage + "/" + search + "\"" %>>&gt;&gt;&gt;</button>
-                <% }else { %>
-                    <button>&gt;&gt;&gt;</button>
-                <% } %>
-                </div>-->
+            <table class='taskslist' id="table"></table>
         </main>
     </body>
+    <script type = text/javascript>
+        let min = (a, b) => {if(a>b)return b;return a;};
+        function update(ids) {
+            fetch("/api/tasks/gettestverdicts/"+ids).then(response=>response.json()).then(response => {
+                let text = "<tr>\n<th>ID</th>\n<th>Задача</th>\n<th>Тема</th>\n<th>Класс</th>\n<th>Автор</th>\n<th>Вердикт</th>\n</tr>";
+                let tasks = response.tasks;
+                let verdicts = response.verdicts;
+                for(let i=0; i<min(tasks.length, verdicts.length); i++){
+                    text+=`\n<tr>\n<td>${parseInt(tasks[i].identificator.split('_')[1])+1}</td>\n<td>${tasks[i].title}</td>\n<td>${tasks[i].topic}</td>\n<td>${tasks[i].grade}</td>\n<td>${tasks[i].author}</td>\n<td>${verdicts[i]}</td>\n</tr>`
+                }
+                resultsarea.innerHTML = text;
+            }).catch(err => console.log(err));
+        }
+        let resultsarea = document.getElementById("table");
+        let ids = "<%= foundTasks %>"
+        update(ids);
+        setInterval(() => {
+            update(ids);
+        }, 2000);
+    </script>
 </html>

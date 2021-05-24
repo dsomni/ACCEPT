@@ -47,41 +47,7 @@
                     <%= tournament.description %>
                 </div>
             </div>
-            <% if(tasks.length!=0){ %>
-                <table class='taskslist'>
-                    <tr>
-                        <th>ID</th>
-                        <th>Задача</th>
-                        <th>Вердикт</th>
-                        <th>История</th>
-                    </tr>
-
-                    <% for (var i=0; i < tasks.length; i++) { %>
-                        <% let task = tasks[i];
-                            if (task) { %>
-                            <tr>
-                                <td>
-                                    <%= parseInt(task.identificator.split('_')[1])+1 %>
-                                </td>
-                                <td> <a class="tlrefs" href=<%="/tournament/task/page/"+tournament.identificator  + '/' + task.identificator %>><%= task.title %></a></td>
-                                <td>
-                                    <%= results[i] %>
-                                </td>
-                                <td><a class="tlrefs" href=<%="/account/" + u_login + "/1/" + task.title.replace(' ','%20') + "&all" %> >[все попытки]</a></td>
-                            </tr>
-                            <% }} %>
-                </table>
-            <% }else{ %>
-
-                <% if(tournament.disqualificated.includes(login)){ %>
-                    <h1 style="text-align: center;color:Red">Вы дисквалифицированы!</h1>
-                <% }else if(tournament.mods.find(item => item == login)){ %>
-                    <h1 style="text-align: center;color:Red">Добавьте задачу</h1>
-                <% }else if(registered){ %>
-                        <h1 style="text-align: center;color:Red">Турнир ещё не начался</h1>
-               <% }else{ %>
-                    <h1 style="text-align: center;color:Red">Вы не зарегистрированы!</h1>
-                <% }} %>
+                <div id="table"></div>
         </main>
         <div id="chat">
             <div id = "messages"></div>
@@ -92,6 +58,40 @@
         <p class="countDownTimer" id="countDownTimer" style="left: 5rem; right:auto; top:6rem"></p>
     </body>
     <script src="/socket.io/socket.io.js"></script>
+    <script type = text/javascript>
+        let min = (a, b) => {if(a>b)return b;return a;};
+        function update(ids) {
+            let text;
+            if(ids.length == 0){
+                if(<%= tournament.disqualificated.includes(login) %>)
+                    text = `<h1 style="text-align: center;color:Red">Вы дисквалифицированы!</h1>`;
+                else if(<%= tournament.mods.find(item => item == login)!=0 %>)
+                    text = `<h1 style="text-align: center;color:Red">Добавьте задачу</h1>`;
+                else if(<%= registered!=null %>)
+                    text = `<h1 style="text-align: center;color:Red">Турнир ещё не начался</h1>`;
+                else
+                    text = `<h1 style="text-align: center;color:Red">Вы не зарегистрированы!</h1>`;
+                resultsarea.innerHTML = text;
+            }else{
+                fetch("/api/tasks/gettestverdicts/"+ids).then(response=>response.json()).then(response => {
+                    text = "<table class='taskslist'><tr>\n<th>ID</th>\n<th>Задача</th>\n<th>Вердикт</th>\n<th>История</th>\n</tr>";
+                    let tasks = response.tasks;
+                    let verdicts = response.verdicts;
+                    for(let i=0; i<min(tasks.length, verdicts.length); i++){
+                        text+=`\n<tr>\n<td>${parseInt(tasks[i].identificator.split('_')[1])+1}</td>\n<td> <a class="tlrefs" href="/tournament/task/page/${<%= tournament.identificator %>}/${tasks[i].identificator}">${tasks[i].title}</a></td>\n<td>${verdicts[i]}</td>\n<td><a class="tlrefs" href="/account/${<%= u_login %>}/1/${tasks[i].title.replace(' ','%20')}&all">[все попытки]</a></td>\n</tr>`;
+                    }
+                    text+="\n</table>";
+                    resultsarea.innerHTML = text;
+                }).catch(err => console.log(err));
+            }
+        }
+        let resultsarea = document.getElementById("table");
+        let ids = "<%= foundTasks %>";
+        update(ids);
+        setInterval(() => {
+            update(ids);
+        }, 2000);
+    </script>
     <script>
         if(!<%= tournament.isBegan %>){
             let countDownDate = new Date('<%= tournament.whenStarts.replace(' ', 'T') %>').getTime();

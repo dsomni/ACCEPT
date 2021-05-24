@@ -35,35 +35,33 @@
             <h4 class="h4">Автор: <%= lesson.author %></h4>
             <div style="margin-left: 20px;" id="statement"><%= lesson.description %></div>
             </div>
-
-        <table class='taskslist'>
-            <tr>
-              <th>ID</th>
-              <th>Задача</th>
-              <th>Тема</th>
-              <th>Класс</th>
-              <th>Автор</th>
-              <th>Вердикт</th>
-              <th>История</th>
-              </tr>
-
-            <% for (var i = 0; i < lesson.tasks.length; i++) { %>
-            <% var task = tasks[i]
-            if (task) { %>
-             <tr>
-              <!--<td><%= parseInt(task.identificator.split('_')[1]) %></td>-->
-              <td><%= i+1 %></td>
-              <td> <a class="tlrefs" href=<%="/task/page/" + task.identificator %>> <%= task.title %> </a> </td>
-              <td><%= task.topic %></td>
-              <td><%= task.grade %></td>
-              <td><%= task.author %></td>
-              <td><%= results[i] %></td>
-              <td><a class="tlrefs" href=<%="/account/" + u_login + "/1/" + task.title.replace(' ','%20') + "&all" %> >[все попытки]</a></td>
-             </tr>
-            <% }} %>
-        </table>
+        <div id="table"></div>
     </main>
     </body>
+        <script type = text/javascript>
+        let min = (a, b) => {if(a>b)return b;return a;};
+        function update(ids) {
+            let text;
+            if(ids.length != 0){
+                fetch("/api/tasks/gettestverdicts/"+ids).then(response=>response.json()).then(response => {
+                    text = "<table class='taskslist'>\n<tr>\n<th>ID</th>\n<th>Задача</th>\n<th>Тема</th>\n<th>Класс</th>\n<th>Автор</th>\n<th>Вердикт</th>\n<th>История</th>\n</tr>";
+                    let tasks = response.tasks;
+                    let verdicts = response.verdicts;
+                    for(let i=0; i<min(tasks.length, verdicts.length); i++){
+                        text+=`\n<tr>\n<td>${i+1}</td>\n<td><a class="tlrefs" href="/task/page/${tasks[i].identificator}">${tasks[i].title}</a></td>\n<td>${tasks[i].topic}</td>\n<td>${tasks[i].grade}</td>\n<td>${tasks[i].author}</td>\n<td>${verdicts[i]}</td>\n<td><a class="tlrefs" href="/account/<%= u_login %>/1/${tasks[i].title.replace(' ','%20')}&all">[все попытки]</a></td>\n</tr>`;
+                    }
+                    text+="\n</table>";
+                    resultsarea.innerHTML = text;
+                }).catch(err => console.log(err));
+            }
+        }
+        let resultsarea = document.getElementById("table");
+        let ids = "<%= foundTasks %>";
+        update(ids);
+        setInterval(() => {
+            update(ids);
+        }, 2000);
+    </script>
     <script type = text/javascript>
         function o() {
             document.getElementById('dialog').showModal();

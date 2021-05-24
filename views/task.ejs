@@ -72,15 +72,9 @@
                         <img src="\public\media\TopLeft.svg">
                         <img src="\public\media\TopRight.svg">
                     </div>
-                    <textarea class="taskarea" id="code" name = "code" placeholder="Place code here" style="font-family: 'Source Code Pro', monospace;"><%= prevCode %></textarea>
+                    <textarea class="taskarea" id="code" name = "code" placeholder="Place code here" style="font-family: 'Source Code Pro', monospace;" required><%= prevCode %></textarea>
                     <input name="file" id="dragdrop" type="file" style="display: none;" accept=".pas, .java, .cpp, .py">
-                    <div class="taskarea"  id="result" name="result" >
-                        <ul>
-                            <% RESULT.forEach(function(item){ %>
-                                <li><%= item[0] %> <a id=<%= item[2] %>><%= item[1] %></a></li>
-                            <% }); %>
-                        </ul>
-                    </div>
+                    <div class="taskarea"  id="result" name="result" ></div>
                     <div class="imgsbottom">
                         <img src="\public\media\BottomLeft.svg">
                         <img src="\public\media\BottomRight.svg">
@@ -95,6 +89,27 @@
 
     </main>
     </body>
+    <script type = text/javascript>
+        function update() {
+            fetch("/api/tasks/gettestresults/"+task).then(response=>response.json()).then(response => {
+                testing = response.length == 1;
+                text = "<ul>";
+                response.forEach(item => {
+                    text+="\n"+`<li>${item[0]}<a id=${item[2]}>${item[1]}</a></li>`
+                });
+                text +="\n</ul>"
+                resultsarea.innerHTML = text;
+            }).catch(err => console.log(err));
+        }
+        let resultsarea = document.getElementById("result");
+        let text;
+        let task = "<%= ID %>";
+        let testing;
+        update();
+        setInterval(() => {
+            update();
+        }, 2000);
+    </script>
     <script type = text/javascript>
         function o_delete() {
             document.getElementById('dialog_delete').showModal();
