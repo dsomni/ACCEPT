@@ -47,15 +47,20 @@
             </form>
             <table class='taskslist' id="table"></table>
 
-            <div id="pages" style="width: 80%; margin-top: 30px; margin-bottom: 30px; margin-left: auto; margin-right: auto; display: flex; justify-content: center; gap: 10px;">
-                <% for(let i=0; i<pages; i++){ %>
-                    <% if(i+1==page){ %>
-                        <a style="text-decoration: none;"><%= i+1 %></a>
-                    <% }else{ %>
-                        <a href="/tasks/<%= i+1 %>/default&all&all&false&all"><%= i+1 %></a>
-                    <% } %>
-                <% } %>
-            </div>
+                <div class='pageinfo'>
+                    <div class="pageRefs">
+                        <%= pageInfo %>
+                    </div>
+                    <div class="pageRefs">
+                        <% for(let i=0; i < pages; i++){ %>
+                            <% if(i+1==page){ %>
+                                <a class="tablerefs" style="font-size: 23px;font-weight:900;"><%= i+1 %></a>
+                            <% }else{ %>
+                                <a class="tablerefs" style="font-size: 20px;" href=<%=`/tasks/${i+1}/${search}`%>><%= i+1 %></a>
+                            <% } %>
+                        <% } %>
+                    </div>
+                </div>
         </main>
     </body>
     <script type = text/javascript>
@@ -66,7 +71,14 @@
                 let tasks = response.tasks;
                 let verdicts = response.verdicts;
                 for(let i=0; i<min(tasks.length, verdicts.length); i++){
-                    text+=`\n<tr>\n<td>${parseInt(tasks[i].identificator.split('_')[1])+1}</td>\n<td>${tasks[i].title}</td>\n<td>${tasks[i].topic}</td>\n<td>${tasks[i].grade}</td>\n<td>${tasks[i].author}</td>\n<td>${verdicts[i]}</td>\n</tr>`
+                    let authorArray = tasks[i].author.split(' ');
+                    let author = authorArray[0];
+                    for(let i=1;i< authorArray.length;i++){
+                        if(authorArray[i].length!=0){
+                            author += ' '+ authorArray[i][0]+'.';
+                        }
+                    }
+                    text+=`\n<tr>\n<td>${parseInt(tasks[i].identificator.split('_')[1])+1}</td>\n<td><a class="tlrefs" href="/task/page/${tasks[i].identificator}">${tasks[i].title}</a></td>\n<td>${tasks[i].topic}</td>\n<td>${tasks[i].grade}</td>\n<td>${author}</td>\n<td>${verdicts[i]} </td>\n</tr>`
                 }
                 resultsarea.innerHTML = text;
             }).catch(err => console.log(err));

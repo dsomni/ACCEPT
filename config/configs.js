@@ -5,8 +5,17 @@ module.exports = {
 	port: "3000", 
 	secret: "secret", 
 	FolderLifeTime: 42000.0, 
-	maxThreadsTasks: 3, 
 	maxThreadsTests: 10, 
+	maxThreadsTasks: 5, 
+	onPage: {
+		newsMain: 1, 
+		newsList: 2, 
+		tasks: "3", 
+		lessons: 3, 
+		tournaments: "5", 
+		students: "6", 
+		attempts: "7"
+	}, 
 	mongodbConfigs: {
 		dbName: "db", 
 		Host: "localhost:27017", 
@@ -19,7 +28,7 @@ module.exports = {
 			news: "news", 
 			tasks: "tasks", 
 			lessons: "lessons", 
-			tournaments: "tournaments"
+			tournament: "tournaments"
 		}
 	}
 }

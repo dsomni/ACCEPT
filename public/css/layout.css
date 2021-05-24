@@ -394,7 +394,7 @@ header input{
     resize: none;
     margin-top: 0px;
     background-color: white;
-    font-size: large;
+    font-size: small;
 }
 .taskarea:focus{
     outline: none;
@@ -457,11 +457,6 @@ header input{
 .addhref{
     margin-left: 120px;
     margin-bottom: 20px;
-}
-.pageinfo {
-    margin-left: auto;
-    margin-right: auto;
-    width: 200px;
 }
 /*-----------------------------------------------------------------------------*/
 /*Header*/
@@ -689,7 +684,22 @@ header input{
     color: black;
 }
 
+.pageinfo {
+    width: 100%;
+}
 
+.pageRefs{
+    min-width: 50%;
+    max-width: 75%;
+    margin-left: 120px;
+    margin-right: auto;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
 
 
 /*-----------------------------------------------------------------------------*/

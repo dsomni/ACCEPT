@@ -19,7 +19,6 @@ const multer = require("multer");
 const StreamZip = require('node-stream-zip');
 const nodemailer = require("nodemailer");
 const app = express();
-
 //---------------------------------------------------------------------------------
 // Queue setup
 
@@ -181,27 +180,26 @@ app.get('/', (req, res) => {
             name : req.user.name,
             title: "Main Page",
             isTeacher: req.user.isTeacher,
-            news: news,
+            news: news.slice(0, config.onPage.newsMain),
             location: undefined
         });
-    }else{
+    } else {
         res.render('main.ejs',{
             login: "",
             name : "",
             title: "Main Page",
             isTeacher: false,
-            news: news,
+            news: news.slice(0, config.onPage.newsMain),
             location: undefined
         });
     };
 });
 
-app.post('/', passport.authenticate('local', {
-        successRedirect: '/',
-        failureRedirect: '/',
-        failureFlash: true
-    })
-);
+app.post('/', (req, res) => passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/',
+    failureFlash: true
+})(req, res));
 
 //---------------------------------------------------------------------------------
 // Task Page
@@ -428,8 +426,11 @@ app.get('/tasks/:page/:search', checkAuthenticated, checkNletter, async (req, re
         foundTasks = tasks;
         if (SortByNew) foundTasks = foundTasks.reverse();
     }
-    let pages = Math.ceil(foundTasks.length / 20);
-    foundTasks = foundTasks.map(item => item.identificator).slice((req.params.page-1)*20, req.params.page*20).join('|')
+    let onPage = config.onPage.tasks;
+    let pageInfo = `${(req.params.page - 1) * onPage+1} - ${min(req.params.page * onPage, foundTasks.length)} из ${foundTasks.length}`;
+    let pages = Math.ceil(foundTasks.length / onPage);
+    foundTasks = foundTasks.map(item => item.identificator).slice((req.params.page - 1) * onPage, req.params.page * onPage).join('|');
+
     res.render('tasks.ejs',{
         login: user.login,
         name: req.user.name,
@@ -437,6 +438,7 @@ app.get('/tasks/:page/:search', checkAuthenticated, checkNletter, async (req, re
         title : "Tasks List",
         tasks: foundTasks,
         isTeacher: req.user.isTeacher,
+        pageInfo,
         pages,
         page: req.params.page,
         search: req.params.search,
@@ -563,7 +565,6 @@ app.get('/account/:login/:page/:search', checkAuthenticated, checkValidation, as
         let tasks = await Task.find({}).exec();
         let tournaments = await Tournament.find({}).exec();
         let attempts = user.attempts;
-        let results = [];
         let foundTasks = [];
         let foundAttempts = [];
 
@@ -592,19 +593,22 @@ app.get('/account/:login/:page/:search', checkAuthenticated, checkValidation, as
                 }
             }
         }
-
-
+        let onPage = config.onPage.attempts;
+        let page = req.params.page;
+        let pages = Math.ceil(foundAttempts.length / onPage);
+        let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, foundAttempts.length)} из ${foundAttempts.length}`;
 
         res.render('account.ejs',{
             login: req.user.login,
             u_login: user.login,
             name: req.user.name,
             title : "Account",
-            results: results,
-            page: req.params.page,
+            pageInfo,
+            page,
+            pages,
             isTeacher: req.user.isTeacher,
-            attempts: foundAttempts,
-            tasks: foundTasks,
+            attempts: foundAttempts.slice((page - 1) * onPage, page * onPage),
+            tasks: foundTasks.slice((page - 1) * onPage, page * onPage),
             search: req.params.search,
             n_name: user.name,
             user: user,
@@ -755,17 +759,24 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, checkNletter, async
         lessons = lessons.reverse();
         results = results.reverse();
     }
+    let onPage = config.onPage.lessons;
+    let page = req.params.page;
+    let pages = Math.ceil(lessons.length / onPage);
+    let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, lessons.length)} из ${lessons.length}`;
+
 
     res.render('lessons.ejs',{
         u_login: user.login,
         n_name: user.name,
         login: req.user.login,
         name: req.user.name,
-        title : "Lessons List",
-        lessons,
-        results,
+        title: "Lessons List",
+        lessons: lessons.slice((page - 1) * onPage, page * onPage),
+        results: results.slice((page - 1) * onPage, page * onPage),
         isTeacher: req.user.isTeacher,
-        page: req.params.page,
+        page,
+        pages,
+        pageInfo,
         search: req.params.search,
         teachers,
         location: req.header('Referer')
@@ -962,14 +973,22 @@ app.get('/students/:page/:search', checkAuthenticated, checkNletter, checkPermis
     }
     foundStudents.sort((a, b) => { return a.name > b.name });
 
+    let onPage = config.onPage.students;
+    let page = req.params.page;
+    let pages = Math.ceil(foundStudents.length / onPage);
+    let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, foundStudents.length)} из ${foundStudents.length}`;
+
     res.render('students.ejs',{
         login: user.login,
         name: req.user.name,
         title : "Students List",
         isTeacher: req.user.isTeacher,
-        page: max(req.params.page, 1),
+        page,
+        pageInfo,
+        pages,
+        onPage,
         search: req.params.search,
-        students: foundStudents,
+        students: foundStudents.slice((page - 1) * onPage, page * onPage),
         location: req.header('Referer')
     })
 })
@@ -1067,6 +1086,7 @@ app.post('/editnews/:id', checkAuthenticated, checkNletter, checkPermission, upl
 // News Page
 app.get("/news/:id", (req, res) => {
     let currentNew = news.find(item => item._id == req.params.id);
+
     if (currentNew) {
         let render = {
             login: '',
@@ -1210,7 +1230,12 @@ app.get('/tournaments/:login/:page/:search', checkAuthenticated, async (req, res
     }
 
     //?
-    foundTournaments.sort((a, b) => { return a._id < b._id })
+    foundTournaments.sort((a, b) => { return a._id < b._id });
+
+    let onPage = config.onPage.tournaments;
+    let page = req.params.page;
+    let pages = Math.ceil(foundTournaments.length / onPage);
+    let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, foundTournaments.length)} из ${foundTournaments.length}`;
 
     res.render('tournaments.ejs',{
         u_login: user.login,
@@ -1218,10 +1243,13 @@ app.get('/tournaments/:login/:page/:search', checkAuthenticated, async (req, res
         login: req.user.login,
         name: req.user.name,
         title: "Tournaments List",
-        tournaments: foundTournaments,
-        results: results,
+        tournaments: foundTournaments.slice((page - 1) * onPage, page * onPage),
+        results: results.slice((page - 1) * onPage, page * onPage),
         isTeacher: req.user.isTeacher,
-        page: req.params.page,
+        page,
+        pages,
+        onPage,
+        pageInfo,
         search: req.params.search,
         location: req.header('Referer')
     })
@@ -1386,8 +1414,6 @@ app.post('/tournament/task/delete/:tour_id/:id', checkAuthenticated, isModerator
 
     childProcess.exec("node " + path.join(__dirname, "/public/scripts/FixAfterDeleteTournamentTask.js") + " " +
         req.params.tour_id + " " + req.params.id)
-    console.log("node " + path.join(__dirname, "/public/scripts/FixAfterDeleteTournamentTask.js") + " " +
-    req.params.tour_id + " " + req.params.id)
     res.redirect('/tournament/page/' + req.user.login + '/' + req.params.tour_id);
 });
 
@@ -1920,13 +1946,22 @@ app.get("/newslist/:page", async (req, res) => {
 
     newslist = await News.find({}).exec();
     newslist.reverse();
+
+    let onPage = config.onPage.newsList;
+    let page = req.params.page;
+    let pages = Math.ceil(newslist.length / onPage);
+    let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, newslist.length)} из ${newslist.length}`;
+
     let rendered = {
         login: (req.user) ? req.user.login : "",
         name: (req.user) ? req.user.name : "",
         title: "News List Page",
         isTeacher: (req.user) ? req.user.isTeacher : false,
-        page: req.params.page,
-        news: newslist,
+        page,
+        pages,
+        onPage,
+        pageInfo,
+        news: newslist.slice((page - 1) * onPage, page * onPage),
         location: req.header('Referer')
     };
 

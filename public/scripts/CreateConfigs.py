@@ -45,6 +45,15 @@ config = {
     'FolderLifeTime': 0.7 * 60 * 1000, # milliseconds
     'maxThreadsTests': 10, #number of test managing simultaneously
     'maxThreadsTasks': 1, #number of tasks managing simultaneously
+    'onPage':{
+		'newsMain': 5,
+		'newsList': 10,#
+		'tasks': 25,#
+		'lessons': 20,#
+		'tournaments': 20,#
+		'students': 50,#
+		'attempts': 25#
+	},
     'mongodbConfigs': {
         'dbName': "db", # mongodb data base name
         'Host': "localhost:27017", # where data base located(default: "localhost:27017")
@@ -69,6 +78,15 @@ secret = input("secret: ")
 PathToUsersList = input("PathToUsersList: ")
 PathToDeleteUsersList = input("PathToDeleteUsersList: ")
 PathToTeachersList = input("PathToTeachersList: ")
+answer0 = input("Do you want to configure number of elements on pages?(y/n): ")
+if answer0.upper() == "Y":
+    newsMain = input("newsMain: ")
+    newsList = input("newsList: ")
+    tasks = input("tasks: ")
+    lessons = input("lessons: ")
+    tournaments = input("tournaments: ")
+    students = input("students: ")
+    attempts = input("attempts: ")
 answer1 = input("Do you want to configure DB?(y/n): ")
 if answer1.upper() == "Y":
     dbName = input("dbName: ")
@@ -102,6 +120,21 @@ if (PathToTeachersList):
     config["PathToTeachersList"] = PathToTeachersList
 if (secret):
     config["secret"] = secret
+if answer0.upper() == "Y":
+        if (newsMain):
+            config["onPage"]["newsMain"] = int(newsMain)
+        if (newsList):
+            config["onPage"]["newsList"] = int(newsList)
+        if (tasks):
+            config["onPage"]["tasks"] = int(tasks)
+        if (lessons):
+            config["onPage"]["lessons"] = int(lessons)
+        if (tournaments):
+            config["onPage"]["tournaments"] = int(tournaments)
+        if (students):
+            config["onPage"]["students"] = int(students)
+        if (attempts):
+            config["onPage"]["attempts"] = int(attempts)
 if answer1.upper() == "Y":
     if (dbName):
         config["mongodbConfigs"]["dbName"] = dbName

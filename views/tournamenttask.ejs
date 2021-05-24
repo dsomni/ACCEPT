@@ -122,7 +122,7 @@
                 testing = response.length == 1;
                 text = "<ul>";
                 response.forEach(item => {
-                    text+="\n"+`<li>${item[0]}<a id=${item[2]}>${item[1]}</a></li>`
+                    text+="\n"+`<li>${item[0]} <a id=${item[2]}>${item[1]}</a></li>`
                 });
                 text +="\n</ul>"
                 resultsarea.innerHTML = text;
