@@ -428,7 +428,8 @@ app.get('/tasks/:page/:search', checkAuthenticated, checkNletter, async (req, re
         foundTasks = tasks;
         if (SortByNew) foundTasks = foundTasks.reverse();
     }
-    foundTasks = foundTasks.map(item => item.identificator).join('|')
+    let pages = Math.ceil(foundTasks.length / 20);
+    foundTasks = foundTasks.map(item => item.identificator).slice((req.params.page-1)*20, req.params.page*20).join('|')
     res.render('tasks.ejs',{
         login: user.login,
         name: req.user.name,
@@ -436,6 +437,7 @@ app.get('/tasks/:page/:search', checkAuthenticated, checkNletter, async (req, re
         title : "Tasks List",
         tasks: foundTasks,
         isTeacher: req.user.isTeacher,
+        pages,
         page: req.params.page,
         search: req.params.search,
         topics: topics,

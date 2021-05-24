@@ -46,6 +46,16 @@
                 <button>Найти</button>
             </form>
             <table class='taskslist' id="table"></table>
+
+            <div id="pages" style="width: 80%; margin-top: 30px; margin-bottom: 30px; margin-left: auto; margin-right: auto; display: flex; justify-content: center; gap: 10px;">
+                <% for(let i=0; i<pages; i++){ %>
+                    <% if(i+1==page){ %>
+                        <a style="text-decoration: none;"><%= i+1 %></a>
+                    <% }else{ %>
+                        <a href="/tasks/<%= i+1 %>/default&all&all&false&all"><%= i+1 %></a>
+                    <% } %>
+                <% } %>
+            </div>
         </main>
     </body>
     <script type = text/javascript>
