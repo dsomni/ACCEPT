@@ -8,3 +8,6 @@ public/processes/*
 public/media/newsImages/*
 public/media/codeFiles/*
 *.pyc
+public/checker/pascalCompiler
+public/checker/pypyCompiler
+public/checker/pythonCompiler
