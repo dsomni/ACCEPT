@@ -234,7 +234,6 @@ header input{
     margin-left: 15%;
     margin-top: 10px;
     margin-bottom: 20px;
-    width: 640px;
     font-size: medium;
     white-space: pre-wrap;
     margin-left: auto;
@@ -817,4 +816,38 @@ header input{
     text-align: center;
     padding: .5rem;
     cursor: pointer;
+}
+
+.tasksSuccessError{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 18vw;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.tasklink{
+    margin: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 4vw;
+    height: 4vw;
+    border: solid black 1px;
+    border-radius: 5%;
+    text-decoration: none;
+    font-size: 2rem;
+}
+.success{
+    background-color:chartreuse;
+}
+.error{
+    background-color: crimson;
+}
+.testing{
+    background-color: gold;
+}
+.nottested{
+    background-color: lightgray;
 }

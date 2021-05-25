@@ -92,9 +92,8 @@
     <script type = text/javascript>
         function update() {
             fetch("/api/tasks/gettestresults/"+task).then(response=>response.json()).then(response => {
-                testing = response.length == 1;
                 text = "<ul>";
-                response.forEach(item => {
+                response.result.forEach(item => {
                     text+="\n"+`<li>${item[0]} <a id=${item[2]}>${item[1]}</a></li>`
                 });
                 text +="\n</ul>"
@@ -108,7 +107,7 @@
         update();
         setInterval(() => {
             update();
-        }, 2000);
+        }, 5000);
     </script>
     <script type = text/javascript>
         function o_delete() {

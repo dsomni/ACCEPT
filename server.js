@@ -18,6 +18,7 @@ const morgan = require("morgan");
 const multer = require("multer");
 const StreamZip = require('node-stream-zip');
 const nodemailer = require("nodemailer");
+require("dotenv").config();
 const app = express();
 //---------------------------------------------------------------------------------
 // Queue setup
@@ -195,11 +196,11 @@ app.get('/', (req, res) => {
     };
 });
 
-app.post('/', (req, res) => passport.authenticate('local', {
+app.post('/', passport.authenticate('local', {
     successRedirect: '/',
     failureRedirect: '/',
     failureFlash: true
-})(req, res));
+}));
 
 //---------------------------------------------------------------------------------
 // Task Page
@@ -1422,15 +1423,15 @@ app.post('/tournament/task/delete/:tour_id/:id', checkAuthenticated, isModerator
 app.get('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTournamentPermission, async (req, res) => {
     let tour_id = req.params.tour_id
     let tournament = await Tournament.findOne({ identificator: tour_id }).exec();
+    let ids = tournament.tasks.map(item => item.identificator).join("|");
     let whenEnds = tournament.whenEnds;
     let isBegan = tournament.isBegan;
-
     problem = tournament.tasks.find(item => item.identificator == req.params.id);
     if(!problem){
         res.redirect('/tournament/page/' + req.user.login + '/' + req.params.tour_id);
     }
     let attempts = req.user.attempts;
-    let result = []
+    let result = [];
     let prevCode = "";
     let language = "";
     for (let i = 0; i < attempts.length; i++) {
@@ -1448,6 +1449,7 @@ app.get('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTournamen
         name: req.user.name,
         title: "Task " + req.params.id,
         isTeacher: req.user.isTeacher,
+        ids,
         problem: problem,
         prevCode: prevCode,
         language: language,
@@ -1971,19 +1973,28 @@ app.get("/newslist/:page", async (req, res) => {
 //---------------------------------------------------------------------------------
 // Get task results
 app.get("/api/tasks/gettestresults/:id", checkAuthenticated, async (req, res) => {
-    let results
+    let results = {
+        result: [],
+        status:""
+    }
     let isInQueue = TestingQueue.findIndex(item => (item.id == req.params.id && item.login == req.user.login));
     try {
         fs.statSync(path.join(__dirname, '/public/processes/' + req.user.login + '_' + req.params.id));
-        results = [["", "Testing...", "er"]];
+        results.result = [["", "Testing...", "er"]];
+        results.status = "testing";
     } catch (err) {
         if (isInQueue != -1) {
-            results = [["", "In Testing Queue(" + (isInQueue + 1).toString() + ")..", "er"]];
+            results.result = [["", "In Testing Queue(" + (isInQueue + 1).toString() + ")..", "er"]];
+            results.status = "testing";
         } else {
             let attempts = req.user.attempts;
             let attempt = attempts.find(item => item.taskID == req.params.id);
             if (attempt) {
-                results = attempt.result;
+                results.result = attempt.result;
+                if (attempt.result.find(item => item[2] == "er") != -1)
+                    results.status = "error";
+                else
+                    result.status = "success";
             }
         }
     }
@@ -2008,8 +2019,9 @@ app.get("/api/tasks/gettestverdicts/:ids", checkAuthenticated, async (req, res) 
         tasks.push(task);
     }
 
-    let verdict;
+    let verdict, isInQueue;
     let verdicts = [];
+    let success = [];
     ids.forEach(id => {
         verdict = req.user.verdicts.find(item => item.taskID == id)
         if (verdict) {
@@ -2017,11 +2029,29 @@ app.get("/api/tasks/gettestverdicts/:ids", checkAuthenticated, async (req, res) 
         } else {
             verdict = "-"
         }
+        isInQueue = TestingQueue.findIndex(item => (item.id == id && item.login == req.user.login));
+        try {
+            fs.statSync(path.join(__dirname, '/public/processes/' + req.user.login + '_' + id));
+            success.push("testing");
+        } catch (err) {
+            if (isInQueue != -1) {
+                success.push("testing");
+            } else {
+                if (verdict == "-") {
+                    success.push("nottested");
+                } else if (verdict == "OK") {
+                    success.push("success");
+                } else {
+                    success.push("error");
+                }
+            }
+        }
         verdicts.push(verdict);
     });
     res.json({
-        verdicts: verdicts,
-        tasks: tasks
+        verdicts,
+        tasks,
+        success
     });
 });
 

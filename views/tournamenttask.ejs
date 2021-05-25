@@ -32,14 +32,14 @@
             <% }} %>
         </div>
         <div class="statement">
-            <%= problem.statement %>
+<%= problem.statement %>
             <h5>Входные данные</h5>
-            <%= problem.input %>
+<%= problem.input %>
             <h5>Выходные данные</h5>
-            <%= problem.output %>
+<%= problem.output %>
         </div>
         </div>
-        <table id="examples" class='taskslist'>
+        <table id="examples" class='taskslist' style="min-width: 50%">
             <tr>
               <th>Example Input</th>
               <th>Example Output</th>
@@ -83,45 +83,38 @@
             </div>
         </form>
         <p class="countDownTimer" id="countDownTimer" style="left: 5rem; right:auto; top:20px"></p>
-        <div id="chat" style="margin-right: 10px;">
-            <div id = "messages" style="padding-left: 5px; font-size: 25px; font-weight: 500; ">
-            <% for (let i=0;i < tournament.tasks.length;i++){
-                let task = tournament.tasks[i];
-                var verdict = 0;
-                if (task.identificator == ID){%>
-                <div style="outline: 1px solid #000;margin-top: 10px;background-color: rgb(140, 190, 255); padding-left: 5px;padding-bottom: 10px; "><a href=<%="/tournament/task/page/"+tournament.identificator+"/" + task.identificator%> style="margin-bottom: 10px; font-weight:bolder;" class="tablerefs"><%= task.title %></a></div>
-                <% } else {
-                    let user = tournament.results.find(item=> item.login == login);
-                    if(user){
-                        let tsks = user.tasks;
-                        let idx = parseInt(task.identificator.split('_')[1]); %>
-                        <%if(!tsks || idx>=tsks.length){ %>
-                            <div style="outline: 1px solid #000;margin-top: 10px;padding-left: 5px;padding-bottom: 10px; "><a href=<%="/tournament/task/page/"+tournament.identificator+"/" + task.identificator%> style="margin-bottom: 10px;" class="tablerefs"><%= task.title %></a></div>
-                       <% }else{ %>
-                            <%let verdict = tsks[idx];
-                            if(verdict.score == 100){ %>
-                                <div style="outline: 1px solid #000;margin-top: 10px;background-color: rgb(150, 255, 129); padding-left: 5px;padding-bottom: 10px; "><a href=<%="/tournament/task/page/"+tournament.identificator+"/" + task.identificator%> style="margin-bottom: 10px;" class="tablerefs"><%= task.title %></a></div>
-                            <%} else if(verdict.tries >0){ %>
-                                <div style="outline: 1px solid #000;margin-top: 10px;background-color: rgb(255, 148, 129); padding-left: 5px;padding-bottom: 10px; "><a href=<%="/tournament/task/page/"+tournament.identificator+"/" + task.identificator%> style="margin-bottom: 10px;" class="tablerefs"><%= task.title %></a></div>
-                            <% } else{ %>
-                                <div style="outline: 1px solid #000;margin-top: 10px;padding-left: 5px;padding-bottom: 10px; "><a href=<%="/tournament/task/page/"+tournament.identificator+"/" + task.identificator%> style="margin-bottom: 10px;" class="tablerefs"><%= task.title %></a></div>
-                            <% } %>
-                       <% } %>
-                    <%}else{ %>
-                        <div style="outline: 1px solid #000;margin-top: 10px;padding-left: 5px;padding-bottom: 10px; "><a href=<%="/tournament/task/page/"+tournament.identificator+"/" + task.identificator%> style="margin-bottom: 10px;" class="tablerefs"><%= task.title %></a></div>
-                    <% } %>
-                <% } %>
-            <% } %>
-            </div>
-        </div>
+        <div class="tasksSuccessError" id="linksarea"></div>
     </main>
     </body>
+    <script>
+        let min = (a, b) => {if(a>b)return b;return a;};
+        function updateOther(ids) {
+            fetch("/api/tasks/gettestverdicts/"+ids).then(response=>response.json()).then(response => {
+                    text = "";
+                    let id = "<%= ID %>"
+                    let tasks = response.tasks;
+                    let statuses = response.success;
+                    for(let i=0; i<min(tasks.length, statuses.length); i++){
+                        if(tasks[i].identificator == id)
+                            text+=`\n<a class="tasklink ${statuses[i]}" href="/tournament/task/page/<%= TUR_ID  %>/${tasks[i].identificator}" style="border: solid black 4px">${parseInt(tasks[i].identificator.split('_')[1])+1}</a>`;
+                        else
+                            text+=`\n<a class="tasklink ${statuses[i]}" href="/tournament/task/page/<%= TUR_ID  %>/${tasks[i].identificator}">${parseInt(tasks[i].identificator.split('_')[1])+1}</a>`;
+                    }
+                    linksarea.innerHTML = text;
+                }).catch(err => console.log(err));
+        }
+        let linksarea = document.getElementById("linksarea");
+        let ids = "<%= ids %>";
+        updateOther(ids);
+        setInterval(() => {
+            updateOther(ids);
+        }, 5000);
+    </script>
     <script type = text/javascript>
         function update() {
             fetch("/api/tasks/gettestresults/"+task).then(response=>response.json()).then(response => {
-                testing = response.length == 1;
                 text = "<ul>";
-                response.forEach(item => {
+                response.result.forEach(item => {
                     text+="\n"+`<li>${item[0]} <a id=${item[2]}>${item[1]}</a></li>`
                 });
                 text +="\n</ul>"
@@ -135,7 +128,7 @@
         update();
         setInterval(() => {
             update();
-        }, 2000);
+        }, 5000);
     </script>
     <script type = text/javascript>
         function o_delete() {
@@ -188,7 +181,7 @@
                         document.getElementById("countDownTimer").innerHTML = "Окончание через "+ ("0"+hours).slice(-2) + ":"
                             + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
 
-                    if (distance < 0) {
+                    if (distance <script) {
                         clearInterval(x);
                         document.getElementById("countDownTimer").innerHTML = "Окончен";
                     }
