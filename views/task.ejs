@@ -91,7 +91,7 @@
     </body>
     <script type = text/javascript>
         function update() {
-            fetch("/api/tasks/gettestresults/"+task).then(response=>response.json()).then(response => {
+            fetch("/api/task/get/testresults/"+task).then(response=>response.json()).then(response => {
                 text = "<ul>";
                 response.result.forEach(item => {
                     text+="\n"+`<li>${item[0]} <a id=${item[2]}>${item[1]}</a></li>`

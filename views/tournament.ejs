@@ -73,7 +73,7 @@
                     text = `<h1 style="text-align: center;color:Red">Вы не зарегистрированы!</h1>`;
                 resultsarea.innerHTML = text;
             }else{
-                fetch("/api/tasks/gettestverdicts/"+ids).then(response=>response.json()).then(response => {
+                fetch("/api/task/get/testverdicts/"+ids).then(response=>response.json()).then(response => {
                     text = "<table class='taskslist'><tr>\n<th>ID</th>\n<th>Задача</th>\n<th>Вердикт</th>\n<th>История</th>\n</tr>";
                     let tasks = response.tasks;
                     let verdicts = response.verdicts;

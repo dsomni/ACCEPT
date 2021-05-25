@@ -743,7 +743,6 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, checkNletter, async
 
     if (SortByNew){
         lessons = lessons.reverse();
-        results = results.reverse();
     }
     let onPage = config.onPage.lessons;
     let page = req.params.page;
@@ -1959,7 +1958,7 @@ app.get("/newslist/:page", async (req, res) => {
 
 //---------------------------------------------------------------------------------
 // Get task results
-app.get("/api/tasks/gettestresults/:id", checkAuthenticated, async (req, res) => {
+app.get("/api/task/get/testresults/:id", checkAuthenticated, async (req, res) => {
     let results = {
         result: [],
         status:""
@@ -1990,8 +1989,8 @@ app.get("/api/tasks/gettestresults/:id", checkAuthenticated, async (req, res) =>
 
 
 //---------------------------------------------------------------------------------
-// Get Verdicts
-app.get("/api/tasks/gettestverdicts/:ids", checkAuthenticated, async (req, res) => {
+// Get task Verdicts
+app.get("/api/task/get/testverdicts/:ids", checkAuthenticated, async (req, res) => {
     let ids = req.params.ids.split("|");
     let tasks = [];
     let task, tournament;
@@ -2044,7 +2043,7 @@ app.get("/api/tasks/gettestverdicts/:ids", checkAuthenticated, async (req, res) 
 
 //---------------------------------------------------------------------------------
 // Get lesson verdicts
-app.get("/api/tasks/getlessonverdicts/:ids", checkAuthenticated, async (req, res) => {
+app.get("/api/lessons/get/verdicts/:ids", checkAuthenticated, async (req, res) => {
     let ids = req.params.ids.split("|");
     let lessons = [];
     let verdicts = [];
@@ -2069,6 +2068,14 @@ app.get("/api/tasks/getlessonverdicts/:ids", checkAuthenticated, async (req, res
         verdicts,
         lessons
     });
+});
+
+//---------------------------------------------------------------------------------
+// Get tournament results
+app.get("/api/tournament/get/results/:id", checkAuthenticated, async (req, res) => {
+    let id = req.params.id;
+    let results = (await Tournament.findOne({ identificator: id }).exec()).results;
+    res.json(results);
 });
 
 //---------------------------------------------------------------------------------

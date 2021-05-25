@@ -23,52 +23,51 @@
                     <span class="slider round"></span>
                 </label>
             <% } %>
-            <table class='taskslist'>
-                <tr>
-                    <th>LOGIN</th>
-                    <%  tournament.tasks.forEach(task => { %>
-                        <th><a class="tlrefs" href=<%="/tournament/task/page/"+tournament.identificator  + '/' + task.identificator %>> <%= Number(task.identificator.split('_')[1])+1 %> </a></th>
-                    <% }); %>
-                    <th>Счёт</th>
-                    <th>Время</th>
-                </tr>
-                <%results.sort((a, b) => {
+            <table class='taskslist' id="table"></table>
+        </main>
+    <script>
+        let min = (a, b) => {if(a>b)return b;return a;};
+        function update() {
+            fetch("/api/tournament/get/results/<%= tournament.identificator %>").then(response=>response.json()).then(response => {
+                let text = "<tr>\n<th>LOGIN</th>\n";
+                let results = response;
+                for (let i = 0; i < results[0].tasks.length; i++) {
+                    text+=`<th><a class="tlrefs" href="/tournament/task/page/<%= tournament.identificator %>/${results.tasks[i].identificator}">${parseInt(results.tasks[i].identificator.split("_")[1])+1}</a></th>`;
+                }
+                text+="\n<th>Счёт</th>\n<th>Время</th>\n";
+                results.sort((a, b) => {
                     if ((a[0].sumscore > b[0].sumscore)||((a[0].sumscore==b[0].sumscore)&&(a[0].sumtime<b[0].sumtime))) {
                         return -1;
                     }
                     else {
                         return 1;
                     }
-                }); %>
-                <% for(let i=0; i < results.length; i++) { %>
-                    <tr>
-                        <% let result = results[i][0]; %>
-                        <% if(!results[i][1] || showTeachers){ %>
-                            <% let loginToShow = result.login;
-                            if(loginToShow.length > 2 && loginToShow.slice(0,2)=="n_"){
+                });
+                let result;
+                for (let i = 0; i < results.length; i++) {
+                    result = results[i];
+                    text+="<tr>\n"
+                    if(result[1] || <%= showTeachers %>){
+                        let loginToShow = result.login;
+                        if(loginToShow.length > 2 && loginToShow.slice(0,2)=="n_"){
                                 loginToShow = loginToShow.slice(2);
-                            }
-                            %>
-                            <td><a class="tlrefs" href=<%="/account/"+ result.login  + '/1/default&all'%>><%= loginToShow %></a></td>
-                            <% for(let j=0; j < result.tasks.length; j++) { %>
-                                <% let task = result.tasks[j]; %>
-                                <td><%= task.score %>(<%= task.tries %>)</td>
-                            <% } %>
-                            <td><%= result.sumscore %></td>
-                            <td><%= result.sumtime %></td>
-                        <% } %>
-                    </tr>
-                <% } %>
-                <!--<% tournament.results.forEach(result => { %>
-                    <tr>
-                        <td><%= result.login %></td>
-                        <% result.tasks.forEach(task => { %>
-                            <td><%= task.score %>(<%= task.tries %>)</td>
-                        <% }); %>
-                        <td><%= result.sumscore %></td>
-                        <td><%= result.sumtime %></td>
-                    </tr>
-                 <%  }); %>-->
-            </table>
-        </main>
+                        }
+                        text+=`<td><a class="tlrefs" href="/account/${result.login}/1/default&all">${loginToShow}</a></td>\n`;
+                        for(let j=0; j<result.tasks.length;j++){
+                            let task = result.tasks[j];
+                            text+=`<td>${task.score}(${task.tries})</td>`
+                        }
+                        text+=`<td>${result.sumscore}</td>\n<td>${result.sumtime}</td>\n`;
+                    }
+                    text+="</tr>\n"
+                }
+                resultsarea.innerHTML = text+"</tr>\n";
+            }).catch(err => console.log(err));
+        }
+        let resultsarea = document.getElementById("table");
+        update();
+        // setInterval(() => {
+        //     update();
+        // }, 5000);
+    </script>
 </html>

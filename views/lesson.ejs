@@ -43,7 +43,7 @@
         function update(ids) {
             let text;
             if(ids.length != 0){
-                fetch("/api/tasks/gettestverdicts/"+ids).then(response=>response.json()).then(response => {
+                fetch("/api/task/get/testverdicts/"+ids).then(response=>response.json()).then(response => {
                     text = "<table class='taskslist'>\n<tr>\n<th>ID</th>\n<th>Задача</th>\n<th>Тема</th>\n<th>Класс</th>\n<th>Автор</th>\n<th>Вердикт</th>\n<th>История</th>\n</tr>";
                     let tasks = response.tasks;
                     let verdicts = response.verdicts;

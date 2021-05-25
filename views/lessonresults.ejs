@@ -36,7 +36,7 @@
                     <th>Вердикт</th>
                 </tr>
 
-                <% for (var i = 0; i < results.length; i++) { 
+                <% for (var i = 0; i < results.length; i++) {
                     let student = results[i][0];%>
                      <tr>
                       <td><a class="tlrefs" href=<%="/account/" + student.login + "/1/" + "default&all" %> > <%=student.login%></a></td>
@@ -48,4 +48,31 @@
                 <% } %>
             </table>
         </main>
+    <script>
+        let min = (a, b) => {if(a>b)return b;return a;};
+        function update(ids) {
+            fetch("/api/tournament/get/results/").then(response=>response.json()).then(response => {
+                let text = "<tr>\n<th>ID</th>\n<th>Урок</th>\n<th>Класс</th>\n<th>Автор</th>\n<th>Вердикт</th>\n</tr>";
+                let lessons = response.lessons;
+                let verdicts = response.verdicts;
+                for(let i=0; i<min(lessons.length, verdicts.length); i++){
+                    let authorArray = lessons[i].author.split(' ');
+                    let author = authorArray[0];
+                    for(let i=1;i< authorArray.length;i++){
+                        if(authorArray[i].length!=0){
+                            author += ' '+ authorArray[i][0]+'.';
+                        }
+                    }
+                    text+=`\n<tr>\n<td>${parseInt(lessons[i].identificator)+1}</td>\n<td><a class="tlrefs" href="/lesson/<%= login %>/${lessons[i].identificator}">${lessons[i].title}</a></td>\n<td>${lessons[i].grade}</td>\n<td>${author}</td>\n<td>${verdicts[i]}</td>\n</tr>`
+                }
+                resultsarea.innerHTML = text;
+            }).catch(err => console.log(err));
+        }
+        let resultsarea = document.getElementById("table");
+        let ids = "<%= ids %>"
+        update(ids);
+        setInterval(() => {
+            update(ids);
+        }, 5000);
+    </script>
 </html>

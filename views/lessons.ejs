@@ -63,14 +63,14 @@
     <script>
         let min = (a, b) => {if(a>b)return b;return a;};
         function update(ids) {
-            fetch("/api/tasks/getlessonverdicts/"+ids).then(response=>response.json()).then(response => {
+            fetch("/api/lessons/get/verdicts/"+ids).then(response=>response.json()).then(response => {
                 let text = "<tr>\n<th>ID</th>\n<th>Урок</th>\n<th>Класс</th>\n<th>Автор</th>\n<th>Вердикт</th>\n</tr>";
                 let lessons = response.lessons;
                 let verdicts = response.verdicts;
-                for(let i=0; i<min(lessons.length, verdicts.length); i++){
+                for(let i = 0; i < min(lessons.length, verdicts.length); i++){
                     let authorArray = lessons[i].author.split(' ');
                     let author = authorArray[0];
-                    for(let i=1;i< authorArray.length;i++){
+                    for(let i = 1; i < authorArray.length; i++){
                         if(authorArray[i].length!=0){
                             author += ' '+ authorArray[i][0]+'.';
                         }
