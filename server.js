@@ -741,21 +741,6 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, checkNletter, async
     if (usedLessons.length != 0)
         lessons = usedLessons;
 
-    let results = [];
-    let result;
-    for (let i = 0; i < lessons.length; i++) {
-        result = "/" + lessons[i].tasks.length
-        let solved = 0;
-        for (let k = 0; k < lessons[i].tasks.length; k++) {
-
-            let verdict = user.verdicts.find(item => item.taskID == lessons[i].tasks[k])
-            if (verdict && verdict.result == "OK") {
-                solved += 1
-            }
-        }
-        result = solved + result;
-        results.push(result)
-    }
     if (SortByNew){
         lessons = lessons.reverse();
         results = results.reverse();
@@ -764,6 +749,8 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, checkNletter, async
     let page = req.params.page;
     let pages = Math.ceil(lessons.length / onPage);
     let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, lessons.length)} из ${lessons.length}`;
+    lessons = lessons.slice((page - 1) * onPage, page * onPage);
+    let ids = lessons.map(item => item.identificator).join('|');
 
 
     res.render('lessons.ejs',{
@@ -772,9 +759,9 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, checkNletter, async
         login: req.user.login,
         name: req.user.name,
         title: "Lessons List",
-        lessons: lessons.slice((page - 1) * onPage, page * onPage),
-        results: results.slice((page - 1) * onPage, page * onPage),
+        lessons,
         isTeacher: req.user.isTeacher,
+        ids,
         page,
         pages,
         pageInfo,
@@ -2055,6 +2042,34 @@ app.get("/api/tasks/gettestverdicts/:ids", checkAuthenticated, async (req, res) 
     });
 });
 
+//---------------------------------------------------------------------------------
+// Get lesson verdicts
+app.get("/api/tasks/getlessonverdicts/:ids", checkAuthenticated, async (req, res) => {
+    let ids = req.params.ids.split("|");
+    let lessons = [];
+    let verdicts = [];
+    for (let i = 0; i < ids.length; i++){
+        lessons.push(Lesson.findOne({ identificator: ids[i] }).exec());
+    }
+    lessons = await Promise.all(lessons);
+
+    let solved, verdict;
+    lessons.forEach(lesson => {
+        solved = 0;
+        for (let i = 0; i < lesson.tasks.length; i++){
+            verdict = req.user.verdicts.find(item => item.taskID == lesson.tasks[i]);
+            if (verdict && verdict.result == "OK") {
+                solved += 1;
+            }
+        }
+        verdicts.push(`${solved}/${lesson.tasks.length}`);
+    })
+
+    res.json({
+        verdicts,
+        lessons
+    });
+});
 
 //---------------------------------------------------------------------------------
 // ??? toDo

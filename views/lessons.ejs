@@ -42,39 +42,7 @@
                 <button id="submitsearch">Найти</button>
             </form>
 
-            <table class='taskslist'>
-                <tr>
-                  <th>ID</th>
-                  <th>Урок</th>
-                  <th>Класс</th>
-                  <th>Автор</th>
-                  <th>Вердикт</th>
-                  </tr>
-                <% min = function(a,b){ if(a < b) return a; return b} %>
-                <% max = function(a,b){ if(a < b) return b; return a} %>
-                <% var onPage = 20 %>
-
-                <% for (var i = 0; i < lessons.length; i++) { %>
-                <% var lesson = lessons[i]; %>
-                 <tr>
-
-                  <td><%= lesson.identificator %></td>
-                  <td> <a class="tlrefs" href=<%=`/lesson/${u_login}/${lesson.identificator}`%>><%= lesson.title %> </a> </td>
-                  <td><%= lesson.grade %></td>
-                  <%
-                    let authorArray = lesson.author ? lesson.author.split(' ') : "";
-                    let author = authorArray[0];
-                    for(let i=1;i< authorArray.length;i++){
-                        if(authorArray[i].length!=0){
-                            author += ' '+ authorArray[i][0]+'.';
-                        }
-                    }
-                  %>
-                  <td><%= author %></td>
-                  <td><%= results[i] %></td>
-                 </tr>
-                <% } %>
-                </table>
+            <table class='taskslist' id="table"></table>
 
                 <div class='pageinfo'>
                     <div class="pageRefs">
@@ -92,4 +60,31 @@
                 </div>
         </main>
     </body>
+    <script>
+        let min = (a, b) => {if(a>b)return b;return a;};
+        function update(ids) {
+            fetch("/api/tasks/getlessonverdicts/"+ids).then(response=>response.json()).then(response => {
+                let text = "<tr>\n<th>ID</th>\n<th>Урок</th>\n<th>Класс</th>\n<th>Автор</th>\n<th>Вердикт</th>\n</tr>";
+                let lessons = response.lessons;
+                let verdicts = response.verdicts;
+                for(let i=0; i<min(lessons.length, verdicts.length); i++){
+                    let authorArray = lessons[i].author.split(' ');
+                    let author = authorArray[0];
+                    for(let i=1;i< authorArray.length;i++){
+                        if(authorArray[i].length!=0){
+                            author += ' '+ authorArray[i][0]+'.';
+                        }
+                    }
+                    text+=`\n<tr>\n<td>${parseInt(lessons[i].identificator)+1}</td>\n<td><a class="tlrefs" href="/lesson/<%= login %>/${lessons[i].identificator}">${lessons[i].title}</a></td>\n<td>${lessons[i].grade}</td>\n<td>${author}</td>\n<td>${verdicts[i]}</td>\n</tr>`
+                }
+                resultsarea.innerHTML = text;
+            }).catch(err => console.log(err));
+        }
+        let resultsarea = document.getElementById("table");
+        let ids = "<%= ids %>"
+        update(ids);
+        setInterval(() => {
+            update(ids);
+        }, 5000);
+    </script>
 </html>
