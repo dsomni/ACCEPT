@@ -51,7 +51,7 @@
     <script type=text/javascript>
         let min = (a, b) => {if(a>b)return b;return a;};
         function update(page) {
-            fetch("/api/attempts/get/verdicts/"+page+"/<%= search %>").then(response=>response.json()).then(response => {
+            fetch("/api/attempts/get/verdicts/<%= u_login %>/"+page+"/<%= search %>").then(response=>response.json()).then(response => {
                 let attempts = response.attempts;
                 let tasks = response.tasks;
                 let text = `<tr>\n<th>Дата</th>\n<th>Задача</th>\n<th>Вердикт</th>\n<th>Язык</th>\n</tr>`;

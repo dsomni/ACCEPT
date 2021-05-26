@@ -29,80 +29,62 @@
                 <button id="submitsearch">Найти</button>
             </form>
 
-            <table class='taskslist'>
-                <tr>
-                    <th>Login</th>
-                    <th>Attempt</th>
-                    <th>TaskID</th>
-                    <th>Score</th>
-                    <th>Дисквалификация</th>
-                </tr>
-                <% min = function(a,b){ if(a < b) return a; return b} %>
-                <% var onPage = 20 %>
-                <% for(let i=(page-1)*onPage; i<min(page*onPage+1,attempts.length); i++){ let task = tasks.find(item => attempts[i].TaskID == item.identificator) %>
-                <tr>
-                    <% let loginToShow = attempts[i].login;
-                    if(loginToShow.length > 2 && loginToShow.slice(0,2)=="n_"){
-                        loginToShow = loginToShow.slice(2);
-                    }
-                    %>
-                    <td><a class="t_attempts" href=<%= "/account/"+attempts[i].login+"/1/default&all" %> ><%= loginToShow  %></a></td>
-                    <td><a class="t_attempts" href=<%= "/attempt/"+attempts[i].login+"/"+attempts[i].AttemptDate %> >[Посылка]</a></td>
-                    <td><a class="t_attempts" href=<%= "/tournament/task/page/"+tourID+"/"+tasks[i].identificator %> ><%= parseInt(tasks[i].identificator.split("_")[1])+1 %></a></td>
-                    <td><%= attempts[i].score  %></td>
-                    <td style="width: 200px;">
+            <table class="taskslist" id="table"></table>
 
-                    <span class="disqual">
-                        <dialog  id=<%='attempt' + i%>>
-                            <form action= <%= `/tournament/disqualAttempt/${tourID}/${attempts[i].AttemptDate}` %>  method="POST">
-                                <p>Вы уверены что хотите дисквалифицировань посылку?</p>
-                                <button>Уверен(а)</button>
-                            </form>
-                            <button onClick=<%='c(\"attempt' + i + '\");' %>>Отмена</button>
-                        </dialog>
-                        <button onclick=<%='o(\"attempt'+ i + '\");'%> class="show">Посылка</button>
-                        <dialog  id=<%='user' + i%>>
-                            <form action= <%= `/tournament/disqualUser/${tourID}/${attempts[i].login}` %>  method="POST">
-                                <p>Вы уверены что хотите дисквалифицировань участника?</p>
-                                <button>Уверен(а)</button>
-                            </form>
-                            <button onClick=<%='c(\"user' + i + '\");' %> >Отмена</button>
-                        </dialog>
-                        <button onclick=<%='o(\"user' + i + '\");'%> class="show">Участник</button>
-                    </span>
-
-                    </td>
-                </tr>
-                <% } %>
-            </table>
-
-            <% var page = Number(page) %>
-            <% var prevPage = page - 1 %>
-            <% var nextPage = page + 1 %>
-
-            <div class='pageinfo'>
-                <div><%= ((page-1)*onPage+1).toString() + "-" +  min(page*onPage,tasks.length-1).toString() + " из " +  (tasks.length-1).toString() %> </div>
-
-                <% if(page>1) { %>
-                    <button onClick=<%= 'location.href=\"/tournament/attempts/'+ tourID + "/" + prevPage + "/" + search + "\"" %>>&lt;&lt;&lt;</button>
-                <% }else { %>
-                    <button>&lt;&lt;&lt;</button>
-                <% } %>
-                <% if(page*onPage<tasks.length-1) { %>
-                    <button onClick=<%= 'location.href=\"/tournament/attempts/'+tourID + "/" + nextPage + "/" + search + "\"" %>>&gt;&gt;&gt;</button>
-                <% }else { %>
-                    <button>&gt;&gt;&gt;</button>
-                <% } %>
+            <div class=`pageinfo`>
+                <div class="pageRefs"><%= pageInfo %></div>
+                <div class="pageRefs">
+                    <% for(let i=0; i < pages; i++){ %>
+                        <% if(i+1==page){ %>
+                            <a class="tablerefs" style="font-size: 23px;font-weight:900;"><%= i+1 %></a>
+                        <% }else{ %>
+                            <a class="tablerefs" style="font-size: 20px;" href=<%= `/tournament/attempts/${tourID}/${i+1}/${search}`%> ><%= i+1 %></a>
+                        <% } %>
+                    <% } %>
                 </div>
+            </div>
         </main>
     </body>
+    <script type=text/javascript>
+        let min = (a, b) => {if(a>b)return b;return a;};
+        function update(page) {
+            fetch("/api/tournament/get/attempts/<%= tourID %>/"+page+"/<%= search %>").then(response=>response.json()).then(response => {
+                let attempts = response.attempts;
+                let dialogs = "";
+                let text = `<tr>\n<th>Login</th>\n<th>Attempt</th>\n<th>TaskID</th>\n<th>Score</th>\n<th>Дисквалификация</th>\n</tr>\n`;
+                let attempt, login;
+                for(let i = 0; i<attempts.length;i++){
+                    attempt = attempts [i];
+                    dialogs = `<span class="disqual">\n<dialog id="attempt${i}">\n<form action="/tournament/disqualAttempt/<%=tourID%>/${attempt.AttemptDate}" method="POST">\n<p>Вы уверены что хотите дисквалифицировань посылку?</p>\n <button>Уверен(а)</button>\n</form>\n<button onClick="c(\'attempt${i}\');">Отмена</button></dialog>\n<button onclick="o(\'attempt${i}\');" class="show">Посылка</button>\n<dialog id="user${i}">\n<form action="/tournament/disqualUser/<%=tourID%>/${attempts[i].login}" method="POST">\n<p>Вы уверены что хотите дисквалифицировань участника?</p>\n<button>Уверен(а)</button>\n</form>\n<button onClick="c(\'user${i}\');" >Отмена</button>\n</dialog>\n<button onclick="o(\'user${i}\');" class="show">Участник</button>\n</span>`;
+                    login = attempt.login;
+                    if(login.length > 2 && login.slice(0,2)=="n_"){
+                        login = login.slice(2);
+                    }
+
+                    text += `<tr>\n`;
+                    text += `<td><a class="t_attempts" href="/account/${attempt.login}/1/default&all">${login}</a></td>\n`;
+                    text += `<td><a class="t_attempts" href="/attempt/${attempt.login}/${attempt.AttemptDate}">[Посылка]</a></td>\n`;
+                    text += `<td><a class="t_attempts" href="/tournament/task/page/<%=tourID%>/${attempt.TaskID}">${parseInt(attempt.TaskID.split("_")[1])+1}</a></td>\n`;
+                    text += `<td>${attempt.score}</td>\n`;
+                    text += `<td style="width: 200px;">${dialogs}</td>\n`;
+                    text += `</tr>\n`;
+                }
+                resultsarea.innerHTML = text;
+            }).catch(err => console.log(err));
+        }
+        let resultsarea = document.getElementById("table");
+        let page = "<%= page %>";
+        update(page);
+        setInterval(() => {
+            update(page);
+        }, 5000);
+    </script>
     <script type = text/javascript>
         function o(id) {
-            console.log(id);
             document.getElementById(id).showModal();
         }
         function c(id) {
             document.getElementById(id).close();
         }
-        </script>
+    </script>
 </html>

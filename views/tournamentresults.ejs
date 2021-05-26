@@ -32,16 +32,14 @@
                 let text = "<tr>\n<th>LOGIN</th>\n";
                 let results = response;
                 for (let i = 0; i < results[0].tasks.length; i++) {
-                    text+=`<th><a class="tlrefs" href="/tournament/task/page/<%= tournament.identificator %>/${results.tasks[i].identificator}">${parseInt(results.tasks[i].identificator.split("_")[1])+1}</a></th>`;
+                    text+=`<th><a class="tlrefs" href="/tournament/task/page/<%= tournament.identificator %>/<%= tournament.identificator %>_${i}">${i+1}</a></th>`;
                 }
                 text+="\n<th>Счёт</th>\n<th>Время</th>\n";
                 results.sort((a, b) => {
-                    if ((a[0].sumscore > b[0].sumscore)||((a[0].sumscore==b[0].sumscore)&&(a[0].sumtime<b[0].sumtime))) {
+                    if ((a[0].sumscore > b[0].sumscore)||((a[0].sumscore==b[0].sumscore)&&(a[0].sumtime<b[0].sumtime)))
                         return -1;
-                    }
-                    else {
+                    else
                         return 1;
-                    }
                 });
                 let result;
                 for (let i = 0; i < results.length; i++) {
@@ -66,8 +64,8 @@
         }
         let resultsarea = document.getElementById("table");
         update();
-        // setInterval(() => {
-        //     update();
-        // }, 5000);
+        setInterval(() => {
+            update();
+        }, 5000);
     </script>
 </html>

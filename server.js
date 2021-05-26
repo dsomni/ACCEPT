@@ -181,7 +181,7 @@ app.get('/', (req, res) => {
             name : req.user.name,
             title: "Main Page",
             isTeacher: req.user.isTeacher,
-            news: news.slice(0, config.onPage.newsMain),
+            news: news?news.slice(0, config.onPage.newsMain):[],
             location: undefined
         });
     } else {
@@ -190,7 +190,7 @@ app.get('/', (req, res) => {
             name : "",
             title: "Main Page",
             isTeacher: false,
-            news: news.slice(0, config.onPage.newsMain),
+            news: news?news.slice(0, config.onPage.newsMain):[],
             location: undefined
         });
     };
@@ -781,7 +781,7 @@ app.get('/lesson/:login/:id',checkAuthenticated, checkNletter, isLessonAvailable
     }
 
     lesson = await Lesson.findOne({identificator: req.params.id}).exec();
-
+    let ids = lesson.tasks.join("|");
     if (!lesson) {
         res.redirect("/lessons/"+req.params.login+"/1/default&all&true&all")
     }else{
@@ -790,9 +790,10 @@ app.get('/lesson/:login/:id',checkAuthenticated, checkNletter, isLessonAvailable
             ID : lesson.identificator,
             u_login: user.login,
             u_name: user.name,
-            login: user.login,
+            login: req.user.login,
             name: req.user.name,
-            title : "Lesson",
+            title: "Lesson",
+            ids,
             isTeacher: req.user.isTeacher,
             lesson : lesson,
             foundTasks : tasks,
@@ -840,7 +841,7 @@ app.post('/editlesson/:id', checkAuthenticated, checkNletter, checkPermission, a
 
 //---------------------------------------------------------------------------------
 // Lesson Results Page
-app.get('/lessonresults/:id/:search', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
+app.get('/lessonresults/:id/:page/:search', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
     lesson = await Lesson.findOne({identificator: req.params.id}).exec();
 
     if (!lesson) {
@@ -875,19 +876,11 @@ app.get('/lessonresults/:id/:search', checkAuthenticated, checkNletter, checkPer
             foundStudents = await User.find({ isTeacher: false }).exec();
         foundStudents.sort((a, b) => { return a.name > b.name });
 
-        let result;
-        for (let i = 0; i < foundStudents.length; i++) {
-            result = "/" + lesson.tasks.length
-            let solved = 0;
-            for (let k = 0; k < lesson.tasks.length; k++) {
-                let verdict = foundStudents[i].verdicts.find(item => item.taskID == lesson.tasks[k])
-                if (verdict && verdict.result == "OK") {
-                    solved += 1
-                }
-            }
-            result = solved + result;
-            results.push([foundStudents[i],result])
-        }
+        let onPage = config.onPage.students;
+        let page = req.params.page;
+        let pages = Math.ceil(foundStudents.length / onPage);
+        let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, foundStudents.length)} из ${foundStudents.length}`;
+        let logins = foundStudents.slice((page - 1) * onPage, page * onPage).map(item => item.login).join("|");
 
         res.render('lessonresults.ejs',{
             ID : lesson.identificator,
@@ -895,20 +888,24 @@ app.get('/lessonresults/:id/:search', checkAuthenticated, checkNletter, checkPer
             name: req.user.name,
             title : "Lesson Results",
             isTeacher: req.user.isTeacher,
-            lesson : lesson,
-            results,
+            lesson: lesson,
+            page,
+            pages,
+            pageInfo,
+            search: req.params.search,
+            logins,
             location: `/lesson/${req.user.login}/${req.params.id}`
         })
     }
 });
 
-app.post('/lessonresults/:id/:search', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
+app.post('/lessonresults/:id/:page/:search', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
     let toSearch = req.body.searcharea;
     if(!toSearch) toSearch = "default";
     toSearch += '&' + req.body.GradeSelector  +
         '&' + (req.body.gradeLetter || "all") +
         '&' + (req.body.Group || "all")
-    res.redirect('/lessonresults/' + req.params.id +'/' + toSearch )
+    res.redirect('/lessonresults/' + req.params.id +'/' + req.params.page + '/' + toSearch )
 });
 
 
@@ -1176,6 +1173,19 @@ app.get('/tournaments/:login/:page/:search', checkAuthenticated, async (req, res
 
     if (a[1] != 'all') {
         foundTournaments = foundTournaments.filter(item => (item.isBegan == isBegan) && (item.isEnded == isEnded));
+    }
+
+    //Sorting tournaments
+    let obj = [];
+    for(let i=0;i<foundTournaments.length;i++){
+        obj.push([foundTournaments[i], results[i]]);
+    }
+    obj.sort(compareTournaments);
+    for(let i=0;i<foundTournaments.length;i++){
+        foundTournaments[i] = obj[i][0];
+    }
+    for(let i=0;i<results.length;i++){
+        results[i] = obj[i][1];
     }
 
     foundTournaments.sort((a, b) => { return a._id < b._id });
@@ -1656,6 +1666,10 @@ app.get('/tournament/attempts/:tour_id/:page/:toSearch', checkAuthenticated, isM
 
     let tasks = attempts.map(attempt => tournament.tasks.find(task => task.identificator == attempt.TaskID));
 
+    let onPage = config.onPage.attempts;
+    let page = req.params.page;
+    let pages = Math.ceil(attempts.length / onPage);
+    let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, attempts.length)} из ${attempts.length}`;
 
     res.render('tournamentattempts.ejs',{
         login: req.user.login,
@@ -1666,6 +1680,9 @@ app.get('/tournament/attempts/:tour_id/:page/:toSearch', checkAuthenticated, isM
         attempts,
         tasks,
         page: req.params.page,
+        onPage,
+        pageInfo,
+        pages,
         search: req.params.toSearch,
         location: `/tournament/page/${req.user.login}/${req.params.tour_id}`
     });
@@ -1951,11 +1968,13 @@ app.get("/api/task/get/testresults/:id", checkAuthenticated, async (req, res) =>
 
 //---------------------------------------------------------------------------------
 // Get task Verdicts
-app.get("/api/task/get/testverdicts/:ids", checkAuthenticated, async (req, res) => {
+app.get("/api/task/get/testverdicts/:login/:ids", checkAuthenticated, async (req, res) => {
     let ids = req.params.ids.split("|");
     let tasks = [];
     let task, tournament;
-
+    let user = await User.findOne({ login: req.params.login });
+    if (!user)
+        user = req.user;
     for (let i = 0; i < ids.length; i++) {
         if (ids[i].split('_')[0] == '0') {
             task = await Task.findOne({ identificator: ids[i] }).exec();
@@ -1970,15 +1989,15 @@ app.get("/api/task/get/testverdicts/:ids", checkAuthenticated, async (req, res) 
     let verdicts = [];
     let success = [];
     ids.forEach(id => {
-        verdict = req.user.verdicts.find(item => item.taskID == id)
+        verdict = user.verdicts.find(item => item.taskID == id)
         if (verdict) {
             verdict = verdict.result
         } else {
             verdict = "-"
         }
-        isInQueue = TestingQueue.findIndex(item => (item.id == id && item.login == req.user.login));
+        isInQueue = TestingQueue.findIndex(item => (item.id == id && item.login == user.login));
         try {
-            fs.statSync(path.join(__dirname, '/public/processes/' + req.user.login + '_' + id));
+            fs.statSync(path.join(__dirname, '/public/processes/' + user.login + '_' + id));
             success.push("testing");
         } catch (err) {
             if (isInQueue != -1) {
@@ -1995,6 +2014,7 @@ app.get("/api/task/get/testverdicts/:ids", checkAuthenticated, async (req, res) 
         }
         verdicts.push(verdict);
     });
+
     res.json({
         verdicts,
         tasks,
@@ -2003,7 +2023,7 @@ app.get("/api/task/get/testverdicts/:ids", checkAuthenticated, async (req, res) 
 });
 
 //---------------------------------------------------------------------------------
-// Get lesson + Tournaments verdicts
+// Get lessons + Tournaments verdicts
 app.get("/api/cringe/get/verdicts/:ids/:flag", checkAuthenticated, async (req, res) => {
     let ids = req.params.ids.split("|");
     let flag = req.params.flag;
@@ -2040,28 +2060,30 @@ app.get("/api/cringe/get/verdicts/:ids/:flag", checkAuthenticated, async (req, r
 
 //---------------------------------------------------------------------------------
 // Get attempt results
-app.get("/api/attempts/get/verdicts/:page/:search", checkAuthenticated, async (req, res) => {
+app.get("/api/attempts/get/verdicts/:login/:page/:search", checkAuthenticated, async (req, res) => {
+    let user = await User.findOne({ login: req.params.login }).exec();
+    if (!user)
+        user = req.user;
     let tasks = await Task.find({}).exec();
     let tournaments = await Tournament.find({}).exec();
     let page = req.params.page;
     let a = req.params.search.split('&amp;');
     let toSearch = a[0]=="default"? "":a[0].toUpperCase();
     let types = a[1];
-    let attempts = req.user.attempts;
+    let attempts = user.attempts;
     let onPage = config.onPage.attempts;
     let foundAttempts = [];
     let foundTasks = [];
     let tourTask = [];
 
-
     tournaments.forEach(tournament => tournament.tasks.forEach(task => tourTask.push(task)));
-    for(let i = 0;   i  <  attempts.length; i++){
+    for(let i = 0; i < attempts.length; i++){
         verylongresult = getVerdict(attempts[i].result);
         if ((types == 'all') || (verylongresult == 'OK')) {
                 if(attempts[i].taskID.split('_')[0] != '0')
-                task = tourTask.find(item => item.identificator == attempts[i].taskID);
+                    task = tourTask.find(item => item.identificator == attempts[i].taskID);
                 else
-                task = tasks.find(item => item.identificator == attempts[i].taskID);
+                    task = tasks.find(item => item.identificator == attempts[i].taskID);
             if (task && task.title.slice(0, toSearch.length).toUpperCase() == toSearch) {
                 foundAttempts.push(attempts[i]);
                 foundTasks.push(task);
@@ -2075,11 +2097,66 @@ app.get("/api/attempts/get/verdicts/:page/:search", checkAuthenticated, async (r
 });
 
 //---------------------------------------------------------------------------------
+// Get lesson result verdicts
+app.get("/api/lessons/get/verdicts/:id/:logins", checkAuthenticated, async (req, res) => {
+    let logins = req.params.logins.split("|");
+    let tasks = (await Lesson.findOne({ identificator: req.params.id }).exec()).tasks;
+    let users = [];
+    let verdicts = [];
+    let results = [];
+    for (let i = 0; i < logins.length; i++){
+        users.push(User.findOne({ login : logins[i]}).exec());
+    }
+    users = await Promise.all(users);
+
+    for (let i = 0; i < users.length; i++){
+        verdicts = users[i].verdicts;
+        solved = 0;
+        for (let i = 0; i < tasks.length; i++){
+            verdict = verdicts.find(item => item.taskID == tasks[i]);
+            if (verdict && verdict.result == "OK") {
+                solved += 1;
+            }
+        }
+        results.push(`${solved}/${tasks.length}`);
+    }
+    res.json({
+        users,
+        results
+    });
+});
+
+//---------------------------------------------------------------------------------
 // Get tournament results
 app.get("/api/tournament/get/results/:id", checkAuthenticated, async (req, res) => {
     let id = req.params.id;
-    let results = (await Tournament.findOne({ identificator: id }).exec()).results;
+    let tournament = await Tournament.findOne({ identificator: id }).exec();
+    let results = tournament.results
+    if (tournament.isFrozen && !tournament.isEnded)
+        results = tournament.frozenResults;
     res.json(results);
+});
+
+//---------------------------------------------------------------------------------
+// Get tournament attempts results
+app.get("/api/tournament/get/attempts/:id/:page/:search", checkAuthenticated, async (req, res) => {
+    let tournament = await Tournament.findOne({ identificator: req.params.id }).exec();
+    let a = req.params.search.split('&amp;');
+    let login = a[0].toLowerCase();
+    let taskID = a[1];
+    let types = a[2].toLowerCase();
+    let toReverse = a[3] == 'true';
+    let attempts = tournament.attempts.filter(item => login == "all" || item.login.toLowerCase() == login)
+        .filter(item => taskID == "all" || parseInt(item.TaskID.split("_")[1]) + 1 == parseInt(taskID))
+        .filter(item => types == "all" || item.score == 100);
+    if (toReverse)
+        attempts = attempts.reverse();
+
+    let onPage = configs.onPage.attempts;
+    attempts = attempts.slice((req.params.page - 1) * onPage, max(req.params.page * onPage, attempts.length));
+    res.json({
+        attempts
+    });
 });
 
 //---------------------------------------------------------------------------------

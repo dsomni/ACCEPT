@@ -18,7 +18,7 @@
             <H1 id="taskname"><%= lesson.title; %></H1>
             <div style="text-align: center;margin: 10px;">
                 <% if(isTeacher){ %>
-                    <a id="editref" class="editref" href=<%= "/lessonresults/" + lesson.identificator + "/default&all&all&all" %> >[Таблица]</a>
+                    <a id="editref" class="editref" href=<%= "/lessonresults/" + lesson.identificator + "/1/default&all&all&all" %> >[Таблица]</a>
                     <a id="editref" class="editref" href=<%= "/editlesson/" + lesson.identificator %> >[Редактировать]</a>
                     <span class="lessonPopup">
                         <dialog  id='dialog'>
@@ -41,9 +41,7 @@
     <script type = text/javascript>
         let min = (a, b) => {if(a>b)return b;return a;};
         function update(ids) {
-            let text;
-            if(ids.length != 0){
-                fetch("/api/task/get/testverdicts/"+ids).then(response=>response.json()).then(response => {
+                fetch("/api/task/get/testverdicts/<%= u_login %>/"+ids).then(response=>response.json()).then(response => {
                     text = "<table class='taskslist'>\n<tr>\n<th>ID</th>\n<th>Задача</th>\n<th>Тема</th>\n<th>Класс</th>\n<th>Автор</th>\n<th>Вердикт</th>\n<th>История</th>\n</tr>";
                     let tasks = response.tasks;
                     let verdicts = response.verdicts;
@@ -53,10 +51,9 @@
                     text+="\n</table>";
                     resultsarea.innerHTML = text;
                 }).catch(err => console.log(err));
-            }
         }
         let resultsarea = document.getElementById("table");
-        let ids = "<%= foundTasks %>";
+        let ids = "<%= ids %>";
         update(ids);
         setInterval(() => {
             update(ids);

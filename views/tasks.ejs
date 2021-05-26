@@ -66,7 +66,7 @@
     <script type = text/javascript>
         let min = (a, b) => {if(a>b)return b;return a;};
         function update(ids) {
-            fetch("/api/task/get/testverdicts/"+ids).then(response=>response.json()).then(response => {
+            fetch("/api/task/get/testverdicts/<%= login %>/"+ids).then(response=>response.json()).then(response => {
                 let text = "<tr>\n<th>ID</th>\n<th>Задача</th>\n<th>Тема</th>\n<th>Класс</th>\n<th>Автор</th>\n<th>Вердикт</th>\n</tr>";
                 let tasks = response.tasks;
                 let verdicts = response.verdicts;
