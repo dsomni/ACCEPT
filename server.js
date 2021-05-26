@@ -566,7 +566,6 @@ app.get('/account/:login/:page/:search', checkAuthenticated, checkValidation, as
         let tasks = await Task.find({}).exec();
         let tournaments = await Tournament.find({}).exec();
         let attempts = user.attempts;
-        let foundTasks = [];
         let foundAttempts = [];
 
         let a = req.params.search.split('&');
@@ -585,7 +584,6 @@ app.get('/account/:login/:page/:search', checkAuthenticated, checkValidation, as
                     task = tasks.find(item => item.identificator == attempts[i].taskID);
                 if (task && task.title.slice(0, toSearch.length).toUpperCase() == toSearch) {
                     foundAttempts.push(attempts[i]);
-                    foundTasks.push(task);
                 }
             }
         }
@@ -1180,43 +1178,13 @@ app.get('/tournaments/:login/:page/:search', checkAuthenticated, async (req, res
         foundTournaments = foundTournaments.filter(item => (item.isBegan == isBegan) && (item.isEnded == isEnded));
     }
 
-
-    let result;
-    for (let i = 0; i < foundTournaments.length; i++){
-        result = "/" + foundTournaments[i].tasks.length
-        let solved = 0;
-        for (let k = 0; k < foundTournaments[i].tasks.length; k++){
-
-            let verdict = user.verdicts.find(item => item.taskID == foundTournaments[i].tasks[k].identificator)
-            if(verdict && verdict.result=="OK"){
-                solved+=1
-            }
-        }
-        result = solved + result;
-        results.push(result)
-    }
-
-    //?
-    let obj = [];
-    for(let i=0;i<foundTournaments.length;i++){
-        obj.push([foundTournaments[i], results[i]]);
-    }
-    obj.sort(compareTournaments);
-
-    for(let i=0;i<foundTournaments.length;i++){
-        foundTournaments[i] = obj[i][0];
-    }
-    for(let i=0;i<results.length;i++){
-        results[i] = obj[i][1];
-    }
-
-    //?
     foundTournaments.sort((a, b) => { return a._id < b._id });
 
     let onPage = config.onPage.tournaments;
     let page = req.params.page;
     let pages = Math.ceil(foundTournaments.length / onPage);
     let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, foundTournaments.length)} из ${foundTournaments.length}`;
+    let ids = foundTournaments.map(item => item.identificator).join("|");
 
     res.render('tournaments.ejs',{
         u_login: user.login,
@@ -1224,9 +1192,8 @@ app.get('/tournaments/:login/:page/:search', checkAuthenticated, async (req, res
         login: req.user.login,
         name: req.user.name,
         title: "Tournaments List",
-        tournaments: foundTournaments.slice((page - 1) * onPage, page * onPage),
-        results: results.slice((page - 1) * onPage, page * onPage),
         isTeacher: req.user.isTeacher,
+        ids,
         page,
         pages,
         onPage,
@@ -2036,31 +2003,38 @@ app.get("/api/task/get/testverdicts/:ids", checkAuthenticated, async (req, res) 
 });
 
 //---------------------------------------------------------------------------------
-// Get lesson verdicts
-app.get("/api/lessons/get/verdicts/:ids", checkAuthenticated, async (req, res) => {
+// Get lesson + Tournaments verdicts
+app.get("/api/cringe/get/verdicts/:ids/:flag", checkAuthenticated, async (req, res) => {
     let ids = req.params.ids.split("|");
-    let lessons = [];
+    let flag = req.params.flag;
+    let objects = [];
     let verdicts = [];
     for (let i = 0; i < ids.length; i++){
-        lessons.push(Lesson.findOne({ identificator: ids[i] }).exec());
+        if (flag!="lessons")
+            objects.push(Tournament.findOne({ identificator: parseInt(ids[i]) }))
+        else
+            objects.push(Lesson.findOne({ identificator: ids[i] }).exec());
     }
-    lessons = await Promise.all(lessons);
+    objects = await Promise.all(objects);
 
-    let solved, verdict;
-    lessons.forEach(lesson => {
+    let solved, verdict, tasks;
+    objects.forEach(object => {
+        tasks = object.tasks
+        if(flag!="lessons")
+            tasks = tasks.map(item => item.identificator)
         solved = 0;
-        for (let i = 0; i < lesson.tasks.length; i++){
-            verdict = req.user.verdicts.find(item => item.taskID == lesson.tasks[i]);
+        for (let i = 0; i < tasks.length; i++){
+            verdict = req.user.verdicts.find(item => item.taskID == tasks[i]);
             if (verdict && verdict.result == "OK") {
                 solved += 1;
             }
         }
-        verdicts.push(`${solved}/${lesson.tasks.length}`);
+        verdicts.push(`${solved}/${tasks.length}`);
     })
 
     res.json({
         verdicts,
-        lessons
+        objects
     });
 });
 
@@ -2073,7 +2047,6 @@ app.get("/api/attempts/get/verdicts/:page/:search", checkAuthenticated, async (r
     let a = req.params.search.split('&amp;');
     let toSearch = a[0]=="default"? "":a[0].toUpperCase();
     let types = a[1];
-    console.log(toSearch, types);
     let attempts = req.user.attempts;
     let onPage = config.onPage.attempts;
     let foundAttempts = [];
