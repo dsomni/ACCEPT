@@ -32,38 +32,7 @@
                 <button id="submitsearch">Найти</button>
             </form>
 
-            <table class='taskslist'>
-                <tr>
-                  <th>Дата</th>
-                  <th>Задача</th>
-                  <th>Вердикт</th>
-                  <th>Язык</th>
-                  </tr>
-                <% min = function(a,b){ if(a < b) return a; return b} %>
-                <% for (var i = 0; i < attempts.length; i++) { %>
-                <% var attempt = attempts[i]; %>
-                <% var task = tasks[i]; %>
-
-                <% var item = attempt.result.find(el => el[2]=="er"); %>
-                <% if(!item) { %>
-                <% item = attempt.result[attempt.result.length - 1]; %>
-                <% }%>
-                <% if(!item || item[0]=='') item = ["🍃","Sheet happens", "ok"]; %>
-                <% var maxDate = new Date(Number(attempt.date) +3*60*60*1000); %>
-                <% var isoDate = maxDate.toISOString(); %>
-                <% var date = isoDate.substr(0, 10) + " " + isoDate.substr(11, 8) ; %>
-                 <tr>
-                  <td> <a class="tlrefs" href=<%="/attempt/" + u_login + '/' +  attempt.date  %>> <%= date %> </a> </td>
-                  <% if(task.identificator.split('_')[0]==0){ %>
-                    <td> <a class="tlrefs" href=<%="/task/page/" + task.identificator %>> <%= task.title %> </a> </td>
-                  <%}else{ %>
-                    <td> <a class="tlrefs" href=<%="/tournament/task/page/" + task.identificator.split('_')[0] + '/' + task.identificator %>> <%= task.title %> </a> </td>
-                  <% } %>
-                  <td><%= item[0] %> <a id=<%= item[2] %>><%= item[1] %></a></td>
-                  <td><%= attempt.language || 'Pascal' %></td>
-                 </tr>
-                <% } %>
-                </table>
+            <table class='taskslist' id = "table"></table>
 
             <div class='pageinfo'>
                 <div class="pageRefs"><%= pageInfo %></div>
@@ -79,4 +48,44 @@
             </div>
         </main>
     </body>
+    <script type=text/javascript>
+        let min = (a, b) => {if(a>b)return b;return a;};
+        function update(page) {
+            fetch("/api/attempts/get/verdicts/"+page+"/<%= search %>").then(response=>response.json()).then(response => {
+                let attempts = response.attempts;
+                let tasks = response.tasks;
+                let text = `<tr>\n<th>Дата</th>\n<th>Задача</th>\n<th>Вердикт</th>\n<th>Язык</th>\n</tr>`;
+                let attempt, task, isoDate, date, item, link;
+                console.log("<%= search %>");
+                for (let i = 0; i < min(attempts.length, tasks.length); i++) {
+                    attempt = attempts[i];
+                    task = tasks[i];
+
+                    isoDate = (new Date(Number(attempt.date) +3*60*60*1000)).toISOString();
+                    date = isoDate.substr(0, 10) + " " + isoDate.substr(11, 8);
+
+                    item = attempt.result.find(el => el[2]=="er");
+                    if(!item)
+                        item = attempt.result[attempt.result.length - 1];
+                    if(!item || item[0]=='') item = ["🍃","leafing...", "ok"];
+
+                    link = `<td><a class="tlrefs" href="/task/page/${task.identificator}">${task.title}</a></td>`;
+                    if(task.identificator.split('_')[0]!='0')
+                        link = `<td><a class="tlrefs" href="/tournament/task/page/${task.identificator.split('_')[0]}/${task.identificator}">${task.title}</a></td>`;
+
+                    text += `<tr><td><a class="tlrefs" href="/attempt/<%=u_login%>/${attempt.date}">${date}</a></td>`;
+                    text += link
+                    text += `<td>${item[0]}<a id="${item[2]}"> ${item[1]}</a></td>`
+                    text += `<td>${attempt.language}</td></tr>`;
+                }
+                resultsarea.innerHTML = text;
+            }).catch(err => console.log(err));
+        }
+        let resultsarea = document.getElementById("table");
+        let page = "<%= page %>";
+        update(page);
+        setInterval(() => {
+            update(page);
+        }, 5000);
+    </script>
 </html>

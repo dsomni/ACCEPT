@@ -8,13 +8,13 @@ module.exports = {
 	maxThreadsTests: 10, 
 	maxThreadsTasks: 5, 
 	onPage: {
-		newsMain: 1, 
-		newsList: 2, 
-		tasks: "3", 
-		lessons: 3, 
-		tournaments: "5", 
-		students: "6", 
-		attempts: "7"
+		newsMain: 5, 
+		newsList:10, 
+		tasks: 25, 
+		lessons: 20, 
+		tournaments: 15, 
+		students: 30, 
+		attempts: 20
 	}, 
 	mongodbConfigs: {
 		dbName: "db", 

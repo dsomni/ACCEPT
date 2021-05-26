@@ -61,7 +61,7 @@ async function check(){
                         fs.stat(path.join(folderPath + "\\result.txt"), async function(err,stats2) {
                             if (!err) {
                                 let resultStrings = fs.readFileSync(path.normalize(folderPath + "\\result.txt"),"utf-8").trim().split("\n");
-                                if(resultStrings[0].length >0 && (resultStrings[0] == 'Test # 1*Compilation Error*er' || resultStrings.length == problem.tests.length)){
+                                if(resultStrings[0].length >0 && (resultStrings[0] == 'Test #1*Compilation Error*er' || resultStrings.length == problem.tests.length)){
 
                                     let result = [];
                                     for(let i = 0; i < resultStrings.length; i++){
@@ -119,7 +119,7 @@ async function check(){
                         fs.stat(path.normalize(folderPath + "\\result.txt"), async function (err, stats2) {
                             if (!err) {
                                 let resultStrings = fs.readFileSync(path.normalize(folderPath + "\\result.txt"), "utf-8").trim().split("\n");
-                                if (resultStrings[0].length >0 && (resultStrings[0] == 'Test # 1*Compilation Error*er' || resultStrings.length == problem.tests.length)) {
+                                if (resultStrings[0].length >0 && (resultStrings[0] == 'Test #1*Compilation Error*er' || resultStrings.length == problem.tests.length)) {
 
                                     let result = [];
                                     for (let i = 0; i < resultStrings.length; i++) {

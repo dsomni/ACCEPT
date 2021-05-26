@@ -572,28 +572,24 @@ app.get('/account/:login/:page/:search', checkAuthenticated, checkValidation, as
         let a = req.params.search.split('&');
         let toSearch = a[0]=="default"? "":a[0].toUpperCase();
         let types = a[1];
-        let tourTask =[]
+        let tourTask =[];
+        let task;
 
         tournaments.forEach(tournament => tournament.tasks.forEach(task => tourTask.push(task)));
         for(let i = 0; i < attempts.length; i++){
             verylongresult = getVerdict(attempts[i].result);
-            if ((attempts[i].taskID.split('_')[0] != '0') && ((types=='all') || (verylongresult=='OK'))){
-                let task = tourTask.find(item => item.identificator == attempts[i].taskID);
-                if (task && task.title.slice(0, toSearch.length).toUpperCase() == toSearch){
+            if ((types == 'all') || (verylongresult == 'OK')) {
+                 if(attempts[i].taskID.split('_')[0] != '0')
+                    task = tourTask.find(item => item.identificator == attempts[i].taskID);
+                 else
+                    task = tasks.find(item => item.identificator == attempts[i].taskID);
+                if (task && task.title.slice(0, toSearch.length).toUpperCase() == toSearch) {
                     foundAttempts.push(attempts[i]);
                     foundTasks.push(task);
                 }
             }
-            else {
-                if ((attempts[i].taskID.split('_')[0] == '0') && ((types=='all') || (verylongresult=='OK'))){
-                    let task = tasks.find(item => item.identificator == attempts[i].taskID);
-                    if (task && task.title.slice(0, toSearch.length).toUpperCase() == toSearch){
-                        foundAttempts.push(attempts[i]);
-                        foundTasks.push(task);
-                    }
-                }
-            }
         }
+
         let onPage = config.onPage.attempts;
         let page = req.params.page;
         let pages = Math.ceil(foundAttempts.length / onPage);
@@ -608,8 +604,6 @@ app.get('/account/:login/:page/:search', checkAuthenticated, checkValidation, as
             page,
             pages,
             isTeacher: req.user.isTeacher,
-            attempts: foundAttempts.slice((page - 1) * onPage, page * onPage),
-            tasks: foundTasks.slice((page - 1) * onPage, page * onPage),
             search: req.params.search,
             n_name: user.name,
             user: user,
@@ -2067,6 +2061,43 @@ app.get("/api/lessons/get/verdicts/:ids", checkAuthenticated, async (req, res) =
     res.json({
         verdicts,
         lessons
+    });
+});
+
+//---------------------------------------------------------------------------------
+// Get attempt results
+app.get("/api/attempts/get/verdicts/:page/:search", checkAuthenticated, async (req, res) => {
+    let tasks = await Task.find({}).exec();
+    let tournaments = await Tournament.find({}).exec();
+    let page = req.params.page;
+    let a = req.params.search.split('&amp;');
+    let toSearch = a[0]=="default"? "":a[0].toUpperCase();
+    let types = a[1];
+    console.log(toSearch, types);
+    let attempts = req.user.attempts;
+    let onPage = config.onPage.attempts;
+    let foundAttempts = [];
+    let foundTasks = [];
+    let tourTask = [];
+
+
+    tournaments.forEach(tournament => tournament.tasks.forEach(task => tourTask.push(task)));
+    for(let i = 0;   i  <  attempts.length; i++){
+        verylongresult = getVerdict(attempts[i].result);
+        if ((types == 'all') || (verylongresult == 'OK')) {
+                if(attempts[i].taskID.split('_')[0] != '0')
+                task = tourTask.find(item => item.identificator == attempts[i].taskID);
+                else
+                task = tasks.find(item => item.identificator == attempts[i].taskID);
+            if (task && task.title.slice(0, toSearch.length).toUpperCase() == toSearch) {
+                foundAttempts.push(attempts[i]);
+                foundTasks.push(task);
+            }
+        }
+    }
+    res.json({
+        attempts: foundAttempts.slice((page-1)*onPage, min(foundAttempts.length, page*onPage)),
+        tasks: foundTasks.slice((page - 1) * onPage, min(foundTasks.length, page*onPage))
     });
 });
 

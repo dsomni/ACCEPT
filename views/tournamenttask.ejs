@@ -96,7 +96,7 @@
                     let statuses = response.success;
                     for(let i=0; i<min(tasks.length, statuses.length); i++){
                         if(tasks[i].identificator == id)
-                            text+=`\n<a class="tasklink ${statuses[i]}" href="/tournament/task/page/<%= TUR_ID  %>/${tasks[i].identificator}" style="border: solid black 4px">${parseInt(tasks[i].identificator.split('_')[1])+1}</a>`;
+                            text+=`\n<a class="tasklink ${statuses[i]}" style="outline: solid black 4px; outline-offset: -4px; font-size: 1.2rem; font-weight: bolder;">${parseInt(tasks[i].identificator.split('_')[1])+1}</a>`;
                         else
                             text+=`\n<a class="tasklink ${statuses[i]}" href="/tournament/task/page/<%= TUR_ID  %>/${tasks[i].identificator}">${parseInt(tasks[i].identificator.split('_')[1])+1}</a>`;
                     }

@@ -764,7 +764,7 @@ header input{
     border: solid 1px black;
     border-radius: 10px;
     background-color: #e4e1e1aa;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     padding: .3rem;
 }
 .ChatMessage{
@@ -828,22 +828,23 @@ header input{
 }
 
 .tasklink{
-    margin: 1px;
+    margin: 2px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    width: 4vw;
-    height: 4vw;
-    border: solid black 1px;
+    justify-content: space-evenly;
+    width: 50px;
+    height: 50px;
+    border: 1px solid black;
     border-radius: 5%;
     text-decoration: none;
-    font-size: 2rem;
+    font-size: 1.5rem;
+    color: black;;
 }
 .success{
-    background-color:chartreuse;
+    background-color:rgb(118, 233, 3);
 }
 .error{
-    background-color: crimson;
+    background-color: rgb(216, 72, 35);
 }
 .testing{
     background-color: gold;

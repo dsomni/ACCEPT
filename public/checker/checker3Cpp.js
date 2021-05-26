@@ -50,7 +50,7 @@ async function go(){
     }catch{
         // Compilation Error
 
-        fs.writeFileSync(path + '\\result.txt', "Test # 1" + "*" + "Compilation Error" + "*" + "er" , "utf8");
+        fs.writeFileSync(path + '\\result.txt', "Test #1" + "*" + "Compilation Error" + "*" + "er" , "utf8");
 
         process.exit();
     }

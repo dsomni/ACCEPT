@@ -44,15 +44,6 @@ async function go(){
     let programText = fs.readFileSync(path+"\\programText.txt", "utf8");
 
     fs.writeFileSync(path + '\\'+fileName +'.java', programText, "utf8");
-    /*try{
-        let err = childProcess.execSync('javac '+ path + '\\'+fileName +'.java');
-    }catch{
-        // Compilation Error
-
-        fs.writeFileSync(path + '\\result.txt', "Test # 1" + "*" + "Compilation Error" + "*" + "er" , "utf8");
-
-        process.exit();
-    }*/
 
     let task;
 
