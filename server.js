@@ -872,8 +872,8 @@ app.get('/lessonresults/:id/:page/:search', checkAuthenticated, checkNletter, ch
                 foundStudents = students;
             }
         }
-        if(foundStudents.length == 0)
-            foundStudents = await User.find({ isTeacher: false }).exec();
+        // if(foundStudents.length == 0)
+        //     foundStudents = await User.find({ isTeacher: false }).exec();
         foundStudents.sort((a, b) => { return a.name > b.name });
 
         let onPage = config.onPage.students;
@@ -1800,7 +1800,7 @@ app.get("/registration", async (req, res) => {
 
 app.post("/registration", async (req, res) => {
     let new_user = {
-        login: "n_"+req.body.login,
+        login: "n-"+req.body.login,
         password: req.body.password,
         name: req.body.name,
         isTeacher:false,
@@ -1865,7 +1865,7 @@ app.post("/EditAccount", checkAuthenticated, async (req, res) => {
             location: undefined
         });
     }
-    if (req.user.login.slice(0, 2) == "n_") {
+    if (req.user.login.slice(0, 2) == "n-") {
         user.name = req.body.name;
         user.group = req.body.email;
     }
@@ -1951,14 +1951,13 @@ app.get("/api/task/get/testresults/:id", checkAuthenticated, async (req, res) =>
             results.result = [["", "In Testing Queue(" + (isInQueue + 1).toString() + ")..", "er"]];
             results.status = "testing";
         } else {
-            let attempts = req.user.attempts;
-            let attempt = attempts.find(item => item.taskID == req.params.id);
+            let attempt = req.user.attempts.find(item => item.taskID == req.params.id);
             if (attempt) {
                 results.result = attempt.result;
-                if (attempt.result.find(item => item[2] == "er") != -1)
+                if (attempt.result.find(item => item[2] == "er") != null)
                     results.status = "error";
                 else
-                    result.status = "success";
+                    results.status = "success";
             }
         }
     }
@@ -1988,67 +1987,39 @@ app.get("/api/task/get/testverdicts/:login/:ids", checkAuthenticated, async (req
   let verdict, isInQueue;
   let verdicts = [];
   let success = [];
-  ids.forEach(id => {
+  for(let i = 0; i<ids.length; i++){
+    id = ids[i];
     verdict = user.verdicts.find(item => item.taskID == id)
     if (verdict) {
-      verdict = verdict.result
+        verdict = verdict.result
     } else {
-      verdict = "-"
+        verdict = "-"
     }
     isInQueue = TestingQueue.findIndex(item => (item.id == id && item.login == user.login));
     try {
-      fs.statSync(path.join(__dirname, '/public/processes/' + user.login + '_' + id));
-      success.push("testing");
-    } catch (err) {
-      if (isInQueue != -1) {
+        fs.statSync(path.join(__dirname, '/public/processes/' + user.login + '_' + id));
         success.push("testing");
-      } else {
-        if (verdict == "-") {
-          success.push("nottested");
-        } else if (verdict == "OK") {
-          success.push("success");
-        } else {
-            tournament = await Tournament.findOne({ identificator: parseInt(ids[i].split('_')[0]) }).exec();
-            task = tournament.tasks.find(item => item.identificator == ids[i]);
-        }
-        tasks.push(task);
-    }
-
-    let verdict, isInQueue;
-    let verdicts = [];
-    let success = [];
-    ids.forEach(id => {
-        verdict = user.verdicts.find(item => item.taskID == id)
-        if (verdict) {
-            verdict = verdict.result
-        } else {
-            verdict = "-"
-        }
-        isInQueue = TestingQueue.findIndex(item => (item.id == id && item.login == user.login));
-        try {
-            fs.statSync(path.join(__dirname, '/public/processes/' + user.login + '_' + id));
+    } catch (err) {
+        if (isInQueue != -1) {
             success.push("testing");
-        } catch (err) {
-            if (isInQueue != -1) {
-                success.push("testing");
+        } else {
+            if (verdict == "-") {
+                success.push("nottested");
+            } else if (verdict == "OK") {
+                success.push("success");
             } else {
-                if (verdict == "-") {
-                    success.push("nottested");
-                } else if (verdict == "OK") {
-                    success.push("success");
-                } else {
-                    success.push("error");
-                }
+                success.push("error");
             }
         }
-        verdicts.push(verdict);
-    });
+    }
+    verdicts.push(verdict);
+  }
 
-    res.json({
-        verdicts,
-        tasks,
-        success
-    });
+  res.json({
+      verdicts,
+      tasks,
+      success
+  });
 });
 
 //---------------------------------------------------------------------------------
@@ -2090,7 +2061,6 @@ app.get("/api/cringe/get/verdicts/:ids/:flag", checkAuthenticated, async (req, r
 //---------------------------------------------------------------------------------
 // Get attempt results
 app.get("/api/attempts/get/verdicts/:login/:page/:search", checkAuthenticated, async (req, res) => {
-<<<<<<< HEAD
   let user = await User.findOne({ login: req.params.login }).exec();
   if (!user || !req.user.isTeacher)
     user = req.user;
@@ -2124,47 +2094,11 @@ app.get("/api/attempts/get/verdicts/:login/:page/:search", checkAuthenticated, a
     attempts: foundAttempts.slice((page - 1) * onPage, min(foundAttempts.length, page * onPage)),
     tasks: foundTasks.slice((page - 1) * onPage, min(foundTasks.length, page * onPage))
   });
-=======
-    let user = await User.findOne({ login: req.params.login }).exec();
-    if (!user)
-        user = req.user;
-    let tasks = await Task.find({}).exec();
-    let tournaments = await Tournament.find({}).exec();
-    let page = req.params.page;
-    let a = req.params.search.split('&amp;');
-    let toSearch = a[0]=="default"? "":a[0].toUpperCase();
-    let types = a[1];
-    let attempts = user.attempts;
-    let onPage = config.onPage.attempts;
-    let foundAttempts = [];
-    let foundTasks = [];
-    let tourTask = [];
-
-    tournaments.forEach(tournament => tournament.tasks.forEach(task => tourTask.push(task)));
-    for(let i = 0; i < attempts.length; i++){
-        verylongresult = getVerdict(attempts[i].result);
-        if ((types == 'all') || (verylongresult == 'OK')) {
-                if(attempts[i].taskID.split('_')[0] != '0')
-                    task = tourTask.find(item => item.identificator == attempts[i].taskID);
-                else
-                    task = tasks.find(item => item.identificator == attempts[i].taskID);
-            if (task && task.title.slice(0, toSearch.length).toUpperCase() == toSearch) {
-                foundAttempts.push(attempts[i]);
-                foundTasks.push(task);
-            }
-        }
-    }
-    res.json({
-        attempts: foundAttempts.slice((page-1)*onPage, min(foundAttempts.length, page*onPage)),
-        tasks: foundTasks.slice((page - 1) * onPage, min(foundTasks.length, page*onPage))
-    });
->>>>>>> parent of 54f661d... Update [format code]
 });
 
 //---------------------------------------------------------------------------------
 // Get lesson result verdicts
 app.get("/api/lessons/get/verdicts/:id/:logins", checkAuthenticated, async (req, res) => {
-<<<<<<< HEAD
   if (!req.user.isTeacher)
     return res.json({});
   let logins = req.params.logins.split("|");
@@ -2192,33 +2126,6 @@ app.get("/api/lessons/get/verdicts/:id/:logins", checkAuthenticated, async (req,
     users,
     results
   });
-=======
-    let logins = req.params.logins.split("|");
-    let tasks = (await Lesson.findOne({ identificator: req.params.id }).exec()).tasks;
-    let users = [];
-    let verdicts = [];
-    let results = [];
-    for (let i = 0; i < logins.length; i++){
-        users.push(User.findOne({ login : logins[i]}).exec());
-    }
-    users = await Promise.all(users);
-
-    for (let i = 0; i < users.length; i++){
-        verdicts = users[i].verdicts;
-        solved = 0;
-        for (let i = 0; i < tasks.length; i++){
-            verdict = verdicts.find(item => item.taskID == tasks[i]);
-            if (verdict && verdict.result == "OK") {
-                solved += 1;
-            }
-        }
-        results.push(`${solved}/${tasks.length}`);
-    }
-    res.json({
-        users,
-        results
-    });
->>>>>>> parent of 54f661d... Update [format code]
 });
 
 //---------------------------------------------------------------------------------
@@ -2235,14 +2142,13 @@ app.get("/api/tournament/get/results/:id", checkAuthenticated, async (req, res) 
 //---------------------------------------------------------------------------------
 // Get tournament attempts results
 app.get("/api/tournament/get/attempts/:id/:page/:search", checkAuthenticated, async (req, res) => {
-<<<<<<< HEAD
   let tournament = await Tournament.findOne({ identificator: req.params.id }).exec();
   let a = req.params.search.split('&amp;');
   let login = a[0].toLowerCase();
   let taskID = a[1];
   let types = a[2].toLowerCase();
   let toReverse = a[3] == 'true';
-  let attempts = tournament.attempts.filter(item => (login == "all" || item.login.toLowerCase() == login || item.login.toLowerCase() == "n_"+login)
+  let attempts = tournament.attempts.filter(item => (login == "all" || item.login.toLowerCase() == login || item.login.toLowerCase() == "n-"+login)
    &&(taskID == "all" || parseInt(item.TaskID.split("_")[1]) + 1 == parseInt(taskID))
    &&(types == "all" || item.score == 100));
   if (toReverse)
@@ -2253,25 +2159,6 @@ app.get("/api/tournament/get/attempts/:id/:page/:search", checkAuthenticated, as
   res.json({
     attempts
   });
-=======
-    let tournament = await Tournament.findOne({ identificator: req.params.id }).exec();
-    let a = req.params.search.split('&amp;');
-    let login = a[0].toLowerCase();
-    let taskID = a[1];
-    let types = a[2].toLowerCase();
-    let toReverse = a[3] == 'true';
-    let attempts = tournament.attempts.filter(item => login == "all" || item.login.toLowerCase() == login)
-        .filter(item => taskID == "all" || parseInt(item.TaskID.split("_")[1]) + 1 == parseInt(taskID))
-        .filter(item => types == "all" || item.score == 100);
-    if (toReverse)
-        attempts = attempts.reverse();
-
-    let onPage = configs.onPage.attempts;
-    attempts = attempts.slice((req.params.page - 1) * onPage, max(req.params.page * onPage, attempts.length));
-    res.json({
-        attempts
-    });
->>>>>>> parent of 54f661d... Update [format code]
 });
 
 //---------------------------------------------------------------------------------
@@ -2308,7 +2195,7 @@ app.get('*', (req,res) => {
 // Functions
 
 function checkNletter(req, res, next) {
-    if(req.user.isTeacher || req.user.login.slice(0, 2) != "n_"){
+    if(req.user.isTeacher || req.user.login.slice(0, 2) != "n-"){
         return next();
     }
     res.redirect('/');

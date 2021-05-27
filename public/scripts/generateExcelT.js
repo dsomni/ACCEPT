@@ -42,7 +42,7 @@ async function run() {
         if(!user)
             continue;
         let loginToShow = results[i].login;
-        if(loginToShow.length > 2 && loginToShow.slice(0,2)=="n_"){
+        if(loginToShow.length > 2 && loginToShow.slice(0,2)=="n-"){
             loginToShow = loginToShow.slice(2);
         }
         realresults.push([loginToShow, user.name])

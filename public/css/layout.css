@@ -438,6 +438,9 @@ header input{
     min-width: 70%;
     table-layout: fixed;
 }
+.tasklist *{
+    height: 4rem;
+}
 .taskslist th {
     border-top: 1px solid #6695fa;
     border-bottom: 1px solid #6695fa;
@@ -851,4 +854,13 @@ header input{
 }
 .nottested{
     background-color: lightgray;
+}
+
+.disqual dialog{
+    font-size: 0.8rem;
+    width: 150px;
+    height: 130px;
+}
+.disqual dialog button{
+    margin: 2px;
 }

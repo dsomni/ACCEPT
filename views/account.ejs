@@ -56,7 +56,6 @@
                 let tasks = response.tasks;
                 let text = `<tr>\n<th>Дата</th>\n<th>Задача</th>\n<th>Вердикт</th>\n<th>Язык</th>\n</tr>`;
                 let attempt, task, isoDate, date, item, link;
-                console.log("<%= search %>");
                 for (let i = 0; i < min(attempts.length, tasks.length); i++) {
                     attempt = attempts[i];
                     task = tasks[i];

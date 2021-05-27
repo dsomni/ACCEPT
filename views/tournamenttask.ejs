@@ -40,85 +40,6 @@
         </div>
         </div>
         <table id="examples" class='taskslist' style="min-width: 50%">
-<<<<<<< HEAD
-          <tr>
-            <th>Example Input</th>
-            <th>Example Output</th>
-          </tr>
-          <% for (var i=0; i < problem.examples.length; i++) { %>
-            <% var example=problem.examples[i]; %>
-              <tr>
-                <td>
-                  <%= example[0] %>
-                </td>
-                <td>
-                  <%= example[1] %>
-                </td>
-              </tr>
-              <% } %>
-        </table>
-
-
-        <form action=<%='/tournament/task/page/' + TUR_ID + '/' + problem.identificator %> method="POST"
-          enctype="multipart/form-data">
-          <div class="container">
-
-            <select name="languageSelector" id="languageSelector">
-              <option value="Pascal" <% if (!language || language=="Pascal" ){%> selected <%}%>>Pascal ABC.NET</option>
-              <option value="Python" <% if (language=="Python" ){%> selected <%}%>>Python 3.8</option>
-              <option value="PyPy" <% if (language=="PyPy" ){%> selected <%}%>>PyPy 3.7</option>
-              <option value="Cpp" <% if (language=="Cpp" ){%> selected <%}%>>C++20</option>
-              <option value="Java" <% if (language=="Java" ){%> selected <%}%>>Java 16</option>
-            </select>
-
-            <div class="imgs">
-              <img src="\public\media\TopLeft.svg">
-              <img src="\public\media\TopRight.svg">
-            </div>
-            <textarea class="taskarea" id="code" name="code" placeholder="Place code here"
-              style="font-family: 'Source Code Pro', monospace;"><%= prevCode %></textarea>
-            <input name="file" id="dragdrop" type="file" style="display: none;" accept=".pas, .java, .cpp, .py">
-            <div class="taskarea" id="result" name="result"></div>
-            <div class="imgsbottom">
-              <img src="\public\media\BottomLeft.svg">
-              <img src="\public\media\BottomRight.svg">
-            </div>
-            <input type="file" name="file" id="codefile">
-          </div>
-          <div id="submitdiv">
-            <button id="submit">Отправить</button>
-          </div>
-        </form>
-        <p class="countDownTimer" id="countDownTimer" style="left: 5rem; right:auto; top:20px"></p>
-        <div class="tasksSuccessError" id="linksarea"></div>
-  </main>
-</body>
-<script>
-  let min = (a, b) => { if (a > b) return b; return a; };
-  function updateOther(ids) {
-    fetch("/api/task/get/testverdicts/<%= login %>/" + ids).then(response => response.json()).then(response => {
-      text = "";
-      let id = "<%= ID %>"
-      let tasks = response.tasks;
-      let statuses = response.success;
-      for (let i = 0; i < min(tasks.length, statuses.length); i++) {
-        if (tasks[i].identificator == id)
-          text += `\n<a class="tasklink ${statuses[i]}" style="outline: solid black 4px; outline-offset: -4px; font-size: 1.2rem; font-weight: bolder;">${parseInt(tasks[i].identificator.split('_')[1]) + 1}</a>`;
-        else
-          text += `\n<a class="tasklink ${statuses[i]}" href="/tournament/task/page/<%= TUR_ID  %>/${tasks[i].identificator}">${parseInt(tasks[i].identificator.split('_')[1]) + 1}</a>`;
-      }
-      linksarea.innerHTML = text;
-    }).catch(err => console.log(err));
-  }
-  let linksarea = document.getElementById("linksarea");
-  let ids = "<%= ids %>";
-  updateOther(ids);
-  setInterval(() => {
-    updateOther(ids);
-  }, 5000);
-</script>
-<script type=text/javascript>
-=======
             <tr>
               <th>Example Input</th>
               <th>Example Output</th>
@@ -131,11 +52,8 @@
              </tr>
             <% } %>
         </table>
-
-
         <form action=<%='/tournament/task/page/' + TUR_ID + '/' + problem.identificator %>  method="POST" enctype="multipart/form-data">
             <div class="container">
-
                 <select name="languageSelector" id = "languageSelector">
                     <option value="Pascal" <% if (!language || language=="Pascal" ){%> selected <%}%>>Pascal ABC.NET</option>
                     <option value="Python" <% if (language=="Python" ){%> selected <%}%>>Python 3.8</option>
@@ -143,7 +61,6 @@
                     <option value="Cpp" <% if (language=="Cpp" ){%> selected <%}%>>C++20</option>
                     <option value="Java" <% if (language=="Java" ){%> selected <%}%>>Java 16</option>
                 </select>
-
                     <div class="imgs">
                         <img src="\public\media\TopLeft.svg">
                         <img src="\public\media\TopRight.svg">
@@ -165,10 +82,10 @@
         <div class="tasksSuccessError" id="linksarea"></div>
     </main>
     </body>
-    <script>
+    <script type = text/javascript>
         let min = (a, b) => {if(a>b)return b;return a;};
         function updateOther(ids) {
-            fetch("/api/task/get/testverdicts/"+ids).then(response=>response.json()).then(response => {
+            fetch("/api/task/get/testverdicts/<%= login %>/"+ids).then(response=>response.json()).then(response => {
                     text = "";
                     let id = "<%= ID %>"
                     let tasks = response.tasks;
@@ -189,11 +106,11 @@
             updateOther(ids);
         }, 5000);
     </script>
-    <script type = text/javascript>
->>>>>>> parent of 54f661d... Update [format code]
-        function update() {
+    <script>
+        function update(){
             fetch("/api/task/get/testresults/"+task).then(response=>response.json()).then(response => {
                 text = "<ul>";
+                console.log(response);
                 response.result.forEach(item => {
                     text+="\n"+`<li>${item[0]} <a id=${item[2]}>${item[1]}</a></li>`
                 });
@@ -210,6 +127,7 @@
             update();
         }, 5000);
     </script>
+
     <script type = text/javascript>
         function o_delete() {
             document.getElementById('dialog_delete').showModal();
@@ -220,54 +138,45 @@
     </script>
     <script>
         if(!<%= tournament.isBegan %>){
-            let countDownDate = new Date('<%= tournament.whenStarts.replace(' ', 'T') %>').getTime();
             var x = setInterval(function () {
-                var now = new Date().getTime();
-
-                var distance = countDownDate - now;
-
-                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                if (days>0)
-                    document.getElementById("countDownTimer").innerHTML = "Начало через "+ days + " дней "+ ("0"+hours).slice(-2) + ":"
-                        + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
-                else
-                    document.getElementById("countDownTimer").innerHTML = "Начало через "+ ("0"+hours).slice(-2) + ":"
-                        + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
-                if (distance < 0) {
-                        clearInterval(x);
-                        document.getElementById("countDownTimer").innerHTML = "Турнир начался! Обновите страницу";
-                }
+            var now = new Date().getTime();
+            var distance = countDownDate - now;
+            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            if (days>0)
+                document.getElementById("countDownTimer").innerHTML = "Начало через "+ days + " дней "+ ("0"+hours).slice(-2) + ":"
+                    + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
+            else
+                document.getElementById("countDownTimer").innerHTML = "Начало через "+ ("0"+hours).slice(-2) + ":"
+                    + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
+            if (distance < 0) {
+                    clearInterval(x);
+                    document.getElementById("countDownTimer").innerHTML = "Турнир начался! Обновите страницу";
+            }
             }, 1000);
         }else{
             let countDownDate = new Date('<%= tournament.whenEnds.replace(' ', 'T') %>').getTime();
             var x = setInterval(function() {
-                    var now = new Date().getTime();
-
-                    var distance = countDownDate - now;
-
-                    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                    if (days>0)
-                        document.getElementById("countDownTimer").innerHTML = "Окончание через "+ days + " дней " + ("0"+hours).slice(-2) + ":"
-                            + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
-                    else
-                        document.getElementById("countDownTimer").innerHTML = "Окончание через "+ ("0"+hours).slice(-2) + ":"
-                            + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
-
-                    if (distance <script) {
-                        clearInterval(x);
-                        document.getElementById("countDownTimer").innerHTML = "Окончен";
-                    }
-                }, 1000);
+                var now = new Date().getTime();
+                var distance = countDownDate - now;
+                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                if (days>0)
+                    document.getElementById("countDownTimer").innerHTML = "Окончание через "+ days + " дней " + ("0"+hours).slice(-2) + ":"
+                        + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
+                else
+                    document.getElementById("countDownTimer").innerHTML = "Окончание через "+ ("0"+hours).slice(-2) + ":"
+                        + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
+                if (distance < 0) {
+                    clearInterval(x);
+                    document.getElementById("countDownTimer").innerHTML = "Окончен";
+                }
+            }, 1000);
         }
-
         let drop = document.getElementById("code");
         let fileInput = document.getElementById("dragdrop");
         drop.ondragover = drop.ondragenter = (evt) => {

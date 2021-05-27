@@ -15,7 +15,7 @@
     <body>
         <main>
             <h1>Результаты урока <%= lesson.title %></h1>
-            <form class="SearchUI" action=<%= "/lessonresults/" + lesson.identificator + "/" + page + "/default" %>  method="POST">
+            <form class="SearchUI" action=<%= "/lessonresults/" + lesson.identificator + "/1/default&all&all&all" %>  method="POST">
                 <select name="GradeSelector" id = "GradeSelector">
                     <option value="all" selected>Все</option>
                     <% for(var i = 1; i < 12; i++) { %>
