@@ -1971,8 +1971,8 @@ app.get("/api/task/get/testverdicts/:login/:ids", checkAuthenticated, async (req
   let tasks = [];
   let task, tournament;
   let user = await User.findOne({ login: req.params.login });
-  if (!user)
-    user = req.user;
+  // if (!user || !req.user.isTeacher)
+  //   user = req.user;
   for (let i = 0; i < ids.length; i++) {
     if (ids[i].split('_')[0] == '0') {
       task = await Task.findOne({ identificator: ids[i] }).exec();
@@ -2060,7 +2060,7 @@ app.get("/api/cringe/get/verdicts/:ids/:flag", checkAuthenticated, async (req, r
 // Get attempt results
 app.get("/api/attempts/get/verdicts/:login/:page/:search", checkAuthenticated, async (req, res) => {
   let user = await User.findOne({ login: req.params.login }).exec();
-  if (!user)
+  if (!user || !req.user.isTeacher)
     user = req.user;
   let tasks = await Task.find({}).exec();
   let tournaments = await Tournament.find({}).exec();
@@ -2097,6 +2097,8 @@ app.get("/api/attempts/get/verdicts/:login/:page/:search", checkAuthenticated, a
 //---------------------------------------------------------------------------------
 // Get lesson result verdicts
 app.get("/api/lessons/get/verdicts/:id/:logins", checkAuthenticated, async (req, res) => {
+  if (!req.user.isTeacher)
+    return res.json({});
   let logins = req.params.logins.split("|");
   let tasks = (await Lesson.findOne({ identificator: req.params.id }).exec()).tasks;
   let users = [];
@@ -2144,9 +2146,9 @@ app.get("/api/tournament/get/attempts/:id/:page/:search", checkAuthenticated, as
   let taskID = a[1];
   let types = a[2].toLowerCase();
   let toReverse = a[3] == 'true';
-  let attempts = tournament.attempts.filter(item => login == "all" || item.login.toLowerCase() == login)
-    .filter(item => taskID == "all" || parseInt(item.TaskID.split("_")[1]) + 1 == parseInt(taskID))
-    .filter(item => types == "all" || item.score == 100);
+  let attempts = tournament.attempts.filter(item => (login == "all" || item.login.toLowerCase() == login || item.login.toLowerCase() == "n_"+login)
+   &&(taskID == "all" || parseInt(item.TaskID.split("_")[1]) + 1 == parseInt(taskID))
+   &&(types == "all" || item.score == 100));
   if (toReverse)
     attempts = attempts.reverse();
 

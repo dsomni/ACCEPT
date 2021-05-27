@@ -43,8 +43,7 @@
             <% } %>
               <a class="EditButtons" href=<%="/tournament/attempts/" +ID+"/1/all&all&all&true" %> >Посылки</a>
               <% } %>
-                <a class="EditButtons" href=<%="/tournament/results/" +tournament.identificator +"/1" %>>Таблица
-                  результатов</a>
+                <a class="EditButtons" href=<%="/tournament/results/" +tournament.identificator +"/1" %>>Таблица результатов</a>
       </div>
       <h4 class="h4">Автор: <%= tournament.author %> Участники: <%= tournament.results.length %>
       </h4>
@@ -71,7 +70,7 @@
             if(ids.length == 0){
                 if(<%= tournament.disqualificated.includes(login) %>)
                     text = `<h1 style="text-align: center;color:Red">Вы дисквалифицированы!</h1>`;
-                else if(<%= tournament.mods.find(item => item == login)!=0 %>)
+                else if(<%= tournament.mods.find(item => item == login)!= null %>)
                     text = `<h1 style="text-align: center;color:Red">Добавьте задачу</h1>`;
                 else if(<%= registered!=null %>)
                     text = `<h1 style="text-align: center;color:Red">Турнир ещё не начался</h1>`;
@@ -84,7 +83,7 @@
                     let tasks = response.tasks;
                     let verdicts = response.verdicts;
                     for(let i=0; i<min(tasks.length, verdicts.length); i++){
-                        text+=`\n<tr>\n<td>${parseInt(tasks[i].identificator.split('_')[1])+1}</td>\n<td> <a class="tlrefs" href="/tournament/task/page/${<%= tournament.identificator %>}/${tasks[i].identificator}">${tasks[i].title}</a></td>\n<td>${verdicts[i]}</td>\n<td><a class="tlrefs" href="/account/${<%= u_login %>}/1/${tasks[i].title.replace(' ','%20')}&all">[все попытки]</a></td>\n</tr>`;
+                        text+=`\n<tr>\n<td>${parseInt(tasks[i].identificator.split('_')[1])+1}</td>\n<td> <a class="tlrefs" href="/tournament/task/page/${<%= tournament.identificator %>}/${tasks[i].identificator}">${tasks[i].title}</a></td>\n<td>${verdicts[i]}</td>\n<td><a class="tlrefs" href="/account/<%= u_login %>/1/${tasks[i].title.replace(' ','%20')}&all">[все попытки]</a></td>\n</tr>`;
                     }
                     text+="\n</table>";
                     resultsarea.innerHTML = text;
