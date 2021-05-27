@@ -1,48 +1,53 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Добавление турнира</title>
 
-        <meta charset="utf-8">
-        <meta name="viewport"
-              content="width=device-width, initial-scale=1.0,
+<head>
+  <title>Добавление турнира</title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,
               maximum-scale=1.0, minimum-scale=1.0,
               user-scalable=no, minimal-ui">
-        <meta name="full-screen" content="yes">
+  <meta name="full-screen" content="yes">
 
-        </head>
-    <body>
-        <main>
+</head>
 
-        <form action='/tournament/add'  method="POST">
-            <div class="lessonAdderForm">
-                <h3 class="h3">Название турнира</h3>
-                <textarea id="title" name = "title" required placeholder="Введите название"></textarea>
-                <h3 class="h3">Описание</h3>
-                <textarea id="description" name = "description" placeholder="Введите описание"></textarea>
-                <h3 class="h3">Дата начала</h3>
-                <input style="width: 90%;margin-left: auto;margin-right: auto;margin-bottom: 10px;" class="dateChooser" type="datetime-local" name="whenStarts" required>
-                <h3 class="h3">Дата окончания</h3>
-                <input style="width: 90%;margin-left: auto;margin-right: auto;margin-bottom: 10px;" class="dateChooser" type="datetime-local" name="whenEnds" required>
-                <h3 class="h3">Заморозить таблицу в:</h3>
-                <input style="width: 90%;margin-left: auto;margin-right: auto;margin-bottom: 10px;" class="dateChooser" type="datetime-local" name="frozeAfter">
-                <h3 class="h3">Модераторы</h3>
-                <textarea id="mods" name = "mods" placeholder="Введите логины модераторов через пробел"></textarea>
-                <h3 class="h3">Разрешить регистрацию после начала турнира</h3>
-                <label class="switch" >
-                    <input type="checkbox" name="allowRegAfterStart">
-                    <span class="slider round"></span>
-                </label>
-                <h3 class="h3">Тип соревнования</h3>
-                <select name="allOrNothing" id = "selector">
-                    <option value="1" selected>Оценка по полность зданой задаче</option>
-                    <option value="0" >Потестовая оценка</option>
-                </select>
-                <h3 class="h3">Штраф за попытку(s)</h3>
-                <input style="width: 10rem" name="penalty" type="number" value="600">
-                <button id="submit">Добавить турнир</button>
-            </div>
-        </form>
-    </main>
-    </body>
+<body>
+  <main>
+
+    <form action='/tournament/add' method="POST">
+      <div class="lessonAdderForm">
+        <h3 class="h3">Название турнира</h3>
+        <textarea id="title" name="title" required placeholder="Введите название"></textarea>
+        <h3 class="h3">Описание</h3>
+        <textarea id="description" name="description" placeholder="Введите описание"></textarea>
+        <h3 class="h3">Дата начала</h3>
+        <input style="width: 90%;margin-left: auto;margin-right: auto;margin-bottom: 10px;" class="dateChooser"
+          type="datetime-local" name="whenStarts" required>
+        <h3 class="h3">Дата окончания</h3>
+        <input style="width: 90%;margin-left: auto;margin-right: auto;margin-bottom: 10px;" class="dateChooser"
+          type="datetime-local" name="whenEnds" required>
+        <h3 class="h3">Заморозить таблицу в:</h3>
+        <input style="width: 90%;margin-left: auto;margin-right: auto;margin-bottom: 10px;" class="dateChooser"
+          type="datetime-local" name="frozeAfter">
+        <h3 class="h3">Модераторы</h3>
+        <textarea id="mods" name="mods" placeholder="Введите логины модераторов через пробел"></textarea>
+        <h3 class="h3">Разрешить регистрацию после начала турнира</h3>
+        <label class="switch">
+          <input type="checkbox" name="allowRegAfterStart">
+          <span class="slider round"></span>
+        </label>
+        <h3 class="h3">Тип соревнования</h3>
+        <select name="allOrNothing" id="selector">
+          <option value="1" selected>Оценка по полность зданой задаче</option>
+          <option value="0">Потестовая оценка</option>
+        </select>
+        <h3 class="h3">Штраф за попытку(s)</h3>
+        <input style="width: 10rem" name="penalty" type="number" value="600">
+        <button id="submit">Добавить турнир</button>
+      </div>
+    </form>
+  </main>
+</body>
+
 </html>

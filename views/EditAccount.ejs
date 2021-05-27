@@ -1,57 +1,62 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Изменение аккаунта</title>
 
-        <meta charset="utf-8">
-        <meta name="viewport"
-              content="width=device-width, initial-scale=1.0,
+<head>
+  <title>Изменение аккаунта</title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,
               maximum-scale=1.0, minimum-scale=1.0,
               user-scalable=no, minimal-ui">
-        <meta name="full-screen" content="yes">
+  <meta name="full-screen" content="yes">
 
-        <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
-        </head>
-    <body>
+  <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
+</head>
 
-        <script>
-        function checkPasswordLength(event){
-            const lenp = document.getElementById("lenp");
-            const password = document.getElementById("password");
-            const button = document.getElementById("submit2");
-            if(password.value.toString().length<5){
-                lenp.style.visibility = "visible";
-                button.disabled = true;
-            }else{
-                lenp.style.visibility = "hidden";
-                button.disabled = false;
-            }
-        };
-        </script>
+<body>
 
-        <main >
-            <h1>Изменение данных пользователя <%= user.name %></h1>
-            <div style="display: flex; justify-content:center">
-                <form class="reg" action= '/EditAccount'  method="POST">
-                <% if(user.login.slice(0, 2)=="n_") { %>
-                    <h3 class="h3">Ф.И.О.</h3>
-                    <input name = "name" value="<%= user.name %>" required>
-                    <h3 class="h3">Электронная почта</h3>
-                    <input id="email" name="email" type="email" value="<%= user.group %>" required>
-                <% } %>
-                <h3 class="h3">Пароль</h3>
-                <input id="password" name="password" type="password" oninput="checkPasswordLength();"">
+  <script>
+    function checkPasswordLength(event) {
+      const lenp = document.getElementById("lenp");
+      const password = document.getElementById("password");
+      const button = document.getElementById("submit2");
+      if (password.value.toString().length < 5) {
+        lenp.style.visibility = "visible";
+        button.disabled = true;
+      } else {
+        lenp.style.visibility = "hidden";
+        button.disabled = false;
+      }
+    };
+  </script>
+
+  <main>
+    <h1>Изменение данных пользователя <%= user.name %>
+    </h1>
+    <div style="display: flex; justify-content:center">
+      <form class="reg" action='/EditAccount' method="POST">
+        <% if(user.login.slice(0, 2)=="n_" ) { %>
+          <h3 class="h3">Ф.И.О.</h3>
+          <input name="name" value="<%= user.name %>" required>
+          <h3 class="h3">Электронная почта</h3>
+          <input id="email" name="email" type="email" value="<%= user.group %>" required>
+          <% } %>
+            <h3 class="h3">Пароль</h3>
+            <input id="password" name="password" type="password" oninput="checkPasswordLength();"">
                 <br>
-                <button id="submit2">Изменить</button>
-                <p id="lenp" style="color: red;">Пароль должен содержать минимум 5 символов!</p>
-            </form>
-            <br>
-        </div>
-        </main>
-        <script>
-            const lenp = document.getElementById("lenp");
-            lenp.style.visibility = "hidden";
-        </script>
-        <h3 style="text-align: center;color:Red"><%= msg %></h3>
-    </body>
+                <button id=" submit2">Изменить</button>
+            <p id="lenp" style="color: red;">Пароль должен содержать минимум 5 символов!</p>
+      </form>
+      <br>
+    </div>
+  </main>
+  <script>
+    const lenp = document.getElementById("lenp");
+    lenp.style.visibility = "hidden";
+  </script>
+  <h3 style="text-align: center;color:Red">
+    <%= msg %>
+  </h3>
+</body>
+
 </html>

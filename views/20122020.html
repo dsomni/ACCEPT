@@ -1,46 +1,47 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Easter Egg 1</title>
 
-        <meta charset="utf-8">
-        <meta name="viewport"
-              content="width=device-width, initial-scale=1.0,
+<head>
+  <title>Easter Egg 1</title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,
               maximum-scale=1.0, minimum-scale=1.0,
               user-scalable=no, minimal-ui">
-        <meta name="full-screen" content="yes">
+  <meta name="full-screen" content="yes">
 
-        <script src="public\scripts\p5.js"></script>
-        <script src="public\scripts\20122020.js"></script>
-        <link rel="stylesheet" href="public\css\20122020.css" type="text/css">
+  <script src="public\scripts\p5.js"></script>
+  <script src="public\scripts\20122020.js"></script>
+  <link rel="stylesheet" href="public\css\20122020.css" type="text/css">
 
-    </head>
-    <body>
+</head>
 
-        <div id = 'menu'>
-            <h1>Colours Changing by dsomni</h1>
-            <br>
-            <button onclick="game();">Start</button>
-            <button onClick='location.href="/about"'>Exit</button>
-        </div>
+<body>
 
-        <div id = 'game'>
-            <canvas id="canvas" style="z-index:1"></canvas>
-            <div id='control'>
-                <div id= "speedTxt" style="z-index:2">Speed</div>
-                <div id= "speedTxt2" style="z-index:2">1</div>
-                <div id= "rgb" style="z-index:2">255 255 255</div>
-                <button style="z-index:2" onclick="back();">BACK</button>
-                <br>
-                <input id="slider" style="z-index:2" type="range" min="0" max="30"
-                 step="1" value="1" oninput="spd()">
-            </div>
+  <div id='menu'>
+    <h1>Colours Changing by dsomni</h1>
+    <br>
+    <button onclick="game();">Start</button>
+    <button onClick='location.href="/about"'>Exit</button>
+  </div>
+
+  <div id='game'>
+    <canvas id="canvas" style="z-index:1"></canvas>
+    <div id='control'>
+      <div id="speedTxt" style="z-index:2">Speed</div>
+      <div id="speedTxt2" style="z-index:2">1</div>
+      <div id="rgb" style="z-index:2">255 255 255</div>
+      <button style="z-index:2" onclick="back();">BACK</button>
+      <br>
+      <input id="slider" style="z-index:2" type="range" min="0" max="30" step="1" value="1" oninput="spd()">
+    </div>
 
 
-        </div>
+  </div>
 
-    <script type="text/javascript">
+  <script type="text/javascript">
     init();
-    </script>
-    </body>
+  </script>
+</body>
+
 </html>

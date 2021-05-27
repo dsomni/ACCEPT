@@ -1,52 +1,55 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Обратная связь</title>
 
-        <meta charset="utf-8">
-        <meta name="viewport"
-              content="width=device-width, initial-scale=1.0,
+<head>
+  <title>Обратная связь</title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,
               maximum-scale=1.0, minimum-scale=1.0,
               user-scalable=no, minimal-ui">
-        <meta name="full-screen" content="yes">
+  <meta name="full-screen" content="yes">
 
-        <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
-        </head>
-    <body>
-        <main>
-            <h1>Отправить репорт</h1>
-            <form action='/report'  method="POST">
-                <div class="container">
-                    <select name="type_selector" id = "type_selector">
-                        <option value="feedback">Отзыв</option>
-                        <option value="suggestion">Предложение</option>
-                        <option value="bug">Сообщение о баге</option>
-                        <option value="other">Другое</option>
-                    </select>
+  <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
+</head>
 
-                    <textarea  style="width:400px;resize:both;" class="taskarea" id="report" name = "report" placeholder="Place feedback here"></textarea>
-                </div>
-                <div id="submitdiv">
-                    <button id="submit" >Отправить</button>
-                </div>
+<body>
+  <main>
+    <h1>Отправить репорт</h1>
+    <form action='/report' method="POST">
+      <div class="container">
+        <select name="type_selector" id="type_selector">
+          <option value="feedback">Отзыв</option>
+          <option value="suggestion">Предложение</option>
+          <option value="bug">Сообщение о баге</option>
+          <option value="other">Другое</option>
+        </select>
 
-                <div class="about" style="margin-left: 10%;">
-                    <h3 class="h3">О важности обратной связи</h3>
-                    <p>
-                        ACCEPT, как и любой другой проект, развивается. Мы стараемся сделать работу с системой
-                        комфортнее и интуитивнее. Поэтому каждый патч мы фиксим баги, меняем стили, добавляем
-                        новый функционал и так далее. Нам важно, чтобы вы получили качественный продукт.
-                    </p>
-                    <p>
-                        Однако мы не можем предусмотреть все случаи и протестировать каждую вкладку и каждую кнопку.
-                        Тестирование требует больших ресурсов, которые мы пускаем на более актуальные и важные задачи.
-                    </p>
-                    <p>
-                        Поэтому мы просив вас, наших пользователей, отправлять информацию а всех недочётах, багах,
-                        недоработках и тд. которые вы смогли найти. Это облегчит нам работу и значительно поможет
-                        в дальнейшем развитии ACCEPT. Конечно, пожелания и новые идеи тоже приветсвуются.
-                    </p>
-                </div>
-        </main>
-    </body>
+        <textarea style="width:400px;resize:both;" class="taskarea" id="report" name="report"
+          placeholder="Place feedback here"></textarea>
+      </div>
+      <div id="submitdiv">
+        <button id="submit">Отправить</button>
+      </div>
+
+      <div class="about" style="margin-left: 10%;">
+        <h3 class="h3">О важности обратной связи</h3>
+        <p>
+          ACCEPT, как и любой другой проект, развивается. Мы стараемся сделать работу с системой
+          комфортнее и интуитивнее. Поэтому каждый патч мы фиксим баги, меняем стили, добавляем
+          новый функционал и так далее. Нам важно, чтобы вы получили качественный продукт.
+        </p>
+        <p>
+          Однако мы не можем предусмотреть все случаи и протестировать каждую вкладку и каждую кнопку.
+          Тестирование требует больших ресурсов, которые мы пускаем на более актуальные и важные задачи.
+        </p>
+        <p>
+          Поэтому мы просив вас, наших пользователей, отправлять информацию а всех недочётах, багах,
+          недоработках и тд. которые вы смогли найти. Это облегчит нам работу и значительно поможет
+          в дальнейшем развитии ACCEPT. Конечно, пожелания и новые идеи тоже приветсвуются.
+        </p>
+      </div>
+  </main>
+</body>
+
 </html>

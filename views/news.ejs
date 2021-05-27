@@ -1,46 +1,50 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title><%= title %></title>
 
-        <meta charset="utf-8">
-        <meta name="viewport"
-              content="width=device-width, initial-scale=1.0,
+<head>
+  <title>
+    <%= title %>
+  </title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,
               maximum-scale=1.0, minimum-scale=1.0,
               user-scalable=no, minimal-ui">
-        <meta name="full-screen" content="yes">
-        </head>
-    <body>
-        <div style="width: 50%; margin-left: auto; margin-right: auto;">
-            <main class="newsPage">
-                <% if(news.imageName && news.imageName.length!=0 ){ %>
-                    <img src="<%='../public/media/newsImages/' + news.imageName %>" alt="Новость"
-                        style="max-height: 200px; max-width: 100vw;">
-                <% } %>
-                <a class="newsTitle"><%= title %></a>
-                <% if (isTeacher){ %>
-                    <span class="newsPopup">
-                        <button onclick='location.href="<%="/editnews/" + news._id %>"'
-                            class="show">[редактировать]</button>
-                        <dialog id='dialog'>
-                            <form action=<%="/deletenews/" + news._id %> method="POST">
-                                Вы действительно хотите удалить новость "<%= news.title %>" ?
-                                    <button>Да</button>
-                            </form>
-                            <button onClick='c();'>Назад</button>
-                        </dialog>
-                        <button onClick='o();' class="show">[удалить]</button>
-                    </span>
-                <% } %>
-                <% let date=new Date(parseInt(news.date)).toLocaleString('en-GB') %>
+  <meta name="full-screen" content="yes">
+</head>
+
+<body>
+  <div style="width: 50%; margin-left: auto; margin-right: auto;">
+    <main class="newsPage">
+      <% if(news.imageName && news.imageName.length!=0 ){ %>
+        <img src="<%='../public/media/newsImages/' + news.imageName %>" alt="Новость"
+          style="max-height: 200px; max-width: 100vw;">
+        <% } %>
+          <a class="newsTitle">
+            <%= title %>
+          </a>
+          <% if (isTeacher){ %>
+            <span class="newsPopup">
+              <button onclick='location.href="<%="/editnews/" + news._id %>"' class="show">[редактировать]</button>
+              <dialog id='dialog'>
+                <form action=<%="/deletenews/" + news._id %> method="POST">
+                  Вы действительно хотите удалить новость "<%= news.title %>" ?
+                    <button>Да</button>
+                </form>
+                <button onClick='c();'>Назад</button>
+              </dialog>
+              <button onClick='o();' class="show">[удалить]</button>
+            </span>
+            <% } %>
+              <% let date=new Date(parseInt(news.date)).toLocaleString('en-GB') %>
                 <pre><%= news.author %>        <%= date %></pre>
                 <div style="margin-top: 10px;">
-                    <%- news.text %>
+                  <%- news.text %>
                 </div>
-            </main>
-        </div>
-    </body>
-    <script type = text/javascript>
+    </main>
+  </div>
+</body>
+<script type=text/javascript>
         function o() {
             document.getElementById('dialog').showModal();
         }
@@ -48,4 +52,5 @@
             document.getElementById('dialog').close();
         }
     </script>
+
 </html>

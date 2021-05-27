@@ -1,95 +1,109 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Задача <%= parseInt(ID.split('_')[1])+1 %></title>
 
-        <meta charset="utf-8">
-        <meta name="viewport"
-              content="width=device-width, initial-scale=1.0,
+<head>
+  <title>Задача <%= parseInt(ID.split('_')[1])+1 %>
+  </title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,
               maximum-scale=1.0, minimum-scale=1.0,
               user-scalable=no, minimal-ui">
-        <meta name="full-screen" content="yes">
-        <link rel="preconnect" href="https://fonts.gstatic.com">
-        <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
-        </head>
-    <body>
-        <main>
-        <div id="task">
-        <H1 id="taskname"><%= problem.title %></H1>
-        <div style="text-align: center; margin: 20px;">
-            <% if(isTeacher){ %>
-                <a id="editref" class="editref" href=<%= "/task/edit/" + problem.identificator %> >[Редактировать]</a>
-                <span class="taskPopup">
-                    <dialog  id='dialog_delete'>
-                    <form action= <%="/task/delete/" + problem.identificator %>  method="POST">
-                        Вы действительно хотите удалить задачу "<%= problem.title %>" ?
-                        <button>Да</button>
-                    </form>
-                    <button onClick='c_delete();'>Назад</button>
-                    </dialog>
-                <button onClick='o_delete();' class="show" >[Удалить]</button>
-                </span>
-            <% } %>
-        </div>
-        <h4 class="h4">Тема: <%= problem.topic %>         Автор: <%= problem.author %></h4><!-- скрывать тему на турнире -->
-        <div class="statement"><%= problem.statement %>
-            <h5>Входные данные</h5>
-<%= problem.input %>
+  <meta name="full-screen" content="yes">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <main>
+    <div id="task">
+      <H1 id="taskname">
+        <%= problem.title %>
+      </H1>
+      <div style="text-align: center; margin: 20px;">
+        <% if(isTeacher){ %>
+          <a id="editref" class="editref" href=<%="/task/edit/" + problem.identificator %> >[Редактировать]</a>
+          <span class="taskPopup">
+            <dialog id='dialog_delete'>
+              <form action=<%="/task/delete/" + problem.identificator %> method="POST">
+                Вы действительно хотите удалить задачу "<%= problem.title %>" ?
+                  <button>Да</button>
+              </form>
+              <button onClick='c_delete();'>Назад</button>
+            </dialog>
+            <button onClick='o_delete();' class="show">[Удалить]</button>
+          </span>
+          <% } %>
+      </div>
+      <h4 class="h4">Тема: <%= problem.topic %> Автор: <%= problem.author %>
+      </h4><!-- скрывать тему на турнире -->
+      <div class="statement">
+        <%= problem.statement %>
+          <h5>Входные данные</h5>
+          <%= problem.input %>
             <h5>Выходные данные</h5>
-<%= problem.output %></div>
-        <% if(problem.hint.doesExist && showHint) { %>
-            <button id="HintButton" onclick="ShowHideHint()">Показать/скрыть подсказку</button>
+            <%= problem.output %>
+      </div>
+      <% if(problem.hint.doesExist && showHint) { %>
+        <button id="HintButton" onclick="ShowHideHint()">Показать/скрыть подсказку</button>
         <% } %>
-        <div class="statement" id="hint"><%= problem.hint.text %></div>
+          <div class="statement" id="hint">
+            <%= problem.hint.text %>
+          </div>
+    </div>
+    <table id="examples" class='taskslist'>
+      <tr>
+        <th>Example Input</th>
+        <th>Example Output</th>
+      </tr>
+      <% for (var i=0; i < problem.examples.length; i++) { %>
+        <% var example=problem.examples[i]; %>
+          <tr>
+            <td>
+              <%= example[0] %>
+            </td>
+            <td>
+              <%= example[1] %>
+            </td>
+          </tr>
+          <% } %>
+    </table>
+
+
+    <form action='/task/page/<%= ID %>' method="POST" enctype="multipart/form-data">
+      <div class="container">
+
+        <select name="languageSelector" id="languageSelector">
+          <option value="Pascal" <% if (!language || language=="Pascal" ){%> selected <%}%>>Pascal ABC.NET</option>
+          <option value="Python" <% if (language=="Python" ){%> selected <%}%>>Python 3.8</option>
+          <option value="PyPy" <% if (language=="PyPy" ){%> selected <%}%>>PyPy 3.7</option>
+          <option value="Cpp" <% if (language=="Cpp" ){%> selected <%}%>>C++20</option>
+          <option value="Java" <% if (language=="Java" ){%> selected <%}%>>Java 16</option>
+        </select>
+
+        <div class="imgs">
+          <img src="\public\media\TopLeft.svg">
+          <img src="\public\media\TopRight.svg">
         </div>
-        <table id="examples" class='taskslist'>
-            <tr>
-              <th>Example Input</th>
-              <th>Example Output</th>
-              </tr>
-            <% for (var i = 0; i < problem.examples.length; i++) { %>
-            <% var example = problem.examples[i]; %>
-             <tr>
-              <td><%= example[0] %></td>
-              <td><%= example[1] %></td>
-             </tr>
-            <% } %>
-        </table>
+        <textarea class="taskarea" id="code" name="code" placeholder="Place code here"
+          style="font-family: 'Source Code Pro', monospace;" required><%= prevCode %></textarea>
+        <input name="file" id="dragdrop" type="file" style="display: none;" accept=".pas, .java, .cpp, .py">
+        <div class="taskarea" id="result" name="result"></div>
+        <div class="imgsbottom">
+          <img src="\public\media\BottomLeft.svg">
+          <img src="\public\media\BottomRight.svg">
+        </div>
+        <input type="file" name="file" id="codefile">
+      </div>
+      <div id="submitdiv">
+        <button id="submit">Отправить</button>
+      </div>
 
+    </form>
 
-        <form action='/task/page/<%= ID %>'  method="POST" enctype="multipart/form-data">
-            <div class="container">
-
-                <select name="languageSelector" id = "languageSelector">
-                    <option value="Pascal" <% if (!language || language=="Pascal"){%> selected <%}%>>Pascal ABC.NET</option>
-                    <option value="Python" <% if (language=="Python"){%> selected <%}%>>Python 3.8</option>
-                    <option value="PyPy" <% if (language=="PyPy"){%> selected <%}%>>PyPy 3.7</option>
-                    <option value="Cpp" <% if (language=="Cpp"){%> selected <%}%>>C++20</option>
-                    <option value="Java" <% if (language=="Java"){%> selected <%}%>>Java 16</option>
-                </select>
-
-                    <div class="imgs">
-                        <img src="\public\media\TopLeft.svg">
-                        <img src="\public\media\TopRight.svg">
-                    </div>
-                    <textarea class="taskarea" id="code" name = "code" placeholder="Place code here" style="font-family: 'Source Code Pro', monospace;" required><%= prevCode %></textarea>
-                    <input name="file" id="dragdrop" type="file" style="display: none;" accept=".pas, .java, .cpp, .py">
-                    <div class="taskarea"  id="result" name="result" ></div>
-                    <div class="imgsbottom">
-                        <img src="\public\media\BottomLeft.svg">
-                        <img src="\public\media\BottomRight.svg">
-                    </div>
-                    <input type="file" name="file" id="codefile">
-            </div>
-            <div id="submitdiv">
-                <button id="submit">Отправить</button>
-            </div>
-
-        </form>
-
-    </main>
-    </body>
-    <script type = text/javascript>
+  </main>
+</body>
+<script type=text/javascript>
         function update() {
             fetch("/api/task/get/testresults/"+task).then(response=>response.json()).then(response => {
                 text = "<ul>";
@@ -109,7 +123,7 @@
             update();
         }, 5000);
     </script>
-    <script type = text/javascript>
+<script type=text/javascript>
         function o_delete() {
             document.getElementById('dialog_delete').showModal();
         }
@@ -137,4 +151,5 @@
             evt.preventDefault();
         }
     </script>
+
 </html>

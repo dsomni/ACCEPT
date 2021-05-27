@@ -1,44 +1,54 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Урок #<%= ID %></title>
 
-        <meta charset="utf-8">
-        <meta name="viewport"
-              content="width=device-width, initial-scale=1.0,
+<head>
+  <title>Урок #<%= ID %>
+  </title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,
               maximum-scale=1.0, minimum-scale=1.0,
               user-scalable=no, minimal-ui">
-        <meta name="full-screen" content="yes">
-        <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
-        </head>
-    <body>
-        <main>
-        <h2><%= u_name %></h2>
-        <div id="task">
-            <H1 id="taskname"><%= lesson.title; %></H1>
-            <div style="text-align: center;margin: 10px;">
-                <% if(isTeacher){ %>
-                    <a id="editref" class="editref" href=<%= "/lessonresults/" + lesson.identificator + "/1/default&all&all&all" %> >[Таблица]</a>
-                    <a id="editref" class="editref" href=<%= "/editlesson/" + lesson.identificator %> >[Редактировать]</a>
-                    <span class="lessonPopup">
-                        <dialog  id='dialog'>
-                            <form action= <%="/deletelesson/" + lesson.identificator %>  method="POST">
-                                Вы действительно хотите удалить урок "<%= lesson.title %>" ?
-                                <button>Да</button>
-                            </form>
-                            <button onClick='c();'>Назад</button>
-                        </dialog>
-                    <button onClick='o();' class="show" >[Удалить]</button>
-                    </span>
-                <% } %>
-            </div>
-            <h4 class="h4">Автор: <%= lesson.author %></h4>
-            <div style="margin-left: 20px;" id="statement"><%= lesson.description %></div>
-            </div>
-        <div id="table"></div>
-    </main>
-    </body>
-    <script type = text/javascript>
+  <meta name="full-screen" content="yes">
+  <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
+</head>
+
+<body>
+  <main>
+    <h2>
+      <%= u_name %>
+    </h2>
+    <div id="task">
+      <H1 id="taskname">
+        <%= lesson.title; %>
+      </H1>
+      <div style="text-align: center;margin: 10px;">
+        <% if(isTeacher){ %>
+          <a id="editref" class="editref" href=<%="/lessonresults/" + lesson.identificator + "/1/default&all&all&all" %>
+            >[Таблица]</a>
+          <a id="editref" class="editref" href=<%="/editlesson/" + lesson.identificator %> >[Редактировать]</a>
+          <span class="lessonPopup">
+            <dialog id='dialog'>
+              <form action=<%="/deletelesson/" + lesson.identificator %> method="POST">
+                Вы действительно хотите удалить урок "<%= lesson.title %>" ?
+                  <button>Да</button>
+              </form>
+              <button onClick='c();'>Назад</button>
+            </dialog>
+            <button onClick='o();' class="show">[Удалить]</button>
+          </span>
+          <% } %>
+      </div>
+      <h4 class="h4">Автор: <%= lesson.author %>
+      </h4>
+      <div style="margin-left: 20px;" id="statement">
+        <%= lesson.description %>
+      </div>
+    </div>
+    <div id="table"></div>
+  </main>
+</body>
+<script type=text/javascript>
         let min = (a, b) => {if(a>b)return b;return a;};
         function update(ids) {
                 fetch("/api/task/get/testverdicts/<%= u_login %>/"+ids).then(response=>response.json()).then(response => {
@@ -59,7 +69,7 @@
             update(ids);
         }, 5000);
     </script>
-    <script type = text/javascript>
+<script type=text/javascript>
         function o() {
             document.getElementById('dialog').showModal();
         }
@@ -67,4 +77,5 @@
             document.getElementById('dialog').close();
         }
     </script>
+
 </html>

@@ -1,61 +1,71 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Редактирование турнира</title>
 
-        <meta charset="utf-8">
-        <meta name="viewport"
-              content="width=device-width, initial-scale=1.0,
+<head>
+  <title>Редактирование турнира</title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,
               maximum-scale=1.0, minimum-scale=1.0,
               user-scalable=no, minimal-ui">
-        <meta name="full-screen" content="yes">
+  <meta name="full-screen" content="yes">
 
-        </head>
-    <body>
-        <main>
+</head>
 
-        <form action=<%= '/tournament/edit/'+tournament.identificator %>  method="POST">
-            <div class="lessonAdderForm">
-                <h3 class="h3">Название турнира</h3>
-                <textarea id="title" name = "title" required placeholder="Введите название"><%=tournament.title%></textarea>
-                <h3 class="h3">Описание</h3>
-                <textarea id="description" name = "description" placeholder="Введите описание"><%=tournament.description%></textarea>
-                <% if(!tournament.isBegan){ %>
-                <h3 class="h3">Дата начала</h3>
-                <input style="width: 90%;margin-left: auto;margin-right: auto;margin-bottom: 10px;" class="dateChooser" type="datetime-local" name="whenStarts" required value=<%= tournament.whenStarts.replace(' ', 'T')%>>
-                <% } %>
-                <h3 class="h3">Дата окончания</h3>
-                <input style="width: 90%;margin-left: auto;margin-right: auto;margin-bottom: 10px;" class="dateChooser" type="datetime-local" name="whenEnds" required value=<%= tournament.whenEnds.replace(' ', 'T')%>>
-                <h3 class="h3">Заморозить таблицу в:</h3>
-                <input style="width: 90%;margin-left: auto;margin-right: auto;margin-bottom: 10px;" class="dateChooser" type="datetime-local" name="frozeAfter" required value=<%= (tournament.frozeAfter) ? tournament.frozeAfter.replace(' ', 'T'): tournament.whenEnds.replace(' ', 'T')%>>
-                <% if(isTeacher) { %>
-                <h3 class="h3">Модераторы</h3>
-                <textarea id="mods" name = "mods" placeholder="Введите логины модераторов через пробел. Логины сторонних пользователей имеют префикс n_"><%= tournament.mods.filter(item=> item!=login).join(" ") %></textarea>
-                <% } %>
+<body>
+  <main>
+
+    <form action=<%='/tournament/edit/' +tournament.identificator %> method="POST">
+      <div class="lessonAdderForm">
+        <h3 class="h3">Название турнира</h3>
+        <textarea id="title" name="title" required placeholder="Введите название"><%=tournament.title%></textarea>
+        <h3 class="h3">Описание</h3>
+        <textarea id="description" name="description"
+          placeholder="Введите описание"><%=tournament.description%></textarea>
+        <% if(!tournament.isBegan){ %>
+          <h3 class="h3">Дата начала</h3>
+          <input style="width: 90%;margin-left: auto;margin-right: auto;margin-bottom: 10px;" class="dateChooser"
+            type="datetime-local" name="whenStarts" required value=<%=tournament.whenStarts.replace(' ', ' T')%>>
+          <% } %>
+            <h3 class="h3">Дата окончания</h3>
+            <input style="width: 90%;margin-left: auto;margin-right: auto;margin-bottom: 10px;" class="dateChooser"
+              type="datetime-local" name="whenEnds" required value=<%=tournament.whenEnds.replace(' ', ' T')%>>
+            <h3 class="h3">Заморозить таблицу в:</h3>
+            <input style="width: 90%;margin-left: auto;margin-right: auto;margin-bottom: 10px;" class="dateChooser"
+              type="datetime-local" name="frozeAfter" required value=<%=(tournament.frozeAfter) ?
+              tournament.frozeAfter.replace(' ', ' T'): tournament.whenEnds.replace(' ', ' T')%>>
+            <% if(isTeacher) { %>
+              <h3 class="h3">Модераторы</h3>
+              <textarea id="mods" name="mods"
+                placeholder="Введите логины модераторов через пробел. Логины сторонних пользователей имеют префикс n_"><%= tournament.mods.filter(item=> item!=login).join(" ") %></textarea>
+              <% } %>
                 Разрешить регистрацию после начала турнира
                 <%if(tournament.allowRegAfterStart){ %>
-                <label class="switch" >
-                    <input type="checkbox" name="allowRegAfterStart"  checked >
+                  <label class="switch">
+                    <input type="checkbox" name="allowRegAfterStart" checked>
                     <span class="slider round"></span>
-                </label>
-                <% } else{%>
-                    <label class="switch" >
-                        <input type="checkbox" name="allowRegAfterStart">
-                        <span class="slider round"></span>
+                  </label>
+                  <% } else{%>
+                    <label class="switch">
+                      <input type="checkbox" name="allowRegAfterStart">
+                      <span class="slider round"></span>
                     </label>
-                <% } %>
-                <% if(!tournament.isBegan){ %>
-                    <select name="allOrNothing" id = "selector">
-                        <option value="1" <% if (tournament.allOrNothing) { %>selected <%}%> >Оценка по полность зданой задаче</option>
-                        <option value="0" <% if (!tournament.allOrNothing) { %>selected <%}%> >Потестовая оценка</option>
-                    </select>
-                <% } %>
-                <h3 class="h3">Штраф за попытку(s)</h3>
-                <input style="width: 10rem" name="penalty" type="number" value=<%= tournament.penalty/1000 %>>
-                <br>
-                <button id="submit2">Сохранить турнир</button>
-            </div>
-        </form>
-    </main>
-    </body>
+                    <% } %>
+                      <% if(!tournament.isBegan){ %>
+                        <select name="allOrNothing" id="selector">
+                          <option value="1" <% if (tournament.allOrNothing) { %>selected <%}%> >Оценка по полность
+                              зданой задаче</option>
+                          <option value="0" <% if (!tournament.allOrNothing) { %>selected <%}%> >Потестовая оценка
+                          </option>
+                        </select>
+                        <% } %>
+                          <h3 class="h3">Штраф за попытку(s)</h3>
+                          <input style="width: 10rem" name="penalty" type="number" value=<%=tournament.penalty/1000 %>>
+                          <br>
+                          <button id="submit2">Сохранить турнир</button>
+      </div>
+    </form>
+  </main>
+</body>
+
 </html>

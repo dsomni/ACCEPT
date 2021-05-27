@@ -1,43 +1,52 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Главная</title>
 
-        <meta charset="utf-8">
-        <meta name="viewport"
-              content="width=device-width, initial-scale=1.0,
+<head>
+  <title>Главная</title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,
               maximum-scale=1.0, minimum-scale=1.0,
               user-scalable=no, minimal-ui">
-        <meta name="full-screen" content="yes">
-        </head>
-    <body>
-        <main>
-            <% if(name && name.slice(0,5).toUpperCase() == "БАГИН" ) { %>
-                <h1 style="background-image: url(../public/media/asdf.hg); background-size: 100px;">Добро пожаловать, <img style="transform: scale(2)" src="../public/media/thdk.ng"> <%= name  %>!<img style="transform: scale(2)" src="../public/media/thdk.ng"></h1>
-            <% } else{  %>
-                <h1>Добро пожаловать, <%= name || "незнакомец" %>!</h1>
+  <meta name="full-screen" content="yes">
+</head>
+
+<body>
+  <main>
+    <% if(name && name.slice(0,5).toUpperCase()=="БАГИН" ) { %>
+      <h1 style="background-image: url(../public/media/asdf.hg); background-size: 100px;">Добро пожаловать, <img
+          style="transform: scale(2)" src="../public/media/thdk.ng">
+        <%= name %>!<img style="transform: scale(2)" src="../public/media/thdk.ng">
+      </h1>
+      <% } else{ %>
+        <h1>Добро пожаловать, <%= name || "незнакомец" %>!</h1>
+        <% } %>
+          <% if (isTeacher){ %>
+            <a style="margin-left: 10px;" class="tlrefs" href="/addnews">[Добавить новость]</a>
             <% } %>
-            <% if (isTeacher){ %>
-                <a style="margin-left: 10px;" class="tlrefs" href="/addnews">[Добавить новость]</a>
-            <% } %>
-            <br>
-            <% min = function(a,b){ if(a < b) return a; return b} %>
-            <% let toDisplay = 10; %>
-            <% for(var i = 0 ; i < min(news.length, toDisplay); i++){ %>
-                <div class="news">
-                    <% var maxDate = new Date(Number(news[i].date)); %>
-                    <% var isoDate = maxDate.toISOString(); %>
-                    <% var date = isoDate.substr(0, 10) ; %>
-                    <a class="newsTitle" href=<%="/news/" + news[i]._id %>><b><%= news[i].title %></b></a>
-                    <br>
-                    <span class="date"> <%= date %> </span>
-                    <%= news[i].description %>
-                </div>
-            <% }%>
-            <a style="font-size: 30px;margin-left: 10px;" class="editref" href="/newslist/1">Перейти ко всем новостям</a>
-        </main>
-    </body>
-    <script type = text/javascript>
+              <br>
+              <% min=function(a,b){ if(a < b) return a; return b} %>
+                <% let toDisplay=10; %>
+                  <% for(var i=0 ; i < min(news.length, toDisplay); i++){ %>
+                    <div class="news">
+                      <% var maxDate=new Date(Number(news[i].date)); %>
+                        <% var isoDate=maxDate.toISOString(); %>
+                          <% var date=isoDate.substr(0, 10) ; %>
+                            <a class="newsTitle" href=<%="/news/" + news[i]._id %>><b>
+                                <%= news[i].title %>
+                              </b></a>
+                            <br>
+                            <span class="date">
+                              <%= date %>
+                            </span>
+                            <%= news[i].description %>
+                    </div>
+                    <% }%>
+                      <a style="font-size: 30px;margin-left: 10px;" class="editref" href="/newslist/1">Перейти ко всем
+                        новостям</a>
+  </main>
+</body>
+<script type=text/javascript>
         function o() {
             document.getElementById('dialog').showModal();
         }
@@ -45,4 +54,5 @@
             document.getElementById('dialog').close();
         }
     </script>
+
 </html>

@@ -1,33 +1,36 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Добавление нововсти</title>
 
-        <meta charset="utf-8">
-        <meta name="viewport"
-              content="width=device-width, initial-scale=1.0,
+<head>
+  <title>Добавление нововсти</title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,
               maximum-scale=1.0, minimum-scale=1.0,
               user-scalable=no, minimal-ui">
-        <meta name="full-screen" content="yes">
+  <meta name="full-screen" content="yes">
 
-        </head>
-    <body>
-        <main>
+</head>
 
-        <form action='/addnews' enctype="multipart/form-data" method="POST">
-            <div class="lessonAdderForm">
-                <h3 class="h3">Заголовок новости</h3>
-                <textarea id="title" name = "title" required placeholder="Введите заголовок" maxlength="70"></textarea>
-                <h3 class="h3">Описание</h3>
-                <textarea style="height:200px;" id="description" name = "description" placeholder="Введите краткое описание" maxlength="200"></textarea>
-                <h3 class="h3">Новость (html формат)</h3>
-                <textarea style="height:500px;" id="text" name = "text" placeholder="Введите новость"></textarea>
-                <h3 class="h3">Картинка (опционально)</h3>
-                <input type="file" name="image" id="image" accept="image/*">
-                <br>
-                <button id="submit2">Добавить новость</button>
-            </div>
-        </form>
-    </main>
-    </body>
+<body>
+  <main>
+
+    <form action='/addnews' enctype="multipart/form-data" method="POST">
+      <div class="lessonAdderForm">
+        <h3 class="h3">Заголовок новости</h3>
+        <textarea id="title" name="title" required placeholder="Введите заголовок" maxlength="70"></textarea>
+        <h3 class="h3">Описание</h3>
+        <textarea style="height:200px;" id="description" name="description" placeholder="Введите краткое описание"
+          maxlength="200"></textarea>
+        <h3 class="h3">Новость (html формат)</h3>
+        <textarea style="height:500px;" id="text" name="text" placeholder="Введите новость"></textarea>
+        <h3 class="h3">Картинка (опционально)</h3>
+        <input type="file" name="image" id="image" accept="image/*">
+        <br>
+        <button id="submit2">Добавить новость</button>
+      </div>
+    </form>
+  </main>
+</body>
+
 </html>

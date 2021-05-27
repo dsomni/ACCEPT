@@ -1,40 +1,48 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Попытка <%= date %></title>
 
-        <meta charset="utf-8">
-        <meta name="viewport"
-              content="width=device-width, initial-scale=1.0,
+<head>
+  <title>Попытка <%= date %>
+  </title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,
               maximum-scale=1.0, minimum-scale=1.0,
               user-scalable=no, minimal-ui">
-        <meta name="full-screen" content="yes">
-        <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
-        </head>
-    <body>
-        <main>
-        <form>
-            <% var maxDate = new Date(Number(date)+3*60*60*1000); %>
-            <% var isoDate = maxDate.toISOString(); %>
-            <% var Completedate = isoDate.substr(0, 10) + " " + isoDate.substr(11, 8) ; %>
+  <meta name="full-screen" content="yes">
+  <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
+</head>
+
+<body>
+  <main>
+    <form>
+      <% var maxDate=new Date(Number(date)+3*60*60*1000); %>
+        <% var isoDate=maxDate.toISOString(); %>
+          <% var Completedate=isoDate.substr(0, 10) + " " + isoDate.substr(11, 8) ; %>
             <div>
-                <div>Дата: <%= Completedate %> </div>
-                <div>Пользователь <a class="tlrefs" href=<%="/account/" + login + "/1/default" %>><%= n_name %> </a> </div>
-                <% if(parseInt(taskID.split('_')[0])!=0){ %>
-                    <a class="tlrefs" href=<%="/tournament/page/" + login + '/' + taskID.split('_')[0] %>>Турнир #<%= parseInt(taskID.split('_')[0]) %> </a>
-                    <a class="tlrefs" href=<%="/tournament/task/" + taskID.split('_')[0] + '/' + taskID %>>Задача #<%= parseInt(taskID.split('_')[1])+1 %> </a>
+              <div>Дата: <%= Completedate %>
+              </div>
+              <div>Пользователь <a class="tlrefs" href=<%="/account/" + login + "/1/default" %>><%= n_name %> </a>
+              </div>
+              <% if(parseInt(taskID.split('_')[0])!=0){ %>
+                <a class="tlrefs" href=<%="/tournament/page/" + login + '/' + taskID.split('_')[0] %>>Турнир #<%=
+                    parseInt(taskID.split('_')[0]) %> </a>
+                <a class="tlrefs" href=<%="/tournament/task/" + taskID.split('_')[0] + '/' + taskID %>>Задача #<%=
+                    parseInt(taskID.split('_')[1])+1 %> </a>
                 <% }else{ %>
-                    <a class="tlrefs" href=<%="/task/page/" + taskID %>>Задача #<%= parseInt(taskID.split('_')[1])+1 %> </a>
-                <% } %>
-                <div>Язык: <%= language || 'Pascal' %> </div>
+                  <a class="tlrefs" href=<%="/task/page/" + taskID %>>Задача #<%= parseInt(taskID.split('_')[1])+1 %>
+                  </a>
+                  <% } %>
+                    <div>Язык: <%= language || 'Pascal' %>
+                    </div>
             </div>
             <div class="container">
-                    <div class="imgs">
-                        <img src="..\..\public\media\TopLeft.svg">
-                        <img src="..\..\public\media\TopRight.svg">
-                    </div>
-                    <textarea class="taskarea" id="code" name = "code" readonly "><%= code %></textarea>
-                    <div class="taskarea"  id="result" name="result" >
+              <div class="imgs">
+                <img src="..\..\public\media\TopLeft.svg">
+                <img src="..\..\public\media\TopRight.svg">
+              </div>
+              <textarea class="taskarea" id="code" name="code" readonly "><%= code %></textarea>
+                    <div class=" taskarea" id="result" name="result">
                         <ul>
                             <% RESULT.forEach(function(item){ %>
                                 <li><%= item[0] %> <a id=<%= item[2] %>><%= item[1] %></a></li>
