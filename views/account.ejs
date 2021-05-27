@@ -1,64 +1,54 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <title>Личный кабинет <%= n_name %></title>
 
-<head>
-  <title>Личный кабинет <%= n_name %>
-  </title>
-
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0,
+        <meta charset="utf-8">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0,
               maximum-scale=1.0, minimum-scale=1.0,
               user-scalable=no, minimal-ui">
-  <meta name="full-screen" content="yes">
+        <meta name="full-screen" content="yes">
 
-  <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
-</head>
-
-<body>
-  <main>
-    <h1 class="h1">Личный кабинет <%= n_name %> <a href="/EditAccount" class="editref">[изменить данные]</a></h1>
-    <div class="student_info">
-      <p>Класс: <%= user.grade + user.gradeLetter %>
-      </p>
-      <% if(user.group && user.group.length<5){ %>
-        <p>Группа: <%= user.group %>
-        </p>
-        <% }else if (!user.isTeacher){ %>
-          <p>Почта: <%= user.group %>
-          </p>
-          <% } %>
-    </div>
-    <form class="SearchUI" action=<%='/account/' + u_login +'/1/default' %> method="POST">
-      <input id="searcharea" name="searcharea" rows=1 placeholder="Поиск по задаче"></input>
-      <select name="selector" id="selector">
-        <option value="all" selected>Все посылки</option>
-        <option value="oks">Только успешные</option>
-      </select>
-      <button id="submitsearch">Найти</button>
-    </form>
-
-    <table class='taskslist' id="table"></table>
-
-    <div class='pageinfo'>
-      <div class="pageRefs">
-        <%= pageInfo %>
-      </div>
-      <div class="pageRefs">
-        <% for(let i=0; i < pages; i++){ %>
-          <% if(i+1==page){ %>
-            <a class="tablerefs" style="font-size: 23px;font-weight:900;">
-              <%= i+1 %>
-            </a>
-            <% }else{ %>
-              <a class="tablerefs" style="font-size: 20px;" href=<%=`/account/${u_login}/${i+1}/${search}`%>><%= i+1 %>
-                  </a>
-              <% } %>
+        <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
+        </head>
+    <body>
+        <main>
+            <h1 class="h1">Личный кабинет <%= n_name %> <a href="/EditAccount" class="editref">[изменить данные]</a></h1>
+            <div class="student_info">
+                <p>Класс: <%= user.grade + user.gradeLetter %></p>
+                <% if(user.group && user.group.length<5){ %>
+                    <p>Группа: <%= user.group %></p>
+                <% }else if (!user.isTeacher){ %>
+                    <p>Почта: <%= user.group %></p>
                 <% } %>
-      </div>
-    </div>
-  </main>
-</body>
-<script type=text/javascript>
+            </div>
+            <form class="SearchUI" action= <%= '/account/'+ u_login +'/1/default' %>  method="POST">
+                <input id="searcharea" name = "searcharea" rows=1 placeholder="Поиск по задаче"></input>
+                <select name="selector" id = "selector">
+                    <option value="all" selected>Все посылки</option>
+                    <option value="oks" >Только успешные</option>
+                </select>
+                <button id="submitsearch">Найти</button>
+            </form>
+
+            <table class='taskslist' id = "table"></table>
+
+            <div class='pageinfo'>
+                <div class="pageRefs"><%= pageInfo %></div>
+                    <div class="pageRefs">
+                    <% for(let i=0; i < pages; i++){ %>
+                        <% if(i+1==page){ %>
+                            <a class="tablerefs" style="font-size: 23px;font-weight:900;"><%= i+1 %></a>
+                        <% }else{ %>
+                                <a class="tablerefs" style="font-size: 20px;" href=<%=`/account/${u_login}/${i+1}/${search}`%>><%= i+1 %></a>
+                        <% } %>
+                    <% } %>
+                </div>
+            </div>
+        </main>
+    </body>
+    <script type=text/javascript>
         let min = (a, b) => {if(a>b)return b;return a;};
         function update(page) {
             fetch("/api/attempts/get/verdicts/<%= u_login %>/"+page+"/<%= search %>").then(response=>response.json()).then(response => {
@@ -98,5 +88,4 @@
             update(page);
         }, 5000);
     </script>
-
 </html>

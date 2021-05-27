@@ -1,106 +1,95 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <title>Ученики</title>
 
-<head>
-  <title>Ученики</title>
-
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0,
+        <meta charset="utf-8">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0,
               maximum-scale=1.0, minimum-scale=1.0,
               user-scalable=no, minimal-ui">
-  <meta name="full-screen" content="yes">
+        <meta name="full-screen" content="yes">
 
-  <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
-</head>
-
-<body>
-  <main>
-    <h1>Ученики</h1>
-    <form class="SearchUI" action='/students/1/default' method="POST">
-      <input name="searcharea" rows=1 placeholder="Поиск ученика">
-      <select name="GradeSelector" id="GradeSelector">
-        <option value="all" selected>Все</option>
-        <% for(var i=6; i < 12; i++) { %>
-          <option value=<%=i %> ><%= i %>
-          </option>
-          <% } %>
-      </select>
-      <input id="gradeLetter" name="gradeLetter" placeholder="Литера">
-      <input id="gradeLetter" name="Group" placeholder="Группа">
-      <button id="submitsearch">Найти</button>
-    </form>
-    <table class='taskslist'>
-      <tr>
-        <th>Логин</th>
-        <th>Имя</th>
-        <th>Класс</th>
-        <th>Группа</th>
-        <th>Уроки</th>
-        <th>Кабинет</th>
-      </tr>
-      <% min=function(a,b){ if(a < b) return a; return b} %>
-        <% for (var i=0; i < students.length; i++) { %>
-          <% var student=students[i]; %>
-            <tr>
-              <% let loginToShow=student.login; if(loginToShow.length> 2 && loginToShow.slice(0,2)=="n_"){
-                loginToShow = loginToShow.slice(2);
-                }
-                %>
-                <td>
-                  <%= loginToShow %>
-                </td>
-                <td>
-                  <%= student.name %>
-                </td>
-                <td>
-                  <%= student.grade + student.gradeLetter %>
-                </td>
+        <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
+        </head>
+    <body>
+        <main>
+            <h1>Ученики</h1>
+            <form class="SearchUI" action= '/students/1/default'  method="POST">
+                <input name = "searcharea" rows=1 placeholder="Поиск ученика">
+                <select name="GradeSelector" id = "GradeSelector">
+                    <option value="all" selected>Все</option>
+                    <% for(var i = 6; i < 12; i++) { %>
+                    <option value=<%= i %> ><%= i %></option>
+                    <% } %>
+                </select>
+                <input id="gradeLetter" name="gradeLetter" placeholder="Литера">
+                <input id="gradeLetter" name="Group" placeholder="Группа">
+                <button id="submitsearch">Найти</button>
+            </form>
+            <table class='taskslist'>
+                <tr>
+                  <th>Логин</th>
+                  <th>Имя</th>
+                  <th>Класс</th>
+                  <th>Группа</th>
+                  <th>Уроки</th>
+                  <th>Кабинет</th>
+                  </tr>
+                <% min = function(a,b){ if(a < b) return a; return b} %>
+                <% for (var i =0; i < students.length; i++) { %>
+                <% var student = students[i]; %>
+                 <tr>
+                    <% let loginToShow = student.login;
+                    if(loginToShow.length > 2 && loginToShow.slice(0,2)=="n_"){
+                        loginToShow = loginToShow.slice(2);
+                    }
+                    %>
+                    <td><%= loginToShow %></td>
+                    <td><%= student.name %> </td>
+                    <td><%= student.grade + student.gradeLetter %></td>
 
 
-                <td>
-                  <span class="group" style="cursor: grab;">
-                    <dialog id=<%='dialog' + i%>>
-                      <form action=<%='/editgroup/' + student.login + '/' +page +'/' + search %> method="POST">
-                        Номер группы:
-                        <input id="groupEditor" name="groupEditor" placeholder=<%=student.group%>>
-                        <button>Сохранить</button>
-                      </form>
-                      <button onClick=<%='c(' + i + ');' %> >Назад</button>
-                    </dialog>
-                    <% if(student.group && student.group.length<5){ %>
-                      <button onClick=<%='o(' + i + ');' %> class="show" ><%=student.group|| 'Edit' %></button>
-                      <% }else{ %>
-                        <button disabled="disabled"></button>
-                        <% } %>
-                  </span>
-                </td>
+                    <td>
+                        <span class="group" style="cursor: grab;">
+                            <dialog  id=<%='dialog' + i%>>
+                                <form action= <%='/editgroup/' + student.login + '/' +page +'/' + search %>  method="POST">
+                                    Номер группы:
+                                    <input id="groupEditor" name="groupEditor" placeholder=<%=student.group%>> <button>Сохранить</button>
+                                </form>
+                                <button onClick=<%='c(' + i + ');' %> >Назад</button>
+                            </dialog>
+                                <% if(student.group && student.group.length<5){ %>
+                                    <button onClick=<%='o(' + i + ');' %> class="show" ><%=student.group|| 'Edit' %></button>
+                                <% }else{ %>
+                                    <button disabled="disabled"></button>
+                                <% } %>
+                        </span>
+                    </td>
 
-                <td><a class="tablerefs" href=<%="/lessons/" + student.login + "/1/default&all&true&all" %>>[открыть]
-                  </a></td>
-                <td><a class="tablerefs" href=<%="/account/" + student.login + "/1/default&all" %>>[открыть] </a></td>
-            </tr>
-            <% } %>
-    </table>
-
-    <div class='pageinfo'>
-      <div class="pageRefs">
-        <%= pageInfo %>
-      </div>
-      <div class="pageRefs">
-        <% for(let i=0; i < pages; i++){ %>
-          <% if(i+1==page){ %>
-            <a class="tablerefs" style="font-size: 23px;font-weight:900;">
-              <%= i+1 %>
-            </a>
-            <% }else{ %>
-              <a class="tablerefs" style="font-size: 20px;" href=<%=`/students/${i+1}/${search}`%>><%= i+1 %></a>
-              <% } %>
+                    <td><a class="tablerefs" href=<%="/lessons/" + student.login + "/1/default&all&true&all" %>>[открыть] </a></td>
+                    <td><a class="tablerefs" href=<%="/account/" + student.login + "/1/default&all" %>>[открыть] </a></td>
+                 </tr>
                 <% } %>
-      </div>
-    </div>
-  </main>
-</body>
-<script type=text/javascript>
+                </table>
+
+                <div class='pageinfo'>
+                    <div class="pageRefs">
+                        <%= pageInfo %>
+                    </div>
+                    <div class="pageRefs">
+                        <% for(let i=0; i < pages; i++){ %>
+                            <% if(i+1==page){ %>
+                                <a class="tablerefs" style="font-size: 23px;font-weight:900;"><%= i+1 %></a>
+                            <% }else{ %>
+                                <a class="tablerefs" style="font-size: 20px;"href=<%=`/students/${i+1}/${search}`%>><%= i+1 %></a>
+                            <% } %>
+                        <% } %>
+                    </div>
+                </div>
+        </main>
+    </body>
+    <script type = text/javascript>
     function o(i) {
         document.getElementById('dialog' + i).showModal();
     }
@@ -108,5 +97,4 @@
         document.getElementById('dialog' + i).close();
     }
     </script>
-
 </html>

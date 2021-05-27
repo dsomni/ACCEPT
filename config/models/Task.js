@@ -2,17 +2,17 @@ const mongoose = require('mongoose')
 const config = require('../configs');
 
 const TaskSchema = new mongoose.Schema({
-  identificator: String,
-  grade: Number,//
-  title: String,
-  statement: String,
-  input: String,
-  output: String,
-  examples: Array,
-  tests: Array,
-  topic: String,//
-  hint: Object,//
-  author: String//
+    identificator: String,
+    grade: Number,//
+    title: String,
+    statement: String,
+    input: String,
+    output: String,
+    examples: Array,
+    tests: Array,
+    topic: String,//
+    hint: Object,//
+    author: String//
 
 }, { collection: config.mongodbConfigs.CollectionNames.tasks });
 

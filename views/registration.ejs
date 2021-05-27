@@ -1,133 +1,127 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <title>Регистрация</title>
 
-<head>
-  <title>Регистрация</title>
-
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0,
+        <meta charset="utf-8">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0,
               maximum-scale=1.0, minimum-scale=1.0,
               user-scalable=no, minimal-ui">
-  <meta name="full-screen" content="yes">
+        <meta name="full-screen" content="yes">
 
-  <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
-</head>
+        <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
+        </head>
+    <body>
+    <script>
+        var satisfyPasswordLength = 0;
+        var satisfyLoginLength = 0;
+        var satisfyLoginUniqueness = 0;
+        var satisfyPasswordSimularity = 0;
 
-<body>
-  <script>
-    var satisfyPasswordLength = 0;
-    var satisfyLoginLength = 0;
-    var satisfyLoginUniqueness = 0;
-    var satisfyPasswordSimularity = 0;
+        function checkPasswordsSimularity(event){
+            const verify = document.getElementById("checkpassword");
+            const par = document.getElementById("diff");
+            const password = document.getElementById("password");
+            const button = document.getElementById("submit2");
+            if(password.value.toString()>0 && password.value != verify.value){
+                par.style.visibility = "visible";
+                satisfyPasswordSimularity = 0;
+            }else{
+                satisfyPasswordSimularity = 1;
+                par.style.visibility = "hidden";
+            }
+            button.disabled = true;
+            if(satisfyPasswordLength && satisfyLoginLength && satisfyLoginUniqueness && satisfyPasswordSimularity){
+                button.disabled = false;
+            }
+        };
 
-    function checkPasswordsSimularity(event) {
-      const verify = document.getElementById("checkpassword");
-      const par = document.getElementById("diff");
-      const password = document.getElementById("password");
-      const button = document.getElementById("submit2");
-      if (password.value.toString() > 0 && password.value != verify.value) {
-        par.style.visibility = "visible";
-        satisfyPasswordSimularity = 0;
-      } else {
-        satisfyPasswordSimularity = 1;
-        par.style.visibility = "hidden";
-      }
-      button.disabled = true;
-      if (satisfyPasswordLength && satisfyLoginLength && satisfyLoginUniqueness && satisfyPasswordSimularity) {
-        button.disabled = false;
-      }
+        function checkPasswordLength(event){
+            const lenp = document.getElementById("lenp");
+            const password = document.getElementById("password");
+            const button = document.getElementById("submit2");
+            if(password.value.toString().length<5){
+                lenp.style.visibility = "visible";
+                satisfyPasswordLength = 0;
+            }else{
+                lenp.style.visibility = "hidden";
+                satisfyPasswordLength = 1;
+            }
+            button.disabled = true;
+            if(satisfyPasswordLength && satisfyLoginLength && satisfyLoginUniqueness && satisfyPasswordSimularity){
+                button.disabled = false;
+            }
+        };
+
+        function checkLoginLength(event){
+            const lenl = document.getElementById("lenl");
+            const login = document.getElementById("login");
+            const button = document.getElementById("submit2");
+            if(login.value.toString().length<3){
+                lenl.style.visibility = "visible";
+                satisfyLoginLength = 0;
+            }else{
+                lenl.style.visibility = "hidden";
+                satisfyLoginLength = 1;
+            }
+            button.disabled = true;
+            if(satisfyPasswordLength && satisfyLoginLength && satisfyLoginUniqueness && satisfyPasswordSimularity){
+                button.disabled = false;
+            }
+        };
+
+    function checkLoginExistance(event,logins){
+        var logins2 = <%- JSON.stringify(logins) %>;
+        const log = document.getElementById("log");
+        const login = document.getElementById("login");
+        const button = document.getElementById("submit2");
+        if(login.value.toString().length>0 && (logins2.indexOf( login.value.toString() ) != -1)){
+            console.log(1)
+            log.style.visibility = "visible";
+            satisfyLoginUniqueness = 0;
+        }else{
+            log.style.visibility = "hidden";
+            satisfyLoginUniqueness = 1;
+        }
+        button.disabled = true;
+        if(satisfyPasswordLength && satisfyLoginLength && satisfyLoginUniqueness && satisfyPasswordSimularity){
+            button.disabled = false;
+        }
     };
 
-    function checkPasswordLength(event) {
-      const lenp = document.getElementById("lenp");
-      const password = document.getElementById("password");
-      const button = document.getElementById("submit2");
-      if (password.value.toString().length < 5) {
-        lenp.style.visibility = "visible";
-        satisfyPasswordLength = 0;
-      } else {
-        lenp.style.visibility = "hidden";
-        satisfyPasswordLength = 1;
-      }
-      button.disabled = true;
-      if (satisfyPasswordLength && satisfyLoginLength && satisfyLoginUniqueness && satisfyPasswordSimularity) {
-        button.disabled = false;
-      }
-    };
-
-    function checkLoginLength(event) {
-      const lenl = document.getElementById("lenl");
-      const login = document.getElementById("login");
-      const button = document.getElementById("submit2");
-      if (login.value.toString().length < 3) {
-        lenl.style.visibility = "visible";
-        satisfyLoginLength = 0;
-      } else {
-        lenl.style.visibility = "hidden";
-        satisfyLoginLength = 1;
-      }
-      button.disabled = true;
-      if (satisfyPasswordLength && satisfyLoginLength && satisfyLoginUniqueness && satisfyPasswordSimularity) {
-        button.disabled = false;
-      }
-    };
-
-    function checkLoginExistance(event, logins) {
-      var logins2 = <% - JSON.stringify(logins) %>;
-      const log = document.getElementById("log");
-      const login = document.getElementById("login");
-      const button = document.getElementById("submit2");
-      if (login.value.toString().length > 0 && (logins2.indexOf(login.value.toString()) != -1)) {
-        console.log(1)
-        log.style.visibility = "visible";
-        satisfyLoginUniqueness = 0;
-      } else {
-        log.style.visibility = "hidden";
-        satisfyLoginUniqueness = 1;
-      }
-      button.disabled = true;
-      if (satisfyPasswordLength && satisfyLoginLength && satisfyLoginUniqueness && satisfyPasswordSimularity) {
-        button.disabled = false;
-      }
-    };
-
-  </script>
-  <main style="display: flex; justify-content:center">
-    <form class="reg" action='/registration' method="POST">
-      <h3 class="h3">Ф.И.О.</h3>
-      <input name="name" placeholder="Ф.И.О." required>
-      <h3 class="h3">Логин</h3>
-      <input id="login" name="login" placeholder="Логин" required oninput="checkLoginLength();checkLoginExistance()">
-      <h3 class="h3">Электронная почта</h3>
-      <input id="email" name="email" type="email" placeholder="example@example.com" required>
-      <h3 class="h3">Пароль</h3>
-      <input id="password" name="password" type="password" placeholder="Пароль" required
-        oninput="checkPasswordLength();checkPasswordsSimularity()">
-      <h3 class="h3">Подтвердите пароль</h3>
-      <input id="checkpassword" name="checkpassword" type="password" placeholder="Пароль" required
-        oninput="checkPasswordsSimularity()">
-      <br>
-      <button id="submit2">Зарегистрироваться</button>
-      <p id="log" style="color: red;">Логин уже занят!</p>
-      <p id="lenl" style="color: red;">Логин должен содержать минимум 3 символа!</p>
-      <p id="diff" style="color: red;">Пароли не совпадают</p>
-      <p id="lenp" style="color: red;">Пароль должен содержать минимум 5 символов!</p>
-      <p style="color: red;">
-        <%= msg %>
-      </p>
-    </form>
-    <br>
-  </main>
-</body>
-<script>
-  const par = document.getElementById("diff");
-  par.style.visibility = "hidden";
-  const lenp = document.getElementById("lenp");
-  lenp.style.visibility = "hidden";
-  const lenl = document.getElementById("lenl");
-  lenl.style.visibility = "hidden";
-  const log = document.getElementById("log");
-  log.style.visibility = "hidden";
 </script>
-
+        <main style="display: flex; justify-content:center">
+            <form class="reg" action= '/registration'  method="POST">
+                <h3 class="h3">Ф.И.О.</h3>
+                <input name = "name" placeholder="Ф.И.О." required>
+                <h3 class="h3">Логин</h3>
+                <input id="login" name="login" placeholder="Логин" required  oninput="checkLoginLength();checkLoginExistance()" >
+                <h3 class="h3">Электронная почта</h3>
+                <input id="email" name="email" type="email" placeholder="example@example.com" required>
+                <h3 class="h3">Пароль</h3>
+                <input id="password" name="password" type="password" placeholder="Пароль" required oninput="checkPasswordLength();checkPasswordsSimularity()">
+                <h3 class="h3">Подтвердите пароль</h3>
+                <input id="checkpassword" name="checkpassword" type="password" placeholder="Пароль" required oninput="checkPasswordsSimularity()">
+                <br>
+                <button id="submit2">Зарегистрироваться</button>
+                <p id="log" style="color: red;">Логин уже занят!</p>
+                <p id="lenl" style="color: red;">Логин должен содержать минимум 3 символа!</p>
+                <p id="diff" style="color: red;">Пароли не совпадают</p>
+                <p id="lenp" style="color: red;">Пароль должен содержать минимум 5 символов!</p>
+                <p style="color: red;"><%= msg %></p>
+            </form>
+            <br>
+        </main>
+    </body>
+    <script>
+        const par = document.getElementById("diff");
+        par.style.visibility = "hidden";
+        const lenp = document.getElementById("lenp");
+        lenp.style.visibility = "hidden";
+        const lenl = document.getElementById("lenl");
+        lenl.style.visibility = "hidden";
+        const log = document.getElementById("log");
+        log.style.visibility = "hidden";
+    </script>
 </html>

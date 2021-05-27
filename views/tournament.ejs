@@ -1,69 +1,64 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <title>Турнир #<%= ID %>
+        </title>
 
-<head>
-  <title>Турнир #<%= ID %>
-  </title>
-
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0,
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0,
                 maximum-scale=1.0, minimum-scale=1.0,
                 user-scalable=no, minimal-ui">
-  <meta name="full-screen" content="yes">
-  <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
-</head>
+        <meta name="full-screen" content="yes">
+        <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
+    </head>
 
-<body>
-  <main>
-    <h2 style="top: 1rem">
-      <%= u_name %>
-    </h2>
-    <div id="task">
-      <H1 id="taskname">
-        <%= tournament.title; %>
-      </H1>
-      <div style="text-align: center;margin: 5%;">
-        <% if(tournament.mods.find(item=> item == login)){ %>
-          <a class="EditButtons" href=<%="/tournament/edit/" + tournament.identificator %> >Редактировать</a>
-          <% if(tournament.identificator!=0){ %>
-            <span class="tourPopup">
-              <dialog id='dialog'>
-                <form action=<%="/deletetournament/" + tournament.identificator %> method="POST">
-                  Вы действительно хотите удалить турнир "<%= tournament.title %>" ?
-                    <button>Да</button>
-                </form>
-                <button onClick='c();'>Назад</button>
-              </dialog>
-              <button onClick='o();' class="show EditButtons" style="background-color: transparent;">Удалить</button>
-              <% } %>
-                <% if(!tournament.isBegan) { %>
-            </span>
-            <a class="EditButtons" href=<%="/tournament/task/add/" + tournament.identificator %> >Добавить задачу</a>
-            <a class="EditButtons" href=<%="/addparticipant_tt/" + tournament.identificator %> >Добавить участников</a>
+    <body>
+        <main>
+            <h2 style = "top: 1rem">
+                <%= u_name %>
+            </h2>
+            <div id="task">
+                <H1 id="taskname"><%= tournament.title; %></H1>
+                <div style="text-align: center;margin: 5%;">
+                    <% if(tournament.mods.find(item => item == login)){ %>
+                        <a class="EditButtons" href=<%="/tournament/edit/" + tournament.identificator %> >Редактировать</a>
+                        <% if(tournament.identificator!=0){ %>
+                        <span class="tourPopup">
+                            <dialog  id='dialog'>
+                                <form action= <%="/deletetournament/" + tournament.identificator %>  method="POST">
+                                    Вы действительно хотите удалить турнир "<%= tournament.title %>" ?
+                                    <button>Да</button>
+                                </form>
+                                <button onClick='c();'>Назад</button>
+                            </dialog>
+                        <button onClick='o();' class="show EditButtons" style="background-color: transparent;">Удалить</button>
+                        <% } %>
+                        <% if(!tournament.isBegan) { %>
+                            </span>
+                                <a class="EditButtons" href=<%="/tournament/task/add/" + tournament.identificator %> >Добавить задачу</a>
+                                <a class="EditButtons" href=<%="/addparticipant_tt/" + tournament.identificator %> >Добавить участников</a>
+                        <% } %>
+                        <a class="EditButtons" href=<%= "/tournament/attempts/"+ID+"/1/all&all&all&true" %> >Посылки</a>
+                    <% } %>
+                    <a class="EditButtons" href=<%= "/tournament/results/"+tournament.identificator +"/1" %>>Таблица результатов</a>
+                </div>
+                <h4 class="h4">Автор: <%= tournament.author %>     Участники: <%= tournament.results.length %> </h4>
+                <div style="margin-left: 20px;" id="statement">
+                    <%= tournament.description %>
+                </div>
+            </div>
+                <div id="table"></div>
+        </main>
+        <div id="chat">
+            <div id = "messages"></div>
+            <% if(tournament.mods.find(item => item == login)){%>
+                <textarea style="outline: none; border: 0px;" type="text" id="sendMessage" placeholder="Введите сообщение"></textarea>
             <% } %>
-              <a class="EditButtons" href=<%="/tournament/attempts/" +ID+"/1/all&all&all&true" %> >Посылки</a>
-              <% } %>
-                <a class="EditButtons" href=<%="/tournament/results/" +tournament.identificator +"/1" %>>Таблица результатов</a>
-      </div>
-      <h4 class="h4">Автор: <%= tournament.author %> Участники: <%= tournament.results.length %>
-      </h4>
-      <div style="margin-left: 20px;" id="statement">
-        <%= tournament.description %>
-      </div>
-    </div>
-    <div id="table"></div>
-  </main>
-  <div id="chat">
-    <div id="messages"></div>
-    <% if(tournament.mods.find(item=> item == login)){%>
-      <textarea style="outline: none; border: 0px;" type="text" id="sendMessage"
-        placeholder="Введите сообщение"></textarea>
-      <% } %>
-  </div>
-  <p class="countDownTimer" id="countDownTimer" style="left: 5rem; right:auto; top:6rem"></p>
-</body>
-<script src="/socket.io/socket.io.js"></script>
-<script type=text/javascript>
+        </div>
+        <p class="countDownTimer" id="countDownTimer" style="left: 5rem; right:auto; top:6rem"></p>
+    </body>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type = text/javascript>
         let min = (a, b) => {if(a>b)return b;return a;};
         function update(ids) {
             let text;
@@ -97,83 +92,82 @@
             update(ids);
         }, 2000);
     </script>
-<script>
-  if (!<%= tournament.isBegan %>) {
-    let countDownDate = new Date('<%= tournament.whenStarts.replace(' ', 'T') %>').getTime();
-    var x = setInterval(function () {
-      var now = new Date().getTime();
+    <script>
+        if(!<%= tournament.isBegan %>){
+            let countDownDate = new Date('<%= tournament.whenStarts.replace(' ', 'T') %>').getTime();
+            var x = setInterval(function () {
+                var now = new Date().getTime();
 
-      var distance = countDownDate - now;
+                var distance = countDownDate - now;
 
-      var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-      if (days > 0)
-        document.getElementById("countDownTimer").innerHTML = "Начало через " + days + " дней " + ("0" + hours).slice(-2) + ":"
-          + ("0" + minutes).slice(-2) + ":" + ("0" + seconds).slice(-2);
-      else
-        document.getElementById("countDownTimer").innerHTML = "Начало через " + ("0" + hours).slice(-2) + ":"
-          + ("0" + minutes).slice(-2) + ":" + ("0" + seconds).slice(-2);
-      if (distance < 0) {
-        clearInterval(x);
-        document.getElementById("countDownTimer").innerHTML = "Турнир начался! Обновите страницу";
-      }
-    }, 1000);
-  }else {
-    let countDownDate = new Date('<%= tournament.whenEnds.replace(' ', 'T') %>').getTime();
-    var x = setInterval(function () {
-      var now = new Date().getTime();
+                if (days>0)
+                    document.getElementById("countDownTimer").innerHTML = "Начало через "+ days + " дней "+ ("0"+hours).slice(-2) + ":"
+                        + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
+                else
+                    document.getElementById("countDownTimer").innerHTML = "Начало через "+ ("0"+hours).slice(-2) + ":"
+                        + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
+                if (distance < 0) {
+                        clearInterval(x);
+                        document.getElementById("countDownTimer").innerHTML = "Турнир начался! Обновите страницу";
+                }
+            }, 1000);
+        }else{
+            let countDownDate = new Date('<%= tournament.whenEnds.replace(' ', 'T') %>').getTime();
+            var x = setInterval(function() {
+                    var now = new Date().getTime();
 
-      var distance = countDownDate - now;
+                    var distance = countDownDate - now;
 
-      var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-      if (days > 0)
-        document.getElementById("countDownTimer").innerHTML = "Окончание через " + days + " дней " + ("0" + hours).slice(-2) + ":"
-          + ("0" + minutes).slice(-2) + ":" + ("0" + seconds).slice(-2);
-      else
-        document.getElementById("countDownTimer").innerHTML = "Окончание через " + ("0" + hours).slice(-2) + ":"
-          + ("0" + minutes).slice(-2) + ":" + ("0" + seconds).slice(-2);
+                    if (days>0)
+                        document.getElementById("countDownTimer").innerHTML = "Окончание через "+ days + " дней " + ("0"+hours).slice(-2) + ":"
+                            + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
+                    else
+                        document.getElementById("countDownTimer").innerHTML = "Окончание через "+ ("0"+hours).slice(-2) + ":"
+                            + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
 
-      if (distance < 0) {
-        clearInterval(x);
-        document.getElementById("countDownTimer").innerHTML = "Окончен";
-      }
-    }, 1000);
-  }
-  var socket = io();
-  socket.emit("new user", { id: <%= ID %>, data: ''})
-  let out = document.getElementById("messages");
-  let input = document.getElementById("sendMessage");
-  if (input) {
-    input.addEventListener("keyup", (e) => {
-      if (e.keyCode == 13 && !e.shiftKey) {
-        if (input.value.trim()) {
-          socket.emit('chat message', { id: <%= ID %>, data: input.value.trim()});
-    input.value = '';
-  }
+                    if (distance < 0) {
+                        clearInterval(x);
+                        document.getElementById("countDownTimer").innerHTML = "Окончен";
+                    }
+                }, 1000);
+        }
+        var socket = io();
+        socket.emit("new user", {id: <%= ID %>, data:''})
+        let out = document.getElementById("messages");
+        let input = document.getElementById("sendMessage");
+        if(input){
+            input.addEventListener("keyup", (e)=>{
+                if(e.keyCode==13 && !e.shiftKey){
+                    if (input.value.trim()) {
+                        socket.emit('chat message', {id: <%= ID %>, data: input.value.trim()});
+                        input.value = '';
+                    }
                 }
             });
         }
-  socket.on('chat message', function (msg) {
-    var p = document.createElement('p');
-    p.className = 'ChatMessage';
-    p.textContent = msg
-    messages.appendChild(p);
-    messages.scrollTo(0, messages.scrollHeight);
-  });
+        socket.on('chat message', function(msg) {
+            var p = document.createElement('p');
+            p.className = 'ChatMessage';
+            p.textContent = msg
+            messages.appendChild(p);
+            messages.scrollTo(0, messages.scrollHeight);
+        });
 
-  function o() {
-    document.getElementById('dialog').showModal();
-  }
-  function c() {
-    document.getElementById('dialog').close();
-  }
-</script>
-
+        function o() {
+            document.getElementById('dialog').showModal();
+        }
+        function c() {
+            document.getElementById('dialog').close();
+        }
+    </script>
 </html>

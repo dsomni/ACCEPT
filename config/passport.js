@@ -4,9 +4,9 @@ const bcrypt = require('bcryptjs');
 function initialize(passport, User) {
   const authenticateUser = async (login, password, done) => {
     var user1 = await User.findOne({ login: login }).exec();
-    var user2 = await User.findOne({ login: "n_" + login }).exec();
-    var user = user1;
-    if (user1 == null) {
+    var user2 = await User.findOne({ login: "n_"+login }).exec();
+    var user  = user1;
+    if(user1==null){
       user = user2;
     }
 
@@ -27,7 +27,7 @@ function initialize(passport, User) {
 
   passport.use(new LocalStrategy({ usernameField: 'login' }, authenticateUser));
   passport.serializeUser((user, done) => done(null, user.id));
-  passport.deserializeUser(async (id, done) => {
+  passport.deserializeUser( async (id, done) => {
     var user = await User.findById(id).exec();
     return done(null, user);
   })

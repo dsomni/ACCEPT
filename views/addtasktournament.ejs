@@ -1,105 +1,95 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <title>Добавление задачи</title>
 
-<head>
-  <title>Добавление задачи</title>
-
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0,
+        <meta charset="utf-8">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0,
               maximum-scale=1.0, minimum-scale=1.0,
               user-scalable=no, minimal-ui">
-  <meta name="full-screen" content="yes">
+        <meta name="full-screen" content="yes">
 
-</head>
+        </head>
+    <body>
+        <main>
 
-<body>
-  <main>
-
-    <form action=<%='/tournament/task/add/' + tournament.identificator %> method="POST" enctype="multipart/form-data">
-      <div class="taskAdderForm">
-        <h3 class="h3">Название задачи</h3>
-        <textarea id="title" name="title" required cols=2 placeholder="Введите название"></textarea>
-        <br>
-
-        <h3 class="h3">Условие</h3>
-        <textarea id="statementinput" name="statement" required cols=2 rows=10 placeholder="Введите условиe"></textarea>
-        <h3 class="h3">Входные данные</h3>
-        <textarea id="inputDescription" name="input" required cols=2 rows=10
-          placeholder="Введите описание входных данных"></textarea>
-        <h3 class="h3">Выходные данные</h3>
-        <textarea id="outputDescription" name="output" required cols=2 rows=10
-          placeholder="Введите описание выходных данных"></textarea>
-        <br>
-
-        <h3 class="h3">Примеры</h3>
-        <%for (var i=0; i < 5; i++){ %>
-          <textarea id=<%="exampleIn" +i
-            %> name = <%= "exampleIn" +i %>  cols=1 rows=3 placeholder="Пример <%=i+1%> INPUT"></textarea>
-          <textarea id=<%="exampleOut" +i
-            %> name = <%= "exampleOut" +i %>  cols=1 rows=3 placeholder="Пример <%=i+1%> OUTPUT"></textarea>
-          <% if (i!=4){ %>
-            <br>
-            <% } %>
-              <% } %>
+        <form action=<%='/tournament/task/add/' + tournament.identificator %>  method="POST" enctype="multipart/form-data">
+            <div class="taskAdderForm">
+                <h3 class="h3">Название задачи</h3>
+                <textarea id="title" name = "title" required cols=2 placeholder="Введите название"></textarea>
                 <br>
-                <h3 class="h3" title="Архив .zip&#10;Файлы input0.txt output0.txt .... input19.txt output19.txt">
-                  Передать тесты архивом</h3>
+
+                <h3 class="h3">Условие</h3>
+                <textarea id="statementinput" name = "statement" required cols=2 rows=10 placeholder="Введите условиe"></textarea>
+                <h3 class="h3">Входные данные</h3>
+                <textarea id="inputDescription" name="input" required cols=2 rows=10 placeholder="Введите описание входных данных"></textarea>
+                <h3 class="h3">Выходные данные</h3>
+                <textarea id="outputDescription" name="output" required cols=2 rows=10 placeholder="Введите описание выходных данных"></textarea>
+                <br>
+
+                <h3 class="h3">Примеры</h3>
+                <%for (var i =0; i < 5; i++){  %>
+                    <textarea id=<%= "exampleIn" +i %> name = <%= "exampleIn" +i %>  cols=1 rows=3 placeholder="Пример <%=i+1%> INPUT"></textarea>
+                    <textarea id=<%= "exampleOut" +i %> name = <%= "exampleOut" +i %>  cols=1 rows=3 placeholder="Пример <%=i+1%> OUTPUT"></textarea>
+                    <% if (i!=4){ %>
+                    <br>
+                    <% } %>
+                <% } %>
+                <br>
+                <h3 class="h3" title="Архив .zip&#10;Файлы input0.txt output0.txt .... input19.txt output19.txt">Передать тесты архивом</h3>
                 <label class="switch">
-                  <input type="checkbox" id="checker" onclick="check();">
-                  <span class="slider round"></span>
+                    <input type="checkbox" id="checker" onclick="check();">
+                    <span class="slider round"></span>
                 </label>
                 <br>
                 <div id="manual" style="display: contents;">
-                  <h3 class="h3">Тесты</h3>
-                  <%for (var i=0; i < 20; i++){ %>
-                    <h4 class="h4">Тест <%= i+1 %>
-                    </h4>
-                    <textarea id=<%="testIn" +i
-                      %> name = <%= "testIn" + i %>  cols=1 rows=3 placeholder="Тест <%=i+1%> INPUT"></textarea>
-                    <textarea id=<%="testOut" +i
-                      %> name = <%= "testOut" + i %>  cols=1 rows=3 placeholder="Тест <%=i+1%> OUTPUT"></textarea>
-                    <br>
+                    <h3 class="h3">Тесты</h3>
+                    <%for (var i =0; i < 20; i++){  %>
+                        <h4 class="h4">Тест <%= i+1 %></h4>
+                        <textarea id=<%= "testIn" +i %> name = <%= "testIn" + i %>  cols=1 rows=3 placeholder="Тест <%=i+1%> INPUT"></textarea>
+                        <textarea id=<%= "testOut" +i %> name = <%= "testOut" + i %>  cols=1 rows=3 placeholder="Тест <%=i+1%> OUTPUT"></textarea>
+                        <br>
                     <% } %>
                 </div>
                 <div id="archive" class="fileChooser">
-                  Выберете архив
+                    Выберете архив
                 </div>
                 <input type="file" name="file" id="testsarchive" style="visibility: hidden;" accept=".zip">
-      </div>
-      <button class="SaveChanges">Добавить задачу</button>
-    </form>
-  </main>
-</body>
-<script>
-  let archive = document.getElementById("archive");
-  let manual = document.getElementById("manual");
-  console.log(manual.style.display);
-  let checker = document.getElementById("checker");
-  archive.style = "display: none";
-  function check() {
-    if (checker.checked) {
-      manual.style.display = "none";
-      archive.style.display = "block";
-    } else {
-      manual.style.display = "contents";
-      archive.style.display = "none";
-    }
-  }
-  let inputFile = document.getElementById("testsarchive");
-  archive.ondragover = archive.ondragenter = (evt) => {
-    evt.preventDefault();
-  }
-  archive.ondrop = (evt) => {
-    inputFile.files = evt.dataTransfer.files;
-    archive.innerHTML = inputFile.files[0].name;
-    evt.preventDefault();
-  }
-  archive.onclick = () => {
-    inputFile.click();
-  }
-  inputFile.addEventListener("change", () => {
-    archive.innerHTML = inputFile.files[0].name
-  }, false)
-</script>
-
+            </div>
+            <button class="SaveChanges">Добавить задачу</button>
+        </form>
+    </main>
+    </body>
+    <script>
+        let archive = document.getElementById("archive");
+        let manual = document.getElementById("manual");
+        console.log(manual.style.display);
+        let checker = document.getElementById("checker");
+        archive.style = "display: none";
+        function check(){
+            if (checker.checked){
+                manual.style.display = "none";
+                archive.style.display = "block";
+            }else{
+                manual.style.display = "contents";
+                archive.style.display = "none";
+            }
+        }
+        let inputFile = document.getElementById("testsarchive");
+        archive.ondragover = archive.ondragenter = (evt) => {
+            evt.preventDefault();
+        }
+        archive.ondrop = (evt)=>{
+            inputFile.files = evt.dataTransfer.files;
+            archive.innerHTML = inputFile.files[0].name;
+            evt.preventDefault();
+        }
+        archive.onclick = ()=>{
+            inputFile.click();
+        }
+        inputFile.addEventListener("change", ()=>{
+            archive.innerHTML = inputFile.files[0].name
+        }, false)
+    </script>
 </html>
