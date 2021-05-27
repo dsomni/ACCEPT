@@ -52,8 +52,11 @@
                     let users = response.users;
                     let verdicts = response.results;
                     for(let i = 0; i < min(users.length, verdicts.length); i++){
+                        let login = users[i].login;
+                        if(login.length>2 && login.slice(0, 2)=="n-")
+                            login = login.slice(2)
                         text += `<tr>`;
-                        text += `<td>${users[i].login}</td>`;
+                        text += `<td>${login}</td>`;
                         text += `<td><a class="tlrefs" href="/account/${users[i].login}/1/default&all">${users[i].name}</a></td>`;
                         text += `<td>${users[i].grade.toString()+users[i].gradeLetter.toString()}</td>`;
                         text += `<td>${users[i].group}</td>`;

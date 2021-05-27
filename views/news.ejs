@@ -34,7 +34,7 @@
                 <% } %>
                 <% let date=new Date(parseInt(news.date)).toLocaleString('en-GB') %>
                 <pre><%= news.author %>        <%= date %></pre>
-                <div style="margin-top: 10px;">
+                <div style="margin-top: 10px; padding: 2rem; text-align: justify;">
                     <%- news.text %>
                 </div>
             </main>

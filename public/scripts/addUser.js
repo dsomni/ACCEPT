@@ -57,13 +57,13 @@ async function toDo(){
             check.password = bcrypt.hashSync(student[2].toString(), 10).toString()
             check.name = student[1]
             check.grade = grade
-            check.gradeLetter = gradeLetter
+            check.gradeLetter = gradeLetter.toLowerCase()
             if(!check.group){
                 check.group = 1;
             }
             await check.save()
         }else{
-            await addStudent(student[0], student[2], student[1], grade, gradeLetter, 1)
+            await addStudent(student[0], student[2], student[1], grade, gradeLetter.toLowerCase(), 1)
         }
     }
 }

@@ -67,7 +67,7 @@
                     text = `<h1 style="text-align: center;color:Red">Вы дисквалифицированы!</h1>`;
                 else if(<%= tournament.mods.find(item => item == login)!= null %>)
                     text = `<h1 style="text-align: center;color:Red">Добавьте задачу</h1>`;
-                else if(<%= registered!=null %>)
+                else if(<%= registered %>)
                     text = `<h1 style="text-align: center;color:Red">Турнир ещё не начался</h1>`;
                 else
                     text = `<h1 style="text-align: center;color:Red">Вы не зарегистрированы!</h1>`;
@@ -90,11 +90,12 @@
         update(ids);
         setInterval(() => {
             update(ids);
-        }, 2000);
+        }, 5000);
     </script>
     <script>
         if(!<%= tournament.isBegan %>){
             let countDownDate = new Date('<%= tournament.whenStarts.replace(' ', 'T') %>').getTime();
+            console.log(countDownDate)
             var x = setInterval(function () {
                 var now = new Date().getTime();
 
@@ -119,27 +120,27 @@
         }else{
             let countDownDate = new Date('<%= tournament.whenEnds.replace(' ', 'T') %>').getTime();
             var x = setInterval(function() {
-                    var now = new Date().getTime();
+            var now = new Date().getTime();
 
-                    var distance = countDownDate - now;
+            var distance = countDownDate - now;
 
-                    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-                    if (days>0)
-                        document.getElementById("countDownTimer").innerHTML = "Окончание через "+ days + " дней " + ("0"+hours).slice(-2) + ":"
-                            + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
-                    else
-                        document.getElementById("countDownTimer").innerHTML = "Окончание через "+ ("0"+hours).slice(-2) + ":"
-                            + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
+            if (days>0)
+                document.getElementById("countDownTimer").innerHTML = "Окончание через "+ days + " дней " + ("0"+hours).slice(-2) + ":"
+                    + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
+            else
+                document.getElementById("countDownTimer").innerHTML = "Окончание через "+ ("0"+hours).slice(-2) + ":"
+                    + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
 
-                    if (distance < 0) {
-                        clearInterval(x);
-                        document.getElementById("countDownTimer").innerHTML = "Окончен";
-                    }
-                }, 1000);
+            if (distance < 0) {
+                clearInterval(x);
+                document.getElementById("countDownTimer").innerHTML = "Окончен";
+            }
+        }, 1000);
         }
         var socket = io();
         socket.emit("new user", {id: <%= ID %>, data:''})

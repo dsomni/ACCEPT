@@ -683,8 +683,14 @@ app.post('/addlesson', checkAuthenticated, checkNletter, checkPermission, async 
     let user = req.user;
     let body = req.body;
 
-    let tasks = body.tasks.split(' ').map(item => '0_' + (parseInt(item)-1));
-    await Adder.addLesson(Lesson, body.grade, body.title, body.description, tasks, user.name);
+    let tasksToAdd = [];
+    let tasks = body.tasks.split(' ').map(item => '0_' + (parseInt(item) - 1));
+    for (let i = 0; i < tasks.length; i++){
+        task = await Task.findOne({ identificator: tasks[i] }).exec();
+        if(task)
+            tasksToAdd.push(tasks[i]);
+    }
+    await Adder.addLesson(Lesson, body.grade, body.title, body.description, tasksToAdd, user.name);
 
     res.redirect('/addlesson');
 });
@@ -716,7 +722,7 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, checkNletter, async
     if (SearchGrade != "all" || !user.isTeacher) properties.grade = user.isTeacher ? SearchGrade : user.grade;
     let lessons = (await Lesson.find(properties).exec());
 
-    if (lessons.length!=0 && lessons[0].identificator == 0) lessons.splice(0, 1);
+    // if (lessons.length!=0 && lessons[0].identificator == 0) lessons.splice(0, 1);
 
     const fuse = new Fuse(lessons, {
         includeScore: true,
@@ -833,7 +839,16 @@ app.post('/editlesson/:id', checkAuthenticated, checkNletter, checkPermission, a
     lesson.title = body.title;
     lesson.description = body.description;
     lesson.grade = body.grade;
-    lesson.tasks = body.tasks.split(' ').map(item => '0_'+(parseInt(item)-1));
+    let tasks = body.tasks.split(' ').map(item => '0_'+(parseInt(item)-1));
+    lesson.tasks = [];
+    for (let i = 0; i < tasks.length; i++){
+        task = await Task.findOne({ identificator: tasks[i] }).exec();
+        if(task)
+            lesson.tasks.push(tasks[i]);
+    }
+
+    lesson.markModified("tasks");
+
     await lesson.save();
 
     res.redirect(`/lesson/${user.login}/${req.params.id}`);
@@ -925,7 +940,7 @@ app.get('/students/:page/:search', checkAuthenticated, checkNletter, checkPermis
     }
     if (a[0] != "default" || a[2] != "all" || a[3] != "all") {
         let toSearch = a[0] == "default" ? '' : a[0];
-        let SearchLetter = a[2] == "all" ? '' : a[2].toUpperCase();
+        let SearchLetter = a[2] == "all" ? '' : a[2].toLowerCase();
         let SearchGroup = a[3] == "all" ? '' : a[3];
         foundStudents = []
         const fuse = new Fuse(students, {
@@ -1046,14 +1061,15 @@ app.post('/editnews/:id', checkAuthenticated, checkNletter, checkPermission, upl
     newsDB.title = body.title;
     newsDB.text = body.text;
     newsDB.description = body.description;
-    if(req.file)
+    if (req.file) {
+        if (newsDB.imageName.length != 0)
+            fs.rm(path.join(__dirname, "./public/media/newsImages/" + newsDB.imageName), (err) => console.info("Ошибка при удалении картинки новости"));
         newsDB.imageName = req.file.filename;
+    }
     await newsDB.save();
 
     let idx = news.findIndex(item => item._id==req.params.id)
-    news[idx].title = body.title;
-    news[idx].text = body.text;
-    news[idx].reference = body.reference;
+    news[idx] = newsDB;
 
     res.redirect('/');
 })
@@ -1508,7 +1524,7 @@ app.get('/tournament/page/:login/:id', checkAuthenticated, checkTournamentValida
         if (!(tournament.mods.find(item => item == req.user.login) || tournament.isEnded || tournament.isBegan && tournament.results.find(item => item.login == req.params.login))) {
             tasks = [];
         }
-        if(!tournament.isBegan && tournament.results.find(item => item.login == req.params.login)){
+        if(tournament.results.find(item => item.login == req.params.login)){
             registered = true;
         }
         tasks = tasks.map(item => item.identificator).join('|');
@@ -1896,7 +1912,7 @@ app.get("/report", checkAuthenticated, async (req, res) => {
 app.post("/report", checkAuthenticated, async (req, res) => {
     if (req.body.report) {
         let sign = "\n" + req.user.name + "\n" + req.user.login
-        let info = await transporter.sendMail({
+        let info = transporter.sendMail({
             from: '"ACCEPT report collector" <accept.report@gmail.com>', // sender address
             to: "pro100pro10010@gmail.com", // list of receivers
             subject: req.body.type_selector, // Subject line

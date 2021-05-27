@@ -37,8 +37,10 @@ async function run() {
 
     let realresults = []
     let user;
-    for (let i = 0; i <results.length; i++){
+    for (let i = 0; i < results.length; i++){
         user = await User.findOne({ login: results[i].login });
+        if (!user)
+            user = await User.findOne({ login: "n-"+results[i].login });
         if(!user)
             continue;
         let loginToShow = results[i].login;

@@ -42,7 +42,7 @@
         <% } %>
         <div class="statement" id="hint"><%= problem.hint.text %></div>
         </div>
-        <table id="examples" class='taskslist'>
+        <table id="examples" class='taskslist' style="width: 60%; min-width: 60%;">
             <tr>
               <th>Example Input</th>
               <th>Example Output</th>
@@ -50,8 +50,8 @@
             <% for (var i = 0; i < problem.examples.length; i++) { %>
             <% var example = problem.examples[i]; %>
              <tr>
-              <td><%= example[0] %></td>
-              <td><%= example[1] %></td>
+              <td style="word-wrap: break-word;"><%= example[0] %></td>
+              <td style="word-wrap: break-word;"><%= example[1] %></td>
              </tr>
             <% } %>
         </table>

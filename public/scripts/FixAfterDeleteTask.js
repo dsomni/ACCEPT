@@ -22,7 +22,7 @@ var deletedTask = process.argv[2]
 
 
 
-async function run(){
+async function run() {
     await Task.deleteOne({identificator: deletedTask})
     let task;
     let tasks = await Task.find({}).exec()
@@ -39,7 +39,7 @@ async function run(){
     let toDelete = []
     for(let i=0; i<lessons.length;i++){
         lesson = lessons[i]
-        deleted = lesson.tasks.findIndex(Element => Element == deletedTask)
+        deleted = lesson.tasks.findIndex(Element => Element == deletedTask);
         if(deleted != -1){
             lesson.tasks.splice(deleted, 1)
         }
@@ -48,9 +48,10 @@ async function run(){
         }
         for(let j = 0; j<lesson.tasks.length; j++){
             if (lesson.tasks[j].split('_')[1] > deletedTask.split('_')[1]){
-                lesson.tasks[j] = lesson.tasks[j].identificator.split('_')[0] + '_' + (parseInt(lesson.tasks[j].identificator.split('_')[1]) - 1)
+                lesson.tasks[j] = lesson.tasks[j].split('_')[0] + '_' + (parseInt(lesson.tasks[j].split('_')[1]) - 1)
             }
         }
+        lesson.markModified("tasks");
         await lesson.save()
     }
     for(let i=0; i<toDelete.length;i++){
