@@ -89,7 +89,7 @@
     <script>
         let min = (a, b) => {if(a>b)return b;return a;};
         function updateOther(ids) {
-            fetch("/api/task/get/testverdicts/"+ids).then(response=>response.json()).then(response => {
+            fetch("/api/task/get/testverdicts/<%= login %>/"+ids).then(response=>response.json()).then(response => {
                     text = "";
                     let id = "<%= ID %>"
                     let tasks = response.tasks;

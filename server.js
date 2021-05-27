@@ -123,8 +123,6 @@ const Tournament = require('./config/models/Tournament');
 //---------------------------------------------------------------------------------
 
 const initializePassport = require('./config/passport');
-const { log } = require('console');
-const { throws } = require('assert');
 const configs = require('./config/configs');
 initializePassport(
     passport,
