@@ -1139,7 +1139,9 @@ app.post('/tournament/add', checkAuthenticated, checkPermission, async (req, res
         emtpy_tournament.attempts = [];
         emtpy_tournament.frozenResults = [];
         emtpy_tournament.disqualificated = [];
+        emtpy_tournament.messages = [];
 
+        emtpy_tournament.markModified('messages');
         emtpy_tournament.markModified('disqualificated');
         emtpy_tournament.markModified('results');
         emtpy_tournament.markModified('attempts');
