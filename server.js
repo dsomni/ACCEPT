@@ -1296,7 +1296,7 @@ app.post('/deletetournament/:tour_id', checkAuthenticated, checkNletter, checkPe
 //Register to tournament
 app.get('/regTournament/:tour_id', checkAuthenticated, async (req, res) => {
     let tournament = await Tournament.findOne({ identificator: req.params.tour_id }).exec()
-    if (!tournament.isBegan || tournament.allowRegAfterStart) {
+    if ((!tournament.isBegan || tournament.allowRegAfterStart) && !req.user.isTeacher) {
         let newRes = {
             login: req.user.login,
             sumscore: 0,
@@ -1622,7 +1622,7 @@ app.post('/tournament/task/edit/:tour_id/:id', checkAuthenticated, isModerator,u
 
 //---------------------------------------------------------------------------------
 // Tournament results page
-app.get('/tournament/results/:tour_id/:showTeachers/', checkAuthenticated, async (req, res) => {
+app.get('/tournament/results/:tour_id/', checkAuthenticated, async (req, res) => {
     let tournament = await Tournament.findOne({ identificator: req.params.tour_id });
     let baza;
     if (tournament.isFrozen && !tournament.isEnded && !tournament.mods.includes(req.user.login)) {
@@ -1645,7 +1645,6 @@ app.get('/tournament/results/:tour_id/:showTeachers/', checkAuthenticated, async
             ID: req.params.tour_id,
             tournament: tournament,
             results: results,
-            showTeachers: req.params.showTeachers == "1",
             isModerator : tournament.mods.includes(req.user.login),
             location: `/tournament/page/${req.user.login}/${req.params.tour_id}`
         });

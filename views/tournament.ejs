@@ -36,11 +36,10 @@
                         <% if(!tournament.isBegan) { %>
                             </span>
                                 <a class="EditButtons" href=<%="/tournament/task/add/" + tournament.identificator %> >Добавить задачу</a>
-                                <!--<a class="EditButtons" href=<%="/addparticipant_tt/" + tournament.identificator %> >Добавить участников</a>-->
                         <% } %>
                         <a class="EditButtons" href=<%= "/tournament/attempts/"+ID+"/1/all&all&all&true" %> >Посылки</a>
                     <% } %>
-                    <a class="EditButtons" href=<%= "/tournament/results/"+tournament.identificator +"/1" %>>Таблица результатов</a>
+                    <a class="EditButtons" href=<%= "/tournament/results/"+tournament.identificator %>>Таблица результатов</a>
                 </div>
                 <h4 class="h4">Автор: <%= tournament.author %>     Участники: <%= tournament.results.length %> </h4>
                 <div style="margin-left: 20px;" id="statement">
