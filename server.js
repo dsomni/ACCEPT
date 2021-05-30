@@ -25,22 +25,24 @@ const app = express();
 
 let TestingQueue = []
 
-object = {
-    command: "",
-    sentAt: Date.now()
-}
-
 function pushToQueue(object) {
     TestingQueue.push(object);
 }
 
 async function popQueue() {
     let object = TestingQueue.shift();
+    let user = await User({ login: object.login }).exec();
+    if (!user)
+        return
+    user.attempts.unshift({
+        taskID: object.id, date: object.sendAt,
+        programText: object.programText, result: [], language: object.language
+    });
+    user.markModified("attempts");
+    await user.save();
 
     fs.mkdirSync(path.normalize(__dirname + '/public/processes/' + object.login + "_" + object.id));
-
     fs.writeFileSync(path.normalize('public/processes/' + object.login + "_" + object.id + "/programText.txt"), object.programText, "utf-8");
-
     childProcess.exec(object.command);
 
     return object;
@@ -123,8 +125,6 @@ const Tournament = require('./config/models/Tournament');
 //---------------------------------------------------------------------------------
 
 const initializePassport = require('./config/passport');
-const { log } = require('console');
-const { throws } = require('assert');
 const configs = require('./config/configs');
 initializePassport(
     passport,
@@ -268,17 +268,13 @@ app.post('/task/page/:id', checkAuthenticated, checkNletter, uploadCode.single('
             }
             if (prevCode == "" || prevCode != programText || req.file) {
 
-                req.user.attempts.unshift({
-                    taskID: req.params.id, date: Date.now().toString(),
-                    programText: programText, result: [], language: language
-                })
-                await req.user.save()
+                let sendAt = Date.now().toString();
 
                 let object = {
                     login: req.user.login,
                     id: req.params.id,
                     programText,
-                    sendAt: Date.now(),
+                    sendAt,
                     command: 'node ' + path.join(__dirname, '/public/checker/checker3' + language + '.js ') + ' ' +
                         path.join(__dirname, '/public/processes/' + req.user.login + "_" + req.params.id) + " " +
                         'program' + req.user.login + "_" + req.params.id + " " +
@@ -1337,7 +1333,6 @@ app.get('/tournament/task/add/:tour_id', checkAuthenticated, isModerator, async 
 });
 
 app.post('/tournament/task/add/:tour_id', checkAuthenticated, isModerator, uploadTests.single('file'), async (req, res) => {
-    let user = req.user;
     let body = req.body;
 
 
@@ -1406,12 +1401,10 @@ app.get('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTournamen
         res.redirect('/tournament/page/' + req.user.login + '/' + req.params.tour_id);
     }
     let attempts = req.user.attempts;
-    let result = [];
     let prevCode = "";
     let language = "";
     for (let i = 0; i < attempts.length; i++) {
         if (attempts[i].taskID == req.params.id) {
-            result = attempts[i].result;
             prevCode = attempts[i].programText;
             language = attempts[i].language;
             break;
@@ -1453,8 +1446,8 @@ app.post('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTourname
                     break;
                 }
             }
-            let language, programText;
-            language = req.body.languageSelector;
+            let programText;
+            let language = req.body.languageSelector;
             if (req.file) {
                 try{
                     let filepath = path.join(__dirname,'/public/codes/'+req.file.filename);
@@ -1470,19 +1463,15 @@ app.post('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTourname
             }
             if (prevCode == "" || prevCode != programText || req.file) {
 
-                let language = req.body.languageSelector;
+                language = req.body.languageSelector;
 
-                req.user.attempts.unshift({
-                    taskID: req.params.id, date: Date.now().toString(),
-                    programText: programText, result: [], language: language
-                })
-                await req.user.save()
+                let sendAt = Date.now().toString();
 
                 let object = {
                     login: req.user.login,
                     id: req.params.id,
                     programText,
-                    sendAt: Date.now(),
+                    sendAt,
                     command: 'node ' + path.join(__dirname, '/public/checker/checker3' + language + '.js') + ' ' +
                         path.join(__dirname, '/public/processes/' + req.user.login + '_' + req.params.id) + " " +
                         'program' + req.user.login + '_' + req.params.id + " " +
@@ -1564,7 +1553,6 @@ app.get('/tournament/task/edit/:tour_id/:id', checkAuthenticated, isModerator, a
 
 app.post('/tournament/task/edit/:tour_id/:id', checkAuthenticated, isModerator,uploadTests.single('file'), async (req, res) => {
     let body = req.body;
-    let user = req.user;
     let tournament = await Tournament.findOne({ identificator: req.params.tour_id });
     let problem = tournament.tasks.find(item => item.identificator == req.params.id);
 

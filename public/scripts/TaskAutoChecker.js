@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const config = require('../../config/configs');
-const childProcess = require("child_process");
 const path = require('path')
 const fs = require('fs')
 
@@ -57,7 +56,7 @@ async function check(){
             if(tournament_id == "0"){
                 let problem = await Task.findOne({ identificator: full_id }).exec();
                 fs.stat(folderPath, function(err,stats) {
-                    if(!err && Date.now()){
+                    if(!err){
                         fs.stat(path.join(folderPath + "\\result.txt"), async function(err,stats2) {
                             if (!err) {
                                 let resultStrings = fs.readFileSync(path.normalize(folderPath + "\\result.txt"),"utf-8").trim().split("\n");
@@ -85,19 +84,16 @@ async function check(){
                                         })
                                     }
 
-                                    let attempts = user.attempts;
-                                    let idxx = 0;
-                                    let obj = {};
-                                    for(let k = 0; k < attempts.length; k++){
-                                        if( attempts[k].taskID == full_id){
-                                            obj = user.attempts[k];
-                                            idxx = k;
-                                            break;
-                                        }
-                                    }
-                                    user.attempts.splice(idxx,1,{taskID: obj.taskID, date: obj.date,
-                                        programText: obj.programText, result: result, language: obj.language})
-                                    await user.save();
+                                    let idx = user.attempts.findIndex(item => item.taskID == full_id);
+                                    let obj = user.attempts[idx];
+                                    user.attempts.splice(idx, 1, {
+                                        taskID: obj.taskID,
+                                        date: obj.date,
+                                        programText: obj.programText,
+                                        result: result,
+                                        language: obj.language
+                                    })
+                                    await user.save()
 
                                     fs.rmdirSync(folderPath,{recursive: true});
                                 }
@@ -109,8 +105,6 @@ async function check(){
                 });
             }else{
                 let tournament = await Tournament.findOne({ identificator: tournament_id }).exec();
-                let whenEnds = tournament.whenEnds;
-                let isBegan = tournament.isBegan;
 
                 let problem = tournament.tasks.find(item => item.identificator == full_id);
 
@@ -143,17 +137,9 @@ async function check(){
                                         })
                                     }
 
-                                    let attempts = user.attempts;
-                                    let idxx = 0;
-                                    let obj = {};
-                                    for (let k = 0; k < attempts.length; k++) {
-                                        if (attempts[k].taskID == full_id) {
-                                            obj = user.attempts[k];
-                                            idxx = k;
-                                            break;
-                                        }
-                                    }
-                                    user.attempts.splice(idxx, 1, {
+                                    let idx = user.attempts.findIndex(item => item.taskID == full_id);
+                                    let obj = user.attempts[idx];
+                                    user.attempts.splice(idx, 1, {
                                         taskID: obj.taskID,
                                         date: obj.date,
                                         programText: obj.programText,
@@ -168,7 +154,7 @@ async function check(){
                                     }
                                     tournament.attempts.push({
                                         login: user.login,
-                                        AttemptDate: user.attempts[0].date,
+                                        AttemptDate: obj.date,,
                                         TaskID: full_id,
                                         score
                                     });
@@ -186,6 +172,7 @@ async function check(){
                                     }
                                     if (!tournament.isEnded && user_result_idx!=-1 && tournament.results[user_result_idx].tasks[task_id].score!=100){
                                         tournament.results[user_result_idx].tasks[task_id].tries += 1;
+                                        tournament.results[user_result_idx].tasks[task_id].attempts.push({ date: obj.date, score });
                                         if (score != 100)
                                             tournament.results[user_result_idx].sumtime += tournament.penalty;
                                         if( tournament.results[user_result_idx].tasks[task_id].score < score){
@@ -217,8 +204,6 @@ async function check(){
     }
 
 }
-
-let max = (a, b)=>{if(a>b)return a;return b};
 
 function getVerdict(results){
     for(let i=0;i<results.length;i++){

@@ -33,20 +33,27 @@
                     else
                         return 1;
                 });
-                let result;
+                let result, links, loginToShow, task;
                 for (let i = 0; i < results.length; i++) {
                     result = results[i];
                     text+="<tr>\n";
-                    console.log(result[1]);
-                    if(result[1]){
-                        let loginToShow = result.login;
+                    if(result){
+                        loginToShow = result.login;
                         if(loginToShow.length > 2 && loginToShow.slice(0,2)=="n-"){
                                 loginToShow = loginToShow.slice(2);
                         }
                         text+=`<td><a class="tlrefs" href="/account/${result.login}/1/default&all">${loginToShow}</a></td>\n`;
                         for(let j=0; j<result.tasks.length;j++){
-                            let task = result.tasks[j];
-                            text+=`<td>${task.score}(${task.tries})</td>`
+                            task = result.tasks[j];
+                            links = "";
+                            task.attempts.forEach(attempt => {
+                                if(attempt.score == "100")
+                                    links+=`<a href="/attempt/${result.login}/${attempt.date}" class="success">100</a>`;
+                                else
+                                    links+=`<a href="/attempt/${result.login}/${attempt.date}" class="error">${attempt.score}</a>`;
+                            });
+                            console.log(links);
+                            text+=`<td class="hasDropDown""><div class="resulttext">${task.score}(${task.tries})</div><div class = "dropdown-content">${links}</div></td>`
                         }
                         text+=`<td>${result.sumscore}</td>\n<td>${result.sumtime}</td>\n`;
                     }
@@ -59,6 +66,6 @@
         update();
         setInterval(() => {
             update();
-        }, 5000);
+        }, 500000);
     </script>
 </html>

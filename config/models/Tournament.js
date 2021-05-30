@@ -33,7 +33,11 @@ const TournamentSchema = new mongoose.Schema({
         tasks: [{
             score: Number,
             dtime: Number,//from start
-            tries: Number
+            tries: Number,
+            attempts: [{
+                date: String,
+                score: String
+            }]
         }]
     }],
     frozeAfter: String,
@@ -45,7 +49,11 @@ const TournamentSchema = new mongoose.Schema({
         tasks: [{
             score: Number,
             dtime: Number,//from start
-            tries: Number
+            tries: Number,
+            attempts: [{
+                date: String,
+                score: String
+            }]
         }]
     }],
     attempts: [{

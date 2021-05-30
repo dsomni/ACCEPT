@@ -864,3 +864,37 @@ header input{
 .disqual dialog button{
     margin: 2px;
 }
+
+.resulttext {
+  color: black;
+  border: none;
+  width: 7rem;
+  padding: .2rem;
+  text-align: center;
+  background: white;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  width: 7rem;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  border: solid #00000011 1px;
+  text-align: center;
+  text-decoration: none;
+  display: block;
+  padding: .2em;
+  font-size: 1rem;
+}
+
+.dropdown-content a:hover {
+    border: solid black 1px;
+}
+
+.hasDropDown:hover .dropdown-content {display: block;}
