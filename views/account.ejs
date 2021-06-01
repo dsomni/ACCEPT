@@ -16,13 +16,20 @@
         <main>
             <h1 class="h1">Личный кабинет <%= n_name %> <a href="/EditAccount" class="editref">[изменить данные]</a></h1>
             <div class="student_info">
-                <p>Класс: <%= user.grade + user.gradeLetter %></p>
+                <%  let role = "Ученик";
+                    if(user.isTeacher) role = "Учитель";
+                    else if (user.group.includes('@')) role = "Пользователь";%>
+                <p>Роль: <%= role %></p>
+                <% if(role == "Ученик") { %>
+                    <p>Класс: <%= user.grade + user.gradeLetter %></p>
+                <% } %>
                 <% if(user.group && user.group.length<5){ %>
                     <p>Группа: <%= user.group %></p>
                 <% }else if (!user.isTeacher){ %>
                     <p>Почта: <%= user.group %></p>
                 <% } %>
             </div>
+            <a href=<%=`/tried/${u_login}/1/default&all`%> >Сданные задачи</a>
             <form class="SearchUI" action= <%= '/account/'+ u_login +'/1/default' %>  method="POST">
                 <input id="searcharea" name = "searcharea" rows=1 placeholder="Поиск по задаче"></input>
                 <select name="selector" id = "selector">

@@ -208,7 +208,7 @@ async function check() {
 function getVerdict(results) {
     for (let i = 0; i < results.length; i++) {
         if (results[i][1] != "OK") {
-            return results[i][1];
+            return results[i][1].split(" ").slice(0,2).map(item => item[0].toUpperCase()).join('');
         }
     }
     if (results.length > 0)

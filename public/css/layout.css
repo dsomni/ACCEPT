@@ -1,868 +1,998 @@
 /*-----------------------------------------------------------------------------*/
+
 /*Global*/
-*{
-    --main-bg-color: #87ceeb;
-    --header-color: #fff;
-    font-family: 'Roboto', sans-serif;
+
+* {
+  --main-bg-color: #87ceeb;
+  --header-color: #fff;
+  font-family: 'Roboto', sans-serif;
 }
 
-body{
-    background-color: var(--main-bg-color);
-    min-width: 1000px;
-    scrollbar-width: thin;
+body {
+  background-color: var(--main-bg-color);
+  min-width: 1000px;
+  scrollbar-width: thin;
 }
-select{
-    max-width: 200px;
+
+select {
+  max-width: 200px;
 }
-body{
-    margin-top: 30px;
+
+body {
+  margin-top: 30px;
 }
-::-webkit-scrollbar{
-    width: 5px;
+
+::-webkit-scrollbar {
+  width: 5px;
 }
-::-webkit-scrollbar-track{
-    background-color: var(--header-color);
+
+::-webkit-scrollbar-track {
+  background-color: var(--header-color);
 }
+
 ::-webkit-scrollbar-thumb {
-    background-color: #888888;
-}
-main{
-    margin-left: 65px;
-    font-size: 20px;
-    margin-top: 0px;
-    padding: 10px;
-    cursor: default;
-}
-.h3{
-    color: #4e4e4e;
-    margin: 5px;
-    font-size: 1.5rem;
+  background-color: #888888;
 }
 
-.h4{
-    color: #4e4e4e;
-    margin: 5px;
-    margin-left: 15px;
-    font-size: small;
+main {
+  margin-left: 65px;
+  font-size: 20px;
+  margin-top: 0px;
+  padding: 10px;
+  cursor: default;
 }
-textarea::-webkit-scrollbar{
-    width: 0px;
-    height: 0px;
+
+.h3 {
+  color: #4e4e4e;
+  margin: 5px;
+  font-size: 1.5rem;
 }
-textarea{
-    scrollbar-width: none;
+
+.h4 {
+  color: #4e4e4e;
+  margin: 5px;
+  margin-left: 15px;
+  font-size: small;
 }
-ul{
-    list-style: none;
+
+textarea::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+
+textarea {
+  scrollbar-width: none;
+}
+
+ul {
+  list-style: none;
 }
 
 /*-----------------------------------------------------------------------------*/
+
 /*Cool Buttons*/
 
 /*-----------------------------------------------------------------------------*/
+
 /*Cool Switcher*/
+
 .switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
 }
+
 .switch input {
-opacity: 0;
-width: 0;
-height: 0;
+  opacity: 0;
+  width: 0;
+  height: 0;
 }
+
 .slider {
-position: absolute;
-cursor: pointer;
-top: 0;
-left: 0;
-right: 0;
-bottom: 0;
-background-color: #ccc;
--webkit-transition: .4s;
-transition: .4s;
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
 }
+
 .slider:before {
-position: absolute;
-content: "";
-height: 26px;
-width: 26px;
-left: 4px;
-bottom: 4px;
-background-color: white;
--webkit-transition: .4s;
-transition: .4s;
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
 }
-input:checked + .slider {
-background-color: #2196F3;
+
+input:checked+.slider {
+  background-color: #2196F3;
 }
-input:focus + .slider {
-box-shadow: 0 0 1px #2196F3;
+
+input:focus+.slider {
+  box-shadow: 0 0 1px #2196F3;
 }
-input:checked + .slider:before {
--webkit-transform: translateX(26px);
--ms-transform: translateX(26px);
-transform: translateX(26px);
+
+input:checked+.slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
 }
+
 .slider.round {
-border-radius: 34px;
+  border-radius: 34px;
 }
+
 .slider.round:before {
-border-radius: 50%;
+  border-radius: 50%;
 }
 
-
 /*-----------------------------------------------------------------------------*/
+
 /*Header*/
-header::-webkit-scrollbar{
-    width: 2px;
+
+header::-webkit-scrollbar {
+  width: 2px;
 }
-header{
-    position: fixed;
-    top: 0px;
-    bottom: 0px;
-    left: 0px;
-    background-color: var(--header-color);
-    height: 100%;
-    width: 65px;
-    z-index: 1;
-    overflow-x: hidden;
-    overflow-y: scroll;
-    scrollbar-width: thin;
-    box-shadow: 0px 2px #00000012;
-    transition: ease-in-out .4s;
-    transition-delay: 0s;
+
+header {
+  position: fixed;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  background-color: var(--header-color);
+  height: 100%;
+  width: 65px;
+  z-index: 1;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  scrollbar-width: thin;
+  box-shadow: 0px 2px #00000012;
+  transition: ease-in-out .4s;
+  transition-delay: 0s;
 }
-header:hover{
-    transition-delay: .75s;
-    width: 220px;
-    word-wrap: normal;
+
+header:hover {
+  transition-delay: .75s;
+  width: 220px;
+  word-wrap: normal;
 }
-header:hover input{
-    width: 80px;
+
+header:hover input {
+  width: 80px;
 }
-header button{
-    display: flex;
-    align-items: center;
-    background-color: transparent;
-    transition: all 300ms ease;
-    font-size: 12pt;
-    font-variant-caps: small-caps;
-    font-weight: bold;
-    border: none;
-    outline: none;
-    margin-top: 10px;
-    margin-left: 5px;
-    letter-spacing: 0.5px;
-    color: #0099ff;
-    cursor: pointer;
+
+header button {
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+  transition: all 300ms ease;
+  font-size: 12pt;
+  font-variant-caps: small-caps;
+  font-weight: bold;
+  border: none;
+  outline: none;
+  margin-top: 10px;
+  margin-left: 5px;
+  letter-spacing: 0.5px;
+  color: #0099ff;
+  cursor: pointer;
 }
-header button img{
-    width: 45px;
-    margin-right: 10px;
+
+header button img {
+  width: 45px;
+  margin-right: 10px;
 }
-header button:hover{
-    transform: scale(1.1);
-    color: #75b5ff;
+
+header button:hover {
+  transform: scale(1.1);
+  color: #75b5ff;
 }
-header input{
-    border: none;
-    outline: none;
-    margin-bottom: 10px;
+
+header input {
+  border: none;
+  outline: none;
+  margin-bottom: 10px;
 }
-#Logo{
-    height: 70px;
-    margin-left: 5px;
-    margin-top: 5px;
-    margin-bottom: 20px;
+
+#Logo {
+  height: 70px;
+  margin-left: 5px;
+  margin-top: 5px;
+  margin-bottom: 20px;
 }
+
 /*-----------------------------------------------------------------------------*/
+
 /*-----------------------------------------------------------------------------*/
+
 /*-----------------------------------------------------------------------------*/
+
 /*ids*/
 
 /*-----------------------------------------------------------------------------*/
+
 /*errors*/
-#ok{
-    color: green;
+
+#ok {
+  color: green;
 }
 
-#er{
-    color: red;
+#er {
+  color: red;
 }
 
 /*-----------------------------------------------------------------------------*/
+
 /*task page*/
-.editref{
-    color: #000000;
-    font-size: medium;
-    text-decoration: none;
+
+.editref {
+  color: #000000;
+  font-size: medium;
+  text-decoration: none;
 }
-.editref:hover{
-    cursor: pointer;
-    color: #2d2aee;
-    text-decoration: underline;
+
+.editref:hover {
+  cursor: pointer;
+  color: #2d2aee;
+  text-decoration: underline;
 }
 
 #submit {
-    margin-top: 10px;
-    width: 100%;
-    height: 30px;
-
+  margin-top: 10px;
+  width: 100%;
+  height: 30px;
 }
+
 #submitdiv {
-    width: 100px;
-    margin-left: auto;
-    margin-right: auto;
+  width: 100px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-#result{
-    width: 304px;
-    height: 354px;
-    overflow: scroll;
-    font-size: large;
-}
-#taskname{
-    text-align: center;
-    margin: 10px;
-    padding: 10px;
-    overflow:hidden;
+#result {
+  width: 304px;
+  height: 354px;
+  overflow: scroll;
+  font-size: large;
 }
 
-#examples{
-    margin-left: 15%;
-    margin-top: 10px;
-    margin-bottom: 20px;
-    font-size: medium;
-    white-space: pre-wrap;
-    margin-left: auto;
-    margin-right: auto;
+#taskname {
+  text-align: center;
+  margin: 10px;
+  padding: 10px;
+  overflow: hidden;
 }
-#task{
-    background-color: #e4e1e1aa;
-    margin-left: auto;
-    margin-right: auto;
-    width: 50%;
-    padding: 10px;
+
+#examples {
+  margin-left: 15%;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  font-size: medium;
+  white-space: pre-wrap;
+  margin-left: auto;
+  margin-right: auto;
 }
-#task h4{
-    text-align: center;
-    white-space: pre-wrap;
-    font-size:medium;
+
+#task {
+  background-color: #e4e1e1aa;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+  padding: 10px;
 }
-#code{
-    white-space: pre-wrap;
+
+#task h4 {
+  text-align: center;
+  white-space: pre-wrap;
+  font-size: medium;
 }
-#HintButton{
-    border: none;
-    width: 100%;
-    font-size: large;
-    color: black;
-    background-color: #fafafaaa;
-    font-size: 14px;
-    padding: 5px;
-    box-shadow: 0 0 3px gray;
+
+#code {
+  white-space: pre-wrap;
 }
-#HintButton:hover{
-    box-shadow: 0 0 8px #aaaaff;
+
+#HintButton {
+  border: none;
+  width: 100%;
+  font-size: large;
+  color: black;
+  background-color: #fafafaaa;
+  font-size: 14px;
+  padding: 5px;
+  box-shadow: 0 0 3px gray;
 }
-#languageSelector{
-    margin-left: auto;
-    margin-right: auto;
-    width: 300px;
+
+#HintButton:hover {
+  box-shadow: 0 0 8px #aaaaff;
 }
+
+#languageSelector {
+  margin-left: auto;
+  margin-right: auto;
+  width: 300px;
+}
+
 /*-----------------------------------------------------------------------------*/
+
 /*Lesson page*/
-.EditButtons, .tlrefs{
-    text-decoration: none;
-    font-size: medium;
-    border: solid .1rem #00000011;
-    color: #000000;
-    margin-left: 10px;
-    margin-bottom: 1rem;
-    white-space: pre;
-    transition: ease-in-out .3s;
+
+.EditButtons, .tlrefs {
+  text-decoration: none;
+  font-size: medium;
+  border: solid .1rem #00000011;
+  color: #000000;
+  margin-left: 10px;
+  margin-bottom: 1rem;
+  white-space: pre;
+  transition: ease-in-out .3s;
 }
 
-.EditButtons:hover, .tlrefs:hover{
-    font-size: large;
-    cursor: pointer;
-}
-.tlrefs{
-    font-size: 1.3rem;
-    border:none
-}
-.tlrefs:hover{
-    font-size: 1.3rem;
-    text-decoration: underline blue 1px;
+.EditButtons:hover, .tlrefs:hover {
+  font-size: large;
+  cursor: pointer;
 }
 
-.time{
-    white-space: nowrap;
+.tlrefs {
+  font-size: 1.3rem;
+  border: none
+}
+
+.tlrefs:hover {
+  font-size: 1.3rem;
+  text-decoration: underline blue 1px;
+}
+
+.time {
+  white-space: nowrap;
 }
 
 /*-----------------------------------------------------------------------------*/
+
 /*editlesson page*/
-#grade{
-    width: 40px;
-    font-size: medium;
+
+#grade {
+  width: 40px;
+  font-size: medium;
 }
+
 /*-----------------------------------------------------------------------------*/
+
 /*Students page*/
-#gradeLetter{
-    width: 50px;
+
+#gradeLetter {
+  width: 50px;
 }
 
-#group_number{
-    width: 20px;
-    border: none;
-
+#group_number {
+  width: 20px;
+  border: none;
 }
-#change_groupeBtn{
-    display: inline;
+
+#change_groupeBtn {
+  display: inline;
 }
 
 /*-----------------------------------------------------------------------------*/
+
 /*-----------------------------------------------------------------------------*/
+
 /*-----------------------------------------------------------------------------*/
+
 /*classes*/
 
-.lessonPopup dialog{
-    align-items: center;
-    border: 2px solid #000000;
-    border-radius: 10px;
-    font-size: 15pt;
-    font-weight: 100;
+.lessonPopup dialog {
+  align-items: center;
+  border: 2px solid #000000;
+  border-radius: 10px;
+  font-size: 15pt;
+  font-weight: 100;
 }
 
-.lessonPopup .show{
-    border: none;
-    outline: none;
-    background: transparent;
-    font-size: 12pt;
-    font-weight: 200;
+.lessonPopup .show {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 12pt;
+  font-weight: 200;
 }
 
-.lessonPopup .show:hover{
-    cursor: pointer;
-    color: #2d2aee;
-    text-decoration: underline;
-}
-.lessonPopup .show:active{
-    outline: none;
+.lessonPopup .show:hover {
+  cursor: pointer;
+  color: #2d2aee;
+  text-decoration: underline;
 }
 
-
+.lessonPopup .show:active {
+  outline: none;
+}
 
 /*-----------------------------------------------------------------------------*/
+
 /*task page*/
-.statement{
-    text-indent: 15px;
-    line-height: 25px;
-    text-align: justify;
-    padding: 20px 30px 20px 30px;
-    white-space: pre-wrap;
-}
-.container{
-    margin-left: auto;
-    margin-right: auto;
-    width: 640px;
-}
-.imgs img{
-    display: inline-block;
-    margin-left: 10px;
-    margin-top: 20px;
-    margin-bottom: -6px;
-    width: 304px;
-}
-.imgsbottom img{
-    display: inline-block;
-    margin-left: 10px;
-    margin-top: -1px;
-    width: 304px;
-}
-.taskarea{
-    vertical-align: top;
-    background-color: transparent;
-    display: inline-block;
-    width: 300px;
-    height: 350px;
-    margin-left: 10px;
-    border: none;
-    resize: none;
-    margin-top: 0px;
-    background-color: white;
-    font-size: small;
-}
-.taskarea:focus{
-    outline: none;
-}
-.taskarea div{
-    overflow: scroll;
+
+.statement {
+  text-indent: 15px;
+  line-height: 25px;
+  text-align: justify;
+  padding: 20px 30px 20px 30px;
+  white-space: pre-wrap;
 }
 
-.taskPopup dialog{
-    align-items: center;
-    border: 2px solid #000000;
-    border-radius: 10px;
-    font-size: 15pt;
-    font-weight: 100;
+.container {
+  margin-left: auto;
+  margin-right: auto;
+  width: 640px;
 }
 
-.taskPopup .show{
-    border: none;
-    outline: none;
-    background: transparent;
-    font-size: 12pt;
-    font-weight: 200;
+.imgs img {
+  display: inline-block;
+  margin-left: 10px;
+  margin-top: 20px;
+  margin-bottom: -6px;
+  width: 304px;
 }
 
-.taskPopup .show:hover{
-    cursor: pointer;
-    color: #2d2aee;
-    text-decoration: underline;
+.imgsbottom img {
+  display: inline-block;
+  margin-left: 10px;
+  margin-top: -1px;
+  width: 304px;
 }
-.taskPopup .show:active{
-    outline: none;
+
+.taskarea {
+  vertical-align: top;
+  background-color: transparent;
+  display: inline-block;
+  width: 300px;
+  height: 350px;
+  margin-left: 10px;
+  border: none;
+  resize: none;
+  margin-top: 0px;
+  background-color: white;
+  font-size: small;
+}
+
+.taskarea:focus {
+  outline: none;
+}
+
+.taskarea div {
+  overflow: scroll;
+}
+
+.taskPopup dialog {
+  align-items: center;
+  border: 2px solid #000000;
+  border-radius: 10px;
+  font-size: 15pt;
+  font-weight: 100;
+}
+
+.taskPopup .show {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 12pt;
+  font-weight: 200;
+}
+
+.taskPopup .show:hover {
+  cursor: pointer;
+  color: #2d2aee;
+  text-decoration: underline;
+}
+
+.taskPopup .show:active {
+  outline: none;
 }
 
 /*-----------------------------------------------------------------------------*/
+
 /*tasks page*/
+
 .taskslist {
-    background: #f5ffff;
-    border-collapse: collapse;
-    text-align: left;
-    margin-top: 20px;
-    margin-left: 120px;
-    min-width: 70%;
-    table-layout: fixed;
+  background: #f5ffff;
+  border-collapse: collapse;
+  text-align: left;
+  margin-top: 20px;
+  margin-left: 120px;
+  min-width: 70%;
+  table-layout: fixed;
 }
-.tasklist *{
-    height: 4rem;
+
+.tasklist * {
+  height: 4rem;
 }
+
 .taskslist th {
-    border-top: 1px solid #6695fa;
-    border-bottom: 1px solid #6695fa;
-    background: #83aaff;
-    color: white;
-    padding: 10px 15px;
+  border-top: 1px solid #6695fa;
+  border-bottom: 1px solid #6695fa;
+  background: #83aaff;
+  color: white;
+  padding: .5rem 1rem;
 }
+
 .taskslist tr:nth-child(odd) {
-    background: #ebf3f9;
+  background: #ebf3f9;
 }
+
 .taskslist td {
-    border: 1px solid #e3eef7;
-    padding: 10px 15px;
-    transition: all 0.5s ease;
+  border: 1px solid #e3eef7;
+  padding: .5rem 1rem;
+  transition: all 0.5s ease;
 }
-.addhref{
-    margin-left: 120px;
-    margin-bottom: 20px;
+
+.addhref {
+  margin-left: 120px;
+  margin-bottom: 20px;
 }
+
 /*-----------------------------------------------------------------------------*/
+
 /*Header*/
-#outer{
-    width: 100%;
-    min-height: 700px;
-    height: 100%;
-    position: relative;
+
+#outer {
+  width: 100%;
+  min-height: 700px;
+  height: 100%;
+  position: relative;
 }
-.navigationButtons{
-   position: absolute;
-   top: 0px;
-    margin-top: 20px;
-    white-space: nowrap;
+
+.navigationButtons {
+  position: absolute;
+  top: 0px;
+  margin-top: 20px;
+  white-space: nowrap;
 }
-.loginInterface{
-    position: absolute;
-    bottom: 0px;
-    margin-bottom: 10px;
-    margin-left: 10px;
-    white-space: nowrap;
+
+.loginInterface {
+  position: absolute;
+  bottom: 0px;
+  margin-bottom: 10px;
+  margin-left: 10px;
+  white-space: nowrap;
 }
-.loginInterface input{
-    display: block;
-    width: 60px;
+
+.loginInterface input {
+  display: block;
+  width: 60px;
 }
-.loginInterface button{
-    margin-left: -5px;
+
+.loginInterface button {
+  margin-left: -5px;
 }
-.login{
-    width: 100px;
+
+.login {
+  width: 100px;
 }
 
 /*-----------------------------------------------------------------------------*/
+
 /*main page*/
-.news{
-    margin-left: 10px;
-    padding-bottom: 15px;
-    padding-left: 25px;
-    padding-right: 30px;
-    padding-top: 10px;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    margin-right: 50px;
-    border: none;
-    resize: none;
-    background-color: #ffffffa6;
-    font-size: 600;
-}
-.newsTitle{
-    text-decoration: none;
-    color: black;
-    font-size: 2rem;
-}
-.date{
-    font-weight: bold;
+
+.news {
+  margin-left: 10px;
+  padding-bottom: 15px;
+  padding-left: 25px;
+  padding-right: 30px;
+  padding-top: 10px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-right: 50px;
+  border: none;
+  resize: none;
+  background-color: #ffffffa6;
+  font-size: 600;
 }
 
-.newsPage{
-    margin: 20px;
-    background-color: #e4e1e1aa;
-    margin-top: 5rem;
-    display: flex;
-    padding: 10px;
-    align-items: center;
-    flex-direction:column;
+.newsTitle {
+  text-decoration: none;
+  color: black;
+  font-size: 2rem;
 }
 
-.newsPage *{
-    flex-basis: content;
+.date {
+  font-weight: bold;
 }
 
-.newsPage .newsTitle{
-    font-size: 3rem;
+.newsPage {
+  margin: 20px;
+  background-color: #e4e1e1aa;
+  margin-top: 5rem;
+  display: flex;
+  padding: 10px;
+  align-items: center;
+  flex-direction: column;
 }
 
-.newsPopup dialog{
-    align-items: center;
-    border: 2px solid #000000;
-    border-radius: 10px;
+.newsPage * {
+  flex-basis: content;
 }
 
-.newsPopup .show{
-    border: none;
-    outline: none;
-    background: transparent;
-    font-size: 11pt;
+.newsPage .newsTitle {
+  font-size: 3rem;
 }
 
-.newsPopup .show:hover{
-    cursor: pointer;
-    color: #2d2aee;
-    text-decoration: underline;
-}
-.newsPopup .show:active{
-    outline: none;
+.newsPopup dialog {
+  align-items: center;
+  border: 2px solid #000000;
+  border-radius: 10px;
 }
 
+.newsPopup .show {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 11pt;
+}
+
+.newsPopup .show:hover {
+  cursor: pointer;
+  color: #2d2aee;
+  text-decoration: underline;
+}
+
+.newsPopup .show:active {
+  outline: none;
+}
 
 /*-----------------------------------------------------------------------------*/
+
 /*Students page*/
-.tablerefs{
-    color: #000000;
-    font-size: large;
-    text-decoration: none;
-}
-.tablerefs:hover{
-    color: #5071df;
-    cursor: pointer;
-    text-decoration: underline;
+
+.tablerefs {
+  color: #000000;
+  font-size: large;
+  text-decoration: none;
 }
 
-.group dialog{
-    align-items: center;
-    border: 2px solid #000000;
-    border-radius: 10px;
+.tablerefs:hover {
+  color: #5071df;
+  cursor: pointer;
+  text-decoration: underline;
 }
 
-.group .show{
-    border: none;
-    outline: none;
-    background: transparent;
-    font-size: 13pt;
+.group dialog {
+  align-items: center;
+  border: 2px solid #000000;
+  border-radius: 10px;
 }
 
-.group .show:hover{
-    cursor: pointer;
-    color: #2d2aee;
-}
-.group .show:active{
-    outline: none;
+.group .show {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 13pt;
 }
 
-.group input{
-    border: 1px solid #000000;
-    outline: none;
-    width: 50px;
+.group .show:hover {
+  cursor: pointer;
+  color: #2d2aee;
+}
+
+.group .show:active {
+  outline: none;
+}
+
+.group input {
+  border: 1px solid #000000;
+  outline: none;
+  width: 50px;
 }
 
 /*-----------------------------------------------------------------------------*/
+
 /*Task adder page*/
-.taskAdderForm{
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    padding-right: 47vw;
-    padding-left: 2vw;
-    font-size: 15pt;
-    font-weight: 600;
+
+.taskAdderForm {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  padding-right: 47vw;
+  padding-left: 2vw;
+  font-size: 15pt;
+  font-weight: 600;
 }
-.taskAdderForm button{
-    height: 50px;
-    font-size: large;
-    border-radius: 10px;
-    border: none;
-    background-color: #f1f1f1;
-    cursor: pointer;
+
+.taskAdderForm button {
+  height: 50px;
+  font-size: large;
+  border-radius: 10px;
+  border: none;
+  background-color: #f1f1f1;
+  cursor: pointer;
 }
-.taskAdderForm button:hover{
-    background-color: #d4d3d3;
+
+.taskAdderForm button:hover {
+  background-color: #d4d3d3;
 }
-.taskAdderForm textarea{
-    border-radius: 1px;
-    border-color: #000000;
-    outline: none;
-    background-color: var(--header-color);
-    margin: 5px;
-    font-size: 10pt;
+
+.taskAdderForm textarea {
+  border-radius: 1px;
+  border-color: #000000;
+  outline: none;
+  background-color: var(--header-color);
+  margin: 5px;
+  font-size: 10pt;
 }
-.taskAdderForm ::placeholder{
-    color: #000000aa;
+
+.taskAdderForm ::placeholder {
+  color: #000000aa;
 }
 
 /*-----------------------------------------------------------------------------*/
+
 /*lessons adder page*/
-.lessonAdderForm{
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    margin-top: 100px;
-    margin-left: auto;
-    margin-right: auto;
-    width: 550px;
-    font-size: 22pt;
-    font-weight: 600;
+
+.lessonAdderForm {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  margin-top: 100px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 550px;
+  font-size: 22pt;
+  font-weight: 600;
 }
-.lessonAdderForm button{
-    height: 50px;
-    font-size: large;
-    border-radius: 10px;
-    border: none;
-    background-color: #f1f1f1;
-    cursor: pointer;
+
+.lessonAdderForm button {
+  height: 50px;
+  font-size: large;
+  border-radius: 10px;
+  border: none;
+  background-color: #f1f1f1;
+  cursor: pointer;
 }
-.lessonAdderForm button:hover{
-    background-color: #d4d3d3;
+
+.lessonAdderForm button:hover {
+  background-color: #d4d3d3;
 }
-.lessonAdderForm textarea{
-    border-radius: 1px;
-    border-color: #000000;
-    outline: none;
-    background-color: var(--header-color);
-    margin: 10px;
-    font-size: 15pt;
+
+.lessonAdderForm textarea {
+  border-radius: 1px;
+  border-color: #000000;
+  outline: none;
+  background-color: var(--header-color);
+  margin: 10px;
+  font-size: 15pt;
 }
-.lessonAdderForm ::placeholder{
-    color: #000000aa;
+
+.lessonAdderForm ::placeholder {
+  color: #000000aa;
 }
-.lessonAdderForm .switch{
-    margin: 10px;
-    margin-top: -10px;
+
+.lessonAdderForm .switch {
+  margin: 10px;
+  margin-top: -10px;
 }
 
 /*-----------------------------------------------------------------------------*/
+
 /*tournament attempts page*/
-.t_attempts{
-    text-decoration: none;
-    color: black;
+
+.t_attempts {
+  text-decoration: none;
+  color: black;
 }
-.t_attempts:hover{
-    color: rgb(32, 148, 226);
-    text-decoration: none;
+
+.t_attempts:hover {
+  color: rgb(32, 148, 226);
+  text-decoration: none;
 }
-.t_attempts:visited{
-    color: black;
+
+.t_attempts:visited {
+  color: black;
 }
 
 .pageinfo {
-    width: 100%;
+  width: 100%;
 }
 
-.pageRefs{
-    min-width: 50%;
-    max-width: 75%;
-    margin-left: 120px;
-    margin-right: auto;
-    margin-top: 15px;
-    margin-bottom: 5px;
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    flex-wrap: wrap;
+.pageRefs {
+  min-width: 50%;
+  max-width: 75%;
+  margin-left: 120px;
+  margin-right: auto;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
-
 
 /*-----------------------------------------------------------------------------*/
+
 /*about page*/
-.about{
-    margin-left: 10px;
-    padding-bottom: 15px;
-    padding-left: 25px;
-    padding-right: 30px;
-    padding-top: 1px;
-    margin-top: 20px;
-    margin-right: 50px;
-    border: none;
-    resize: none;
-    background-color: #ffffffa6;
-    font-size: larger;
+
+.about {
+  margin-left: 10px;
+  padding-bottom: 15px;
+  padding-left: 25px;
+  padding-right: 30px;
+  padding-top: 1px;
+  margin-top: 20px;
+  margin-right: 50px;
+  border: none;
+  resize: none;
+  background-color: #ffffffa6;
+  font-size: larger;
 }
-.about a{
-    text-decoration: none;
-    color: #000000;
+
+.about a {
+  text-decoration: none;
+  color: #000000;
 }
-#highlighting{
-    font-weight: bold;
+
+#highlighting {
+  font-weight: bold;
 }
 
 /*-----------------------------------------------------------------------------*/
-.SearchUI{
-    margin: 20px;
-    margin-left: 120px;
-    width: 40%;
-    display: grid;
-    grid-template-columns: 1fr 1fr 0.5fr 0.5fr 0.5fr 1fr;
-    gap: 3px;
-}
-#Acronim-container{
-    width: 100%;
-    text-align: center;
-}
-#Acronim{
-    width: 50%;
-}
-.student_info{
-    margin-left: 120px;
-}
-.SaveChanges{
-    position: fixed;
-    top: 25px;
-    right: 10%;
-    height: 50px;
-    width: 30%;
-    font-size: large;
-    border-radius: 10px;
-    border: none;
-    background-color: #f1f1f1;
-    cursor: pointer;
-}
-.countDownTimer{
-    position: fixed;
-    top: 1rem;
-    right: 1rem;
-    min-width: 10%;
-    min-height: 1rem;
-    border: solid 1px black;
-    border-radius: 10px;
-    background-color: #e4e1e1aa;
-    font-size: 1.2rem;
-    padding: .3rem;
-}
-.ChatMessage{
-    width: calc(100%-2px);
-    border-bottom: solid #00000077 .1em;
-    margin: 0;
-    white-space: pre-line;
-    overflow-wrap: break-word;
-    padding: 3%;
-}
-#sendMessage{
-    position: absolute;
-    bottom: 0px;
-    border: none;
-    border-top: solid blue .1em;
-    width: 100%;
-    height: 10%;
-    padding: .5em;
-}
-#sendMessage:focus{
-    outline: none;
-}
-#chat{
-    position: absolute;
-    width: 20%;
-    height: 40%;
-    top: 0px;
-    right: 0px;
-    background-color: lightblue;
-    overflow: hidden;
-    border-color: #aaaaaa;
-    border-radius: 0% 0% 0% 5%;
-}
-#messages{
-    width: 100%;
-    height: 88%;
-    padding-bottom: 30%;
-    background-color: rgb(192, 229, 241);
-    overflow: scroll;
-}
-.statement h5{
-    padding: 0px;
-    margin: -15px;
+
+.SearchUI {
+  margin: 20px;
+  margin-left: 120px;
+  width: 40%;
+  display: grid;
+  grid-template-columns: 1fr 1fr 0.5fr 0.5fr 0.5fr 1fr;
+  gap: 3px;
 }
 
-.fileChooser{
-    width: 100%;
-    border: solid black 1px;
-    text-align: center;
-    padding: .5rem;
-    cursor: pointer;
+#Acronim-container {
+  width: 100%;
+  text-align: center;
 }
 
-.tasksSuccessError{
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 18vw;
-    display: flex;
-    flex-wrap: wrap;
+#Acronim {
+  width: 50%;
 }
 
-.tasklink{
-    margin: 2px;
-    display: flex;
-    align-items: center;
-    justify-content: space-evenly;
-    width: 50px;
-    height: 50px;
-    border: 1px solid black;
-    border-radius: 5%;
-    text-decoration: none;
-    font-size: 1.5rem;
-    color: black;;
-}
-.success{
-    background-color:rgb(118, 233, 3);
-}
-.error{
-    background-color: rgb(216, 72, 35);
-}
-.testing{
-    background-color: gold;
-}
-.nottested{
-    background-color: lightgray;
+.student_info {
+  margin-left: 120px;
 }
 
-.disqual dialog{
-    font-size: 0.8rem;
-    width: 150px;
-    height: 130px;
+.SaveChanges {
+  position: fixed;
+  top: 25px;
+  right: 10%;
+  height: 50px;
+  width: 30%;
+  font-size: large;
+  border-radius: 10px;
+  border: none;
+  background-color: #f1f1f1;
+  cursor: pointer;
 }
-.disqual dialog button{
-    margin: 2px;
+
+.countDownTimer {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  min-width: 10%;
+  min-height: 1rem;
+  border: solid 1px black;
+  border-radius: 10px;
+  background-color: #e4e1e1aa;
+  font-size: 1.2rem;
+  padding: .3rem;
+}
+
+.ChatMessage {
+  width: calc(100%-2px);
+  border-bottom: solid #00000077 .1em;
+  margin: 0;
+  white-space: pre-line;
+  overflow-wrap: break-word;
+  padding: 3%;
+}
+
+#sendMessage {
+  position: absolute;
+  bottom: 0px;
+  border: none;
+  border-top: solid blue .1em;
+  width: 100%;
+  height: 10%;
+  padding: .5em;
+}
+
+#sendMessage:focus {
+  outline: none;
+}
+
+#chat {
+  position: absolute;
+  width: 20%;
+  height: 40%;
+  top: 0px;
+  right: 0px;
+  background-color: lightblue;
+  overflow: hidden;
+  border-color: #aaaaaa;
+  border-radius: 0% 0% 0% 5%;
+}
+
+#messages {
+  width: 100%;
+  height: 88%;
+  padding-bottom: 30%;
+  background-color: rgb(192, 229, 241);
+  overflow: scroll;
+}
+
+.statement h5 {
+  padding: 0px;
+  margin: -15px;
+}
+
+.fileChooser {
+  width: 100%;
+  border: solid black 1px;
+  text-align: center;
+  padding: .5rem;
+  cursor: pointer;
+}
+
+.tasksSuccessError {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 18vw;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.tasklink {
+  margin: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  width: 50px;
+  height: 50px;
+  border: 1px solid black;
+  border-radius: 5%;
+  text-decoration: none;
+  font-size: 1.5rem;
+  color: black;
+  ;
+}
+
+.success {
+  background-color: rgb(118, 233, 3);
+}
+
+.error {
+  background-color: rgb(216, 72, 35);
+}
+
+.testing {
+  background-color: gold;
+}
+
+.nottested {
+  background-color: lightgray;
+}
+
+.disqual dialog {
+  font-size: 0.8rem;
+  width: 150px;
+  height: 130px;
+}
+
+.disqual dialog button {
+  margin: 2px;
 }
 
 .resulttext {
@@ -881,7 +1011,7 @@ header input{
   position: absolute;
   background-color: hsl(180, 100%, 98%);
   width: 5rem;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
 }
 
@@ -896,7 +1026,39 @@ header input{
 }
 
 .dropdown-content a:hover {
-    border: solid black 1px;
+  border: solid black 1px;
 }
 
-.hasDropDown:hover .dropdown-content {display: block;}
+.hasDropDown:hover .dropdown-content {
+  display: block;
+}
+
+.microtable {
+  background: #f5ffff;
+  border-collapse: collapse;
+  text-align: left;
+  margin-left: 120px;
+  table-layout: fixed;
+}
+
+.microtable * {
+  height: 4rem;
+}
+
+.microtable th {
+  border-top: 1px solid #6695fa;
+  border-bottom: 1px solid #6695fa;
+  background: #83aaff;
+  color: white;
+  padding: .125rem 1.5rem;
+}
+
+.microtable tr:nth-child(odd) {
+  background: #ebf3f9;
+}
+
+.microtable td {
+  border: 1px solid #e3eef7;
+  padding: .125rem 1.5rem;
+  transition: all 0.5s ease;
+}

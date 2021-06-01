@@ -274,6 +274,7 @@ app.post('/task/page/:id', checkAuthenticated, checkNletter, uploadCode.single('
                     login: req.user.login,
                     id: req.params.id,
                     programText,
+                    language,
                     sendAt,
                     command: 'node ' + path.join(__dirname, '/public/checker/checker3' + language + '.js ') + ' ' +
                         path.join(__dirname, '/public/processes/' + req.user.login + "_" + req.params.id) + " " +
@@ -1471,6 +1472,7 @@ app.post('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTourname
                     login: req.user.login,
                     id: req.params.id,
                     programText,
+                    language,
                     sendAt,
                     command: 'node ' + path.join(__dirname, '/public/checker/checker3' + language + '.js') + ' ' +
                         path.join(__dirname, '/public/processes/' + req.user.login + '_' + req.params.id) + " " +
@@ -1939,6 +1941,110 @@ app.get("/newslist/:page", async (req, res) => {
     res.render("newslist.ejs", rendered)
 });
 
+
+//---------------------------------------------------------------------------------
+// Tried Page
+app.get('/tried/:login/:page/:search', checkAuthenticated, checkValidation, async (req, res) => {
+    let user;
+    if (req.user.login == req.params.login) {
+        user = req.user;
+    } else {
+        user = await User.findOne({ login: req.params.login }).exec();
+    }
+
+    if (user) {
+        let tasks = await Task.find({}).exec();
+        let tournaments = await Tournament.find({}).exec();
+        let verdicts = user.verdicts;
+        let foundTasks = [];
+        let foundVerdicts = []
+
+        let a = req.params.search.split('&');
+        let toSearch = a[0] == "default" ? "" : a[0].toUpperCase();
+        let types = a[1];
+        let tourTask = [];
+        let task;
+
+        tournaments.forEach(tournament => tournament.tasks.forEach(task => tourTask.push(task)));
+        for (let i = 0; i < verdicts.length; i++) {
+            if (verdicts[i].taskID.split('_')[0] != '0')
+                task = tourTask.find(item => item.identificator == verdicts[i].taskID);
+            else
+                task = tasks.find(item => item.identificator == verdicts[i].taskID);
+            if(task) {
+              foundTasks.push(task);
+              foundVerdicts.push(verdicts[i]);
+            }
+        }
+        req.user.verdicts = foundVerdicts;
+        req.user.markModified("verdicts");
+        await req.user.save();
+
+        const fuse = new Fuse(foundTasks, {
+            includeScore: true,
+            keys: ["title"]
+        });
+        tasks = [];
+        verdicts = [];
+        if (!(toSearch == ""))
+            fuse.search(toSearch).forEach(task => {
+                if (task.score < 0.5) {
+                    tasks.push(task.item);
+                    verdicts.push(foundVerdicts.find(verdict => verdict.taskID == task.item.identificator));
+                }
+            });
+        if (verdicts.length > 0) {
+            foundTasks = tasks;
+            foundVerdicts = verdicts;
+        }
+        verdicts = [];
+        tasks = [];
+        for (let i = 0; i < foundVerdicts.length; i++){
+            if (types == "all" || foundVerdicts[i].result == "OK") {
+                verdicts.push(foundVerdicts[i]);
+                tasks.push(foundTasks[i]);
+            }
+        }
+
+        let onPage = config.onPage.attempts;
+        let page = req.params.page;
+        let pages = Math.ceil(verdicts.length / onPage);
+        let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, verdicts.length)} из ${verdicts.length}`;
+        verdicts = verdicts.slice((page - 1) * onPage, min(page * onPage, verdicts.length));
+        tasks = tasks.slice((page - 1) * onPage, min(page * onPage, tasks.length));
+
+
+        res.render('triedTasks.ejs', {
+            login: req.user.login,
+            u_login: user.login,
+            name: req.user.name,
+            title: "Tried Tasks",
+            pageInfo,
+            page,
+            pages,
+            verdicts,
+            tasks,
+            isTeacher: req.user.isTeacher,
+            search: req.params.search,
+            n_name: user.name,
+            user: user,
+            location: req.header('Referer')
+        })
+
+    } else {
+        res.redirect('/tried/' + req.user.login + '/1/default&all')
+    }
+});
+
+app.post('/tried/:login/:page/:search', checkAuthenticated, checkValidation, async (req, res) => {
+    let toSearch = req.body.searcharea;
+    if (!toSearch) toSearch = "default";
+    toSearch += '&' + req.body.selector;
+    res.redirect('/tried/' + req.params.login.toString() + '/' + req.params.page.toString() + '/' + toSearch)
+});
+
+
+//------------------------------------------------------------------------------------------------API
 //---------------------------------------------------------------------------------
 // Get task results
 app.get("/api/task/get/testresults/:id", checkAuthenticated, async (req, res) => {
@@ -2278,7 +2384,7 @@ let min = (a, b)=>{return a+b-max(a, b)}
 function getVerdict(results){
     for(let i=0;i<results.length;i++){
         if(results[i][1]!="OK"){
-            return results[i][1];
+            return results[i][1].split(" ").slice(0,2).map(item => item[0].toUpperCase()).join("");
         }
     }
     if(results.length>0)
