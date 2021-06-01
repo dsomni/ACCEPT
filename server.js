@@ -2155,9 +2155,11 @@ app.get("/api/tournament/get/attempts/:id/:page/:search", checkAuthenticated, as
   let taskID = a[1];
   let types = a[2].toLowerCase();
   let toReverse = a[3] == 'true';
-  let attempts = tournament.attempts.filter(item => (login == "all" || item.login.toLowerCase() == login || item.login.toLowerCase() == "n-"+login)
-   &&(taskID == "all" || parseInt(item.TaskID.split("_")[1]) + 1 == parseInt(taskID))
+  let attempts1 = tournament.attempts.filter(item => (taskID == "all" || parseInt(item.TaskID.split("_")[1]) + 1 == parseInt(taskID))
    &&(types == "all" || item.score == 100));
+  let attempts = attempts1.filter(item => (login == "all" || item.login.toLowerCase() == login || item.login.toLowerCase() == "n-" + login));
+  if (attempts.length == 0)
+    attempts = attempts1.filter(item => (login == "all" || item.login.toLowerCase().slice(0, login.length) == login || item.login.toLowerCase().slice(0, login.length+2) == "n-" + login));
   if (toReverse)
     attempts = attempts.reverse();
 
