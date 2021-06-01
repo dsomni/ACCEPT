@@ -91,7 +91,6 @@ async function run() {
     }
     var rightNow = new Date();
     rightNow = new Date(rightNow.valueOf()+1000*60*60*3); // +3
-    //console.log(rightNow);
     var res = rightNow.toISOString().slice(0,10).replace(/-/g,".");
     wb.write(path.join(__dirname + "/../tables/"+tournament.title + " Results_" + res + ".xlsx"));
 

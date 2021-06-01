@@ -1944,7 +1944,8 @@ app.get("/newslist/:page", async (req, res) => {
 app.get("/api/task/get/testresults/:id", checkAuthenticated, async (req, res) => {
     let results = {
         result: [],
-        status:""
+        status: "",
+        code: ""
     }
     let isInQueue = TestingQueue.findIndex(item => (item.id == req.params.id && item.login == req.user.login));
     try {
@@ -1963,6 +1964,7 @@ app.get("/api/task/get/testresults/:id", checkAuthenticated, async (req, res) =>
                     results.status = "error";
                 else
                     results.status = "success";
+                results.code = attempt.programText;
             }
         }
     }

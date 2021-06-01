@@ -94,7 +94,6 @@
     <script>
         if(!<%= tournament.isBegan %>){
             let countDownDate = new Date('<%= tournament.whenStarts.replace(' ', 'T') %>').getTime();
-            console.log(countDownDate)
             var x = setInterval(function () {
                 var now = new Date().getTime();
 

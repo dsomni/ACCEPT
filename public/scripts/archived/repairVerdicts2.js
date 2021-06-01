@@ -20,14 +20,12 @@ async function go() {
     for (let i = 0; i < users.length; i++) {
         let user = users[i];
         let verdicts = user.verdicts;
-        console.log(user.verdicts)
         for (let j = 0; j < verdicts.length; j++){
            verdicts[j].taskID = '0_' + verdicts[j].taskID;
         }
        user.verdicts = verdicts;
         users[i].markModified('verdicts');
         await user.save();
-        console.log(user.verdicts)
     }
 }
 go();
