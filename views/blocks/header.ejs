@@ -8,6 +8,7 @@
                 <button onClick='location.href="/tasks/1/default&all&all&false&all"'><img src="/public/media/task.svg">Задачи</button>
                 <button onClick=<%='location.href=\"/lessons/' + login + "/1/default&all&true&all" + "\"" %>> <img src="/public/media/lesson.svg">Уроки</button>
                 <button onClick=<%= 'location.href=\"/tournaments/'+ login + "/1/default&all&all" + "\"" %>> <img src="/public/media/tournament.svg">Турниры</button>
+                <button onClick=<%= 'location.href=\"/rating/1'+"\"" %>> <img src="/public/media/rating.svg">Рейтинг</button>
                 <%if (isTeacher){ %>
                     <button onClick='location.href="/students/1/default&all&all&all"'><img src="/public/media/students.svg">Ученики</button>
                 <% } %>

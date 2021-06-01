@@ -28,8 +28,10 @@
                 <% }else if (!user.isTeacher){ %>
                     <p>Почта: <%= user.group %></p>
                 <% } %>
+                <p>Решённых задач: <%= user.verdicts.filter(item => item.result=="OK").length %></p>
+
+                <p><a class="tlrefs" style="margin-left: 0; background-color: #6388ff62; padding: .5rem;"  href=<%=`/tried/${u_login}/1/default&all`%> >Отправленные задачи</a></p>
             </div>
-            <a href=<%=`/tried/${u_login}/1/default&all`%> >Сданные задачи</a>
             <form class="SearchUI" action= <%= '/account/'+ u_login +'/1/default' %>  method="POST">
                 <input id="searcharea" name = "searcharea" rows=1 placeholder="Поиск по задаче"></input>
                 <select name="selector" id = "selector">

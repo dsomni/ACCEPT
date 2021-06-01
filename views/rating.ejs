@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Рейтинг</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0,
+              maximum-scale=1.0, minimum-scale=1.0,
+              user-scalable=no, minimal-ui">
+        <meta name="full-screen" content="yes">
+
+        <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
+        </head>
+    <body>
+        <main>
+            <h1>Рейтинг</h1>
+            <table class='taskslist'>
+                <tr>
+                  <th>№</th>
+                  <th>Логин</th>
+                  <th>Имя</th>
+                  <th>Счёт</th>
+                </tr>
+
+                <% for (var i = 0; i < objs.length; i++) { %>
+                <% var student = objs[i]; %>
+                 <tr>
+                    <% let loginToShow = student.login;
+                    if(loginToShow.length > 2 && loginToShow.slice(0,2)=="n-"){
+                        loginToShow = loginToShow.slice(2);
+                    }
+                    %>
+                    <% if (student.login == login) { %>
+                        <td style="font-weight: bolder;font-size: 1.5rem;"><%= (page - 1) * onPage + i + 1%></td>
+                        <td style="font-weight: bolder;font-size: 1.5rem;"><%= loginToShow %></td>
+                        <td style="font-weight: bolder;font-size: 1.5rem;"><%= student.name %> </td>
+                        <td style="font-weight: bolder;font-size: 1.5rem;"><%= student.verdict %></td>
+                    <% } else { %>
+                        <td><%= (page - 1) * onPage + i + 1 %></td>
+                        <td><%= loginToShow %></td>
+                        <td><%= student.name %> </td>
+                        <td><%= student.verdict %></td>
+                    <% } %>
+                 </tr>
+                <% } %>
+                </table>
+
+                <div class='pageinfo'>
+                    <div class="pageRefs">
+                        <%= pageInfo %>
+                    </div>
+                    <div class="pageRefs">
+                        <% for(let i=0; i < pages; i++){ %>
+                            <% if(i+1==page){ %>
+                                <a class="tablerefs" style="font-size: 23px;font-weight:900;"><%= i+1 %></a>
+                            <% }else{ %>
+                                <a class="tablerefs" style="font-size: 20px;"href=<%=`/rating/${i+1}`%>><%= i+1 %></a>
+                            <% } %>
+                        <% } %>
+                    </div>
+                </div>
+        </main>
+    </body>
+    <script type = text/javascript>
+    function o(i) {
+        document.getElementById('dialog' + i).showModal();
+    }
+    function c(i) {
+        document.getElementById('dialog' + i).close();
+    }
+    </script>
+</html>
