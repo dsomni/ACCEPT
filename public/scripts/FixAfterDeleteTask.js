@@ -83,7 +83,7 @@ async function run() {
         }
         for(let j = 0; j<verdicts.length; j++){
             if (verdicts[j].taskID.split('_')[1] > deletedTask.split('_')[1]){
-                verdicts[j].taskID = verdicts[j].taskID.split('_')[0] + '+' + (parseInt(verdicts[j].taskID.split('_')[1]) - 1);;
+                verdicts[j].taskID = verdicts[j].taskID.split('_')[0] + '_' + (parseInt(verdicts[j].taskID.split('_')[1]) - 1);;
             }
         }
         user.verdicts = verdicts;
