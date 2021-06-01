@@ -868,17 +868,19 @@ header input{
 .resulttext {
   color: black;
   border: none;
-  width: 7rem;
+  width: 5rem;
   padding: .2rem;
   text-align: center;
-  background: white;
+  background: #f5ffff;
 }
 
 .dropdown-content {
+  max-height: 100px;
+  overflow-y: scroll;
   display: none;
   position: absolute;
-  background-color: #f1f1f1;
-  width: 7rem;
+  background-color: hsl(180, 100%, 98%);
+  width: 5rem;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
 }

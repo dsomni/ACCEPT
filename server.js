@@ -31,7 +31,7 @@ function pushToQueue(object) {
 
 async function popQueue() {
     let object = TestingQueue.shift();
-    let user = await User({ login: object.login }).exec();
+    let user = await User.findOne({ login: object.login }).exec();
     if (!user)
         return
     user.attempts.unshift({

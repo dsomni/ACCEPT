@@ -52,7 +52,6 @@
                                 else
                                     links+=`<a href="/attempt/${result.login}/${attempt.date}" class="error">${attempt.score}</a>`;
                             });
-                            console.log(links);
                             text+=`<td class="hasDropDown""><div class="resulttext">${task.score}(${task.tries})</div><div class = "dropdown-content">${links}</div></td>`
                         }
                         text+=`<td>${result.sumscore}</td>\n<td>${result.sumtime}</td>\n`;
@@ -66,6 +65,6 @@
         update();
         setInterval(() => {
             update();
-        }, 500000);
+        }, 5000);
     </script>
 </html>
