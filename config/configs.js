@@ -28,7 +28,8 @@ module.exports = {
 			news: "news",
 			tasks: "tasks",
 			lessons: "lessons",
-			tournament: "tournaments"
+			tournament: "tournaments",
+			quizzes: "quizzes"
 		}
 	}
 }

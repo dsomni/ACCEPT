@@ -15,10 +15,11 @@
     <body>
         <main>
             <h1>Уроки <%= n_name %></h1>
-            <div></div>
+            <a class="editref addhref" style="background-color: rgba(255, 35, 35, 0.692); padding: 10px; font-size: 1.5rem; font-weight:bolder"" href="/quizzes">Контрольные</a>
             <% if (isTeacher){ %>
-                <a class="tlrefs addhref" href="/addlesson">[Добавить урок]</a>
+                <a class="tlrefs" href="/addlesson">[Добавить урок]</a>
             <% } %>
+
             <form class="SearchUI" action= <%= '/lessons/'+ u_login +'/1/default' %>  method="POST">
                 <input name = "searcharea" rows=1 placeholder="Поиск урока"></input>
                 <% if(isTeacher){ %>

@@ -66,7 +66,8 @@ config = {
                           'news': "news", # with news
                           'tasks': "tasks", # with tasks
                           'lessons': "lessons", # with lessons
-                          'tournament': "tournaments"
+                          'tournament': "tournaments", # with tournaments
+                          'quizzes': "quizzes" # with quizzes
                           }
     },
 }
@@ -103,6 +104,7 @@ if answer1.upper() == "Y":
         tasks = input("tasks: ")
         lessons = input("lessons: ")
         tournament = input("tournament: ")
+        quizzes = input("quizzes: ")
 
 if (port):
     config["port"] = port
@@ -156,6 +158,8 @@ if answer1.upper() == "Y":
             config["mongodbConfigs"]["CollectionNames"]["lessons"] = lessons
         if (tournament):
             config["mongodbConfigs"]["CollectionNames"]["tournament"] = tournament
+        if (quizzes):
+            config["mongodbConfigs"]["CollectionNames"]["quizzes"] = quizzes
 
 f = open("".join(i+'/' for i in __file__.split("/")
                  [:-3])+"config/configs.js", "w+")
