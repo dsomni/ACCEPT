@@ -84,3 +84,22 @@ exports.addTaskToTournament = async function (Tournament, tour_id, title, statem
     tournament.markModified("tasks");
     await tournament.save();
 }
+
+exports.AddQuizTemplate = async (Quiz, title, description, duration, author) => {
+    let quiz = {
+        identificator: (await Quiz.countDocuments({ template: true })) + "_0",
+        tamplate: true,
+        title: title,
+        description: description,
+        duration: duration,
+        tasks: [],
+        grade: "",
+        author: author,
+        whenEnds: "",
+        isBegan: false,
+        isEnded: false,
+        results: [],
+        attempts: []
+    }
+    await Quiz.create(quiz)
+}

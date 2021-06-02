@@ -121,6 +121,7 @@ const Task = require('./config/models/Task');
 const News = require('./config/models/News');
 const Lesson = require('./config/models/Lesson');
 const Tournament = require('./config/models/Tournament');
+const Quiz = require('./config/models/Quiz');
 
 //---------------------------------------------------------------------------------
 
@@ -2091,6 +2092,44 @@ app.get('/rating/:page', checkAuthenticated, async (req, res) => {
   });
 });
 
+//---------------------------------------------------------------------------------
+// Quiz page
+
+app.get("/quiz/page/:login/:id", checkAuthenticated, checkGrade, async (req, res) => {
+  let quiz = await Quiz.findOne({ identificator: req.params.id }).exec();
+
+  res.render("Quiz/Page.ejs", {
+    title: "Quiz page",
+    login: req.user.login,
+    name: req.user.name,
+    u_login: req.params.login,
+    quiz,
+    user: req.user,
+    isTeacher: req.user.isTeacher,
+    location: req.header('Referer')
+  });
+});
+
+//---------------------------------------------------------------------------------
+// Add quiz page
+
+
+app.get("/quiz/add", checkAuthenticated, checkPermission, async (req, res) => {
+  res.render("Quiz/Add.ejs", {
+    title: "Add quiz",
+    login: req.user.login,
+    name: req.user.name,
+    user: req.user,
+    isTeacher: req.user.isTeacher,
+    location: req.header('Referer')
+  });
+});
+app.post("/quiz/add", checkAuthenticated, checkPermission, async (req, res) => {
+  Adder.AddQuizTemplate(Quiz, req.body.title, req.body.description, req.body.duration, req.user.login);
+
+  res.redirect("/quiz/add");
+});
+
 
 // API
 //------------------------------------------------------------------------------------------------API
@@ -2397,6 +2436,17 @@ function checkTournamentValidation(req, res, next) {
   }
   res.redirect('/tournaments/' + req.user.login + '/1/default&all')
 }
+
+function checkGrade(req, res, next) {
+  if (req.user.isTeacher)
+    return next()
+  Quiz.findOne({ identificator: req.params.id }).then(quiz => {
+    if ((req.user.grade + req.user.gradeLetter).toLowerCase() == quiz.grade.toLowerCase())
+      return next()
+    return res.redirect("/");
+  }).catch(err => res.redirect("/"));
+}
+
 async function checkTournamentPermission(req, res, next) {
   let tour_id = req.params.tour_id;
   let tournament = await Tournament.findOne({ identificator: tour_id }).exec();

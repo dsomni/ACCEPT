@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const config = require('../configs');
 
 const QuizSchema = new mongoose.Schema({
-  identificator: Number,
+  identificator: String,
   title: String,
   description: String,
   tamplate: Boolean,//When start quiz create copy

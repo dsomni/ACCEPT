@@ -194,7 +194,6 @@ header button img {
 
 header button:hover {
   transform: scale(1.1);
-  color: #75b5ff;
 }
 
 header input {
