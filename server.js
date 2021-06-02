@@ -221,7 +221,7 @@ app.get('/task/page/:id', checkAuthenticated, checkNletter, async (req, res) => 
       break;
     }
   }
-  res.render('task.ejs', {
+  res.render('Task/page.ejs', {
     login: req.user.login,
     ID: req.params.id,
     name: req.user.name,
@@ -295,7 +295,7 @@ app.post('/task/page/:id', checkAuthenticated, checkNletter, uploadCode.single('
 // Add Task Page
 app.get('/task/add', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
   let user = req.user;
-  res.render('addtask.ejs', {
+  res.render('Task/add.ejs', {
     login: user.login,
     name: req.user.name,
     title: "Add Task",
@@ -459,7 +459,7 @@ app.post('/tasks/:page/:search', checkAuthenticated, checkNletter, async (req, r
 app.get('/task/edit/:id', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
   let problem = await Task.findOne({ identificator: req.params.id }).exec()
   let user = req.user;
-  res.render('edittask.ejs', {
+  res.render('Task/edit.ejs', {
     login: user.login,
     name: req.user.name,
     title: "Edit Task",
@@ -591,7 +591,7 @@ app.get('/account/:login/:page/:search', checkAuthenticated, checkValidation, as
     let pages = Math.ceil(foundAttempts.length / onPage);
     let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, foundAttempts.length)} из ${foundAttempts.length}`;
 
-    res.render('account.ejs', {
+    res.render('Account/account.ejs', {
       login: req.user.login,
       u_login: user.login,
       name: req.user.name,
@@ -641,7 +641,7 @@ app.get('/attempt/:login/:date', checkAuthenticated, checkValidation, async (req
     }
 
     if (attempt) {
-      res.render('attempt.ejs', {
+      res.render('Account/attempt.ejs', {
         login: user.login,
         name: req.user.name,
         title: "Attempt",
@@ -668,7 +668,7 @@ app.get('/attempt/:login/:date', checkAuthenticated, checkValidation, async (req
 // Add Lesson Page
 app.get('/addlesson', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
   let user = req.user;
-  res.render('addlesson.ejs', {
+  res.render('Lesson/add.ejs', {
     login: user.login,
     name: req.user.name,
     title: "Add Lesson",
@@ -790,7 +790,7 @@ app.get('/lesson/:login/:id', checkAuthenticated, checkNletter, isLessonAvailabl
     res.redirect("/lessons/" + req.params.login + "/1/default&all&true&all")
   } else {
     let tasks = lesson.tasks.join('|');
-    res.render('lesson.ejs', {
+    res.render('Lesson/lesson.ejs', {
       ID: lesson.identificator,
       u_login: user.login,
       u_name: user.name,
@@ -819,7 +819,7 @@ app.get('/editlesson/:id', checkAuthenticated, checkNletter, checkPermission, as
   let lesson = await Lesson.findOne({ identificator: req.params.id }).exec();
   lesson.tasks = lesson.tasks.map(item => parseInt(item.split('_')[1]) + 1);
   let user = req.user;
-  res.render('editlesson.ejs', {
+  res.render('Lesson/edit.ejs', {
     login: user.login,
     name: req.user.name,
     title: "Edit Lesson",
@@ -895,7 +895,7 @@ app.get('/lessonresults/:id/:page/:search', checkAuthenticated, checkNletter, ch
     let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, foundStudents.length)} из ${foundStudents.length}`;
     let logins = foundStudents.slice((page - 1) * onPage, page * onPage).map(item => item.login).join("|");
 
-    res.render('lessonresults.ejs', {
+    res.render('Lesson/results.ejs', {
       ID: lesson.identificator,
       login: req.user.login,
       name: req.user.name,
@@ -1006,7 +1006,7 @@ app.post('/students/:page/:search', checkAuthenticated, checkNletter, checkPermi
 // Add News Page
 app.get('/addnews', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
   let user = req.user;
-  res.render('addnews.ejs', {
+  res.render('News/add.ejs', {
     login: user.login,
     name: req.user.name,
     title: "Add News",
@@ -1042,7 +1042,7 @@ app.post('/deletenews/:id', checkAuthenticated, checkNletter, checkPermission, a
 app.get('/editnews/:id', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
   one_news = news.find(item => item._id == req.params.id)
   let user = req.user;
-  res.render('editnews.ejs', {
+  res.render('News/edit.ejs', {
     login: user.login,
     name: req.user.name,
     title: "Edit News",
@@ -1091,7 +1091,7 @@ app.get("/news/:id", (req, res) => {
       render.name = req.user.name;
       render.isTeacher = req.user.isTeacher;
     }
-    res.render("news.ejs", render);
+    res.render('News/page.ejs', render);
   } else {
     res.redirect('/')
   }
@@ -1101,7 +1101,7 @@ app.get("/news/:id", (req, res) => {
 // Add Tournament Page
 app.get('/tournament/add', checkAuthenticated, checkPermission, async (req, res) => {
   let user = req.user;
-  res.render('addtournament.ejs', {
+  res.render('Tournament/Global/add.ejs', {
     login: user.login,
     name: req.user.name,
     title: "Add Tournament",
@@ -1249,13 +1249,13 @@ app.post('/tournaments/:login/:page/:search', checkAuthenticated, async (req, re
 app.get('/tournament/edit/:tour_id', checkAuthenticated, isModerator, async (req, res) => {
   let tournament = await Tournament.findOne({ identificator: req.params.tour_id }).exec();
   let user = req.user;
-  res.render('edittournament.ejs', {
+  res.render('Tournament/Global/edit.ejs', {
     login: user.login,
     name: req.user.name,
     title: "Edit Tournament",
     isTeacher: req.user.isTeacher,
     tournament: tournament,
-    location: '/tournament/' + req.user.login + '/' + req.params.tour_id
+    location: '/tournament/page/' + req.user.login + '/' + req.params.tour_id
   })
 })
 
@@ -1324,7 +1324,7 @@ app.get('/regTournament/:tour_id', checkAuthenticated, async (req, res) => {
 app.get('/tournament/task/add/:tour_id', checkAuthenticated, isModerator, async (req, res) => {
   let user = req.user;
   let tournament = await Tournament.findOne({ identificator: req.params.tour_id }).exec()
-  res.render('addtasktournament.ejs', {
+  res.render('Tournament/Task/add.ejs', {
     login: user.login,
     name: req.user.name,
     title: "Add Task",
@@ -1412,7 +1412,7 @@ app.get('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTournamen
       break;
     }
   }
-  res.render('tournamenttask.ejs', {
+  res.render('Tournament/Task/page.ejs', {
     login: req.user.login,
     ID: req.params.id,
     TUR_ID: req.params.tour_id,
@@ -1522,7 +1522,7 @@ app.get('/tournament/page/:login/:id', checkAuthenticated, checkTournamentValida
       registered = true;
     }
     tasks = tasks.map(item => item.identificator).join('|');
-    res.render('tournament.ejs', {
+    res.render('Tournament/Global/page.ejs', {
       ID: tournament.identificator,
       u_login: user.login,
       u_name: user.name,
@@ -1543,7 +1543,7 @@ app.get('/tournament/page/:login/:id', checkAuthenticated, checkTournamentValida
 app.get('/tournament/task/edit/:tour_id/:id', checkAuthenticated, isModerator, async (req, res) => {
   let tournament = await Tournament.findOne({ identificator: req.params.tour_id });
   let task = tournament.tasks.find(item => item.identificator == req.params.id);
-  res.render('edittasktournament.ejs', {
+  res.render('Tournament/Task/edit.ejs', {
     login: req.user.login,
     name: req.user.name,
     title: "Edit Tournament Task",
@@ -1628,7 +1628,7 @@ app.get('/tournament/results/:tour_id/', checkAuthenticated, async (req, res) =>
       if (user)
         results.push([baza[i], user.isTeacher]);
     }
-    res.render('tournamentresults.ejs', {
+    res.render('Tournament/Global/results.ejs', {
       login: req.user.login,
       name: req.user.name,
       title: "Tournament Results",
@@ -1679,7 +1679,7 @@ app.get('/tournament/attempts/:tour_id/:page/:toSearch', checkAuthenticated, isM
   let pages = Math.ceil(attempts.length / onPage);
   let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, attempts.length)} из ${attempts.length}`;
 
-  res.render('tournamentattempts.ejs', {
+  res.render('Tournament/Global/attempts.ejs', {
     login: req.user.login,
     name: req.user.name,
     title: tournament.title,
@@ -1795,7 +1795,7 @@ app.get("/registration", async (req, res) => {
     }
     logins.push(login);
   }
-  res.render('registration.ejs', {
+  res.render('Account/registration.ejs', {
     login: "",
     name: "",
     title: "Registration Page",
@@ -1857,13 +1857,13 @@ app.get("/EditAccount", checkAuthenticated, async (req, res) => {
     location: req.header('Referer')
   };
 
-  res.render("editaccount.ejs", rendered)
+  res.render('Accout/edit.ejs', rendered)
 });
 
 app.post("/EditAccount", checkAuthenticated, async (req, res) => {
   let user = await User.findOne({ login: req.user.login });
   if (req.body.password.length < 5 && req.body.password.trim().length != 0) {
-    return res.render('editaccount.ejs', {
+    return res.render('Account/edit.ejs', {
       login: req.user.login,
       name: req.user.name,
       title: "Edit Account Page",
@@ -1898,7 +1898,7 @@ app.get("/report", checkAuthenticated, async (req, res) => {
     location: req.header('Referer')
   };
 
-  res.render("report.ejs", rendered)
+  res.render('Account/report.ejs', rendered)
 });
 
 app.post("/report", checkAuthenticated, async (req, res) => {
@@ -1939,7 +1939,7 @@ app.get("/newslist/:page", async (req, res) => {
     location: req.header('Referer')
   };
 
-  res.render("newslist.ejs", rendered)
+  res.render('News/list.ejs', rendered)
 });
 
 
@@ -2015,7 +2015,7 @@ app.get('/tried/:login/:page/:search', checkAuthenticated, checkValidation, asyn
     tasks = tasks.slice((page - 1) * onPage, min(page * onPage, tasks.length));
 
 
-    res.render('triedTasks.ejs', {
+    res.render('Account/triedTasks.ejs', {
       login: req.user.login,
       u_login: user.login,
       name: req.user.name,
@@ -2098,7 +2098,7 @@ app.get('/rating/:page', checkAuthenticated, async (req, res) => {
 app.get("/quiz/page/:login/:id", checkAuthenticated, checkGrade, async (req, res) => {
   let quiz = await Quiz.findOne({ identificator: req.params.id }).exec();
 
-  res.render("Quiz/Page.ejs", {
+  res.render('Quiz/Page.ejs', {
     title: "Quiz page",
     login: req.user.login,
     name: req.user.name,
@@ -2115,7 +2115,7 @@ app.get("/quiz/page/:login/:id", checkAuthenticated, checkGrade, async (req, res
 
 
 app.get("/quiz/add", checkAuthenticated, checkPermission, async (req, res) => {
-  res.render("Quiz/Add.ejs", {
+  res.render('Quiz/Add.ejs', {
     title: "Add quiz",
     login: req.user.login,
     name: req.user.name,
@@ -2367,19 +2367,19 @@ app.get("/api/tournament/get/attempts/:id/:page/:search", checkAuthenticated, as
 //---------------------------------------------------------------------------------
 // ??? toDo
 app.get('/egg1', checkAuthenticated, checkNotPermission, async (req, res) => {
-  res.sendFile(__dirname + '/views/20122020.html')
+  res.sendFile(__dirname + '/views/Random/20122020.html')
 })
 app.get('/MazeByMalveetha&Dsomni', checkAuthenticated, checkNotPermission, async (req, res) => {
-  res.sendFile(__dirname + '/views/21122020.html')
+  res.sendFile(__dirname + '/views/Random/21122020.html')
 })
 app.get('/emojiegg', checkAuthenticated, checkNotPermission, async (req, res) => {
-  res.sendFile(__dirname + '/views/19012021.html')
+  res.sendFile(__dirname + '/views/Random/19012021.html')
 })
 app.get('/patrikegg', checkAuthenticated, checkNotPermission, async (req, res) => {
-  res.sendFile(__dirname + '/views/20012021.html')
+  res.sendFile(__dirname + '/views/Random/20012021.html')
 })
 app.get('/beee', checkAuthenticated, checkNotPermission, async (req, res) => {
-  res.sendFile(__dirname + '/views/25012021.html')
+  res.sendFile(__dirname + '/views/Random/25012021.html')
 })
 //---------------------------------------------------------------------------------
 // Log Out
