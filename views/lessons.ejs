@@ -15,7 +15,7 @@
     <body>
         <main>
             <h1>Уроки <%= n_name %></h1>
-            <a class="editref addhref" style="background-color: rgba(255, 35, 35, 0.692); padding: 10px; font-size: 1.5rem; font-weight:bolder"" href="/quizzes">Контрольные</a>
+            <a class="editref addhref" style="background-color: rgba(255, 35, 35, 0.692); padding: 10px; font-size: 1.5rem; font-weight:bolder"" href="/quizzes/<%= u_login %>/1/default">Контрольные</a>
             <% if (isTeacher){ %>
                 <a class="tlrefs" href="/addlesson">[Добавить урок]</a>
             <% } %>

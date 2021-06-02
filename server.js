@@ -713,7 +713,7 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, checkNletter, async
   let toSearch = a[0] == "default" ? "" : a[0].toUpperCase();
   let SearchGrade = a[1]
   let SortByNew = a[2] == "false";
-  let author = a[3].replace(/%20/g, " ");
+  let author = a[3]?a[3].replace(/%20/g, " "):"all";
   let usedLessons;
   let properties = {}
   if (author != "all") properties.author = author;
@@ -2093,6 +2093,52 @@ app.get('/rating/:page', checkAuthenticated, async (req, res) => {
 });
 
 //---------------------------------------------------------------------------------
+// Quizzes page
+
+app.get('/quizzes/:login/:page/:search', checkAuthenticated, async (req, res) => {
+  let u_login = req.user.login;
+  let u_name = req.user.name;
+  let user = req.user;
+  if (req.user.isTeacher) {
+    user = await User.findOne({ login: req.params.login });
+    if (user) {
+      u_login = user.login;
+      u_name = user.name;
+    }
+  }
+
+  let quizzes;
+  if (user.isTeacher) {
+    quizzes = await Quiz.find().exec();
+  } else {
+    quizzes = await Quiz.find({ template: false }).exec();
+  }
+
+  let onPage = config.onPage.students;
+  let page = req.params.page;
+  let pages = Math.ceil(quizzes.length / onPage);
+  let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, quizzes.length)} из ${quizzes.length}`;
+  quizzes = quizzes.slice((page - 1) * onPage, min(page * onPage, quizzes.length));
+
+
+  res.render('quizzes.ejs', {
+    login: req.user.login,
+    name: req.user.name,
+    u_login,
+    u_name,
+    title: "Rating",
+    pageInfo,
+    page,
+    pages,
+    quizzes,
+    onPage,
+    isTeacher: req.user.isTeacher,
+    user: user,
+    location: req.header('Referer')
+  });
+});
+
+//---------------------------------------------------------------------------------
 // Quiz page
 
 app.get("/quiz/page/:login/:id", checkAuthenticated, checkGrade, async (req, res) => {
@@ -2121,7 +2167,7 @@ app.get("/quiz/add", checkAuthenticated, checkPermission, async (req, res) => {
     name: req.user.name,
     user: req.user,
     isTeacher: req.user.isTeacher,
-    location: req.header('Referer')
+    location: `/quizzes/${req.user.login}/1/default`
   });
 });
 app.post("/quiz/add", checkAuthenticated, checkPermission, async (req, res) => {
@@ -2129,8 +2175,20 @@ app.post("/quiz/add", checkAuthenticated, checkPermission, async (req, res) => {
 
   res.redirect("/quiz/add");
 });
+app.post("/quiz/delete/:id", checkAuthenticated, checkPermission, async (req, res) => {
+  console.log(req.params.id)
+  await Quiz.deleteOne({ identificator: req.params.id });
 
+  res.redirect(`/quizzes/${req.user.login}/1/default`);
+});
 
+//---------------------------------------------------------------------------------
+// Add start page
+app.post("/quiz/start/:id", checkAuthenticated, checkPermission, async (req, res) => {
+  Adder.AddQuiz(Quiz, req.body.grade, req.user.login, req.params.id);
+
+  res.redirect(`/quizzes/${req.user.login}/1/default`);
+});
 // API
 //------------------------------------------------------------------------------------------------API
 //---------------------------------------------------------------------------------

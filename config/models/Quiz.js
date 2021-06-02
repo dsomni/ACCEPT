@@ -2,10 +2,12 @@ const mongoose = require('mongoose')
 const config = require('../configs');
 
 const QuizSchema = new mongoose.Schema({
-  identificator: String,
+  identificator: Number,//Quiz odd if template else even
   title: String,
   description: String,
-  tamplate: Boolean,//When start quiz create copy
+  parent: Number,
+  teacher: String,
+  template: Boolean,//When start quiz create copy
   grade: String,
   tasks: [{
     identificator: String,

@@ -10,30 +10,39 @@
                 user-scalable=no, minimal-ui">
         <meta name="full-screen" content="yes">
         <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
-        <link rel="stylesheet" href="quizStyles.css" type="text/css">
     </head>
 
     <body>
         <main>
-            <h2 style = "top: 1rem">
-                <%= u_login %>
-            </h2>
             <div id="task">
                 <H1 id="taskname"><%= quiz.title; %></H1>
                 <div style="text-align: center;margin: 5%;">
                     <% if(isTeacher){ %>
-                        <a class="EditButtons" href=<%="/quiz/edit/" + quiz.identificator %> >Редактировать</a>
+                        <% if(quiz.template){ %>
+                            <span class="tourPopup">
+                            <dialog  id='start'>
+                                <form action=<%=`/quiz/start/${quiz.identificator}` %>  method="POST">
+                                    <h3>Класс</h3>
+                                    <input type="text" name="grade" id="grade" style="width: 3rem;">
+                                    <button>Да</button>
+                                </form>
+                                <button onClick='c("start");'>Назад</button>
+                            </dialog>
+                            <button onClick='o("start");' class="show EditButtons" style="background-color: transparent;">Начать</button>
+                            </span>
+                        <% } %>
+                        <a class="EditButtons" href=<%=`/quiz/edit/${quiz.identificator}` %> >Редактировать</a>
                         <span class="tourPopup">
-                            <dialog  id='dialog'>
-                                <form action= <%="/quiz/delete" + quiz.identificator %>  method="POST">
+                            <dialog  id='delete'>
+                                <form action= <%="/quiz/delete/" + quiz.identificator %>  method="POST">
                                     Вы действительно хотите удалить работу "<%= quiz.title %>" ?
                                     <button>Да</button>
                                 </form>
-                                <button onClick='c();'>Назад</button>
+                                <button onClick='c("delete");'>Назад</button>
                             </dialog>
-                        <button onClick='o();' class="show EditButtons" style="background-color: transparent;">Удалить</button>
+                            <button onClick='o("delete");' class="show EditButtons" style="background-color: transparent;">Удалить</button>
+                        </span>
                         <% if(!quiz.isBegan) { %>
-                            </span>
                                 <a class="EditButtons" href=<%="/quiz/task/add/" + quiz.identificator %> >Добавить задачу</a>
                         <% } %>
                         <a class="EditButtons" href=<%= "/quiz/attempts/"+quiz.identificator+"/1/all&all&all&true" %> >Посылки</a>
@@ -47,14 +56,13 @@
             </div>
             <div id="table"></div>
         </main>
-        <p class="countDownTimer" id="countDownTimer" style="left: 5rem; right:auto; top:6rem"></p>
     </body>
     <script>
-        function o() {
-            document.getElementById('dialog').showModal();
+        function o(id) {
+            document.getElementById(id).showModal();
         }
-        function c() {
-            document.getElementById('dialog').close();
+        function c(id) {
+            document.getElementById(id).close();
         }
     </script>
 </html>
