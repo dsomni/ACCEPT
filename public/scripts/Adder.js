@@ -87,44 +87,29 @@ exports.addTaskToTournament = async function (Tournament, tour_id, title, statem
 
 exports.AddQuizTemplate = async (Quiz, title, description, duration, author) => {
     let quiz = {
-        identificator: await Quiz.countDocuments({template: true})*2+1,
-        parent: null,
-        template: true,
+        identificator: await Quiz.countDocuments(),
         title: title,
-        teacher: "",
         description: description,
         duration: duration,
+        hasActiveLesson: false,
         tasks: [],
-        grade: "",
         author: author,
-        whenEnds: "",
-        isBegan: false,
-        isEnded: false,
-        results: [],
-        attempts: []
+        lessons: []
     }
-    await Quiz.create(quiz)
+    await Quiz.insertMany([quiz]);
 }
 exports.AddQuiz = async (Quiz, grade, teacher, parentID) => {
     let parent = await Quiz.findOne({ identificator: parentID }).exec();
     let whenEnds = new Date();
     whenEnds = new Date(whenEnds.getTime() + parent.duration * 60 * 1000).replace("T", " ");
-    let quiz = {
-        identificator: await Quiz.countDocuments({template: false})*2,
-        parent: parentID,
-        teacher: teacher,
-        template: false,
-        title: parent.title,
-        description: parent.description,
-        duration: parent.duration,
-        tasks: parent.tasks,
+    let lesson = {
         grade,
-        author: parent.author,
-        whenEnds,
-        isBegan: true,
-        isEnded: false,
+        teacher,
         results: [],
-        attempts: []
+        attempts: [],
+        whenEnds
     }
-    await Quiz.create(quiz)
+    parent.lessons.push(lesson);
+    parent.markModified("lessons");
+    await parent.save();
 }

@@ -713,7 +713,7 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, checkNletter, async
   let toSearch = a[0] == "default" ? "" : a[0].toUpperCase();
   let SearchGrade = a[1]
   let SortByNew = a[2] == "false";
-  let author = a[3]?a[3].replace(/%20/g, " "):"all";
+  let author = a[3] ? a[3].replace(/%20/g, " ") : "all";
   let usedLessons;
   let properties = {}
   if (author != "all") properties.author = author;
@@ -2049,10 +2049,10 @@ app.post('/tried/:login/:page/:search', checkAuthenticated, checkValidation, asy
 // Rating Page
 app.get('/rating/:page', checkAuthenticated, async (req, res) => {
 
-  let objs=[];
+  let objs = [];
   let user, count, obj;
-  let users = await User.find({isTeacher: false});
-  for (let i = 0; i<users.length; i++){
+  let users = await User.find({ isTeacher: false });
+  for (let i = 0; i < users.length; i++) {
     user = users[i];
     obj = {
       login: user.login,
@@ -2060,15 +2060,15 @@ app.get('/rating/:page', checkAuthenticated, async (req, res) => {
       verdict: 0
     };
     count = 0;
-    for (let j = 0; j < user.verdicts.length; j++){
-      if(user.verdicts[j].result=="OK"){
+    for (let j = 0; j < user.verdicts.length; j++) {
+      if (user.verdicts[j].result == "OK") {
         count++;
       }
     }
     obj.verdict = count;
     objs.push(obj);
   }
-  objs.sort((a, b) => { return b.verdict-a.verdict;} );
+  objs.sort((a, b) => { return b.verdict - a.verdict; });
 
   let onPage = config.onPage.students;
   let page = req.params.page;
@@ -2094,8 +2094,8 @@ app.get('/rating/:page', checkAuthenticated, async (req, res) => {
 
 //---------------------------------------------------------------------------------
 // Quizzes page
-
 app.get('/quizzes/:login/:page/:search', checkAuthenticated, async (req, res) => {
+  let toSearch = req.params.search.toLowerCase() == "default" ? "" : req.params.search.toLowerCase();
   let u_login = req.user.login;
   let u_name = req.user.name;
   let user = req.user;
@@ -2114,7 +2114,22 @@ app.get('/quizzes/:login/:page/:search', checkAuthenticated, async (req, res) =>
     quizzes = await Quiz.find({ template: false }).exec();
   }
 
-  let onPage = config.onPage.students;
+  const fuse = new Fuse(quizzes, {
+    includeScore: true,
+    keys: ["title"]
+  });
+
+  usedQuizzes = [];
+  if (toSearch != "") {
+    fuse.search(toSearch).forEach(quiz => {
+      if (quiz.score < 0.5) {
+        usedQuizzes.push(quiz.item);
+      }
+    });
+    quizzes = usedQuizzes;
+  }
+
+  let onPage = config.onPage.lessons;
   let page = req.params.page;
   let pages = Math.ceil(quizzes.length / onPage);
   let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, quizzes.length)} из ${quizzes.length}`;
@@ -2138,9 +2153,13 @@ app.get('/quizzes/:login/:page/:search', checkAuthenticated, async (req, res) =>
   });
 });
 
+app.post('/quizzes/:login/:page/:search', checkAuthenticated, async (req, res) => {
+  let toSearch = req.body.searcharea ? req.body.searcharea : "default";
+  res.redirect(`/quizzes/${req.params.login}/${req.params.page}/${toSearch}`);
+});
+
 //---------------------------------------------------------------------------------
 // Quiz page
-
 app.get("/quiz/page/:login/:id", checkAuthenticated, checkGrade, async (req, res) => {
   let quiz = await Quiz.findOne({ identificator: req.params.id }).exec();
 
@@ -2158,8 +2177,6 @@ app.get("/quiz/page/:login/:id", checkAuthenticated, checkGrade, async (req, res
 
 //---------------------------------------------------------------------------------
 // Add quiz page
-
-
 app.get("/quiz/add", checkAuthenticated, checkPermission, async (req, res) => {
   res.render('Quiz/Add.ejs', {
     title: "Add quiz",
@@ -2171,7 +2188,7 @@ app.get("/quiz/add", checkAuthenticated, checkPermission, async (req, res) => {
   });
 });
 app.post("/quiz/add", checkAuthenticated, checkPermission, async (req, res) => {
-  Adder.AddQuizTemplate(Quiz, req.body.title, req.body.description, req.body.duration, req.user.login);
+  Adder.AddQuizTemplate(Quiz, req.body.title, req.body.description, req.body.duration, req.user.name);
 
   res.redirect("/quiz/add");
 });
@@ -2185,10 +2202,13 @@ app.post("/quiz/delete/:id", checkAuthenticated, checkPermission, async (req, re
 //---------------------------------------------------------------------------------
 // Add start page
 app.post("/quiz/start/:id", checkAuthenticated, checkPermission, async (req, res) => {
-  Adder.AddQuiz(Quiz, req.body.grade, req.user.login, req.params.id);
+  Adder.AddQuiz(Quiz, req.body.grade, req.user.name, req.params.id);
 
   res.redirect(`/quizzes/${req.user.login}/1/default`);
 });
+
+
+
 // API
 //------------------------------------------------------------------------------------------------API
 //---------------------------------------------------------------------------------

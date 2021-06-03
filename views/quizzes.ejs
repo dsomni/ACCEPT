@@ -20,8 +20,8 @@
         <a class="tlrefs" href="/quiz/add">[Добавить урок]</a>
       <% } %>
 
-      <form class="SearchUI" action='/quizzes/<% u_login %>/1/default'  method="POST">
-        <input name = "searcharea" rows=1 placeholder="Поиск урока(ID)"></input>
+      <form class="SearchUI" action='/quizzes/<%= u_login %>/1/default'  method="POST">
+        <input name = "searcharea" rows=1 placeholder="Поиск урока"></input>
         <button id="submitsearch">Найти</button>
       </form>
 
@@ -33,13 +33,16 @@
         </tr>
         <% for(let i = 0; i<quizzes.length; i++){ %>
           <tr>
-            <% if(isTeacher){ %>
-              <td><%= parseInt(quizzes[i].identificator) %></td>
-            <% } else { %>
-              <td><%= parseInt(quizzes[i].identificator/2)+1 %></td>
-            <% } %>
-            <td><a class="tlhref" href="/quiz/page/<%= u_login %>/<%= quizzes[i].identificator %>"><%= quizzes[i].title %></a></td>
-            <td><%= quizzes[i].author %></td>
+            <td><%= parseInt(quizzes[i].identificator)+1 %></td>
+            <td><a class="tlrefs" href="/quiz/page/<%= u_login %>/<%= quizzes[i].identificator %>"><%= quizzes[i].title %></a></td>
+            <% let authorArray = quizzes[i].author.split(' ');
+            let author = authorArray[0];
+            for(let i=1;i< authorArray.length;i++){
+                if(authorArray[i].length!=0){
+                    author += ' '+ authorArray[i][0]+'.';
+                }
+            } %>
+            <td><%= author  %></td>
           </tr>
         <% } %>
       </table>

@@ -5,6 +5,9 @@ const QuizSchema = new mongoose.Schema({
   identificator: Number,
   title: String,
   description: String,
+  author: String,
+  duration: Number,
+  hasActiveLesson: Boolean,
   tasks: [{
     identificator: String,
     author: String,
@@ -15,13 +18,10 @@ const QuizSchema = new mongoose.Schema({
     examples: Array,
     tests: Array,
   }],
-  author: String,
-  duration: Number,
-  hasActiveLesson: Boolean,
-  lessons:[{
+  lessons: [{
     grade: String,
     whenEnds: String,
-    teacher:String,
+    teacher: String,
     results: [{
       login: String,
       sumscore: Number,
