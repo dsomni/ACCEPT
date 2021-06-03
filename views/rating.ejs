@@ -19,7 +19,9 @@
                 <tr>
                   <th>№</th>
                   <th>Логин</th>
-                  <th>Имя</th>
+                  <% if (isTeacher) { %>
+                    <th>Имя</th>
+                  <% } %>
                   <th>Счёт</th>
                 </tr>
 
@@ -34,12 +36,16 @@
                     <% if (student.login == login) { %>
                         <td style="font-weight: bolder;font-size: 1.5rem;"><%= (page - 1) * onPage + i + 1%></td>
                         <td style="font-weight: bolder;font-size: 1.5rem;"><%= loginToShow %></td>
-                        <td style="font-weight: bolder;font-size: 1.5rem;"><%= student.name %> </td>
+                        <% if (isTeacher) { %>
+                          <td style="font-weight: bolder;font-size: 1.5rem;"><%= student.name %> </td>
+                        <% } %>
                         <td style="font-weight: bolder;font-size: 1.5rem;"><%= student.verdict %></td>
                     <% } else { %>
                         <td><%= (page - 1) * onPage + i + 1 %></td>
                         <td><%= loginToShow %></td>
-                        <td><%= student.name %> </td>
+                        <% if (isTeacher) { %>
+                          <td><%= student.name %> </td>
+                        <% } %>
                         <td><%= student.verdict %></td>
                     <% } %>
                  </tr>
