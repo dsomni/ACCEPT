@@ -94,22 +94,49 @@ exports.AddQuizTemplate = async (Quiz, title, description, duration, author) => 
         hasActiveLesson: false,
         tasks: [],
         author: author,
-        lessons: []
+        lessons: [{
+            grade:  "teacher",
+            teacher: "server",
+            results: [],
+            attempts: [],
+            whenEnds: 0,
+            isEnded: true
+    }]
     }
     await Quiz.insertMany([quiz]);
 }
+
 exports.AddQuiz = async (Quiz, grade, teacher, parentID) => {
     let parent = await Quiz.findOne({ identificator: parentID }).exec();
     let whenEnds = new Date();
-    whenEnds = new Date(whenEnds.getTime() + parent.duration * 60 * 1000).replace("T", " ");
+    whenEnds = (new Date(whenEnds.getTime() + parent.duration * 60 * 1000 + 3*60*60*1000)).toISOString().replace("T", " ").split(".")[0];
     let lesson = {
         grade,
         teacher,
         results: [],
         attempts: [],
-        whenEnds
+        whenEnds,
+        isEnded: false
     }
+    parent.hasActiveLesson = true;
     parent.lessons.push(lesson);
     parent.markModified("lessons");
     await parent.save();
+}
+
+exports.addTaskToQuiz = async function (Quiz, quiz_id, title, author, statement, input, output, examples, tests) {
+
+    let quiz = await Quiz.findOne({ identificator: quiz_id }).exec();
+    quiz.tasks.push({
+        identificator: "Q" + quiz_id + '_' + quiz.tasks.length,
+        title,
+        author,
+        statement,
+        input,
+        output,
+        examples,
+        tests,
+    });
+    quiz.markModified("tasks");
+    await quiz.save();
 }

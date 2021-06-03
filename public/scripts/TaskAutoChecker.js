@@ -18,6 +18,7 @@ mongoose.connect(connectionString, {
 const Task = require('../../config/models/Task');
 const User = require('../../config/models/User');
 const Tournament = require('../../config/models/Tournament');
+const Quiz = require('../../config/models/Quiz');
 
 var isBusy = false;
 
@@ -54,13 +55,13 @@ async function check() {
       let user = await User.findOne({ login: user_login }).exec();
 
       if (tournament_id == "0") {
-        let problem = await Task.findOne({ identificator: full_id }).exec();
+        let task = await Task.findOne({ identificator: full_id }).exec();
         fs.stat(folderPath, function (err, stats) {
           if (!err) {
             fs.stat(path.join(folderPath + "\\result.txt"), async function (err, stats2) {
               if (!err) {
                 let resultStrings = fs.readFileSync(path.normalize(folderPath + "\\result.txt"), "utf-8").trim().split("\n");
-                if (resultStrings[0].length > 0 && (resultStrings[0] == 'Test #1*Compilation Error*er' || resultStrings.length == problem.tests.length)) {
+                if (resultStrings[0].length > 0 && (resultStrings[0] == 'Test #1*Compilation Error*er' || resultStrings.length == task.tests.length)) {
 
                   let result = [];
                   for (let i = 0; i < resultStrings.length; i++) {
@@ -103,17 +104,17 @@ async function check() {
             });
           }
         });
-      } else {
+      } else if (tournament_id[0]!="Q") {
         let tournament = await Tournament.findOne({ identificator: tournament_id }).exec();
 
-        let problem = tournament.tasks.find(item => item.identificator == full_id);
+        let task = tournament.tasks.find(item => item.identificator == full_id);
 
         fs.stat(folderPath, function (err, stats) {
           if (!err && Date.now()) {
             fs.stat(path.normalize(folderPath + "\\result.txt"), async function (err, stats2) {
               if (!err) {
                 let resultStrings = fs.readFileSync(path.normalize(folderPath + "\\result.txt"), "utf-8").trim().split("\n");
-                if (resultStrings[0].length > 0 && (resultStrings[0] == 'Test #1*Compilation Error*er' || resultStrings.length == problem.tests.length)) {
+                if (resultStrings[0].length > 0 && (resultStrings[0] == 'Test #1*Compilation Error*er' || resultStrings.length == task.tests.length)) {
 
                   let result = [];
                   for (let i = 0; i < resultStrings.length; i++) {
@@ -166,7 +167,8 @@ async function check() {
                       tournament.results[user_result_idx].tasks.push({
                         score: 0,
                         dtime: 0,
-                        tries: 0
+                        tries: 0,
+                        attempts: []
                       })
                     }
                   }
@@ -189,6 +191,92 @@ async function check() {
                   }
                   tournament.markModified("results");
                   await tournament.save()
+
+                  fs.rmdirSync(folderPath, { recursive: true });
+                }
+              } else if (Date.now() - stats.birthtimeMs >= config.FolderLifeTime) {
+                fs.rmdirSync(path.normalize(folderPath), { recursive: true });
+              }
+            });
+          }
+        });
+      }else{
+        let quiz_id = tournament_id.slice(1);
+        let quiz = await Quiz.findOne({ identificator: quiz_id }).exec();
+        let grade = user.isTeacher ? 'teacher' : user.grade + user.gradeLatter;
+        let lesson = quiz.lessons.find(item => item.grade == grade);
+
+        let task = quiz.tasks.find(item => item.identificator == full_id);
+
+        fs.stat(folderPath, function (err, stats) {
+          if (!err && Date.now()) {
+            fs.stat(path.normalize(folderPath + "\\result.txt"), async function (err, stats2) {
+              if (!err) {
+                let resultStrings = fs.readFileSync(path.normalize(folderPath + "\\result.txt"), "utf-8").trim().split("\n");
+                if (resultStrings[0].length > 0 && (resultStrings[0] == 'Test #1*Compilation Error*er' || resultStrings.length == task.tests.length)) {
+                  let result = [];
+                  for (let i = 0; i < resultStrings.length; i++) {
+                    result.push(resultStrings[i].split('*'));
+                  }
+                  result.sort((a, b) => {
+                    return Number(a[0].split('#')[1]) - Number(b[0].split('#')[1])
+                  })
+                  // let idx = user.verdicts.findIndex(item => item.taskID == full_id)
+                  // if (idx == -1) {
+                  //   user.verdicts.push({
+                  //     taskID: full_id,
+                  //     result: getVerdict(result)
+                  //   })
+                  // } else if (user.verdicts[idx].result != "OK") {
+                  //   user.verdicts.splice(idx, 1);
+                  //   user.verdicts.push({
+                  //     taskID: full_id,
+                  //     result: getVerdict(result)
+                  //   })
+                  // }
+                  let score = getScore(result);
+
+                  idx = max(0 ,lesson.attempts.findIndex(item => item.TaskID == full_id));
+                  let obj = lesson.attempts[idx];
+                  obj.result = result;
+                  obj.score = score;
+                  lesson.attempts[idx] = obj;
+                  // await lesson.save()
+
+
+                  // lesson lesson results update
+                  let lesson_result_idx = lesson.results.findIndex(item => item.login == user.login);
+                  if (lesson_result_idx == -1) {
+                    lesson.results.push({
+                      login: user.login,
+                      sumscore: 0,
+                      tasks: []
+                    });
+                    lesson_result_idx = lesson.results.findIndex(item => item.login == user.login);
+                  }
+                  if ((!lesson.isEnded || user.isTeacher) && lesson_result_idx != -1 && task_id >= lesson.results[lesson_result_idx].tasks.length) {
+                    while (lesson.results[lesson_result_idx].tasks.length <= task_id) {
+                      lesson.results[lesson_result_idx].tasks.push({
+                        score: 0,
+                        tries: 0,
+                        attempts: []
+                      })
+                    }
+                  }
+                  if ((!lesson.isEnded || user.isTeacher)  && lesson_result_idx != -1 && lesson.results[lesson_result_idx].tasks[task_id].score != 100) {
+                    lesson.results[lesson_result_idx].tasks[task_id].tries += 1;
+                    lesson.results[lesson_result_idx].tasks[task_id].attempts.push({ date: obj.date, score });
+                    if (lesson.results[lesson_result_idx].tasks[task_id].score < score) {
+                      lesson.results[lesson_result_idx].sumscore -= lesson.results[lesson_result_idx].tasks[task_id].score;
+                      lesson.results[lesson_result_idx].sumscore += score;
+                      lesson.results[lesson_result_idx].tasks[task_id].score = score;
+                    }
+                  }
+
+                  idx = quiz.lessons.findIndex(item => item.grade == grade);
+                  quiz.lessons.splice(idx, 1, lesson);
+                  quiz.markModified("lessons");
+                  await quiz.save()
 
                   fs.rmdirSync(folderPath, { recursive: true });
                 }

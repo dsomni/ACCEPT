@@ -21,6 +21,7 @@ const QuizSchema = new mongoose.Schema({
   lessons: [{
     grade: String,
     whenEnds: String,
+    isEnded: Boolean,
     teacher: String,
     results: [{
       login: String,
@@ -41,7 +42,7 @@ const QuizSchema = new mongoose.Schema({
       score: Number,
       programText: String,
       language: String,
-      result: [String]
+      result: [Array]
     }],
   }]
 }, { collection: config.mongodbConfigs.CollectionNames.quizes });

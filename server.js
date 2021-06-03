@@ -34,12 +34,32 @@ async function popQueue() {
   let user = await User.findOne({ login: object.login }).exec();
   if (!user)
     return
-  user.attempts.unshift({
-    taskID: object.id, date: object.sendAt,
-    programText: object.programText, result: [], language: object.language
-  });
-  user.markModified("attempts");
-  await user.save();
+  if (object.id[0] != "Q") {
+    user.attempts.unshift({
+      taskID: object.id, date: object.sendAt,
+      programText: object.programText, result: [], language: object.language
+    });
+    user.markModified("attempts");
+    await user.save();
+  } else {
+    let quiz_id = object.id.split("_")[0];
+    quiz_id = quiz_id.slice(1, quiz_id.length);
+    let quiz = await Quiz.findOne({ identificator: quiz_id }).exec();
+    let grade = user.isTeacher ? "teacher" : user.grade + user.gradeLetter;
+    let lesson = quiz.lessons.find(item => item.grade == grade);
+    lesson.attempts.unshift({
+      login: user.login,
+      TaskID: object.id,
+      date: object.sendAt,
+      programText: object.programText,
+      result: [],
+      language: object.language
+    });
+    let idx = quiz.lessons.findIndex(item => item.grade == grade);
+    quiz.lessons.splice(idx, 1, lesson);
+    quiz.markModified("lessons");
+    await quiz.save();
+  }
 
   fs.mkdirSync(path.normalize(__dirname + '/public/processes/' + object.login + "_" + object.id));
   fs.writeFileSync(path.normalize('public/processes/' + object.login + "_" + object.id + "/programText.txt"), object.programText, "utf-8");
@@ -2162,14 +2182,16 @@ app.post('/quizzes/:login/:page/:search', checkAuthenticated, async (req, res) =
 // Quiz page
 app.get("/quiz/page/:login/:id", checkAuthenticated, checkGrade, async (req, res) => {
   let quiz = await Quiz.findOne({ identificator: req.params.id }).exec();
+  let student = await User.findOne({ login: req.params.login }).exec();
 
-  res.render('Quiz/Page.ejs', {
+  res.render('Quiz/Global/Page.ejs', {
     title: "Quiz page",
     login: req.user.login,
     name: req.user.name,
-    u_login: req.params.login,
+    u_login: student.login,
     quiz,
     user: req.user,
+    grade: (req.user.isTeacher && req.params.login == req.user.login) ? "teacher" : student.grade,
     isTeacher: req.user.isTeacher,
     location: req.header('Referer')
   });
@@ -2178,7 +2200,7 @@ app.get("/quiz/page/:login/:id", checkAuthenticated, checkGrade, async (req, res
 //---------------------------------------------------------------------------------
 // Add quiz page
 app.get("/quiz/add", checkAuthenticated, checkPermission, async (req, res) => {
-  res.render('Quiz/Add.ejs', {
+  res.render('Quiz/Global/Add.ejs', {
     title: "Add quiz",
     login: req.user.login,
     name: req.user.name,
@@ -2204,7 +2226,7 @@ app.get("/quiz/edit/:id", checkAuthenticated, checkPermission, async (req, res) 
     duration: quiz.duration,
     identificator: quiz.identificator
   }
-  res.render('Quiz/Edit.ejs', {
+  res.render('Quiz/Global/Edit.ejs', {
     title: "Add quiz",
     login: req.user.login,
     name: req.user.name,
@@ -2235,9 +2257,254 @@ app.post("/quiz/delete/:id", checkAuthenticated, checkPermission, async (req, re
 //---------------------------------------------------------------------------------
 // Add start page
 app.post("/quiz/start/:id", checkAuthenticated, checkPermission, async (req, res) => {
+  let grade = req.body.grade.toLowerCase();
+  let letter = grade[grade.length-1];
+  grade = parseInt(grade.slice(0, grade.length-1));
+  if (letter > "я" || letter < 'а' || !grade || grade>11 || grade<1)
+    return res.redirect(`/quizzes/${req.user.login}/1/default`);
   Adder.AddQuiz(Quiz, req.body.grade, req.user.name, req.params.id);
 
-  res.redirect(`/quizzes/${req.user.login}/1/default`);
+  res.redirect(`/quizzes/${req.user.login}/1/default`);//redirect to lesson results page
+});
+
+//---------------------------------------------------------------------------------
+// Add Task to Quiz Page
+app.get('/quiz/task/add/:quiz_id', checkAuthenticated, checkPermission, async (req, res) => {
+  let user = req.user;
+  let quiz = await Quiz.findOne({ identificator: req.params.quiz_id }).exec()
+  res.render('Quiz/Task/add.ejs', {
+    ID: req.params.quiz_id,
+    login: user.login,
+    name: req.user.name,
+    title: "Add Task",
+    isTeacher: req.user.isTeacher,
+    location: '/quiz/page/' + req.user.login + '/' + req.params.quiz_id
+  });
+});
+
+app.post('/quiz/task/add/:quiz_id', checkAuthenticated, checkPermission, uploadTests.single('file'), async (req, res) => {
+  let body = req.body;
+
+
+  let examples = [];
+  let exI, exO;
+  for (let i = 0; i < 5; i++) {
+    eval("exI = body.exampleIn" + i)
+    eval("exO = body.exampleOut" + i)
+    if (exI == "" || exO == "") break;
+    examples.push([exI.trim(), exO.trim()]);
+  }
+
+  let tests = [];
+  if (req.file) {
+    try {
+      let filepath = path.join(__dirname, '/public/tests/' + req.file.filename)
+      const zip = new StreamZip.async({ file: filepath });
+
+      const entriesCount = await zip.entriesCount;
+
+      for (let i = 0; i < entriesCount / 2; i++) {
+        let inp = await zip.entryData("input" + i + ".txt");
+        let out = await zip.entryData("output" + i + ".txt");
+        tests.push([inp.toString('utf8').trim(), out.toString('utf8').trim()])
+      }
+
+      await zip.close();
+      childProcess.exec('del /q \"' + filepath + '\"');
+
+    } catch (err) {
+      console.log(err)
+    }
+  } else {
+    let tI, tO;
+    for (let i = 0; i < 20; i++) {
+      eval("tI = body.testIn" + i)
+      eval("tO = body.testOut" + i)
+      if (tI == "" || tO == "") break;
+      tests.push([tI.trim(), tO.trim()]);
+    }
+  }
+  await Adder.addTaskToQuiz(Quiz, req.params.quiz_id, body.title.trim(), req.user.name, body.statement.trim(), body.input.trim(), body.output.trim(), examples, tests);
+
+  res.redirect('/quiz/task/add/' + req.params.quiz_id);
+});
+
+//---------------------------------------------------------------------------------
+// Edit Quiz task
+app.get('/quiz/task/edit/:quiz_id/:id', checkAuthenticated, checkPermission, async (req, res) => {
+  let quiz = await Quiz.findOne({ identificator: req.params.quiz_id });
+  let task = quiz.tasks.find(item => item.identificator == req.params.id);
+  quiz = {
+    hasActiveLesson: quiz.hasActiveLesson,
+    identificator: quiz.identificator,
+    whenEnds: quiz.whenEnds
+  }
+  res.render('quiz/Task/edit.ejs', {
+    login: req.user.login,
+    name: req.user.name,
+    title: "Edit Quiz Task",
+    isTeacher: req.user.isTeacher,
+    task: task,
+    quiz,
+    location: `/quiz/task/page/${req.params.quiz_id}/${req.params.id}`
+  })
+});
+
+app.post('/quiz/task/edit/:quiz_id/:id', checkAuthenticated, checkPermission, uploadTests.single('file'), async (req, res) => {
+  let body = req.body;
+  let quiz = await Quiz.findOne({ identificator: req.params.quiz_id });
+  let problem = quiz.tasks.find(item => item.identificator == req.params.id);
+
+  let examples = [];
+  let exI, exO;
+  for (let i = 0; i < 5; i++) {
+    eval("exI = body.exampleIn" + i)
+    eval("exO = body.exampleOut" + i)
+    if (exI == "" || exO == "") break;
+    examples.push([exI.trim(), exO.trim()]);
+  }checkGrade
+
+  let tests = [];
+  if (req.file) {
+    try {
+      let filepath = path.join(__dirname, '/public/tests/' + req.file.filename)
+      const zip = new StreamZip.async({ file: filepath });
+
+      const entriesCount = await zip.entriesCount;
+
+      for (let i = 0; i < entriesCount / 2; i++) {
+        let inp = await zip.entryData("input" + i + ".txt");
+        let out = await zip.entryData("output" + i + ".txt");
+        tests.push([inp.toString('utf8').trim(), out.toString('utf8').trim()])
+      }
+
+      await zip.close();
+      childProcess.exec('del /q \"' + filepath + '\"');
+
+    } catch (err) {
+      console.log(err)
+    }
+  } else {
+    let tI, tO;
+    for (let i = 0; i < 20; i++) {
+      eval("tI = body.testIn" + i)
+      eval("tO = body.testOut" + i)
+      if (tI == "" || tO == "") break;
+      tests.push([tI.trim(), tO.trim()]);
+    }
+  }
+
+  problem.title = body.title.trim();
+  problem.statement = body.statement.trim();
+  problem.input = body.input.trim();
+  problem.output = body.output.trim();
+  problem.examples = examples;
+  problem.tests = tests;
+
+  quiz.markModified('tasks');
+  await quiz.save();
+
+  res.redirect('/quiz/task/page/' + req.params.quiz_id + '/' + req.params.id);
+});
+
+//---------------------------------------------------------------------------------
+// Quiz Task Page
+app.get('/quiz/task/page/:quiz_id/:id', checkAuthenticated, checkGrade, async (req, res) => {
+  let quiz_id = req.params.quiz_id
+  let quiz = await Quiz.findOne({ identificator: quiz_id }).exec();
+  let ids = quiz.tasks.map(item => item.identificator).join("|");
+  let whenEnds = quiz.whenEnds;
+  task = quiz.tasks.find(item => item.identificator == req.params.id);
+  if (!task) {
+    return res.redirect('/quiz/page/' + req.user.login + '/' + req.params.quiz_id);
+  }
+  let attempts = req.user.attempts;
+  let prevCode = "";
+  let language = "";
+  for (let i = 0; i < attempts.length; i++) {
+    if (attempts[i].taskID == req.params.id) {
+      prevCode = attempts[i].programText;
+      language = attempts[i].language;
+      break;
+    }
+  }
+  let grade = req.user.isTeacher ? "teacher" : req.user.grade + req.user.gradeLetter;
+  let lesson = quiz.lessons.find(item => item.grade == grade );
+  if (!lesson)
+    return res.redirect(`/quiz/page/${req.user.login}/${req.params.quiz_id}`);
+
+  quiz.whenEnds = lesson.whenEnds;
+  res.render('Quiz/Task/page.ejs', {
+    login: req.user.login,
+    ID: req.params.id,
+    TUR_ID: req.params.quiz_id,
+    name: req.user.name,
+    title: "Task " + req.params.id,
+    isTeacher: req.user.isTeacher,
+    ids,
+    task: task,
+    prevCode: prevCode,
+    language: language,
+    quiz,
+    location: '/quiz/page/' + req.user.login + '/' + req.params.quiz_id
+  });
+});
+
+// Quiz Task Page listener
+app.post('/quiz/task/page/:quiz_id/:id', checkAuthenticated, checkGrade, uploadCode.single('file'), async (req, res) => {
+  fs.stat(path.normalize('public/processes/' + req.user.login + '_' + req.params.id), async function (err) {
+    let isInQueue = TestingQueue.findIndex(item => (item.id == req.params.id && item.login == req.user.login))
+    if (!err || isInQueue != -1) {
+      res.redirect('/quiz/task/page/' + req.params.quiz_id + '/' + req.params.id);
+    }
+    else if (err.code === 'ENOENT') {
+
+      let prevCode = ""
+      let attempts = req.user.attempts;
+      for (let i = 0; i < attempts.length; i++) {
+        if (attempts[i].taskID == req.params.id) {
+          prevCode = attempts[i].programText;
+          result = attempts[i].result;
+          break;
+        }
+      }
+      let programText;
+      let language = req.body.languageSelector;
+      if (req.file) {
+        try {
+          let filepath = path.join(__dirname, '/public/codes/' + req.file.filename);
+          programText = fs.readFileSync(filepath, "utf8");
+          childProcess.exec('del /q \"' + filepath + '\"');
+
+        } catch (err) {
+          console.log(err)
+        }
+
+      } else {
+        programText = req.body.code;
+      }
+      if (prevCode == "" || prevCode != programText || req.file) {
+
+        language = req.body.languageSelector;
+
+        let sendAt = Date.now().toString();
+
+        let object = {
+          login: req.user.login,
+          id: req.params.id,
+          programText,
+          language,
+          sendAt,
+          command: 'node ' + path.join(__dirname, '/public/checker/checker3' + language + '.js') + ' ' +
+            path.join(__dirname, '/public/processes/' + req.user.login + '_' + req.params.id) + " " +
+            'program' + req.user.login + '_' + req.params.id + " " +
+            req.params.id
+        }
+        pushToQueue(object);
+      }
+      res.redirect('/quiz/task/page/' + req.params.quiz_id + '/' + req.params.id);
+    }
+  });
 });
 
 

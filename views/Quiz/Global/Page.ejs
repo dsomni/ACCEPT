@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Контрольная работы #<%= parseInt(quiz.identificator)+1 %>
+  </title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,
+          maximum-scale=1.0, minimum-scale=1.0,
+          user-scalable=no, minimal-ui">
+  <meta name="full-screen" content="yes">
+  <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
+</head>
+
+<body>
+  <main>
+    <div id="task">
+      <H1 id="taskname">
+        <%= quiz.title; %>
+      </H1>
+      <div style="text-align: center;margin: 5%;">
+        <% if(isTeacher){ %>
+          <span class="tourPopup">
+            <dialog id='start'>
+              <form action=<%=`/quiz/start/${quiz.identificator}` %> method="POST">
+                <h3 class="h3">Класс</h3>
+                <input type="text" name="grade" id="grade" style="width: 3rem; margin: .4rem;">
+                <br>
+                <button style="margin: .2rem;">Начать</button>
+              </form>
+              <button onClick='c("start");'>Отмена</button>
+            </dialog>
+            <button onClick='o("start");' class="show EditButtons"
+              style="background-color: pink; padding: 1rem;">Начать</button>
+          </span>
+          <br>
+          <a class="EditButtons" href=<%=`/quiz/edit/${quiz.identificator}` %> >Редактировать</a>
+          <span class="tourPopup">
+            <dialog id='delete'>
+              <form action=<%="/quiz/delete/" + quiz.identificator %> method="POST">
+                Вы действительно хотите удалить работу "<%= quiz.title %>" ?
+                  <button>Да</button>
+              </form>
+              <button onClick='c("delete");'>Назад</button>
+            </dialog>
+            <button onClick='o("delete");' class="show EditButtons">Удалить</button>
+          </span>
+          <% if(!quiz.isBegan) { %><a class="EditButtons" href=<%="/quiz/task/add/" + quiz.identificator %> >Добавить задачу</a><% } %>
+            <br>
+        <% } %>
+        <a class="EditButtons" href=<%="/quiz/results/" +quiz.identificator %>>Таблица результатов</a>
+      </div>
+      <h4 class="h4">Автор: <%= quiz.author %>
+      </h4>
+      <div style="margin-left: 20px;" id="statement"><%= quiz.description %></div>
+    </div>
+    <table class="taskslist" id="table">
+        <tr>
+          <th>ID</th>
+          <th>Задача</th>
+          <th>Автор</th>
+          <th>Вердикт</th>
+        </tr>
+        <% for(let i=0; i < quiz.tasks.length; i++){ %>
+          <% let task=quiz.tasks[i] %>
+          <tr>
+            <td><%= parseInt(task.identificator.split('_')[1]) + 1 %></td>
+            <td><a class="tlrefs" href="/quiz/task/page/<%= quiz.identificator %>/<%= task.identificator %>"><%= task.title %></a></td>
+            <% let authorArray=quiz.author.split(' ');
+              let author = authorArray[0];
+              for(let i=1;i< authorArray.length;i++){
+                if(authorArray[i].length!=0){
+                    author += ' '+ authorArray[i][0]+' .';
+                }
+              }
+            %>
+            <td><%= author %></td>
+            <%
+            function getVerdict() {
+              let attempts = quiz.lessons.find(item=> item.grade == grade).attempts.filter(item=> item.login == u_login && item.identificator == task.identificator);
+              for(let j = 0; j<attempts.length; j++){
+                let results=attempts[j].results;
+                for (let i=0; i < results.length; i++) {
+                  if (results[i][1] !="OK" ) {
+                    return results[i][1].split(" ").slice(0, 2).map(item => item[0].toUpperCase()).join("");
+                  }
+                }
+                if (results.length > 0)
+                  return " OK";
+                return 'err' ;
+              }
+            } %>
+            <td><%= getVerdict() %></td>
+          </tr>
+        <% } %>
+    </table>
+  </main>
+</body>
+<script>
+  function o(id) {
+    document.getElementById(id).showModal();
+  }
+  function c(id) {
+    document.getElementById(id).close();
+  }
+</script>
+
+</html>

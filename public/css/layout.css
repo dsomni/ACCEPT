@@ -332,7 +332,9 @@ header input {
   margin-left: 10px;
   margin-bottom: 1rem;
   white-space: pre;
-  transition: ease-in-out .3s;
+  transition: ease-in-out .2s;
+  background-color: transparent;
+  padding: 4px;
 }
 
 .EditButtons:hover, .tlrefs:hover {
