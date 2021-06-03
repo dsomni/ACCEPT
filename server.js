@@ -2187,14 +2187,47 @@ app.get("/quiz/add", checkAuthenticated, checkPermission, async (req, res) => {
     location: `/quizzes/${req.user.login}/1/default`
   });
 });
+
 app.post("/quiz/add", checkAuthenticated, checkPermission, async (req, res) => {
   Adder.AddQuizTemplate(Quiz, req.body.title, req.body.description, req.body.duration, req.user.name);
 
   res.redirect("/quiz/add");
 });
+
+//---------------------------------------------------------------------------------
+// Add quiz page
+app.get("/quiz/edit/:id", checkAuthenticated, checkPermission, async (req, res) => {
+  let quiz = await Quiz.findOne({ identificator: req.params.id }).exec();
+  quiz = {
+    title: quiz.title,
+    description: quiz.description,
+    duration: quiz.duration,
+    identificator: quiz.identificator
+  }
+  res.render('Quiz/Edit.ejs', {
+    title: "Add quiz",
+    login: req.user.login,
+    name: req.user.name,
+    user: req.user,
+    quiz,
+    isTeacher: req.user.isTeacher,
+    location: `/quiz/page/${req.user.login}/${req.params.id}`
+  });
+});
+
+app.post("/quiz/edit/:id", checkAuthenticated, checkPermission, async (req, res) => {
+  let quiz = await Quiz.findOne({ identificator:req.params.id }).exec();
+  quiz.description = req.body.description;
+  quiz.title = req.body.title;
+  quiz.duration = req.body.duration;
+  await quiz.save();
+  res.redirect(`/quiz/page/${req.user.login}/${req.params.id}`);
+});
+
+//---------------------------------------------------------------------------------
+// Delete Quiz page
 app.post("/quiz/delete/:id", checkAuthenticated, checkPermission, async (req, res) => {
-  console.log(req.params.id)
-  await Quiz.deleteOne({ identificator: req.params.id });
+  childProcess.exec("node " + path.join(__dirname, "/public/scripts/FixAfterDeleteQuiz.js") + " " + req.params.id)
 
   res.redirect(`/quizzes/${req.user.login}/1/default`);
 });

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Редактировать контрольный урок</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0,
+              maximum-scale=1.0, minimum-scale=1.0,
+              user-scalable=no, minimal-ui">
+        <meta name="full-screen" content="yes">
+
+        </head>
+    <body>
+        <main>
+        <h1 class="h1">Редактирование контрольного урока </h1>
+        <form action='/quiz/edit/<%= quiz.identificator %>'  method="POST">
+            <div class="lessonAdderForm">
+                <h3 class="h3">Название урока</h3>
+                <textarea id="title" name = "title" required placeholder="Введите название"><%= quiz.title %></textarea>
+                <h3 class="h3">Описание</h3>
+                <textarea id="description" name = "description" placeholder="Введите описание"><%= quiz.description %></textarea>
+                <h3 class="h3">Продолжительность (мин.)</h3>
+                <input type="number" id="duration" name="duration" value="<%= quiz.duration %>" required>
+                <button id="submit">Сохранить урок</button>
+            </div>
+        </form>
+    </main>
+    </body>
+</html>
