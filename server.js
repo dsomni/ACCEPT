@@ -2168,7 +2168,6 @@ app.post("/quiz/start/:id", checkAuthenticated, checkPermission, async (req, res
 // Add Task to Quiz Page
 app.get('/quiz/task/add/:quiz_id', checkAuthenticated, checkPermission, async (req, res) => {
   let user = req.user;
-  let quiz = await Quiz.findOne({ identificator: req.params.quiz_id }).exec()
   res.render('Quiz/Task/add.ejs', {
     ID: req.params.quiz_id,
     login: user.login,

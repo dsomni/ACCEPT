@@ -59,7 +59,7 @@ class Player{
                 if (Math.sqrt((i-this.i)*(i-this.i)+(j-this.j)*(j-this.j))<this.radius){
                     blocks[i][j].isVisible(l)
                 }
-            }            
+            }
         }
     }
 }

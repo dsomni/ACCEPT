@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const config = require('../../config/configs');
+const config = require('../../../config/configs');
 const xlsx = require('node-xlsx').default;
 const bcrypt = require('bcryptjs');
 
@@ -24,7 +24,7 @@ mongoose.connection.on('error', (err) => {
 
 mongoose.set('useCreateIndex', true);
 
-const User = require('../../config/models/User');
+const User = require('../../../config/models/User');
 
 async function addStudent (login, password, name, grade, gradeLetter, group){
     await User.insertMany([{

@@ -8,9 +8,9 @@
     "dev": "nodemon server",
     "mongo": "sudo systemctl start mongod.service",
     "configurate": "public\\checker\\pythonCompiler\\python.exe public\\scripts\\CreateConfigs.py",
-    "addUsers": "node public\\scripts\\addUser.js",
-    "addTeachers": "node public\\scripts\\addTeacher.js",
-    "deleteUsers": "node public\\scripts\\delUser.js",
+    "addUsers": "node public\\scripts\\users\\addUser.js",
+    "addTeachers": "node public\\scripts\\users\\addTeacher.js",
+    "deleteUsers": "node public\\scripts\\users\\delUser.js",
     "fix": "node public\\scripts\\FixDBv3.js",
     "configureCompilers": "node public\\scripts\\CheckCompilers\\Checker.js"
   },
