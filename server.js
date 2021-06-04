@@ -256,58 +256,7 @@ app.get('/task/page/:id', checkAuthenticated, checkNletter, async (req, res) => 
 });
 // Task Page listener
 app.post('/task/page/:id', checkAuthenticated, checkNletter, uploadCode.single('file'), async (req, res) => {
-  fs.stat(path.normalize('public/processes/' + req.user.login + "_" + req.params.id), async function (err) {
-    let isInQueue = TestingQueue.findIndex(item => (item.id == req.params.id && item.login == req.user.login));
-    if (!err || isInQueue != -1) {
-      res.redirect('/task/page/' + req.params.id);
-    }
-    else if (err.code === 'ENOENT') {
-
-      let prevCode = ""
-      let attempts = req.user.attempts;
-      for (let i = 0; i < attempts.length; i++) {
-        if (attempts[i].taskID == req.params.id) {
-          prevCode = attempts[i].programText;
-          result = attempts[i].result;
-          break;
-        }
-      }
-      let language, programText;
-      language = req.body.languageSelector;
-      if (req.file) {
-        try {
-          let filepath = path.join(__dirname, '/public/codes/' + req.file.filename);
-          programText = fs.readFileSync(filepath, "utf8");
-          childProcess.exec('del /q \"' + filepath + '\"');
-
-        } catch (err) {
-          console.log(err)
-        }
-
-      } else {
-        programText = req.body.code;
-      }
-      if (prevCode == "" || prevCode != programText || req.file) {
-
-        let sendAt = Date.now().toString();
-
-        let object = {
-          login: req.user.login,
-          id: req.params.id,
-          programText,
-          language,
-          sendAt,
-          command: 'node ' + path.join(__dirname, '/public/checker/checker3' + language + '.js ') + ' ' +
-            path.join(__dirname, '/public/processes/' + req.user.login + "_" + req.params.id) + " " +
-            'program' + req.user.login + "_" + req.params.id + " " +
-            req.params.id
-        }
-        pushToQueue(object);
-      }
-
-      res.redirect('/task/page/' + req.params.id);
-    }
-  });
+  TaskPost(req, res, '/task/page/' + req.params.id);
 })
 
 
@@ -1452,59 +1401,7 @@ app.get('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTournamen
 
 // Tournament Task Page listener
 app.post('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTournamentPermission, uploadCode.single('file'), async (req, res) => {
-  fs.stat(path.normalize('public/processes/' + req.user.login + '_' + req.params.id), async function (err) {
-    let isInQueue = TestingQueue.findIndex(item => (item.id == req.params.id && item.login == req.user.login))
-    if (!err || isInQueue != -1) {
-      res.redirect('/tournament/task/page/' + req.params.tour_id + '/' + req.params.id);
-    }
-    else if (err.code === 'ENOENT') {
-
-      let prevCode = ""
-      let attempts = req.user.attempts;
-      for (let i = 0; i < attempts.length; i++) {
-        if (attempts[i].taskID == req.params.id) {
-          prevCode = attempts[i].programText;
-          result = attempts[i].result;
-          break;
-        }
-      }
-      let programText;
-      let language = req.body.languageSelector;
-      if (req.file) {
-        try {
-          let filepath = path.join(__dirname, '/public/codes/' + req.file.filename);
-          programText = fs.readFileSync(filepath, "utf8");
-          childProcess.exec('del /q \"' + filepath + '\"');
-
-        } catch (err) {
-          console.log(err)
-        }
-
-      } else {
-        programText = req.body.code;
-      }
-      if (prevCode == "" || prevCode != programText || req.file) {
-
-        language = req.body.languageSelector;
-
-        let sendAt = Date.now().toString();
-
-        let object = {
-          login: req.user.login,
-          id: req.params.id,
-          programText,
-          language,
-          sendAt,
-          command: 'node ' + path.join(__dirname, '/public/checker/checker3' + language + '.js') + ' ' +
-            path.join(__dirname, '/public/processes/' + req.user.login + '_' + req.params.id) + " " +
-            'program' + req.user.login + '_' + req.params.id + " " +
-            req.params.id
-        }
-        pushToQueue(object);
-      }
-      res.redirect('/tournament/task/page/' + req.params.tour_id + '/' + req.params.id);
-    }
-  });
+  TaskPost(req, res, '/tournament/task/page/' + req.params.tour_id + '/' + req.params.id);
 });
 
 
@@ -2452,59 +2349,7 @@ app.get('/quiz/task/page/:quiz_id/:id', checkAuthenticated, checkGrade, async (r
 
 // Quiz Task Page listener
 app.post('/quiz/task/page/:quiz_id/:id', checkAuthenticated, checkGrade, uploadCode.single('file'), async (req, res) => {
-  fs.stat(path.normalize('public/processes/' + req.user.login + '_' + req.params.id), async function (err) {
-    let isInQueue = TestingQueue.findIndex(item => (item.id == req.params.id && item.login == req.user.login))
-    if (!err || isInQueue != -1) {
-      res.redirect('/quiz/task/page/' + req.params.quiz_id + '/' + req.params.id);
-    }
-    else if (err.code === 'ENOENT') {
-
-      let prevCode = ""
-      let attempts = req.user.attempts;
-      for (let i = 0; i < attempts.length; i++) {
-        if (attempts[i].taskID == req.params.id) {
-          prevCode = attempts[i].programText;
-          result = attempts[i].result;
-          break;
-        }
-      }
-      let programText;
-      let language = req.body.languageSelector;
-      if (req.file) {
-        try {
-          let filepath = path.join(__dirname, '/public/codes/' + req.file.filename);
-          programText = fs.readFileSync(filepath, "utf8");
-          childProcess.exec('del /q \"' + filepath + '\"');
-
-        } catch (err) {
-          console.log(err)
-        }
-
-      } else {
-        programText = req.body.code;
-      }
-      if (prevCode == "" || prevCode != programText || req.file) {
-
-        language = req.body.languageSelector;
-
-        let sendAt = Date.now().toString();
-
-        let object = {
-          login: req.user.login,
-          id: req.params.id,
-          programText,
-          language,
-          sendAt,
-          command: 'node ' + path.join(__dirname, '/public/checker/checker3' + language + '.js') + ' ' +
-            path.join(__dirname, '/public/processes/' + req.user.login + '_' + req.params.id) + " " +
-            'program' + req.user.login + '_' + req.params.id + " " +
-            req.params.id
-        }
-        pushToQueue(object);
-      }
-      res.redirect('/quiz/task/page/' + req.params.quiz_id + '/' + req.params.id);
-    }
-  });
+  TaskPost(req, res, '/quiz/task/page/' + req.params.quiz_id + '/' + req.params.id);
 });
 
 
@@ -2901,6 +2746,63 @@ function compareTournaments(a, b) {
   return b_fDate - a_fDate;
 
 }
+function TaskPost(req, res, redirect) {
+   fs.stat(path.normalize('public/processes/' + req.user.login + "_" + req.params.id), async function (err) {
+    let isInQueue = TestingQueue.findIndex(item => (item.id == req.params.id && item.login == req.user.login));
+    if (!err || isInQueue != -1) {
+      res.redirect(redirect);
+    }
+    else if (err.code === 'ENOENT') {
+
+      let prevCode = ""
+      let attempts = req.user.attempts;
+      for (let i = 0; i < attempts.length; i++) {
+        if (attempts[i].taskID == req.params.id) {
+          prevCode = attempts[i].programText;
+          result = attempts[i].result;
+          break;
+        }
+      }
+      let language, programText;
+      language = req.body.languageSelector;
+      if (req.file) {
+        try {
+          let filepath = path.join(__dirname, '/public/codes/' + req.file.filename);
+          programText = fs.readFileSync(filepath, "utf8");
+          childProcess.exec('del /q \"' + filepath + '\"');
+
+        } catch (err) {
+          console.log(err)
+        }
+
+      } else {
+        programText = req.body.code;
+      }
+      if (prevCode == "" || prevCode != programText || req.file) {
+
+        let sendAt = Date.now().toString();
+
+        let object = {
+          login: req.user.login,
+          id: req.params.id,
+          programText,
+          language,
+          sendAt,
+          command: 'node ' + path.join(__dirname, '/public/checker/checker3' + language + '.js ') + ' ' +
+            path.join(__dirname, '/public/processes/' + req.user.login + "_" + req.params.id) + " " +
+            'program' + req.user.login + "_" + req.params.id + " " +
+            req.params.id
+        }
+        pushToQueue(object);
+      }
+
+      res.redirect(redirect);
+    }
+  });
+}
+
+
+
 
 //---------------------------------------------------------------------------------
 // Tournaments timer checker start
