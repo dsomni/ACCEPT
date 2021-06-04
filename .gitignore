@@ -1,6 +1,8 @@
 .env
 node_modules
-public/scripts/users.xlsx
+public/scripts/users/users.xlsx
+public/scripts/users/teachers.xlsx
+public/scripts/users/deleteUsers
 public/tables/*.xlsx
 config/configs.js
 public/logs/*.log
