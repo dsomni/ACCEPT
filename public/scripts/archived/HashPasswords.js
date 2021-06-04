@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const config = require('../../config/configs');
+const config = require('../../../config/configs');
 const mongoose = require('mongoose');
 
 let connectionString;
@@ -20,7 +20,7 @@ mongoose.connection.on('error', (err) => {
     console.log("Error while connecting to DB: " + err);
 });
 
-const User = require('../../config/models/User');
+const User = require('../../../config/models/User');
 
 async function go() {
     let users = await User.find({}).exec();

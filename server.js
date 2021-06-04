@@ -187,11 +187,11 @@ load();
 
 //---------------------------------------------------------------------------------
 // Checking tournaments
-childProcess.exec('node ' + path.join(__dirname, '/public/scripts/Tchecker.js'));
+childProcess.exec('node ' + path.join(__dirname, '/public/scripts/serverScripts/Tchecker.js'));
 
 //---------------------------------------------------------------------------------
 // Checking tasks
-childProcess.exec('node ' + path.join(__dirname, '/public/scripts/TaskAutoChecker.js'));
+childProcess.exec('node ' + path.join(__dirname, '/public/scripts/serverScripts/FixAfterDelete.js'));
 
 //---------------------------------------------------------------------------------
 // Main Page
@@ -514,7 +514,7 @@ app.post('/task/edit/:id', checkAuthenticated, checkNletter, checkPermission, up
 // Delete Task
 app.post('/task/delete/:id', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
 
-  childProcess.exec("node " + path.join(__dirname, "/public/scripts/FixAfterDeleteTask.js") + " " + req.params.id)
+  childProcess.exec("node " + path.join(__dirname, "/public/scripts/fixes/FixAfterDeleteTask.js") + " " + req.params.id)
 
   res.redirect('/tasks/1/default&all&all&false&all')
 })
@@ -778,7 +778,7 @@ app.get('/lesson/:login/:id', checkAuthenticated, checkNletter, isLessonAvailabl
 //---------------------------------------------------------------------------------
 // Delete Lesson
 app.post('/deletelesson/:id', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
-  childProcess.exec("node " + path.join(__dirname, "/public/scripts/FixAfterDeleteLesson.js") + " " + req.params.id)
+  childProcess.exec("node " + path.join(__dirname, "/public/scripts/fixes/FixAfterDeleteLesson.js") + " " + req.params.id)
   res.redirect('/lessons/' + req.user.login + '/1/default&all&true&all');
 })
 
@@ -1254,7 +1254,7 @@ app.post('/deletetournament/:tour_id', checkAuthenticated, checkNletter, checkPe
   let tournament = await Tournament.findOne({ identificator: req.params.tour_id }).exec();
   tournament.title = "";
   tournament.save();
-  childProcess.exec("node " + path.join(__dirname, "/public/scripts/FixAfterDeleteTournament.js") + " " + req.params.tour_id)
+  childProcess.exec("node " + path.join(__dirname, "/public/scripts/fixes/FixAfterDeleteTournament.js") + " " + req.params.tour_id)
   res.redirect('/tournaments/' + req.user.login + '/1/default&all&all');
 })
 
@@ -1354,7 +1354,7 @@ app.post('/tournament/task/add/:tour_id', checkAuthenticated, isModerator, uploa
 // Delete Task from Tournament
 app.post('/tournament/task/delete/:tour_id/:id', checkAuthenticated, isModerator, async (req, res) => {
 
-  childProcess.exec("node " + path.join(__dirname, "/public/scripts/FixAfterDeleteTournamentTask.js") + " " +
+  childProcess.exec("node " + path.join(__dirname, "/public/scripts/fixes/FixAfterDeleteTournamentTask.js") + " " +
     req.params.tour_id + " " + req.params.id)
   res.redirect('/tournament/page/' + req.user.login + '/' + req.params.tour_id);
 });
@@ -2146,7 +2146,7 @@ app.post("/quiz/edit/:id", checkAuthenticated, checkPermission, async (req, res)
 //---------------------------------------------------------------------------------
 // Delete Quiz page
 app.post("/quiz/delete/:id", checkAuthenticated, checkPermission, async (req, res) => {
-  childProcess.exec("node " + path.join(__dirname, "/public/scripts/FixAfterDeleteQuiz.js") + " " + req.params.id)
+  childProcess.exec("node " + path.join(__dirname, "/public/scripts/fixes/FixAfterDeleteQuiz.js") + " " + req.params.id)
 
   res.redirect(`/quizzes/${req.user.login}/1/default`);
 });
@@ -2806,13 +2806,13 @@ function TaskPost(req, res, redirect) {
 //---------------------------------------------------------------------------------
 // Tournaments timer checker start
 setInterval(() => {
-  childProcess.exec('node ' + path.join(__dirname, '/public/scripts/Tchecker.js'));
+  childProcess.exec('node ' + path.join(__dirname, '/public/scripts/serverScripts/Tchecker.js'));
 }, 1000 * 60 * 10)
 
 //---------------------------------------------------------------------------------
 // Tasks auto results checker
 setInterval(() => {
-  childProcess.exec('node ' + path.join(__dirname, '/public/scripts/TaskAutoChecker.js'));
+  childProcess.exec('node ' + path.join(__dirname, '/public/scripts/serverScripts/FixAfterDelete.js'));
 }, 1000 * 60 * 10)
 
 //---------------------------------------------------------------------------------

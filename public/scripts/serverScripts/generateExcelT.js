@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const config = require('../../config/configs');
+const config = require('../../../config/configs');
 const path = require('path')
 var xl = require('excel4node');
 
@@ -15,8 +15,8 @@ mongoose.connect(connectionString, {
     useUnifiedTopology: true
 })
 
-const Tournament = require('../../config/models/Tournament');
-const User = require('../../config/models/User');
+const Tournament = require('../../../config/models/Tournament');
+const User = require('../../../config/models/User');
 
 var identificator = process.argv[2];
 

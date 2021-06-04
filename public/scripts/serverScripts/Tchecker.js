@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const config = require('../../config/configs');
+const config = require('../../../config/configs');
 const childProcess = require("child_process");
 const path = require('path')
 
@@ -15,7 +15,7 @@ mongoose.connect(connectionString, {
     useUnifiedTopology: true
 })
 
-const Tournament = require('../../config/models/Tournament');
+const Tournament = require('../../../config/models/Tournament');
 
 let to_check_end=[];
 let to_check_begin = [];
@@ -34,7 +34,7 @@ async function checkEnd(){
             tournament.isEnded = true;
             tournament.markModified('isEnded');
             await tournament.save();
-            childProcess.exec('node ' + path.join(__dirname, '/generateExcelT.js') + ' ' + t_i);
+            childProcess.exec('node ' + path.join(__dirname, '/scripts/serverScripts/generateExcelT.js') + ' ' + t_i);
         }
     }
     if(b){

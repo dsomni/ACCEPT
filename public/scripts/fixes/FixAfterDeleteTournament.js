@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const config = require('../../config/configs');
+const config = require('../../../config/configs');
 
 var connectionString
 if(config.mongodbConfigs.User.Username!="" && config.mongodbConfigs.User.Password!=""){
@@ -13,7 +13,7 @@ mongoose.connect(connectionString,{
     useUnifiedTopology: true
 })
 
-const User = require('../../config/models/User');
+const User = require('../../../config/models/User');
 
 var deletedTournament = process.argv[2]
 

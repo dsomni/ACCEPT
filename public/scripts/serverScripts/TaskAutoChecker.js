@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const config = require('../../config/configs');
+const config = require('../../../config/configs');
 const path = require('path')
 const fs = require('fs')
 
@@ -15,10 +15,10 @@ mongoose.connect(connectionString, {
   useUnifiedTopology: true
 })
 
-const Task = require('../../config/models/Task');
-const User = require('../../config/models/User');
-const Tournament = require('../../config/models/Tournament');
-const Quiz = require('../../config/models/Quiz');
+const Task = require('../../../config/models/Task');
+const User = require('../../../config/models/User');
+const Tournament = require('../../../config/models/Tournament');
+const Quiz = require('../../../config/models/Quiz');
 
 var isBusy = false;
 
