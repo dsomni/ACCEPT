@@ -13,3 +13,4 @@ public/media/codeFiles/*
 public/checker/pascalCompiler
 public/checker/pypyCompiler
 public/checker/pythonCompiler
+package-lock.json
