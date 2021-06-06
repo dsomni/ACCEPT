@@ -18,6 +18,7 @@ const morgan = require("morgan");
 const multer = require("multer");
 const StreamZip = require('node-stream-zip');
 const nodemailer = require("nodemailer");
+const MongoStorage = require("connect-mongo");
 require("dotenv").config();
 const app = express();
 //---------------------------------------------------------------------------------
@@ -168,7 +169,8 @@ app.use(flash());
 app.use(session({
   secret: config.secret,
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  store: MongoStorage.create({ mongoUrl: connectionString })
 }));
 app.use(passport.initialize());
 app.use(passport.session());
