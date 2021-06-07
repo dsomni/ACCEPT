@@ -24,7 +24,7 @@ async function run() {
     let deleted = tournament.tasks.findIndex(Element => Element.taskID == deletedTask)
     tournament.tasks.splice(deleted, 1);
     for (let i = 0; i < tournament.tasks.length; i++) {
-        if (tournament.tasks[i].identificator.split('_')[1] > deletedTask.split('_')[1])
+        if (parseInt(tournament.tasks[i].identificator.split('_')[1]) > parseInt(deletedTask.split('_')[1]))
             tournament.tasks[i].identificator = TourId + '_' + (parseInt(tournament.tasks[i].identificator.split('_')[1]) - 1);
     };
 

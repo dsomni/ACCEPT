@@ -26,7 +26,7 @@ async function check() {
   if (!isBusy) {
     isBusy = true;
 
-    let processesPath = path.normalize(__dirname + "\\..\\processes");
+    let processesPath = path.normalize(__dirname + "\\..\\..\\processes");
 
     let files = await fs.readdirSync(processesPath);
     for (let i = 0; i < files.length; i++) {
@@ -242,7 +242,6 @@ async function check() {
                   obj.score = score;
                   lesson.attempts[idx] = obj;
                   // await lesson.save()
-
 
                   // lesson lesson results update
                   let lesson_result_idx = lesson.results.findIndex(item => item.login == user.login);

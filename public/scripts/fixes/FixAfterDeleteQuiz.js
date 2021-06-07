@@ -15,19 +15,19 @@ mongoose.connect(connectionString, {
 
 const Quiz = require('../../../config/models/Quiz');
 
-var deletedQuiz = process.argv[2]
+var deletedQuiz = parseInt(process.argv[2]);
 
 async function run() {
   await Quiz.deleteOne({ identificator: deletedQuiz })
   let quizzes = await Quiz.find({});
-  for (let i = 0; i < quizzes.length; i++){
+  for (let i = 0; i < quizzes.length; i++) {
     if (quizzes[i].identificator > deletedQuiz) {
       quizzes[i].identificator -= 1;
       await quizzes[i].save();
     }
   }
 }
-// run().then(process.exit());
+
 run();
 setTimeout(() => {
   process.exit()

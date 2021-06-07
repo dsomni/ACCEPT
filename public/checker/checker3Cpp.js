@@ -32,6 +32,7 @@ function sleep(ms) {
 
 const Task = require('../../config/models/Task');
 const Tournament = require('../../config/models/Tournament');
+const Quiz = require('../../config/models/Quiz');
 
 async function go(){
 
@@ -39,7 +40,6 @@ async function go(){
     let fileName = process.argv[3];
     let taskid = process.argv[4];
     let tour_id = process.argv[4].split('_')[0];
-
 
     let programText = fs.readFileSync(path+"\\programText.txt", "utf8");
 
@@ -57,7 +57,10 @@ async function go(){
 
     let task;
 
-    if (tour_id == '0') {
+    if (tour_id[0] == "Q") {
+        let quiz = await Quiz.findOne({ identificator: tour_id.slice(1) });
+        task = quiz.tasks.find(item => item.identificator == taskid);
+    } else if (tour_id == '0') {
         task = await Task.findOne({ identificator: taskid }).exec();
     } else {
         let tournament = await Tournament.findOne({ identificator: tour_id }).exec();

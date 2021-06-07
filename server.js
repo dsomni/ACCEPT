@@ -201,7 +201,7 @@ childProcess.exec('node ' + path.join(__dirname, '/public/scripts/serverScripts/
 
 //---------------------------------------------------------------------------------
 // Checking tasks
-childProcess.exec('node ' + path.join(__dirname, '/public/scripts/serverScripts/FixAfterDelete.js'));
+childProcess.exec('node ' + path.join(__dirname, '/public/scripts/serverScripts/TaskAutoChecker.js'));
 
 //---------------------------------------------------------------------------------
 // Main Page
@@ -1978,7 +1978,7 @@ app.get('/quizzes/:login/:page/:search', checkAuthenticated, async (req, res) =>
   } else {
     quizzes = await Quiz.find({ template: false }).exec();
   }
-  if(!!toSearch)
+  if (!!toSearch)
     quizzes = fuseSearch(quizzes, "title", toSearch, 0.5, [], (quiz, params) => { return true });
 
   let onPage = config.onPage.lessons;
@@ -2069,7 +2069,7 @@ app.get("/quiz/edit/:id", checkAuthenticated, checkPermission, async (req, res) 
 });
 
 app.post("/quiz/edit/:id", checkAuthenticated, checkPermission, async (req, res) => {
-  let quiz = await Quiz.findOne({ identificator:req.params.id }).exec();
+  let quiz = await Quiz.findOne({ identificator: req.params.id }).exec();
   quiz.description = req.body.description;
   quiz.title = req.body.title;
   quiz.duration = req.body.duration;
@@ -2086,12 +2086,22 @@ app.post("/quiz/delete/:id", checkAuthenticated, checkPermission, async (req, re
 });
 
 //---------------------------------------------------------------------------------
+// Delete Task from Quiz
+app.post('/quiz/task/delete/:quiz_id/:id', checkAuthenticated, checkPermission, async (req, res) => {
+  console.log("node " + path.join(__dirname, "/public/scripts/fixes/FixAfterDeleteQuizTask.js") + " " +
+    req.params.quiz_id + " " + req.params.id);
+  childProcess.exec("node " + path.join(__dirname, "/public/scripts/fixes/FixAfterDeleteQuizTask.js") + " " +
+    req.params.quiz_id + " " + req.params.id);
+  res.redirect('/quiz/page/' + req.user.login + '/' + req.params.quiz_id);
+});
+
+//---------------------------------------------------------------------------------
 // Add start page
 app.post("/quiz/start/:id", checkAuthenticated, checkPermission, async (req, res) => {
   let grade = req.body.grade.toLowerCase();
-  let letter = grade[grade.length-1];
-  grade = parseInt(grade.slice(0, grade.length-1));
-  if (letter > "я" || letter < 'а' || !grade || grade>11 || grade<1)
+  let letter = grade[grade.length - 1];
+  grade = parseInt(grade.slice(0, grade.length - 1));
+  if (letter > "я" || letter < 'а' || !grade || grade > 11 || grade < 1)
     return res.redirect(`/quizzes/${req.user.login}/1/default`);
   Adder.AddQuiz(Quiz, req.body.grade, req.user.name, req.params.id);
 
@@ -2191,7 +2201,7 @@ app.post('/quiz/task/edit/:quiz_id/:id', checkAuthenticated, checkPermission, up
     eval("exO = body.exampleOut" + i)
     if (exI == "" || exO == "") break;
     examples.push([exI.trim(), exO.trim()]);
-  }checkGrade
+  } checkGrade
 
   let tests = [];
   if (req.file) {
@@ -2258,7 +2268,7 @@ app.get('/quiz/task/page/:quiz_id/:id', checkAuthenticated, checkGrade, async (r
     }
   }
   let grade = req.user.isTeacher ? "teacher" : req.user.grade + req.user.gradeLetter;
-  let lesson = quiz.lessons.find(item => item.grade == grade );
+  let lesson = quiz.lessons.find(item => item.grade == grade);
   if (!lesson)
     return res.redirect(`/quiz/page/${req.user.login}/${req.params.quiz_id}`);
 
@@ -2331,7 +2341,6 @@ app.get("/api/task/get/testverdicts/:login/:ids", checkAuthenticated, async (req
     if (ids[i].split('_')[0] == '0') {
       task = await Task.findOne({ identificator: ids[i] }).exec();
     } else {
-      console.log(ids[i])
       tournament = await Tournament.findOne({ identificator: parseInt(ids[i].split('_')[0]) }).exec();
       task = tournament.tasks.find(item => item.identificator == ids[i]);
     }
@@ -2683,7 +2692,7 @@ function compareTournaments(a, b) {
 
 }
 function TaskPost(req, res, redirect) {
-   fs.stat(path.normalize('public/processes/' + req.user.login + "_" + req.params.id), async function (err) {
+  fs.stat(path.normalize('public/processes/' + req.user.login + "_" + req.params.id), async function (err) {
     let isInQueue = TestingQueue.findIndex(item => (item.id == req.params.id && item.login == req.user.login));
     if (!err || isInQueue != -1) {
       res.redirect(redirect);
@@ -2746,7 +2755,7 @@ setInterval(() => {
 //---------------------------------------------------------------------------------
 // Tasks auto results checker
 setInterval(() => {
-  childProcess.exec('node ' + path.join(__dirname, '/public/scripts/serverScripts/FixAfterDelete.js'));
+  childProcess.exec('node ' + path.join(__dirname, '/public/scripts/serverScripts/TaskAutoChecker.js'));
 }, 1000 * 60 * 10)
 
 //---------------------------------------------------------------------------------
