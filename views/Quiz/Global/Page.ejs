@@ -55,46 +55,7 @@
       </h4>
       <div style="margin-left: 20px;" id="statement"><%= quiz.description %></div>
     </div>
-    <table class="taskslist" id="table">
-        <tr>
-          <th>ID</th>
-          <th>Задача</th>
-          <th>Автор</th>
-          <th>Вердикт</th>
-        </tr>
-        <% for(let i=0; i < quiz.tasks.length; i++){ %>
-          <% let task=quiz.tasks[i] %>
-          <tr>
-            <td><%= parseInt(task.identificator.split('_')[1]) + 1 %></td>
-            <td><a class="tlrefs" href="/quiz/task/page/<%= quiz.identificator %>/<%= task.identificator %>"><%= task.title %></a></td>
-            <% let authorArray=quiz.author.split(' ');
-              let author = authorArray[0];
-              for(let i=1;i< authorArray.length;i++){
-                if(authorArray[i].length!=0){
-                    author += ' '+ authorArray[i][0]+' .';
-                }
-              }
-            %>
-            <td><%= author %></td>
-            <%
-            function getVerdict() {
-              let attempts = quiz.lessons.find(item=> item.grade == grade).attempts.filter(item=> item.login == u_login && item.identificator == task.identificator);
-              for(let j = 0; j<attempts.length; j++){
-                let results=attempts[j].results;
-                for (let i=0; i < results.length; i++) {
-                  if (results[i][1] !="OK" ) {
-                    return results[i][1].split(" ").slice(0, 2).map(item => item[0].toUpperCase()).join("");
-                  }
-                }
-                if (results.length > 0)
-                  return " OK";
-                return 'err' ;
-              }
-            } %>
-            <td><%= getVerdict() %></td>
-          </tr>
-        <% } %>
-    </table>
+    <div id="table"></div>
   </main>
 </body>
 <script>
@@ -105,5 +66,26 @@
     document.getElementById(id).close();
   }
 </script>
-
+<script>
+  let min = (a, b) => {if(a>b)return b;return a;};
+  function update(ids) {
+    let text = "<table class='taskslist'><tr>\n<th>ID</th>\n<th>Задача</th>\n<th>Вердикт</th>\n</tr>";
+    fetch("/api/task/get/testverdicts/<%= login %>/" + ids).then(response => response.json()).then(response => {
+      let tasks = response.tasks;
+      let verdicts = response.verdicts;
+      console.log(response);
+      for (let i = 0; i < min(tasks.length, verdicts.length); i++) {
+        text += `\n<tr>\n<td>${parseInt(tasks[i].identificator.split('_')[1]) + 1}</td>\n<td> <a class="tlrefs" href="/quiz/task/page/${<%= quiz.identificator %>} /${tasks[i].identificator}">${tasks[i].title}</a></td>\n <td> ${ verdicts[i] }</td>\n</tr >`;
+        }
+        text+="\n</table>";
+        resultsarea.innerHTML = text;
+    }).catch(err => console.log(err));
+  }
+  let resultsarea = document.getElementById("table");
+  let ids = "<%= ids %>";
+  update(ids);
+  setInterval(() => {
+      update(ids);
+  }, 5000);
+</script>
 </html>

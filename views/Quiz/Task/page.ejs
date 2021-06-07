@@ -83,7 +83,7 @@
         <div class="tasksSuccessError" id="linksarea"></div>
     </main>
     </body>
-    <!-- <script>
+    <script>
         function update(){
             fetch("/api/task/get/testresults/"+task).then(response=>response.json()).then(response => {
                 text = "<ul>";
@@ -107,13 +107,13 @@
         let resultsarea = document.getElementById("result");
         let inputarea = document.getElementById("code");
         let text;
-        let task = "";
+        let task = "<%= task.identificator %>";
         let testing;
         update();
         setInterval(() => {
             update();
         }, 5000);
-    </script> -->
+    </script>
     <script type = text/javascript>
         function o_delete() {
             document.getElementById('dialog_delete').showModal();

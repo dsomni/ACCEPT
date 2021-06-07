@@ -2026,6 +2026,7 @@ app.get("/quiz/page/:login/:id", checkAuthenticated, checkGrade, async (req, res
     u_login: student.login,
     quiz,
     user: req.user,
+    ids: quiz.tasks.map(item => item.identificator).join("|"),
     grade: (req.user.isTeacher && req.params.login == req.user.login) ? "teacher" : student.grade,
     isTeacher: req.user.isTeacher,
     location: req.header('Referer')
@@ -2308,6 +2309,17 @@ app.get("/api/task/get/testresults/:id", checkAuthenticated, async (req, res) =>
     status: "",
     code: ""
   }
+  let attempts;
+  if(req.params.id[0] == "Q"){
+    let quiz = await Quiz.findOne({ identificator: req.params.id.split("_")[0].slice(1) });
+    let grade = req.user.grade + req.user.gradeLetter;
+    if(req.user.isTeacher)
+      grade = "teacher";
+    let lesson = quiz.lessons.find(item => item.grade == grade);
+    attempts = lesson.attempts;
+  } else {
+    attempts = req.user.attempts;
+  }
   let isInQueue = TestingQueue.findIndex(item => (item.id == req.params.id && item.login == req.user.login));
   try {
     fs.statSync(path.join(__dirname, '/public/processes/' + req.user.login + '_' + req.params.id));
@@ -2315,10 +2327,10 @@ app.get("/api/task/get/testresults/:id", checkAuthenticated, async (req, res) =>
     results.status = "testing";
   } catch (err) {
     if (isInQueue != -1) {
-      results.result = [["", "In Testing Queue(" + (isInQueue + 1).toString() + ")..", "er"]];
+      results.result = [["", "In testing queue(" + (isInQueue + 1).toString() + ")..", "er"]];
       results.status = "testing";
     } else {
-      let attempt = req.user.attempts.find(item => item.taskID == req.params.id);
+      let attempt = attempts.find(item => (item.TaskID == req.params.id)||(item.taskID == req.params.id));
       if (attempt) {
         results.result = attempt.result;
         if (attempt.result.find(item => item[2] == "er") != null)
@@ -2337,16 +2349,17 @@ app.get("/api/task/get/testresults/:id", checkAuthenticated, async (req, res) =>
 app.get("/api/task/get/testverdicts/:login/:ids", checkAuthenticated, async (req, res) => {
   let ids = req.params.ids.split("|");
   let tasks = [];
-  let task, tournament;
+  let task, tournament, quiz, lesson;
   let user = await User.findOne({ login: req.params.login });
-  // if (!user || !req.user.isTeacher)
-  //   user = req.user;
   for (let i = 0; i < ids.length; i++) {
     if (ids[i].split('_')[0] == '0') {
       task = await Task.findOne({ identificator: ids[i] }).exec();
-    } else {
+    } else if(ids[i][0] != "Q") {
       tournament = await Tournament.findOne({ identificator: parseInt(ids[i].split('_')[0]) }).exec();
       task = tournament.tasks.find(item => item.identificator == ids[i]);
+    } else {
+      quiz = await Quiz.findOne({ identificator: parseInt(ids[i].split("_")[0].slice(1)) }).exec();
+      task = quiz.tasks.find(item => item.identificator == ids[i]);
     }
     tasks.push(task);
   }
@@ -2354,13 +2367,30 @@ app.get("/api/task/get/testverdicts/:login/:ids", checkAuthenticated, async (req
   let verdict, isInQueue;
   let verdicts = [];
   let success = [];
+  let grade;
   for (let i = 0; i < ids.length; i++) {
     id = ids[i];
-    verdict = user.verdicts.find(item => item.taskID == id)
-    if (verdict) {
-      verdict = verdict.result
+    if (id[0] == "Q") {
+      grade = user.grade+user.gradeLetter;
+      if(user.isTeacher)
+        grade = "teacher";
+      quiz = await Quiz.findOne({ identificator: parseInt(id.split("_")[0].slice(1)) }).exec();
+      lesson = quiz.lessons.find(item => item.grade == grade);
+      verdict = "-";
+      let items = lesson.attempts.filter(item => (item.TaskID == id && item.login == user.login)).reverse();
+      for(let k = 0; k < items.length; k++){
+        let item = items[k];
+        if(getVerdict(item.result)=="OK")
+          verdict = "OK";
+          break;
+      };
     } else {
-      verdict = "-"
+      verdict = user.verdicts.find(item => item.taskID == id)
+      if (verdict) {
+        verdict = verdict.result
+      } else {
+        verdict = "-"
+      }
     }
     isInQueue = TestingQueue.findIndex(item => (item.id == id && item.login == user.login));
     try {
