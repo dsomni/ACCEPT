@@ -114,7 +114,6 @@ const uploadTests = multer({
   })
 });
 
-
 //---------------------------------------------------------------------------------
 // MongoDB connecting
 let connectionString;
@@ -261,7 +260,6 @@ app.post('/task/page/:id', checkAuthenticated, checkNletter, uploadCode.single('
   TaskPost(req, res, '/task/page/' + req.params.id);
 })
 
-
 //---------------------------------------------------------------------------------
 // Add Task Page
 app.get('/task/add', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
@@ -346,28 +344,26 @@ app.get('/tasks/:page/:search', checkAuthenticated, checkNletter, async (req, re
   let user = req.user;
   let teachers = await User.find({ isTeacher: true });
   teachers = teachers.map(item => item.name);
-  let foundTasks = []
+  let foundTasks = [];
   let a = req.params.search.split('&');
   let tasks;
   SortByNew = a[3] == "true";
-  if (a[0] != "default" || a[1] != "all" || a[2] != "all" || a[3] != "false" || a[4] != "all") {
-    toSearch = a[0] == "default" ? "" : a[0].toUpperCase();
-    SearchTopic = a[1].toUpperCase();
-    SearchGrade = a[2]
-    author = a[4]
+  if (a[0].toLowerCase() != "default" || a[1] != "all" || a[2] != "all" || a[3] != "false" || a[4] != "all") {
+    let toSearch = a[0] == "default" ? "" : a[0].toUpperCase();
+    let SearchTopic = a[1].toUpperCase();
+    let SearchGrade = a[2]
+    let author = a[4]
 
     let properties = {}
     if (SearchGrade != "all") properties.grade = SearchGrade;
     if (author != "all") properties.author = author.replace("%20", ' ');
     tasks = await Task.find(properties).exec();
 
-
-    foundTasks = fuseSearch(tasks, "title", toSearch, 0.5, (task) => {
-      (task.topic.split(" ").join("").trim().toUpperCase() == SearchTopic || SearchTopic == "ALL")
+    foundTasks = fuseSearch(tasks, "title", toSearch, 0.5, [SearchTopic], (task, params) => {
+      return (task.topic.split(" ").join("").trim().toUpperCase() == params[0] || params[0] == "ALL")
     })
 
     if (SortByNew) foundTasks = foundTasks.reverse();
-
   } else {
     tasks = await Task.find({}).exec();
   }
@@ -664,24 +660,24 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, checkNletter, async
 
   let teachers = await User.find({ isTeacher: true });
   teachers = teachers.map(item => item.name);
-
-
+  let lessons;
   let a = req.params.search.split('&');
-  let toSearch = a[0] == "default" ? "" : a[0].toUpperCase();
-  let SearchGrade = a[1]
-  let SortByNew = a[2] == "false";
-  let author = a[3] ? a[3].replace(/%20/g, " ") : "all";
-  let properties = {}
-  if (author != "all") properties.author = author;
-  if (SearchGrade != "all" || !user.isTeacher) properties.grade = user.isTeacher ? SearchGrade : user.grade;
-  let lessons = (await Lesson.find(properties).exec());
+  if (a[0].toLowerCase() != "default" || a[1] != "all" || a[2] != "true" || a[3] != "all") {
+    let toSearch = a[0] == "default" ? "" : a[0].toUpperCase();
+    let SearchGrade = a[1]
+    let SortByNew = a[2] == "false";
+    let author = a[3] ? a[3].replace(/%20/g, " ") : "all";
+    let properties = {}
+    if (author != "all") properties.author = author;
+    if (SearchGrade != "all" || !user.isTeacher) properties.grade = user.isTeacher ? SearchGrade : user.grade;
+    lessons = (await Lesson.find(properties).exec());
 
-  // if (lessons.length!=0 && lessons[0].identificator == 0) lessons.splice(0, 1);
-
-  lessons = fuseSearch(lessons, "title", toSearch, 0.5, item => { return true });
-
-  if (SortByNew) {
-    lessons = lessons.reverse();
+    lessons = fuseSearch(lessons, "title", toSearch, 0.5, [], (item, params) => { return true });
+    if (SortByNew) {
+      lessons = lessons.reverse();
+    }
+  } else {
+    lessons = await Lesson.find({}).exec();
   }
 
   let onPage = config.onPage.lessons;
@@ -690,7 +686,6 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, checkNletter, async
   let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, lessons.length)} из ${lessons.length}`;
   lessons = lessons.slice((page - 1) * onPage, page * onPage);
   let ids = lessons.map(item => item.identificator).join('|');
-
 
   res.render('lessons.ejs', {
     u_login: user.login,
@@ -865,7 +860,6 @@ app.post('/lessonresults/:id/:page/:search', checkAuthenticated, checkNletter, c
   res.redirect('/lessonresults/' + req.params.id + '/' + req.params.page + '/' + toSearch)
 });
 
-
 //---------------------------------------------------------------------------------
 // Students List Page
 app.get('/students/:page/:search', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
@@ -874,6 +868,7 @@ app.get('/students/:page/:search', checkAuthenticated, checkNletter, checkPermis
 
   let a = req.params.search.split('&');
   let SearchGrade = a[1] == "all" ? '' : a[1];
+  let foundStudents
   if (SearchGrade != "") {
     students = await User.find({ grade: SearchGrade, isTeacher: false }).exec();
   } else {
@@ -884,8 +879,8 @@ app.get('/students/:page/:search', checkAuthenticated, checkNletter, checkPermis
     let SearchLetter = a[2] == "all" ? '' : a[2].toLowerCase();
     let SearchGroup = a[3] == "all" ? '' : a[3];
 
-    let foundStudents = fuseSearch(students, "name", toSearch, 0.5, (student) => {
-      return (student.item.gradeLetter == SearchLetter || SearchLetter == "") && (student.item.group == SearchGroup || SearchGroup == "")
+    foundStudents = fuseSearch(students, "name", toSearch, 0.5, [SearchLetter, SearchGroup], (student, params) => {
+      return (student.item.gradeLetter == params[0] || params[0] == "") && (student.item.group == params[1] || params[1] == "")
     })
   } else {
     foundStudents = students;
@@ -1099,18 +1094,20 @@ app.get('/tournaments/:login/:page/:search', checkAuthenticated, async (req, res
     user = await User.findOne({ login: req.params.login }).exec();
   }
   let results = [];
-
+  let foundTournaments;
+  let tournaments = (await Tournament.find({}).exec()).slice(1).filter(item => item.title != "");
   let a = req.params.search.split('&');
-  let toSearch = a[0] == "default" ? '' : a[0].toUpperCase();
-  let isBegan = a[1] == 'true';
-  let isEnded = a[2] == 'true';
+  if (a[0].toLowerCase() != "default" || a[1] != "all") {
+    let toSearch = a[0] == "default" ? '' : a[0].toUpperCase();
+    let isBegan = a[1].toLowerCase() == 'true';
+    let isEnded = a[2].toLowerCase() == 'true';
 
-  let Tournaments = (await Tournament.find({}).exec()).slice(1).filter(item => item.title != "");
-
-
-  let foundTournaments = fuseSearch(Tournaments, "title", toSearch, 0.5, (tournament) => {
-    return (a[1] != "all") && (tournament.isBegan == isBegan) && (tournament.isEnded == isEnded);
-  })
+    foundTournaments = fuseSearch(tournaments, "title", toSearch, 0.5, [a[1], isBegan, isEnded], (tournament, params) => {
+      return (params[0] == "all") || ((tournament.isBegan == params[1]) && (tournament.isEnded == params[2]));
+    })
+  } else {
+    foundTournaments = tournaments;
+  }
 
   //Sorting tournaments
   let obj = [];
@@ -1164,7 +1161,6 @@ app.post('/tournaments/:login/:page/:search', checkAuthenticated, async (req, re
   res.redirect('/tournaments/' + req.params.login + '/' + req.params.page.toString() + '/' + toSearch)
 })
 
-
 //---------------------------------------------------------------------------------
 // Edit Tournament Page
 app.get('/tournament/edit/:tour_id', checkAuthenticated, isModerator, async (req, res) => {
@@ -1210,7 +1206,6 @@ app.post('/deletetournament/:tour_id', checkAuthenticated, checkNletter, checkPe
   res.redirect('/tournaments/' + req.user.login + '/1/default&all&all');
 })
 
-
 //---------------------------------------------------------------------------------
 //Register to tournament
 app.get('/regTournament/:tour_id', checkAuthenticated, async (req, res) => {
@@ -1231,14 +1226,12 @@ app.get('/regTournament/:tour_id', checkAuthenticated, async (req, res) => {
       })
     }
 
-
     tournament.results.push(newRes);
     tournament.markModified('results');
     await tournament.save();
   }
   res.redirect('/tournaments/' + req.user.login + '/1/default&all&all')
 })
-
 
 //---------------------------------------------------------------------------------
 // Add Task to Tournament Page
@@ -1257,7 +1250,6 @@ app.get('/tournament/task/add/:tour_id', checkAuthenticated, isModerator, async 
 
 app.post('/tournament/task/add/:tour_id', checkAuthenticated, isModerator, uploadTests.single('file'), async (req, res) => {
   let body = req.body;
-
 
   let examples = [];
   let exI, exO;
@@ -1355,7 +1347,6 @@ app.get('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTournamen
 app.post('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTournamentPermission, uploadCode.single('file'), async (req, res) => {
   TaskPost(req, res, '/tournament/task/page/' + req.params.tour_id + '/' + req.params.id);
 });
-
 
 //---------------------------------------------------------------------------------
 // Tournament Page
@@ -1811,7 +1802,6 @@ app.get("/newslist/:page", async (req, res) => {
   res.render('News/list.ejs', rendered)
 });
 
-
 //---------------------------------------------------------------------------------
 // Tried Page
 app.get('/tried/:login/:page/:search', checkAuthenticated, checkValidation, async (req, res) => {
@@ -1883,7 +1873,6 @@ app.get('/tried/:login/:page/:search', checkAuthenticated, checkValidation, asyn
     verdicts = verdicts.slice((page - 1) * onPage, min(page * onPage, verdicts.length));
     tasks = tasks.slice((page - 1) * onPage, min(page * onPage, tasks.length));
 
-
     res.render('Account/triedTasks.ejs', {
       login: req.user.login,
       u_login: user.login,
@@ -1912,7 +1901,6 @@ app.post('/tried/:login/:page/:search', checkAuthenticated, checkValidation, asy
   toSearch += '&' + req.body.selector;
   res.redirect('/tried/' + req.params.login.toString() + '/' + req.params.page.toString() + '/' + toSearch)
 });
-
 
 //---------------------------------------------------------------------------------
 // Rating Page
@@ -1944,7 +1932,6 @@ app.get('/rating/:page', checkAuthenticated, async (req, res) => {
   let pages = Math.ceil(objs.length / onPage);
   let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, objs.length)} из ${objs.length}`;
   objs = objs.slice((page - 1) * onPage, min(page * onPage, objs.length));
-
 
   res.render('rating.ejs', {
     login: req.user.login,
@@ -1982,16 +1969,14 @@ app.get('/quizzes/:login/:page/:search', checkAuthenticated, async (req, res) =>
   } else {
     quizzes = await Quiz.find({ template: false }).exec();
   }
-
-
-  quizzes = fuseSearch(quizzes, "title", toSearch, 0.5, (quiz) => { return true });
+  if(!!toSearch)
+    quizzes = fuseSearch(quizzes, "title", toSearch, 0.5, [], (quiz, params) => { return true });
 
   let onPage = config.onPage.lessons;
   let page = req.params.page;
   let pages = Math.ceil(quizzes.length / onPage);
   let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, quizzes.length)} из ${quizzes.length}`;
   quizzes = quizzes.slice((page - 1) * onPage, min(page * onPage, quizzes.length));
-
 
   res.render('quizzes.ejs', {
     login: req.user.login,
@@ -2120,7 +2105,6 @@ app.get('/quiz/task/add/:quiz_id', checkAuthenticated, checkPermission, async (r
 
 app.post('/quiz/task/add/:quiz_id', checkAuthenticated, checkPermission, uploadTests.single('file'), async (req, res) => {
   let body = req.body;
-
 
   let examples = [];
   let exI, exO;
@@ -2291,8 +2275,6 @@ app.post('/quiz/task/page/:quiz_id/:id', checkAuthenticated, checkGrade, uploadC
   TaskPost(req, res, '/quiz/task/page/' + req.params.quiz_id + '/' + req.params.id);
 });
 
-
-
 // API
 //------------------------------------------------------------------------------------------------API
 //---------------------------------------------------------------------------------
@@ -2327,7 +2309,6 @@ app.get("/api/task/get/testresults/:id", checkAuthenticated, async (req, res) =>
   res.json(results);
 });
 
-
 //---------------------------------------------------------------------------------
 // Get task Verdicts
 app.get("/api/task/get/testverdicts/:login/:ids", checkAuthenticated, async (req, res) => {
@@ -2341,6 +2322,7 @@ app.get("/api/task/get/testverdicts/:login/:ids", checkAuthenticated, async (req
     if (ids[i].split('_')[0] == '0') {
       task = await Task.findOne({ identificator: ids[i] }).exec();
     } else {
+      console.log(ids[i])
       tournament = await Tournament.findOne({ identificator: parseInt(ids[i].split('_')[0]) }).exec();
       task = tournament.tasks.find(item => item.identificator == ids[i]);
     }
@@ -2559,22 +2541,11 @@ app.get('*', (req, res) => {
 //---------------------------------------------------------------------------------
 // Functions
 
-function fuseSearch(items, key, toSearch, accuracy, callback) {
-  const fuse = new Fuse(items, {
-    includeScore: true,
-    keys: [key]
-  });
-  foundItems = [];
-  if (!!toSearch)
-    fuse.search(toSearch).forEach(found => {
-      if ((found.score < accuracy) && callback(found.item)) {
-        foundItems.push(found);
-      }
-    });
-  return foundItems
+function fuseSearch(items, key, toSearch, accuracy, params, callback) {
+  const fuse = new Fuse(items, { includeScore: true, keys: [key] });
+  foundItems = toSearch != "" ? fuse.search(toSearch) : items.map(item => { return { item: item, score: 0 } });
+  return foundItems.filter(found => { return (found.score < accuracy) && callback(found.item, params) }).map(item => item.item);
 }
-
-
 
 function checkNletter(req, res, next) {
   if (req.user.isTeacher || req.user.login.slice(0, 2) != "n-") {
@@ -2756,9 +2727,6 @@ function TaskPost(req, res, redirect) {
     }
   });
 }
-
-
-
 
 //---------------------------------------------------------------------------------
 // Tournaments timer checker start
