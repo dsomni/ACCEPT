@@ -86,13 +86,11 @@
     <script type = text/javascript>
         let min = (a, b) => {if(a>b)return b;return a;};
         function updateOther(ids) {
-            console.log("/api/task/get/testverdicts/<%= login %>/"+ids);
             fetch("/api/task/get/testverdicts/<%= login %>/"+ids).then(response=>response.json()).then(response => {
                     text = "";
                     let id = "<%= ID %>";
                     let tasks = response.tasks;
                     let statuses = response.success;
-                    console.log(statuses)
                     for(let i=0; i<min(tasks.length, statuses.length); i++){
                         if(tasks[i].identificator == id)
                             text+=`\n<a class="tasklink ${statuses[i]}" style="outline: solid black 4px; outline-offset: -4px; font-size: 1.2rem; font-weight: bolder;">${parseInt(tasks[i].identificator.split('_')[1])+1}</a>`;

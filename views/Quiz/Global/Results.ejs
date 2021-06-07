@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Результаты урока</title></title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,
+              maximum-scale=1.0, minimum-scale=1.0,
+              user-scalable=no, minimal-ui">
+  <meta name="full-screen" content="yes">
+
+  <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
+</head>
+
+<body>
+  <main>
+    <h1>Результаты урока <%= quiz.title %> класса <%= grade %></h1>
+    <form action="/quiz/results/<%= quiz.identificator %>/<%= grade %>" method="post">
+      <select name="gradeSelector" id = "gradeSelector">
+          <% for(let i = 0; i < quiz.lessons.length; i++){ %>
+            <option value="<%= quiz.lessons[i].grade %>"><%= quiz.lessons[i].grade.toUpperCase() %></option>
+          <% } %>
+      </select>
+      <button>Показать</button>
+    </form>
+    <table class='taskslist' id="table"></table>
+  </main>
+  <script>
+    let min = (a, b) => { if (a > b) return b; return a; };
+    function update(first) {
+      if (first || <%= !quiz.isEnded %>){
+        fetch("/api/quiz/get/results/<%= quiz.identificator %>/<%= lesson.grade %>").then(response => response.json()).then(response => {
+          let text = "<tr>\n<th>LOGIN</th>\n";
+          let results = response;
+          for (let i = 0; i < results[0].tasks.length; i++) {
+            text += `<th><a class="tlrefs" href="/quiz/task/page/<%= quiz.identificator %>/Q<%= quiz.identificator %>_${i}">${i + 1}</a></th>`;
+          }
+          text += "\n<th>Счёт</th>\n";
+          results.sort((a, b) => {
+            if ((a.sumscore > b.sumscore) || ((a.sumscore == b.sumscore) && (a.sumtime < b.sumtime)))
+              return -1;
+            else
+              return 1;
+          });
+          let result, links, loginToShow, task;
+          for (let i = 0; i < results.length; i++) {
+            result = results[i];
+            text += "<tr>\n";
+            if (result) {
+              text += `<td><a class="tlrefs" href="/account/${result.login}/1/default&all">${result.login}</a></td>\n`;
+              for (let j = 0; j < result.tasks.length; j++) {
+                task = result.tasks[j];
+                links = "";
+                task.attempts.reverse().forEach(attempt => {
+                  if (attempt.score == "100")
+                    links += `<a href="/quiz/attempt/<%= quiz.identificator %>/${result.login}/${attempt.date}" class="success">100</a>`;
+                  else
+                    links += `<a href="/quiz/attempt/<%= quiz.identificator %>/${result.login}/${attempt.date}" class="error">${attempt.score}</a>`;
+                });
+                text += `<td class="hasDropDown"><div class="resulttext">${task.score}(${task.tries})</div><div class = "dropdown-content">${links}</div></td>`
+              }
+              text += `<td>${result.sumscore}</td>\n`;
+            }
+            text += "</tr>\n"
+          }
+          resultsarea.innerHTML = text + "</tr>\n";
+        }).catch(err => console.log(err));
+      }
+    }
+    let resultsarea = document.getElementById("table");
+    update(true);
+    setInterval(() => {
+      update(false);
+    }, 10000);
+  </script>
+</html>

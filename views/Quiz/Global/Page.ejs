@@ -49,7 +49,7 @@
           <% if(!quiz.isBegan) { %><a class="EditButtons" href=<%="/quiz/task/add/" + quiz.identificator %> >Добавить задачу</a><% } %>
             <br>
         <% } %>
-        <a class="EditButtons" href=<%="/quiz/results/" +quiz.identificator %>>Таблица результатов</a>
+        <a class="EditButtons" href=<%="/quiz/results/" + quiz.identificator + "/teacher" %>>Таблица результатов</a>
       </div>
       <h4 class="h4">Автор: <%= quiz.author %>
       </h4>
@@ -75,7 +75,7 @@
       let verdicts = response.verdicts;
       console.log(response);
       for (let i = 0; i < min(tasks.length, verdicts.length); i++) {
-        text += `\n<tr>\n<td>${parseInt(tasks[i].identificator.split('_')[1]) + 1}</td>\n<td> <a class="tlrefs" href="/quiz/task/page/${<%= quiz.identificator %>} /${tasks[i].identificator}">${tasks[i].title}</a></td>\n <td> ${ verdicts[i] }</td>\n</tr >`;
+        text += `\n<tr>\n<td>${parseInt(tasks[i].identificator.split('_')[1]) + 1}</td>\n<td> <a class="tlrefs" href="/quiz/task/page/${<%= quiz.identificator %>}/${tasks[i].identificator}">${tasks[i].title}</a></td>\n <td> ${ verdicts[i] }</td>\n</tr >`;
         }
         text+="\n</table>";
         resultsarea.innerHTML = text;

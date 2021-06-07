@@ -51,5 +51,5 @@
     </div>
 </header>
 <% if (location){ %>
-    <button style="position: absolute; top: 0px; left: 65px;background-color: Transparent;background-repeat:no-repeat;border: none;" onClick=<%= 'location.href='+"\""+location+"\"" %>><img style=" width: 40px;" src="/public/media/back.svg"></button>
+    <button style="position: absolute; top: 0px; left: 65px; background-color: transparent; background-repeat:no-repeat; border: none;" onClick=<%= `location.href="${location}"` %> ><img style=" width: 40px;" src="/public/media/back.svg"></button>
 <% } %>

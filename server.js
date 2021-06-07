@@ -2299,6 +2299,67 @@ app.post('/quiz/task/page/:quiz_id/:id', checkAuthenticated, checkGrade, uploadC
   TaskPost(req, res, '/quiz/task/page/' + req.params.quiz_id + '/' + req.params.id);
 });
 
+//---------------------------------------------------------------------------------
+// quiz results page
+app.get('/quiz/results/:quiz_id/:grade', checkAuthenticated, checkPermission, async (req, res) => {
+  let quiz = await Quiz.findOne({ identificator: req.params.quiz_id });
+  let lesson = quiz.lessons.find(lesson => lesson.grade == req.params.grade);
+  if (lesson) {
+    res.render('Quiz/Global/Results.ejs', {
+      login: req.user.login,
+      name: req.user.name,
+      title: "quiz Results",
+      isTeacher: req.user.isTeacher,
+      quiz,
+      lesson,
+      results: lesson.results,
+      grade: req.params.grade,
+      location: `/quiz/page/${req.user.login}/${req.params.quiz_id}`
+    });
+  } else {
+    res.redirect('/');
+  }
+});
+
+app.post("/quiz/results/:quiz_id/:grade", checkAuthenticated, checkPermission, async (req, res) => {
+  res.redirect(`/quiz/results/${req.params.quiz_id}/${req.body.gradeSelector}`)
+})
+
+//---------------------------------------------------------------------------------
+// Attempt Page
+app.get('/quiz/attempt/:quiz_id/:login/:date', checkAuthenticated, checkValidation, async (req, res) => {
+  let user;
+  if (req.user.login == req.params.login || req.user.isTeacher) {
+    user = req.user;
+  } else {
+    user = await User.findOne({ login: req.params.login }).exec();
+  }
+  let grade = user.grade + user.gradeLetter;
+  if(user.isTeacher)
+    grade = "teacher";
+  let quiz = await Quiz.findOne({ identificator: req.params.quiz_id }).exec();
+  let lesson = quiz.lessons.find(item => item.grade == grade);
+  let attempt = lesson.attempts.find(item => item.date == req.params.date);
+
+  if (attempt) {
+    res.render('Account/attempt.ejs', {
+      login: user.login,
+      name: req.user.name,
+      n_name: user.name,
+      title: "Attempt",
+      isTeacher: req.user.isTeacher,
+      RESULT: attempt.result,
+      code: attempt.programText,
+      taskID: attempt.TaskID,
+      date: attempt.date,
+      language: attempt.language,
+      location: `/account/${req.params.login}/1/default&all`
+    })
+  } else {
+    res.redirect('/account/' + req.user.login + '/1/default&all')
+  }
+})
+
 // API
 //------------------------------------------------------------------------------------------------API
 //---------------------------------------------------------------------------------
@@ -2535,6 +2596,17 @@ app.get("/api/tournament/get/results/:id", checkAuthenticated, async (req, res) 
   let results = tournament.results
   if (tournament.isFrozen && !tournament.isEnded)
     results = tournament.frozenResults;
+  res.json(results);
+});
+
+//---------------------------------------------------------------------------------
+// Get tournament results
+app.get("/api/quiz/get/results/:id/:grade", checkAuthenticated, async (req, res) => {
+  let id = req.params.id;
+  let grade = req.params.grade;
+  let quiz = await Quiz.findOne({ identificator: id }).exec();
+  let lesson = quiz.lessons.find(item => item.grade == grade);
+  let results = lesson.results;
   res.json(results);
 });
 
