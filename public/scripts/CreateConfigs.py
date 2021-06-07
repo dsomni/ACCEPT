@@ -40,6 +40,7 @@ config = {
     'PathToUsersList': "PATH", # Path to users.xlsx file
     'PathToDeleteUsersList': "PATH", # Path to deleteUsers.xlsx file
     'PathToTeachersList': "PATH", # Path to teachers.xlsx file
+    "sessionLiveTime": 45*60,
     'port': "3000", # server port
     'secret': "secret",
     'FolderLifeTime': 0.7 * 60 * 1000, # milliseconds
@@ -72,6 +73,7 @@ config = {
     },
 }
 port = input("Port(number): ")
+sessionLiveTime = input("Session Live Time(seconds): ")
 FolderLifeTime = input("FolderLifeTime: ")
 maxThreadsTests = input("maxThreadsTests: ")
 maxThreadsTasks = input("maxThreadsTasks: ")
@@ -108,6 +110,8 @@ if answer1.upper() == "Y":
 
 if (port):
     config["port"] = port
+if (sessionLiveTime):
+    config["sessionLiveTime"] = int(eval(sessionLiveTime))
 if (FolderLifeTime):
     config["FolderLifeTime"] = int(eval(FolderLifeTime))
 if (maxThreadsTests):

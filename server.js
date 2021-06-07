@@ -168,8 +168,17 @@ app.use(flash());
 app.use(session({
   secret: config.secret,
   resave: false,
-  saveUninitialized: false,
-  store: MongoStorage.create({ mongoUrl: connectionString })
+  rolling: true,
+  saveUninitialized: true,
+  store: MongoStorage.create({
+    mongoUrl: connectionString,
+    autoremove: "interval",
+    autoRemoveInterval: 10,
+    ttl: config.sessionLiveTime,
+    crypto: {
+      secret: config.secret
+    }
+  })
 }));
 app.use(passport.initialize());
 app.use(passport.session());
