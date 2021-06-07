@@ -2281,7 +2281,7 @@ app.get('/quiz/task/page/:quiz_id/:id', checkAuthenticated, checkGrade, async (r
   res.render('Quiz/Task/page.ejs', {
     login: req.user.login,
     ID: req.params.id,
-    TUR_ID: req.params.quiz_id,
+    QUIZ_ID: req.params.quiz_id,
     name: req.user.name,
     title: "Task " + req.params.id,
     isTeacher: req.user.isTeacher,
@@ -2307,7 +2307,8 @@ app.get("/api/task/get/testresults/:id", checkAuthenticated, async (req, res) =>
   let results = {
     result: [],
     status: "",
-    code: ""
+    code: "",
+    language: "Pascal"
   }
   let attempts;
   if(req.params.id[0] == "Q"){
@@ -2338,6 +2339,7 @@ app.get("/api/task/get/testresults/:id", checkAuthenticated, async (req, res) =>
         else
           results.status = "success";
         results.code = attempt.programText;
+        results.language = attempt.language;
       }
     }
   }
@@ -2380,8 +2382,8 @@ app.get("/api/task/get/testverdicts/:login/:ids", checkAuthenticated, async (req
       let items = lesson.attempts.filter(item => (item.TaskID == id && item.login == user.login)).reverse();
       for(let k = 0; k < items.length; k++){
         let item = items[k];
-        if(getVerdict(item.result)=="OK")
-          verdict = "OK";
+        verdict = getVerdict(item.result);
+        if(verdict == "OK")
           break;
       };
     } else {
@@ -2690,7 +2692,7 @@ function getVerdict(results) {
   }
   if (results.length > 0)
     return "OK";
-  return 'err';
+  return '-';
 }
 
 function getScore(results) {

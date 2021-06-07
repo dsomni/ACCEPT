@@ -55,11 +55,11 @@
         <form action=<%='/tournament/task/page/' + TUR_ID + '/' + problem.identificator %>  method="POST" enctype="multipart/form-data">
             <div class="container">
                 <select name="languageSelector" id = "languageSelector">
-                    <option value="Pascal" <% if (!language || language=="Pascal" ){%> selected <%}%>>Pascal ABC.NET</option>
-                    <option value="Python" <% if (language=="Python" ){%> selected <%}%>>Python 3.8</option>
-                    <option value="PyPy" <% if (language=="PyPy" ){%> selected <%}%>>PyPy 3.7</option>
-                    <option value="Cpp" <% if (language=="Cpp" ){%> selected <%}%>>C++20</option>
-                    <option value="Java" <% if (language=="Java" ){%> selected <%}%>>Java 16</option>
+                    <option class="opt" value="Pascal" selected >Pascal ABC.NET</option>
+                    <option class="opt" value="Python" >Python 3.8</option>
+                    <option class="opt" value="PyPy">PyPy 3.7</option>
+                    <option class="opt" value="Cpp" >C++20</option>
+                    <option class="opt" value="Java">Java 16</option>
                 </select>
                     <div class="imgs">
                         <img src="\public\media\TopLeft.svg">
@@ -116,6 +116,12 @@
                 text +="\n</ul>";
                 if(inputarea.value == ""){
                     inputarea.value = response.code;
+                    for (let i = 0; i < options.length; i++) {
+                        options[i].selected = false;
+                        if (options[i].value == response.language) {
+                            options[i].selected = true;
+                        }
+                    }
                 }
                 if(response.status == "testing"){
                     inputarea.readOnly = true;
@@ -129,6 +135,7 @@
         }
         let resultsarea = document.getElementById("result");
         let inputarea = document.getElementById("code");
+        let options = document.getElementsByClassName("opt");
         let text;
         let task = "<%= ID %>";
         let testing;
