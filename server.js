@@ -200,6 +200,10 @@ load();
 childProcess.exec('node ' + path.join(__dirname, '/public/scripts/serverScripts/Tchecker.js'));
 
 //---------------------------------------------------------------------------------
+// Checking quizzes
+childProcess.exec('node ' + path.join(__dirname, '/public/scripts/serverScripts/Qchecker.js'));
+
+//---------------------------------------------------------------------------------
 // Checking tasks
 childProcess.exec('node ' + path.join(__dirname, '/public/scripts/serverScripts/TaskAutoChecker.js'));
 
@@ -2102,10 +2106,10 @@ app.post("/quiz/start/:id", checkAuthenticated, checkPermission, async (req, res
   let letter = grade[grade.length - 1];
   grade = parseInt(grade.slice(0, grade.length - 1));
   if (letter > "я" || letter < 'а' || !grade || grade > 11 || grade < 1)
-    return res.redirect(`/quizzes/${req.user.login}/1/default`);
+    return res.redirect(`/quiz/page/${req.user.login}/${req.params.id}`);
   Adder.AddQuiz(Quiz, req.body.grade, req.user.name, req.params.id);
 
-  res.redirect(`/quizzes/${req.user.login}/1/default`);//redirect to lesson results page
+  res.redirect(`/quiz/page/${req.user.login}/${req.params.id}`);
 });
 
 //---------------------------------------------------------------------------------
@@ -2747,9 +2751,10 @@ function TaskPost(req, res, redirect) {
 }
 
 //---------------------------------------------------------------------------------
-// Tournaments timer checker start
+// Timer checker start
 setInterval(() => {
   childProcess.exec('node ' + path.join(__dirname, '/public/scripts/serverScripts/Tchecker.js'));
+  childProcess.exec('node ' + path.join(__dirname, '/public/scripts/serverScripts/Qchecker.js'));
 }, 1000 * 60 * 10)
 
 //---------------------------------------------------------------------------------
