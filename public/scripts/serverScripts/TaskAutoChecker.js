@@ -203,8 +203,8 @@ async function check() {
       }else{
         let quiz_id = tournament_id.slice(1);
         let quiz = await Quiz.findOne({ identificator: quiz_id }).exec();
-        let grade = user.isTeacher ? 'teacher' : user.grade + user.gradeLatter;
-        let lesson = quiz.lessons.find(item => item.grade == grade);
+        let grade = user.isTeacher ? 'teacher' : user.grade + user.gradeLetter;
+        let lesson = quiz.lessons.find(item => item.grade.toLowerCase() == grade.toLowerCase());
 
         let task = quiz.tasks.find(item => item.identificator == full_id);
 
@@ -221,19 +221,6 @@ async function check() {
                   result.sort((a, b) => {
                     return Number(a[0].split('#')[1]) - Number(b[0].split('#')[1])
                   })
-                  // let idx = user.verdicts.findIndex(item => item.taskID == full_id)
-                  // if (idx == -1) {
-                  //   user.verdicts.push({
-                  //     taskID: full_id,
-                  //     result: getVerdict(result)
-                  //   })
-                  // } else if (user.verdicts[idx].result != "OK") {
-                  //   user.verdicts.splice(idx, 1);
-                  //   user.verdicts.push({
-                  //     taskID: full_id,
-                  //     result: getVerdict(result)
-                  //   })
-                  // }
                   let score = getScore(result);
 
                   idx = max(0 ,lesson.attempts.findIndex(item => item.TaskID == full_id));

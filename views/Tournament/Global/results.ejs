@@ -19,6 +19,7 @@
         </main>
     <script>
         let min = (a, b) => {if(a>b)return b;return a;};
+        let prevTable="";
         function update(first) {
             if(first || <%= !tournament.isEnded %>)
                 fetch("/api/tournament/get/results/<%= tournament.identificator %>").then(response=>response.json()).then(response => {
@@ -59,7 +60,10 @@
                         }
                         text+="</tr>\n"
                     }
-                    resultsarea.innerHTML = text+"</tr>\n";
+                    if (prevTable != text+"</tr>\n") {
+                        resultsarea.innerHTML = text+"</tr>\n";
+                        prevTable = text;
+                    }
                 }).catch(err => console.log(err));
         }
         let resultsarea = document.getElementById("table");

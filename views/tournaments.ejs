@@ -47,6 +47,7 @@
     </body>
     <script>
         let min = (a, b) => { if (a > b) return b; return a; };
+        let prevTable="";
         function update(ids) {
             fetch("/api/cringe/get/verdicts/" + ids + "/tournaments").then(response => response.json()).then(response => {
                 let text = `<tr>\n<th>Турнир</th>\n<th>Автор</th>\n<th>Вердикт</th>\n<th>Начало</th>\n<th>Окончание</th>\n<th>Регистрация</th>\n<th>Статус</th>\n`;
@@ -102,7 +103,10 @@
                     text += status;
                     text += '</tr>';
                 }
-                resultsarea.innerHTML = text;
+                if(prevTable != text){
+                    resultsarea.innerHTML = text;
+                    prevTable = text;
+                }
             }).catch(err => console.log(err));
         }
         let resultsarea = document.getElementById("table");

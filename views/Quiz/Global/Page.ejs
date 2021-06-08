@@ -56,6 +56,7 @@
       <div style="margin-left: 20px;" id="statement"><%= quiz.description %></div>
     </div>
     <div id="table"></div>
+    <p class="countDownTimer" id="countDownTimer" style="left: 5rem; right:auto; top:20px"></p>
   </main>
 </body>
 <script>
@@ -68,17 +69,20 @@
 </script>
 <script>
   let min = (a, b) => {if(a>b)return b;return a;};
+  let prevTable="";
   function update(ids) {
     let text = "<table class='taskslist'><tr>\n<th>ID</th>\n<th>Задача</th>\n<th>Вердикт</th>\n</tr>";
     fetch("/api/task/get/testverdicts/<%= login %>/" + ids).then(response => response.json()).then(response => {
       let tasks = response.tasks;
       let verdicts = response.verdicts;
-      console.log(response);
       for (let i = 0; i < min(tasks.length, verdicts.length); i++) {
         text += `\n<tr>\n<td>${parseInt(tasks[i].identificator.split('_')[1]) + 1}</td>\n<td> <a class="tlrefs" href="/quiz/task/page/${<%= quiz.identificator %>}/${tasks[i].identificator}">${tasks[i].title}</a></td>\n <td> ${ verdicts[i] }</td>\n</tr >`;
         }
         text+="\n</table>";
-        resultsarea.innerHTML = text;
+        if(prevTable != text)
+          resultsarea.innerHTML = text;
+          prevTable = text;
+        }
     }).catch(err => console.log(err));
   }
   let resultsarea = document.getElementById("table");
@@ -87,5 +91,39 @@
   setInterval(() => {
       update(ids);
   }, 5000);
+</script>
+<script>
+  function getTime(){
+    fetch("/api/quiz/get/time/<%= quiz.identificator %>/<%= grade %>").then(response=>response.json()).then(response => {
+      if(!response.error)
+          whenEnds = new Date(response.whenEnds).getTime();
+    }).catch(err => console.log(err));
+  }
+  let whenEnds;
+  getTime();
+  setInterval(() => {
+    getTime();
+  }, 3000);
+
+  setInterval(() => {
+    let countDownDate = new Date(whenEnds).getTime();
+    var now = Date.now();
+    var distance = countDownDate - now;
+    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    if (days>0)
+      document.getElementById("countDownTimer").innerHTML = "Окончание через "+ days + " дней " + ("0"+hours).slice(-2) + ":"
+          + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
+    else
+      document.getElementById("countDownTimer").innerHTML = "Окончание через "+ ("0"+hours).slice(-2) + ":"
+          + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
+    if (distance < 0) {
+      if(<%= !isTeacher %>)
+        window.location.reload()
+      document.getElementById("countDownTimer").innerHTML = "Окончен";
+    }
+  }, 1000);
 </script>
 </html>

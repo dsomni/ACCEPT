@@ -84,6 +84,7 @@
     </body>
     <script type = text/javascript>
         let min = (a, b) => {if(a>b)return b;return a;};
+        let prevTableL="";
         function updateOther(ids) {
             fetch("/api/task/get/testverdicts/<%= login %>/"+ids).then(response=>response.json()).then(response => {
                     text = "";
@@ -96,7 +97,10 @@
                         else
                             text+=`\n<a class="tasklink ${statuses[i]}" href="/tournament/task/page/<%= TUR_ID  %>/${tasks[i].identificator}">${parseInt(tasks[i].identificator.split('_')[1])+1}</a>`;
                     }
-                    linksarea.innerHTML = text;
+                    if (prevTableL != text) {
+                        linksarea.innerHTML = text;
+                        prevTableL = text;
+                    }
                 }).catch(err => console.log(err));
         }
         let linksarea = document.getElementById("linksarea");
@@ -107,6 +111,7 @@
         }, 5000);
     </script>
     <script>
+        let prevTable="";
         function update(){
             fetch("/api/task/get/testresults/"+task).then(response=>response.json()).then(response => {
                 text = "<ul>";
@@ -130,7 +135,10 @@
                     inputarea.readOnly = false;
                     inputarea.placeholder = "Place code here";
                 }
-                resultsarea.innerHTML = text;
+                if (prevTable != text) {
+                    resultsarea.innerHTML = text;
+                    prevTable = text;
+                }
             }).catch(err => console.log(err));
         }
         let resultsarea = document.getElementById("result");

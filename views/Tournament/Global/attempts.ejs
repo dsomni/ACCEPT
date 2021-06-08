@@ -47,6 +47,7 @@
     </body>
     <script type=text/javascript>
         let min = (a, b) => {if(a>b)return b;return a;};
+        let prevTable="";
         function update(page) {
             fetch("/api/tournament/get/attempts/<%= tourID %>/"+page+"/<%= search %>").then(response=>response.json()).then(response => {
                 let attempts = response.attempts;
@@ -69,7 +70,10 @@
                     text += `<td style="width: 200px;">${dialogs}</td>\n`;
                     text += `</tr>\n`;
                 }
-                resultsarea.innerHTML = text;
+                if(prevTable != text){
+                    resultsarea.innerHTML = text;
+                    prevTable = text;
+                }
             }).catch(err => console.log(err));
         }
         let resultsarea = document.getElementById("table");

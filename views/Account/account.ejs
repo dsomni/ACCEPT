@@ -59,6 +59,7 @@
     </body>
     <script type=text/javascript>
         let min = (a, b) => {if(a>b)return b;return a;};
+        let prevTable="";
         function update(page) {
             fetch("/api/attempts/get/verdicts/<%= u_login %>/"+page+"/<%= search %>").then(response=>response.json()).then(response => {
                 let attempts = response.attempts;
@@ -86,7 +87,10 @@
                     text += `<td>${item[0]}<a id="${item[2]}"> ${item[1]}</a></td>`
                     text += `<td>${attempt.language}</td></tr>`;
                 }
-                resultsarea.innerHTML = text;
+                if(prevTable != text){
+                    resultsarea.innerHTML = text;
+                    prevTable = text;
+                }
             }).catch(err => console.log(err));
         }
         let resultsarea = document.getElementById("table");

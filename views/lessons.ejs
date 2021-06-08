@@ -63,6 +63,7 @@
     </body>
     <script>
         let min = (a, b) => {if(a>b)return b;return a;};
+        let prevTable="";
         function update(ids) {
             fetch("/api/cringe/get/verdicts/"+ids+"/lessons").then(response=>response.json()).then(response => {
                 let text = "<tr>\n<th>ID</th>\n<th>Урок</th>\n<th>Класс</th>\n<th>Автор</th>\n<th>Вердикт</th>\n</tr>";
@@ -78,7 +79,10 @@
                     }
                     text+=`\n<tr>\n<td>${parseInt(lessons[i].identificator)+1}</td>\n<td><a class="tlrefs" href="/lesson/<%= login %>/${lessons[i].identificator}">${lessons[i].title}</a></td>\n<td>${lessons[i].grade}</td>\n<td>${author}</td>\n<td>${verdicts[i]}</td>\n</tr>`
                 }
+                if(text != prevTable){
                 resultsarea.innerHTML = text;
+                prevTable = text;
+            }
             }).catch(err => console.log(err));
         }
         let resultsarea = document.getElementById("table");

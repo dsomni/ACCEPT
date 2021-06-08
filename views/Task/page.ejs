@@ -90,6 +90,7 @@
     </main>
     </body>
     <script>
+        let prevTable="";
         function update() {
             fetch("/api/task/get/testresults/" + task).then(response => response.json()).then(response => {
                 text = "<ul>";
@@ -113,7 +114,10 @@
                     inputarea.readOnly = false;
                     inputarea.placeholder = "Place code here";
                 }
-                resultsarea.innerHTML = text;
+                if(prevTable != text){
+                    resultsarea.innerHTML = text;
+                    prevTable = text;
+                }
             }).catch(err => console.log(err));
         }
         let resultsarea = document.getElementById("result");

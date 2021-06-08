@@ -48,7 +48,7 @@ async function popQueue() {
     quiz_id = quiz_id.slice(1, quiz_id.length);
     let quiz = await Quiz.findOne({ identificator: quiz_id }).exec();
     let grade = user.isTeacher ? "teacher" : user.grade + user.gradeLetter;
-    let lesson = quiz.lessons.find(item => item.grade == grade);
+    let lesson = quiz.lessons.find(item => item.grade.toLowerCase() == grade.toLowerCase());
     lesson.attempts.unshift({
       login: user.login,
       TaskID: object.id,
@@ -57,7 +57,7 @@ async function popQueue() {
       result: [],
       language: object.language
     });
-    let idx = quiz.lessons.findIndex(item => item.grade == grade);
+    let idx = quiz.lessons.findIndex(item => item.grade.toLowerCase() == grade.toLowerCase());
     quiz.lessons.splice(idx, 1, lesson);
     quiz.markModified("lessons");
     await quiz.save();
@@ -1978,11 +1978,9 @@ app.get('/quizzes/:login/:page/:search', checkAuthenticated, async (req, res) =>
     }
   }
 
-  let quizzes;
-  if (user.isTeacher) {
-    quizzes = await Quiz.find().exec();
-  } else {
-    quizzes = await Quiz.find({ template: false }).exec();
+  let quizzes = await Quiz.find().exec();
+  if (!user.isTeacher) {
+    quizzes = quizzes.filter(item => item.lessons.find(lesson => !lesson.isEnded && lesson.grade.toLowerCase() == user.grade + user.gradeLetter.toLowerCase()));
   }
   if (!!toSearch)
     quizzes = fuseSearch(quizzes, "title", toSearch, 0.5, [], (quiz, params) => { return true });
@@ -2017,8 +2015,8 @@ app.post('/quizzes/:login/:page/:search', checkAuthenticated, async (req, res) =
 
 //---------------------------------------------------------------------------------
 // Quiz page
-app.get("/quiz/page/:login/:id", checkAuthenticated, checkGrade, async (req, res) => {
-  let quiz = await Quiz.findOne({ identificator: req.params.id }).exec();
+app.get("/quiz/page/:login/:quiz_id", checkAuthenticated, checkGrade, async (req, res) => {
+  let quiz = await Quiz.findOne({ identificator: req.params.quiz_id }).exec();
   let student = await User.findOne({ login: req.params.login }).exec();
 
   res.render('Quiz/Global/Page.ejs', {
@@ -2029,7 +2027,7 @@ app.get("/quiz/page/:login/:id", checkAuthenticated, checkGrade, async (req, res
     quiz,
     user: req.user,
     ids: quiz.tasks.map(item => item.identificator).join("|"),
-    grade: (req.user.isTeacher && req.params.login == req.user.login) ? "teacher" : student.grade,
+    grade: (req.user.isTeacher && req.params.login == req.user.login) ? "teacher" : student.grade + student.gradeLetter.toLowerCase(),
     isTeacher: req.user.isTeacher,
     location: req.header('Referer')
   });
@@ -2095,8 +2093,6 @@ app.post("/quiz/delete/:id", checkAuthenticated, checkPermission, async (req, re
 //---------------------------------------------------------------------------------
 // Delete Task from Quiz
 app.post('/quiz/task/delete/:quiz_id/:id', checkAuthenticated, checkPermission, async (req, res) => {
-  console.log("node " + path.join(__dirname, "/public/scripts/fixes/FixAfterDeleteQuizTask.js") + " " +
-    req.params.quiz_id + " " + req.params.id);
   childProcess.exec("node " + path.join(__dirname, "/public/scripts/fixes/FixAfterDeleteQuizTask.js") + " " +
     req.params.quiz_id + " " + req.params.id);
   res.redirect('/quiz/page/' + req.user.login + '/' + req.params.quiz_id);
@@ -2208,7 +2204,7 @@ app.post('/quiz/task/edit/:quiz_id/:id', checkAuthenticated, checkPermission, up
     eval("exO = body.exampleOut" + i)
     if (exI == "" || exO == "") break;
     examples.push([exI.trim(), exO.trim()]);
-  } checkGrade
+  }
 
   let tests = [];
   if (req.file) {
@@ -2259,8 +2255,8 @@ app.get('/quiz/task/page/:quiz_id/:id', checkAuthenticated, checkGrade, async (r
   let quiz_id = req.params.quiz_id
   let quiz = await Quiz.findOne({ identificator: quiz_id }).exec();
   let ids = quiz.tasks.map(item => item.identificator).join("|");
-  let grade = req.user.isTeacher ? "teacher" : req.user.grade + req.user.gradeLetter;
-  let lesson = quiz.lessons.find(item => item.grade == grade);
+  let grade = req.user.isTeacher ? "teacher" : req.user.grade + req.user.gradeLetter.toLowerCase();
+  let lesson = quiz.lessons.find(item => item.grade.toLowerCase() == grade.toLowerCase());
   let whenEnds = lesson.whenEnds;
   task = quiz.tasks.find(item => item.identificator == req.params.id);
   if (!task) {
@@ -2284,6 +2280,7 @@ app.get('/quiz/task/page/:quiz_id/:id', checkAuthenticated, checkGrade, async (r
     login: req.user.login,
     ID: req.params.id,
     QUIZ_ID: req.params.quiz_id,
+    grade,
     name: req.user.name,
     title: "Task " + req.params.id,
     isTeacher: req.user.isTeacher,
@@ -2307,7 +2304,7 @@ app.get('/quiz/results/:quiz_id/:grade', checkAuthenticated, checkPermission, as
   let quiz = await Quiz.findOne({ identificator: req.params.quiz_id });
   if (!quiz)
     return res.redirect("/")
-  let lesson = quiz.lessons.find(lesson => lesson.grade == req.params.grade);
+  let lesson = quiz.lessons.find(lesson => lesson.grade.toLowerCase() == req.params.grade.toLowerCase());
   if (lesson) {
     res.render('Quiz/Global/Results.ejs', {
       login: req.user.login,
@@ -2317,7 +2314,7 @@ app.get('/quiz/results/:quiz_id/:grade', checkAuthenticated, checkPermission, as
       quiz,
       lesson,
       results: lesson.results,
-      grade: req.params.grade,
+      grade: req.params.grade.toLowerCase(),
       location: `/quiz/page/${req.user.login}/${req.params.quiz_id}`
     });
   } else {
@@ -2333,16 +2330,14 @@ app.post("/quiz/results/:quiz_id/:grade", checkAuthenticated, checkPermission, a
 // Attempt Page
 app.get('/quiz/attempt/:quiz_id/:login/:date', checkAuthenticated, checkValidation, async (req, res) => {
   let user;
-  if (req.user.login == req.params.login || req.user.isTeacher) {
+  if (req.user.login == req.params.login || !req.user.isTeacher) {
     user = req.user;
   } else {
     user = await User.findOne({ login: req.params.login }).exec();
   }
-  let grade = user.grade + user.gradeLetter;
-  if(user.isTeacher)
-    grade = "teacher";
+  let grade = user.isTeacher ? "teacher" : user.grade + user.gradeLetter;
   let quiz = await Quiz.findOne({ identificator: req.params.quiz_id }).exec();
-  let lesson = quiz.lessons.find(item => item.grade == grade);
+  let lesson = quiz.lessons.find(item => item.grade.toLowerCase() == grade.toLowerCase());
   let attempt = lesson.attempts.find(item => item.date == req.params.date);
 
   if (attempt) {
@@ -2368,9 +2363,20 @@ app.get('/quiz/attempt/:quiz_id/:login/:date', checkAuthenticated, checkValidati
 //Quiz add time
 app.post("/quiz/set/time", checkAuthenticated, checkPermission, async (req, res) => {
   let quiz = await Quiz.findOne({ identificator: req.body.quiz_id });
-  let lesson = quiz.lessons.findIndex(item => item.grade == req.body.grade);
-  quiz.lessons[lesson].whenEnds = req.body.time;
-  quiz.lessons[lesson].isEnded = false;
+  let lessonIdx = quiz.lessons.findIndex(item => item.grade.toLowerCase() == req.body.grade.toLowerCase());
+  let lesson = quiz.lessons[lessonIdx];
+  if (!lesson.isEnded) {
+    quiz.lessons[lessonIdx].whenEnds = (new Date(Date.parse(lesson.whenEnds) + req.body.time + 3 * 60 * 60 * 1000)).toISOString().replace("T", " ").split(".")[0];
+  } else {
+    quiz.lessons[lessonIdx].whenEnds = (new Date(Date.now() + req.body.time + 3 * 60 * 60 * 1000)).toISOString().replace("T", " ").split(".")[0];
+  }
+  if (new Date(quiz.lessons[lessonIdx].whenEnds).getTime() - Date.now() <= 0) {
+    quiz.lessons[lessonIdx].isEnded = true;
+  } else {
+    quiz.lessons[lessonIdx].isEnded = false;
+    quiz.hasActiveLesson = true;
+  }
+  quiz.markModified("hasActiveLesson");
   quiz.markModified("lessons");
   await quiz.save();
   res.json({ error: false });
@@ -2385,16 +2391,18 @@ app.get("/api/task/get/testresults/:id", checkAuthenticated, async (req, res) =>
     result: [],
     status: "",
     code: "",
-    language: "Pascal"
+    language: "Pascal",
+    whenEnds: 0,
   }
   let attempts;
-  if(req.params.id[0] == "Q"){
+  if (req.params.id[0] == "Q") {
     let quiz = await Quiz.findOne({ identificator: req.params.id.split("_")[0].slice(1) });
     let grade = req.user.grade + req.user.gradeLetter;
-    if(req.user.isTeacher)
+    if (req.user.isTeacher)
       grade = "teacher";
-    let lesson = quiz.lessons.find(item => item.grade == grade);
+    let lesson = quiz.lessons.find(item => item.grade.toLowerCase() == grade.toLowerCase());
     attempts = lesson.attempts;
+    results.whenEnds = lesson.whenEnds;
   } else {
     attempts = req.user.attempts;
   }
@@ -2408,7 +2416,7 @@ app.get("/api/task/get/testresults/:id", checkAuthenticated, async (req, res) =>
       results.result = [["", "In testing queue(" + (isInQueue + 1).toString() + ")..", "er"]];
       results.status = "testing";
     } else {
-      let attempt = attempts.find(item => (item.TaskID == req.params.id)||(item.taskID == req.params.id));
+      let attempt = attempts.find(item => (item.TaskID == req.params.id) || (item.taskID == req.params.id));
       if (attempt) {
         results.result = attempt.result;
         if (attempt.result.find(item => item[2] == "er") != null)
@@ -2433,7 +2441,7 @@ app.get("/api/task/get/testverdicts/:login/:ids", checkAuthenticated, async (req
   for (let i = 0; i < ids.length; i++) {
     if (ids[i].split('_')[0] == '0') {
       task = await Task.findOne({ identificator: ids[i] }).exec();
-    } else if(ids[i][0] != "Q") {
+    } else if (ids[i][0] != "Q") {
       tournament = await Tournament.findOne({ identificator: parseInt(ids[i].split('_')[0]) }).exec();
       task = tournament.tasks.find(item => item.identificator == ids[i]);
     } else {
@@ -2450,17 +2458,17 @@ app.get("/api/task/get/testverdicts/:login/:ids", checkAuthenticated, async (req
   for (let i = 0; i < ids.length; i++) {
     id = ids[i];
     if (id[0] == "Q") {
-      grade = user.grade+user.gradeLetter;
-      if(user.isTeacher)
+      grade = user.grade + user.gradeLetter;
+      if (user.isTeacher)
         grade = "teacher";
       quiz = await Quiz.findOne({ identificator: parseInt(id.split("_")[0].slice(1)) }).exec();
-      lesson = quiz.lessons.find(item => item.grade == grade);
+      lesson = quiz.lessons.find(item => item.grade.toLowerCase() == grade.toLowerCase());
       verdict = "-";
       let items = lesson.attempts.filter(item => (item.TaskID == id && item.login == user.login)).reverse();
-      for(let k = 0; k < items.length; k++){
+      for (let k = 0; k < items.length; k++) {
         let item = items[k];
         verdict = getVerdict(item.result);
-        if(verdict == "OK")
+        if (verdict == "OK")
           break;
       };
     } else {
@@ -2652,6 +2660,15 @@ app.get("/api/tournament/get/attempts/:id/:page/:search", checkAuthenticated, as
   });
 });
 
+//--------------------------------------------------------------------------------------
+app.get("/api/quiz/get/time/:quiz_id/:grade", checkAuthenticated, async (req, res) => {
+  let quiz = await Quiz.findOne({ identificator: req.params.quiz_id });
+  let lesson = quiz.lessons.find(lesson => lesson.grade.toLowerCase() == req.params.grade.toLowerCase());
+  if (!lesson)
+    return res.json({ error: true });
+  return res.json({ error: false, whenEnds: lesson.whenEnds });
+});
+
 //---------------------------------------------------------------------------------
 // ??? toDo
 app.get('/egg1', checkAuthenticated, checkNotPermission, async (req, res) => {
@@ -2731,14 +2748,18 @@ function checkTournamentValidation(req, res, next) {
   res.redirect('/tournaments/' + req.user.login + '/1/default&all')
 }
 
-function checkGrade(req, res, next) {
+async function checkGrade(req, res, next) {
   if (req.user.isTeacher)
     return next()
-  Quiz.findOne({ identificator: req.params.id }).then(quiz => {
-    if ((req.user.grade + req.user.gradeLetter).toLowerCase() == quiz.grade.toLowerCase())
-      return next()
-    return res.redirect("/");
-  }).catch(err => res.redirect("/"));
+  user = await User.findOne({ login: req.params.login ? req.params.login : req.user.login });
+  if (!user)
+    return res.redirect(`/quizzes/${req.user.login}/1/default`);
+  let quiz = await Quiz.findOne({ identificator: req.params.quiz_id });
+  let grade = user.isTeacher ? "teacher" : user.grade + user.gradeLetter;
+  let lesson = quiz.lessons.find(lesson => !lesson.isEnded && lesson.grade.toLowerCase() == grade.toLowerCase());
+  if (lesson)
+    return next()
+  return res.redirect(`/quizzes/${req.user.login}/1/default`);
 }
 
 async function checkTournamentPermission(req, res, next) {

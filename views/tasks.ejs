@@ -65,6 +65,7 @@
     </body>
     <script type = text/javascript>
         let min = (a, b) => {if(a>b)return b;return a;};
+        let prevTable="";
         function update(ids) {
             fetch("/api/task/get/testverdicts/<%= login %>/"+ids).then(response=>response.json()).then(response => {
                 let text = "<tr>\n<th>ID</th>\n<th>Задача</th>\n<th>Тема</th>\n<th>Класс</th>\n<th>Автор</th>\n<th>Вердикт</th>\n</tr>";
@@ -80,7 +81,10 @@
                     }
                     text+=`\n<tr>\n<td>${parseInt(tasks[i].identificator.split('_')[1])+1}</td>\n<td><a class="tlrefs" href="/task/page/${tasks[i].identificator}">${tasks[i].title}</a></td>\n<td>${tasks[i].topic}</td>\n<td>${tasks[i].grade}</td>\n<td>${author}</td>\n<td>${verdicts[i]} </td>\n</tr>`
                 }
-                resultsarea.innerHTML = text;
+                if(prevTable != text){
+                    resultsarea.innerHTML = text;
+                    prevTable = text;
+                }
             }).catch(err => console.log(err));
         }
         let resultsarea = document.getElementById("table");

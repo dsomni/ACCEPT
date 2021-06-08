@@ -24,7 +24,6 @@ async function checkEnd() {
   now = new Date();
   let b = false;
   let lesson, quiz;
-  console.log(to_check_end);
   for (let i = 0; i < to_check_end.length; i++) {
     obj = to_check_end[i];
     quiz = obj.quiz;

@@ -46,6 +46,7 @@
 
         <script type = text/javascript>
             let min = (a, b) => {if(a>b)return b;return a;};
+            let prevTable="";
             function update(ids) {
                 fetch("/api/lessons/get/verdicts/<%=lesson.identificator%>/"+ids).then(response=>response.json()).then(response => {
                     let text = `<tr>\n<th>Логин</th>\n<th>Имя</th>\n<th>Класс</th>\n<th>Группа</th>\n<th>Вердикт</th>\n</tr>\n`;
@@ -63,7 +64,10 @@
                         text += `<td><a class="tlrefs" href="/lesson/${users[i].login}/<%=ID%>">${verdicts[i]}</a></td>`;
                         text +=`</tr>`;
                     };
-                    resultsarea.innerHTML = text;
+                    if(prevTable != text){
+                        resultsarea.innerHTML = text;
+                        prevTable = text;
+                    }
                 }).catch(err => console.log(err));
             }
             let resultsarea = document.getElementById("table");

@@ -59,6 +59,7 @@
     <script src="/socket.io/socket.io.js"></script>
     <script type = text/javascript>
         let min = (a, b) => {if(a>b)return b;return a;};
+        let prevTable="";
         function update(ids) {
             let text;
             if(ids.length == 0){
@@ -80,7 +81,10 @@
                         text+=`\n<tr>\n<td>${parseInt(tasks[i].identificator.split('_')[1])+1}</td>\n<td> <a class="tlrefs" href="/tournament/task/page/${<%= tournament.identificator %>}/${tasks[i].identificator}">${tasks[i].title}</a></td>\n<td>${verdicts[i]}</td>\n<td><a class="tlrefs" href="/account/<%= u_login %>/1/${tasks[i].title.replace(' ','%20')}&all">[все попытки]</a></td>\n</tr>`;
                     }
                     text+="\n</table>";
-                    resultsarea.innerHTML = text;
+                    if(prevTable != text){
+                        resultsarea.innerHTML = text;
+                        prevTable = text;
+                    }
                 }).catch(err => console.log(err));
             }
         }

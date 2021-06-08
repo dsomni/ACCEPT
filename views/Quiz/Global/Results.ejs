@@ -26,7 +26,7 @@
     </form>
     <div>
       <dialog id="addtime">
-        <h3 class = "h3">Время в секундах которое необходимо добавить</h3>
+        <h3 class = "h3">Время в минутах которое необходимо добавить</h3>
         <input type="number" name="time" id="time">
         <button id="comfirmButton">Добавить</button>
         <button id="cancelButton">Отмена</button>
@@ -45,6 +45,7 @@
   </main>
   <script>
     let min = (a, b) => { if (a > b) return b; return a; };
+    let prevTable="";
     function update(first) {
       if (first || <%= !quiz.isEnded %>){
         fetch("/api/quiz/get/results/<%= quiz.identificator %>/<%= lesson.grade %>").then(response => response.json()).then(response => {
@@ -81,7 +82,10 @@
             }
             text += "</tr>\n"
           }
-          resultsarea.innerHTML = text + "</tr>\n";
+          if(prevTable != text + "</tr>\n"){
+            resultsarea.innerHTML = text + "</tr>\n";
+            prevTable = text + "</tr>\n"
+          }
         }).catch(err => console.log(err));
       }
     }
@@ -89,7 +93,7 @@
     update(true);
     setInterval(() => {
       update(false);
-    }, 10000);
+    }, 5000);
   </script>
   <script>
     let addTime = document.getElementById("addtime");
@@ -104,8 +108,7 @@
       addTime.close();
     });
     comfirmButton.addEventListener("click", () => {
-      let time = timeInput.value*1000;
-      time = (new Date(Date.parse('<%= lesson.whenEnds %>') + time + 3*60*60*1000)).toISOString().replace("T", " ").split(".")[0];
+      let time = timeInput.value*60*1000;
       addTime.close();
       fetch("/quiz/set/time", {
         method: "POST",
@@ -124,6 +127,17 @@
     });
 </script>
 <script>
+  let quiz_id = "<%= quiz.identificator %>";
+  let grade = "<%= grade %>";
+  let whenEnds = 0;
+  async function getTime(){
+    let response = await fetch("/api/quiz/get/time/" + quiz_id + "/" + grade).then(response=>response.json())
+    if(response.error)
+      return 0
+    return new Date(response.whenEnds).getTime();
+  }
+
+
   let dropTime = document.getElementById("droptime");
   let showDropButton = document.getElementById("droptimebutton");
   let comfirmDropButton = document.getElementById("comfirmDropButton");
@@ -136,22 +150,24 @@
     dropTime.close();
   });
   comfirmDropButton.addEventListener("click", ()=>{
-    time = (new Date(Date.now() + 3*60*60*1000)).toISOString().replace("T", " ").split(".")[0];
-    dropTime.close();
-    fetch("/quiz/set/time", {
-        method: "POST",
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        mode: "cors",
-        credentials: "same-origin",
-        body: JSON.stringify({
-          quiz_id : "<%= quiz.identificator  %>",
-          grade: "<%= grade %>",
-          time
-        })
+    getTime().then(whenEnds =>{
+      let time = Date.now()- whenEnds;
+      dropTime.close();
+      fetch("/quiz/set/time", {
+          method: "POST",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          mode: "cors",
+          credentials: "same-origin",
+          body: JSON.stringify({
+            quiz_id : "<%= quiz.identificator  %>",
+            grade: "<%= grade %>",
+            time
+          })
       });
+    });
   });
 </script>
 </html>
