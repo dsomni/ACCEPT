@@ -19,6 +19,7 @@ const multer = require("multer");
 const StreamZip = require('node-stream-zip');
 const nodemailer = require("nodemailer");
 const MongoStorage = require("connect-mongo");
+const bodyParser = require("body-parser");
 require("dotenv").config();
 const app = express();
 //---------------------------------------------------------------------------------
@@ -162,6 +163,7 @@ app.use(morgan(':method   :date[web]   :url   :status', {
 app.use(express.urlencoded({ extended: false }));
 app.use('/public', express.static('public')); //where search for static files
 
+app.use(bodyParser.json());
 app.use(expressLayouts);
 app.set('layout', 'layout.ejs');
 app.use(flash());
@@ -2257,7 +2259,9 @@ app.get('/quiz/task/page/:quiz_id/:id', checkAuthenticated, checkGrade, async (r
   let quiz_id = req.params.quiz_id
   let quiz = await Quiz.findOne({ identificator: quiz_id }).exec();
   let ids = quiz.tasks.map(item => item.identificator).join("|");
-  let whenEnds = quiz.whenEnds;
+  let grade = req.user.isTeacher ? "teacher" : req.user.grade + req.user.gradeLetter;
+  let lesson = quiz.lessons.find(item => item.grade == grade);
+  let whenEnds = lesson.whenEnds;
   task = quiz.tasks.find(item => item.identificator == req.params.id);
   if (!task) {
     return res.redirect('/quiz/page/' + req.user.login + '/' + req.params.quiz_id);
@@ -2272,8 +2276,6 @@ app.get('/quiz/task/page/:quiz_id/:id', checkAuthenticated, checkGrade, async (r
       break;
     }
   }
-  let grade = req.user.isTeacher ? "teacher" : req.user.grade + req.user.gradeLetter;
-  let lesson = quiz.lessons.find(item => item.grade == grade);
   if (!lesson)
     return res.redirect(`/quiz/page/${req.user.login}/${req.params.quiz_id}`);
 
@@ -2303,6 +2305,8 @@ app.post('/quiz/task/page/:quiz_id/:id', checkAuthenticated, checkGrade, uploadC
 // quiz results page
 app.get('/quiz/results/:quiz_id/:grade', checkAuthenticated, checkPermission, async (req, res) => {
   let quiz = await Quiz.findOne({ identificator: req.params.quiz_id });
+  if (!quiz)
+    return res.redirect("/")
   let lesson = quiz.lessons.find(lesson => lesson.grade == req.params.grade);
   if (lesson) {
     res.render('Quiz/Global/Results.ejs', {
@@ -2359,6 +2363,18 @@ app.get('/quiz/attempt/:quiz_id/:login/:date', checkAuthenticated, checkValidati
     res.redirect('/account/' + req.user.login + '/1/default&all')
   }
 })
+
+//------------------------------------------------------------------------------------------------
+//Quiz add time
+app.post("/quiz/set/time", checkAuthenticated, checkPermission, async (req, res) => {
+  let quiz = await Quiz.findOne({ identificator: req.body.quiz_id });
+  let lesson = quiz.lessons.findIndex(item => item.grade == req.body.grade);
+  quiz.lessons[lesson].whenEnds = req.body.time;
+  quiz.lessons[lesson].isEnded = false;
+  quiz.markModified("lessons");
+  await quiz.save();
+  res.json({ error: false });
+});
 
 // API
 //------------------------------------------------------------------------------------------------API
@@ -2605,6 +2621,8 @@ app.get("/api/quiz/get/results/:id/:grade", checkAuthenticated, async (req, res)
   let id = req.params.id;
   let grade = req.params.grade;
   let quiz = await Quiz.findOne({ identificator: id }).exec();
+  if (!quiz)
+    return res.redirect("/");
   let lesson = quiz.lessons.find(item => item.grade == grade);
   let results = lesson.results;
   res.json(results);

@@ -99,7 +99,7 @@ exports.AddQuizTemplate = async (Quiz, title, description, duration, author) => 
             teacher: "server",
             results: [],
             attempts: [],
-            whenEnds: 0,
+            whenEnds: (new Date(Date.now() + 3*60*60*1000)).toISOString().replace("T", " ").split(".")[0],
             isEnded: true
     }]
     }
@@ -109,7 +109,7 @@ exports.AddQuizTemplate = async (Quiz, title, description, duration, author) => 
 exports.AddQuiz = async (Quiz, grade, teacher, parentID) => {
     let parent = await Quiz.findOne({ identificator: parentID }).exec();
     let whenEnds = new Date();
-    whenEnds = (new Date(whenEnds.getTime() + parent.duration * 60 * 1000 + 3*60*60*1000)).toISOString().replace("T", " ").split(".")[0];
+    whenEnds = (new Date(whenEnds.getTime() + parent.duration * 60 * 1000 + 3 * 60 * 60 * 1000)).toISOString().replace("T", " ").split(".")[0];
     let lesson = {
         grade,
         teacher,
@@ -125,7 +125,6 @@ exports.AddQuiz = async (Quiz, grade, teacher, parentID) => {
 }
 
 exports.addTaskToQuiz = async function (Quiz, quiz_id, title, author, statement, input, output, examples, tests) {
-
     let quiz = await Quiz.findOne({ identificator: quiz_id }).exec();
     quiz.tasks.push({
         identificator: "Q" + quiz_id + '_' + quiz.tasks.length,
