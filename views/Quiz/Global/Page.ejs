@@ -79,7 +79,7 @@
         text += `\n<tr>\n<td>${parseInt(tasks[i].identificator.split('_')[1]) + 1}</td>\n<td> <a class="tlrefs" href="/quiz/task/page/${<%= quiz.identificator %>}/${tasks[i].identificator}">${tasks[i].title}</a></td>\n <td> ${ verdicts[i] }</td>\n</tr >`;
         }
         text+="\n</table>";
-        if(prevTable != text)
+        if(prevTable != text){
           resultsarea.innerHTML = text;
           prevTable = text;
         }
