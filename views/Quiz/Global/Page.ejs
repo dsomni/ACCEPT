@@ -44,20 +44,21 @@
               </form>
               <button onClick='c("delete");'>Назад</button>
             </dialog>
-            <button onClick='o("delete");' class="show EditButtons">Удалить</button>
+            <button onClick='o("delete");' class="show EditButtons" style = "margin-bottom: 2rem;">Удалить</button>
           </span>
-          <% if(!quiz.isBegan) { %><a class="EditButtons" href=<%="/quiz/task/add/" + quiz.identificator %> >Добавить задачу</a><% } %>
-            <br>
-        <% } %>
-        <a class="EditButtons" href=<%="/quiz/results/" + quiz.identificator + "/teacher" %>>Таблица результатов</a>
+          <% if(!quiz.isBegan) { %>
+            <a class="EditButtons" href=<%="/quiz/task/add/" + quiz.identificator %> >Добавить задачу</a><% } %>
+            <% } %>
+        <br>
+        <a class="EditButtons" href=<%="/quiz/results/" + quiz.identificator + "/teacher" %> style="background-color: lightgreen; padding: 1rem;" >Панель управления</a>
       </div>
-      <h4 class="h4">Автор: <%= quiz.author %>
-      </h4>
+      <h4 class="h4">Автор: <%= quiz.author %>&nbsp;&nbsp;&nbsp;&nbsp;Длительность: <%= quiz.duration %> минут</h4>
       <div style="margin-left: 20px;" id="statement"><%= quiz.description %></div>
     </div>
     <div id="table"></div>
-    <p class="countDownTimer" id="countDownTimer" style="left: 5rem; right:auto; top:20px"></p>
-
+    <% if(!isTeacher){ %>
+      <p class="countDownTimer" id="countDownTimer" style="left: 5rem; right:auto; top:20px"></p>
+    <% } %>
     <div id="times" style="position: fixed;top: .2rem; right: .2rem;"></div>
   </main>
 </body>
@@ -94,58 +95,58 @@
       update(ids);
   }, 5000);
 </script>
-<script>
-  function getTime(){
-    fetch("/api/quiz/get/time/<%= quiz.identificator %>/<%= grade %>").then(response=>response.json()).then(response => {
-      if(!response.error)
-          whenEnds = new Date(response.whenEnds).getTime();
-    }).catch(err => console.log(err));
-  }
-  let whenEnds;
-  getTime();
-  setInterval(() => {
+<% if( isTeacher && quiz.hasActiveLesson ){ %>
+  <script>
+    function getTime(){
+      fetch("/api/quiz/get/time/<%= quiz.identificator %>/<%= grade %>").then(response=>response.json()).then(response => {
+        if(!response.error)
+            whenEnds = new Date(response.whenEnds).getTime();
+      }).catch(err => console.log(err));
+    }
+    let whenEnds;
     getTime();
-  }, 3000);
-
-  setInterval(() => {
-    let countDownDate = new Date(whenEnds).getTime();
-    var now = Date.now();
-    var distance = countDownDate - now;
-    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-    if (days>0)
-      document.getElementById("countDownTimer").innerHTML = "Окончание через "+ days + " дней " + ("0"+hours).slice(-2) + ":"
-          + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
-    else
-      document.getElementById("countDownTimer").innerHTML = "Окончание через "+ ("0"+hours).slice(-2) + ":"
-          + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
-    if (distance < 0) {
-      if(<%= !isTeacher %>)
-        window.location.reload()
-      document.getElementById("countDownTimer").innerHTML = "Окончен";
-    }
-  }, 1000);
-</script>
-<script>
-  <% if( isTeacher){ %>
-    async function updateWhenEnds(grades){
-    let text = ""
-    for(let i = 0; i<grades.length; i++){
-      let response = await fetch(`/api/quiz/get/time/<%= quiz.identificator %>/${grades[i]}`).then(response=>response.json());
-      if(!response.error){
-        text+=`<p class="countDownTimer whenEnds" id="countDownTimer"><a class="tlrefs" href="/quiz/results/<%= login %>/${grades[i]}"><b>${grades[i].toUpperCase()}</b></a> --- ${response.whenEnds}</p>`;
-      }
-    }
-    times.innerHTML = text;
-  }
-  let grades = "<%= quiz.lessons.filter(item => !item.isEnded).map(item=> item.grade).join("|") %>".split('|');
-  let times = document.getElementById("times");
-    updateWhenEnds(grades);
     setInterval(() => {
+      getTime();
+    }, 3000);
+
+    setInterval(() => {
+      let countDownDate = new Date(whenEnds).getTime();
+      var now = Date.now();
+      var distance = countDownDate - now;
+      var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      if (days>0)
+        document.getElementById("countDownTimer").innerHTML = "Окончание через "+ days + " дней " + ("0"+hours).slice(-2) + ":"
+            + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
+      else
+        document.getElementById("countDownTimer").innerHTML = "Окончание через "+ ("0"+hours).slice(-2) + ":"
+            + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
+      if (distance < 0) {
+        if(<%= !isTeacher %>)
+          window.location.reload()
+        document.getElementById("countDownTimer").innerHTML = "Окончен";
+      }
+    }, 1000);
+  </script>
+  <script>
+    async function updateWhenEnds(grades){
+      let text = ""
+      for(let i = 0; i<grades.length; i++){
+        let response = await fetch(`/api/quiz/get/time/<%= quiz.identificator %>/${grades[i].toLowerCase()}`).then(response=>response.json());
+        if(!response.error){
+          text+=`<p class="countDownTimer whenEnds" id="countDownTimer"><a class="tlrefs" href="/quiz/results/<%= login %>/${grades[i]}"><b>${grades[i].toUpperCase()}</b></a> --- ${response.whenEnds}</p>`;
+        }
+      }
+      times.innerHTML = text;
+    }
+    let grades = "<%= quiz.lessons.filter(item => !item.isEnded).map(item=> item.grade).join("|") %>".split('|');
+    let times = document.getElementById("times");
       updateWhenEnds(grades);
-    }, 10000);
- <% } %>
-</script>
+      setInterval(() => {
+        updateWhenEnds(grades);
+      }, 10000);
+  </script>
+<% } %>
 </html>

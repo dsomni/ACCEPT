@@ -2632,7 +2632,19 @@ app.get("/api/quiz/get/results/:id/:grade", checkAuthenticated, async (req, res)
   if (!quiz)
     return res.redirect("/");
   let lesson = quiz.lessons.find(item => item.grade == grade);
-  let results = lesson.results;
+  let results = [];
+  let result;
+  for(let i=0 ; i< lesson.results.length;i++){
+    result = lesson.results[i];
+    let user = await User.findOne({ login: result.login }).exec();
+    result = {
+      name: user.name,
+      login: result.login,
+      sumscore: result.sumscore,
+      tasks: result.tasks,
+    }
+    results.push(result);
+  }
   res.json(results);
 });
 

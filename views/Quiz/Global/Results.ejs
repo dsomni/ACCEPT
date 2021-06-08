@@ -46,7 +46,9 @@
       <% } %>
     </div>
     <table class='taskslist noPages' id="table"></table>
-    <p class="countDownTimer" id="countDownTimer" style="left: auto; right:1rem; top:20px"></p>
+    <% if(!(grade=="teacher")){ %>
+      <p class="countDownTimer" id="countDownTimer" style="left: auto; right:1rem; top:20px"></p>
+    <% } %>
   </main>
   <script>
     let min = (a, b) => { if (a > b) return b; return a; };
@@ -54,7 +56,7 @@
     function update(first) {
       if (first || <%= !quiz.isEnded %>){
         fetch("/api/quiz/get/results/<%= quiz.identificator %>/<%= lesson.grade %>").then(response => response.json()).then(response => {
-          let text = "<tr>\n<th>LOGIN</th>\n";
+          let text = "<tr>\n<th>LOGIN</th><th>Имя</th>\n";
           let results = response;
           for (let i = 0; i < results[0].tasks.length; i++) {
             text += `<th><a class="tlrefs" href="/quiz/task/page/<%= quiz.identificator %>/Q<%= quiz.identificator %>_${i}">${i + 1}</a></th>`;
@@ -72,6 +74,7 @@
             text += "<tr>\n";
             if (result) {
               text += `<td><a class="tlrefs" href="/account/${result.login}/1/default&all">${result.login}</a></td>\n`;
+              text += `<td>${result.name}</td>\n`;
               for (let j = 0; j < result.tasks.length; j++) {
                 task = result.tasks[j];
                 links = "";
@@ -174,37 +177,38 @@
     });
   });
 </script>
-<script>
-  function getTime2(){
-    fetch("/api/quiz/get/time/<%= quiz.identificator %>/<%= grade %>").then(response=>response.json()).then(response => {
-      if(!response.error)
-          whenEnds2 = new Date(response.whenEnds).getTime();
-    }).catch(err => console.log(err));
-  }
-  let whenEnds2;
-  getTime2();
-  setInterval(() => {
-    getTime2();
-  }, 3000);
-
-  setInterval(() => {
-    let countDownDate = new Date(whenEnds2).getTime();
-    var now = Date.now();
-    var distance = countDownDate - now;
-    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-    if (days>0)
-      document.getElementById("countDownTimer").innerHTML = "Окончание через "+ days + " дней " + ("0"+hours).slice(-2) + ":"
-          + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
-    else
-      document.getElementById("countDownTimer").innerHTML = "Окончание через "+ ("0"+hours).slice(-2) + ":"
-          + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
-    if (distance < 0) {
-      document.getElementById("countDownTimer").innerHTML = "Окончен";
+<% if(!(grade == "teacher")){ %>
+  <script>
+    function getTime2(){
+      fetch("/api/quiz/get/time/<%= quiz.identificator %>/<%= grade %>").then(response=>response.json()).then(response => {
+        if(!response.error)
+            whenEnds2 = new Date(response.whenEnds).getTime();
+      }).catch(err => console.log(err));
     }
-  }, 1000);
-</script>
+    let whenEnds2;
+    getTime2();
+    setInterval(() => {
+      getTime2();
+    }, 3000);
 
+    setInterval(() => {
+      let countDownDate = new Date(whenEnds2).getTime();
+      var now = Date.now();
+      var distance = countDownDate - now;
+      var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      if (days>0)
+        document.getElementById("countDownTimer").innerHTML = "Окончание через "+ days + " дней " + ("0"+hours).slice(-2) + ":"
+            + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
+      else
+        document.getElementById("countDownTimer").innerHTML = "Окончание через "+ ("0"+hours).slice(-2) + ":"
+            + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
+      if (distance < 0) {
+        document.getElementById("countDownTimer").innerHTML = "Окончен";
+      }
+    }, 1000);
+  </script>
+<% } %>
 </html>
