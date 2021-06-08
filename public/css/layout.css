@@ -162,7 +162,7 @@ header {
 
 header:hover {
   transition-delay: .75s;
-  width: 220px;
+  width: 200px;
   word-wrap: normal;
 }
 
@@ -890,6 +890,11 @@ header input {
   padding: .3rem;
 }
 
+.whenEnds {
+  position: relative;
+  margin: 5px;
+}
+
 .ChatMessage {
   width: calc(100%-2px);
   border-bottom: solid #00000077 .1em;
@@ -996,13 +1001,17 @@ header input {
   margin: 2px;
 }
 
+.noPages{
+  margin-bottom: 5rem;
+}
+
 .resulttext {
   color: black;
   border: none;
   width: 5rem;
   padding: .2rem;
   text-align: center;
-  background: #f5ffff;
+  background: transparent;
 }
 
 .dropdown-content {

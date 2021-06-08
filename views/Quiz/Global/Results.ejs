@@ -15,33 +15,38 @@
 
 <body>
   <main>
-    <h1>Результаты урока <%= quiz.title %> класса <%= grade %></h1>
-    <form action="/quiz/results/<%= quiz.identificator %>/<%= grade %>" method="post">
-      <select name="gradeSelector" id = "gradeSelector">
-          <% for(let i = 0; i < quiz.lessons.length; i++){ %>
-            <option value="<%= quiz.lessons[i].grade %>"><%= quiz.lessons[i].grade.toUpperCase() %></option>
-          <% } %>
-      </select>
-      <button>Показать</button>
-    </form>
-    <div>
-      <dialog id="addtime">
-        <h3 class = "h3">Время в минутах которое необходимо добавить</h3>
-        <input type="number" name="time" id="time">
-        <button id="comfirmButton">Добавить</button>
-        <button id="cancelButton">Отмена</button>
-      </dialog>
-      <button id="addtimebutton">Добавить время</button>
+    <h1><%= (grade == "teacher" ? `Посылки учителей урока \"${quiz.title}\"` : `Результаты урока \"${quiz.title}\" класса ${grade.toUpperCase()}`) %></h1>
+    <div style="display: flex; flex-direction: row; gap:5px; margin-left: 120px;">
+      <form action="/quiz/results/<%= quiz.identificator %>/<%= grade %>" method="post">
+        <select name="gradeSelector" id = "gradeSelector">
+            <% for(let i = 0; i < quiz.lessons.length; i++){ %>
+              <option value="<%= quiz.lessons[i].grade %>" <%= quiz.lessons[i].grade.toLowerCase()==grade.toLowerCase()?"selected":"" %> ><%= quiz.lessons[i].grade.toUpperCase() %></option>
+            <% } %>
+        </select>
+        <button>Показать</button>
+      </form>
+      <% if(!(grade=="teacher")){ %>
+        <div>
+          <dialog id="addtime">
+            <h3 class = "h3">Время в минутах которое необходимо добавить</h3>
+            <input type="number" name="time" id="time">
+            <button id="comfirmButton">Добавить</button>
+            <button id="cancelButton">Отмена</button>
+          </dialog>
+          <button id="addtimebutton">Добавить время</button>
+        </div>
+        <div>
+          <dialog id="droptime">
+            <h3 class = "h3">Вы уверены что хотите завершить контрольную работу</h3>
+            <button id="comfirmDropButton">Завершить</button>
+            <button id="cancelDropButton">Отмена</button>
+          </dialog>
+          <button id="droptimebutton">Завершить</button>
+        </div>
+      <% } %>
     </div>
-    <div>
-      <dialog id="droptime">
-        <h3 class = "h3">Вы уверены что хотите завершить контрольную работу</h3>
-        <button id="comfirmDropButton">Завершить</button>
-        <button id="cancelDropButton">Отмена</button>
-      </dialog>
-      <button id="droptimebutton">Завершить</button>
-    </div>
-    <table class='taskslist' id="table"></table>
+    <table class='taskslist noPages' id="table"></table>
+    <p class="countDownTimer" id="countDownTimer" style="left: auto; right:1rem; top:20px"></p>
   </main>
   <script>
     let min = (a, b) => { if (a > b) return b; return a; };
@@ -137,7 +142,6 @@
     return new Date(response.whenEnds).getTime();
   }
 
-
   let dropTime = document.getElementById("droptime");
   let showDropButton = document.getElementById("droptimebutton");
   let comfirmDropButton = document.getElementById("comfirmDropButton");
@@ -170,4 +174,37 @@
     });
   });
 </script>
+<script>
+  function getTime2(){
+    fetch("/api/quiz/get/time/<%= quiz.identificator %>/<%= grade %>").then(response=>response.json()).then(response => {
+      if(!response.error)
+          whenEnds2 = new Date(response.whenEnds).getTime();
+    }).catch(err => console.log(err));
+  }
+  let whenEnds2;
+  getTime2();
+  setInterval(() => {
+    getTime2();
+  }, 3000);
+
+  setInterval(() => {
+    let countDownDate = new Date(whenEnds2).getTime();
+    var now = Date.now();
+    var distance = countDownDate - now;
+    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    if (days>0)
+      document.getElementById("countDownTimer").innerHTML = "Окончание через "+ days + " дней " + ("0"+hours).slice(-2) + ":"
+          + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
+    else
+      document.getElementById("countDownTimer").innerHTML = "Окончание через "+ ("0"+hours).slice(-2) + ":"
+          + ("0"+minutes).slice(-2) + ":" + ("0"+seconds).slice(-2);
+    if (distance < 0) {
+      document.getElementById("countDownTimer").innerHTML = "Окончен";
+    }
+  }, 1000);
+</script>
+
 </html>
