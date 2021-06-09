@@ -1579,7 +1579,7 @@ app.post('/tournament/attempts/:tour_id/:page/:toSearch', checkAuthenticated, is
 
 //---------------------------------------------------------------------------------
 // Tournament disqualification
-app.post("/tournament/disqualAttempt/:tour_id/:AttemptDate", checkAuthenticated, isModerator, async (req, res) => {
+app.get("/tournament/disqualAttempt/:tour_id/:AttemptDate", checkAuthenticated, isModerator, async (req, res) => {
   let AttemptDate = req.params.AttemptDate;
   let tournament = await Tournament.findOne({ identificator: req.params.tour_id }).exec();
   let idx = tournament.attempts.findIndex(item => item.AttemptDate == AttemptDate);
@@ -1588,6 +1588,9 @@ app.post("/tournament/disqualAttempt/:tour_id/:AttemptDate", checkAuthenticated,
   let TaskID = tournament.attempts[idx].TaskID.split('_')[1];
   tournament.attempts.splice(idx, 1);
   let resUserIndx = tournament.results.findIndex(item => item.login == login);
+  console.log(idx, login, resUserIndx);
+  if (resUserIndx == -1)
+    return res.redirect(`/tournament/attempts/${req.params.tour_id}/1/all&all&all&true`);
   if (score == tournament.results[resUserIndx].tasks[TaskID].score) {
     let mx = -1;
     let mx_ind;
@@ -1618,7 +1621,7 @@ app.post("/tournament/disqualAttempt/:tour_id/:AttemptDate", checkAuthenticated,
   res.redirect(`/tournament/attempts/${req.params.tour_id}/1/all&all&all&true`)
 });
 
-app.post("/tournament/disqualUser/:tour_id/:login", checkAuthenticated, isModerator, async (req, res) => {
+app.get("/tournament/disqualUser/:tour_id/:login", checkAuthenticated, isModerator, async (req, res) => {
   let login = req.params.login;
   let tournament = await Tournament.findOne({ identificator: req.params.tour_id }).exec();
   tournament.results.splice(tournament.results.findIndex(item => item.login == login), 1);

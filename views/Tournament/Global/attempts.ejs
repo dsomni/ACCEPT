@@ -51,12 +51,14 @@
         function update(page) {
             fetch("/api/tournament/get/attempts/<%= tourID %>/"+page+"/<%= search %>").then(response=>response.json()).then(response => {
                 let attempts = response.attempts;
-                let dialogs = "";
-                let text = `<tr>\n<th>Login</th>\n<th>Attempt</th>\n<th>TaskID</th>\n<th>Score</th>\n<th>Дисквалификация</th>\n</tr>\n`;
+                let popup = "";
+                let text = `<tr>\n<th>Login</th>\n<th>Attempt</th>\n<th>TaskID</th>\n<th>Score</th>\n<th style="text-align: center;">Бан</th>\n</tr>\n`;
                 let attempt, login;
                 for(let i = 0; i<attempts.length;i++){
                     attempt = attempts [i];
-                    dialogs = `<span class="disqual">\n<dialog id="attempt${i}">\n<form action="/tournament/disqualAttempt/<%=tourID%>/${attempt.AttemptDate}" method="POST">\n<p>Вы уверены что хотите дисквалифицировань посылку?</p>\n<button >Уверен(а)</button>\n</form>\n<button onClick="c(\'attempt${i}\');">Отмена</button></dialog>\n<button onclick="o(\'attempt${i}\');" class="show">Посылка</button>\n<dialog id="user${i}">\n<form action="/tournament/disqualUser/<%=tourID%>/${attempts[i].login}" method="POST">\n<p>Вы уверены что хотите дисквалифицировань участника?</p>\n<button>Уверен(а)</button>\n</form>\n<button onClick="c(\'user${i}\');">Отмена</button>\n</dialog>\n<button onclick="o(\'user${i}\');" class="show">Участник</button>\n</span>`;
+                    popup = `<span class="popuptext" id="attempt${i}"><button class="popupButton" onclick="location.href='/tournament/disqualAttempt/<%=tourID%>/${attempt.AttemptDate}'" >Посылку</button>`
+                        + `<button class="popupButton" onclick="location.href='/tournament/disqualUser/<%=tourID%>/${attempts[i].login}'">Пользователя</button></span>`
+                    // dialogs = `<span class="disqual">\n<dialog id="attempt${i}">\n<form action="/tournament/disqualAttempt/<%=tourID%>/${attempt.AttemptDate}" method="POST">\n<p>Вы уверены что хотите дисквалифицировань посылку?</p>\n<button >Уверен(а)</button>\n</form>\n<button onClick="c(\'attempt${i}\');">Отмена</button></dialog>\n<button onclick="o(\'attempt${i}\');" class="show">Посылка</button>\n<dialog id="user${i}">\n<form action="/tournament/disqualUser/<%=tourID%>/${attempts[i].login}" method="POST">\n<p>Вы уверены что хотите дисквалифицировань участника?</p>\n<button>Уверен(а)</button>\n</form>\n<button onClick="c(\'user${i}\');">Отмена</button>\n</dialog>\n<button onclick="o(\'user${i}\');" class="show">Участник</button>\n</span>`;
                     login = attempt.login;
                     if(login.length > 2 && login.slice(0,2)=="n-"){
                         login = login.slice(2);
@@ -67,7 +69,7 @@
                     text += `<td><a class="t_attempts" href="/attempt/${attempt.login}/${attempt.AttemptDate}">[Посылка]</a></td>\n`;
                     text += `<td><a class="t_attempts" href="/tournament/task/page/<%=tourID%>/${attempt.TaskID}">${parseInt(attempt.TaskID.split("_")[1])+1}</a></td>\n`;
                     text += `<td>${attempt.score}</td>\n`;
-                    text += `<td style="width: 200px;">${dialogs}</td>\n`;
+                    text += `<td class="popup" onclick=ShowPopUp(${i}) > [X] ${popup}</td>\n`;
                     text += `</tr>\n`;
                 }
                 if(prevTable != text){
@@ -102,6 +104,12 @@
         }
         function c(id) {
             document.getElementById(id).close();
+        }
+    </script>
+    <script>
+        function ShowPopUp(i){
+            let popup = document.getElementById("attempt" + i);
+            popup.classList.toggle("show");
         }
     </script>
 </html>
