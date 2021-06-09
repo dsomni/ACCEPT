@@ -4,6 +4,11 @@ const pathConst = require("path");
 const mongoose = require('mongoose');
 const config = require('../../config/configs');
 
+let command = __dirname + '/pascalCompiler/pabcnetcclear.exe ';
+if (process.platform == "linux") {
+    command = "pabcnetcclear "
+}
+
 childProcess.exec('chcp 65001 | dir');
 
 let connectionString
@@ -41,16 +46,16 @@ async function go() {
     let taskid = process.argv[4];
     let tour_id = process.argv[4].split('_')[0];
 
-    let programText = fs.readFileSync(path + "\\programText.txt", "utf8");
+    let programText = fs.readFileSync(path + "/programText.txt", "utf8");
 
-    fs.writeFileSync(path + '\\' + fileName + '.pas', programText, "utf8");
+    fs.writeFileSync(path + '/' + fileName + '.pas', programText, "utf8");
 
     try {
-        childProcess.execSync(__dirname + '\\pascalCompiler\\pabcnetcclear.exe ' + path + '\\' + fileName + '.pas');
-    } catch {
+        childProcess.execSync(command + path + '/' + fileName + '.pas');
+    } catch(err) {
         // Compilation Error
 
-        fs.writeFileSync(path + '\\result.txt', "Test #1" + "*" + "Compilation Error" + "*" + "er", "utf8");
+        fs.writeFileSync(path + '/result.txt', "Test #1" + "*" + err + "*" + "er", "utf8");
 
         process.exit();
     }
@@ -70,18 +75,18 @@ async function go() {
     let tests = task.tests
 
     for (let i = 0; i < tests.length; i++) {
-        fs.writeFileSync(path + '\\input' + i + ".txt", tests[i][0], "utf8");
-        fs.writeFileSync(path + '\\output' + i + ".txt", tests[i][1], "utf8");
+        fs.writeFileSync(path + '/input' + i + ".txt", tests[i][0], "utf8");
+        fs.writeFileSync(path + '/output' + i + ".txt", tests[i][1], "utf8");
     }
 
-    fs.writeFileSync(path + '\\result.txt', "");
+    fs.writeFileSync(path + '/result.txt', "");
 
     for (let i = 0; i < tests.length; i++) {
         if (i % max(1, Math.trunc(config.maxThreadsTests - 0.7 * countProcesses())) == 0) {
             await sleep(1000);
         }
         childProcess.exec('node' + ' ' +
-            __dirname + '\\checker3PascalHelper.js' + ' ' +
+            __dirname + '/checker3PascalHelper.js' + ' ' +
             path + ' ' +
             fileName + ' ' +
             i);

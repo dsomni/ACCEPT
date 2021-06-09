@@ -11,8 +11,8 @@ let compilers = {
     "cpp": [path.join(__dirname, "cpp.exe"), ""],
     "java": ['java', [path.join(__dirname, "java.java")]],
     "pascal": [path.join(__dirname, "pascal.exe"), ""],
-    "python": [path.join(__dirname, "..\\..\\checker\\pythonCompiler\\python.exe"), path.join(__dirname, "python.py")],
-    "pypy": [path.join(__dirname, "..\\..\\checker\\pypyCompiler\\pypy3.exe"), path.join(__dirname, "python.py")],
+    "python": [path.join(__dirname, "../../checker/pythonCompiler/python.exe"), path.join(__dirname, "python.py")],
+    "pypy": [path.join(__dirname, "../../checker/pypyCompiler/pypy3.exe"), path.join(__dirname, "python.py")],
 }
 
 async function run(Command) {

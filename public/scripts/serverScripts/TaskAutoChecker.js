@@ -26,12 +26,12 @@ async function check() {
   if (!isBusy) {
     isBusy = true;
 
-    let processesPath = path.normalize(__dirname + "\\..\\..\\processes");
+    let processesPath = path.normalize(__dirname + "/../../processes");
 
     let files = await fs.readdirSync(processesPath);
     for (let i = 0; i < files.length; i++) {
       let filename = files[i];
-      let folderPath = path.normalize(processesPath + '\\' + filename);
+      let folderPath = path.normalize(processesPath + '/' + filename);
       let info = filename.split('_')
       if (info.length != 3) {
         try {
@@ -58,9 +58,9 @@ async function check() {
         let task = await Task.findOne({ identificator: full_id }).exec();
         fs.stat(folderPath, function (err, stats) {
           if (!err) {
-            fs.stat(path.join(folderPath + "\\result.txt"), async function (err, stats2) {
+            fs.stat(path.join(folderPath + "/result.txt"), async function (err, stats2) {
               if (!err) {
-                let resultStrings = fs.readFileSync(path.normalize(folderPath + "\\result.txt"), "utf-8").trim().split("\n");
+                let resultStrings = fs.readFileSync(path.normalize(folderPath + "/result.txt"), "utf-8").trim().split("\n");
                 if (resultStrings[0].length > 0 && (resultStrings[0] == 'Test #1*Compilation Error*er' || resultStrings.length == task.tests.length)) {
 
                   let result = [];
@@ -111,9 +111,9 @@ async function check() {
 
         fs.stat(folderPath, function (err, stats) {
           if (!err && Date.now()) {
-            fs.stat(path.normalize(folderPath + "\\result.txt"), async function (err, stats2) {
+            fs.stat(path.normalize(folderPath + "/result.txt"), async function (err, stats2) {
               if (!err) {
-                let resultStrings = fs.readFileSync(path.normalize(folderPath + "\\result.txt"), "utf-8").trim().split("\n");
+                let resultStrings = fs.readFileSync(path.normalize(folderPath + "/result.txt"), "utf-8").trim().split("\n");
                 if (resultStrings[0].length > 0 && (resultStrings[0] == 'Test #1*Compilation Error*er' || resultStrings.length == task.tests.length)) {
 
                   let result = [];
@@ -210,9 +210,9 @@ async function check() {
 
         fs.stat(folderPath, function (err, stats) {
           if (!err && Date.now()) {
-            fs.stat(path.normalize(folderPath + "\\result.txt"), async function (err, stats2) {
+            fs.stat(path.normalize(folderPath + "/result.txt"), async function (err, stats2) {
               if (!err) {
-                let resultStrings = fs.readFileSync(path.normalize(folderPath + "\\result.txt"), "utf-8").trim().split("\n");
+                let resultStrings = fs.readFileSync(path.normalize(folderPath + "/result.txt"), "utf-8").trim().split("\n");
                 if (resultStrings[0].length > 0 && (resultStrings[0] == 'Test #1*Compilation Error*er' || resultStrings.length == task.tests.length)) {
                   let result = [];
                   for (let i = 0; i < resultStrings.length; i++) {

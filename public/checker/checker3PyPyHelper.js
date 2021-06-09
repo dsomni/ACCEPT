@@ -2,6 +2,10 @@ const fs = require('fs');
 const childProcess = require("child_process");
 const compilers = require('../../config/compilers');
 
+let command = __dirname + '/pypyCompiler/pypy3.exe';
+if (process.platform == "linux") {
+    command = "pypy3"
+}
 
 childProcess.exec('chcp 65001 | dir');
 
@@ -11,16 +15,16 @@ var i = Number(process.argv[4]);
 
 async function run(){
 
-    input = fs.readFileSync(path + '\\input'+i+".txt",'utf8').trim();
-    output = fs.readFileSync(path + '\\output'+i+".txt",'utf8').trim();
+    input = fs.readFileSync(path + '/input'+i+".txt",'utf8').trim();
+    output = fs.readFileSync(path + '/output'+i+".txt",'utf8').trim();
 
     var pOutput ='';
     var result ="Test #" + (i+1).toString() + "*" + "Wrong Answer" + "*" + "er" +"\n";
 
-    var spawnProcess = childProcess.spawn(__dirname + '\\pypyCompiler\\pypy3.exe', [path + '\\'+fileName +'.py'], {shell: false});
+    var spawnProcess = childProcess.spawn(command, [path + '/'+fileName +'.py'], {shell: false});
 
     spawnProcess.on('error', function (error) {
-        fs.appendFileSync(path + '\\result.txt', "Test #" + (i+1).toString() + "*" + "Compilation Error" + "*" + "er" +"\n",  function(error){ if(error) throw error;});
+        fs.appendFileSync(path + '/result.txt', "Test #" + (i+1).toString() + "*" + "Compilation Error" + "*" + "er" +"\n",  function(error){ if(error) throw error;});
         spawnProcess.stdout.removeAllListeners();
         spawnProcess.stderr.removeAllListeners();
         process.exit()
@@ -36,7 +40,7 @@ async function run(){
         }
     });
     spawnProcess.stderr.on('data', function (data) {
-        fs.appendFileSync(path + '\\result.txt', "Test #" + (i+1).toString() + "*" + "Runtime error" + "*" + "er" +"\n",  function(error){ if(error) throw error;});
+        fs.appendFileSync(path + '/result.txt', "Test #" + (i+1).toString() + "*" + "Runtime error" + "*" + "er" +"\n",  function(error){ if(error) throw error;});
         spawnProcess.stdout.removeAllListeners();
         spawnProcess.stderr.removeAllListeners();
         process.exit()
@@ -44,7 +48,7 @@ async function run(){
     });
 
     spawnProcess.on('close', (code) => {
-        fs.appendFileSync(path + '\\result.txt', result, function(error){ if(error) throw error;});
+        fs.appendFileSync(path + '/result.txt', result, function(error){ if(error) throw error;});
         spawnProcess.stdout.removeAllListeners();
         spawnProcess.stderr.removeAllListeners();
         process.exit()
@@ -55,7 +59,7 @@ async function run(){
 
     setTimeout(()=>{
         result = "Test #" + (i+1).toString() + "*" + "Time limit exceeded" + "*" + "er" +"\n"
-        fs.appendFileSync(path + '\\result.txt', result, function(error){ if(error) throw error;});
+        fs.appendFileSync(path + '/result.txt', result, function(error){ if(error) throw error;});
         spawnProcess.stdout.removeAllListeners();
         spawnProcess.stderr.removeAllListeners();
         spawnProcess.kill('SIGINT');

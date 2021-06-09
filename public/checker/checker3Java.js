@@ -41,9 +41,9 @@ async function go(){
     let taskid = process.argv[4];
     let tour_id = process.argv[4].split('_')[0];
 
-    let programText = fs.readFileSync(path+"\\programText.txt", "utf8");
+    let programText = fs.readFileSync(path+"/programText.txt", "utf8");
 
-    fs.writeFileSync(path + '\\'+fileName +'.java', programText, "utf8");
+    fs.writeFileSync(path + '/'+fileName +'.java', programText, "utf8");
 
     let task;
 
@@ -60,18 +60,18 @@ async function go(){
     let tests = task.tests
 
     for(let i = 0; i<tests.length; i++){
-        fs.writeFileSync(path + '\\input'+i+".txt", tests[i][0], "utf8");
-        fs.writeFileSync(path + '\\output'+i+".txt", tests[i][1], "utf8");
+        fs.writeFileSync(path + '/input'+i+".txt", tests[i][0], "utf8");
+        fs.writeFileSync(path + '/output'+i+".txt", tests[i][1], "utf8");
     }
 
-    fs.writeFileSync(path + '\\result.txt', "");
+    fs.writeFileSync(path + '/result.txt', "");
 
     for(let i = 0; i < tests.length; i++){
         if (i % max(1, Math.trunc(config.maxThreadsTests - 0.7 * countProcesses())) == 0) {
             await sleep(1000);
         }
         childProcess.exec('node' + ' ' +
-        __dirname + '\\checker3JavaHelper.js' + ' ' +
+        __dirname + '/checker3JavaHelper.js' + ' ' +
         path + ' ' +
         fileName + ' ' +
         i);
