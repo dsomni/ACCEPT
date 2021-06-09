@@ -50,7 +50,7 @@ async function run(){
     spawnProcess.stdin.write(input);
     spawnProcess.stdin.end();
 
-    setTimeout(() => {
+    return setTimeout(() => {
         result = "Test #" + (i + 1).toString() + "*" + "Time limit exceeded" + "*" + "er" + "\n"
         fs.appendFileSync(path + '/result.txt', result, function (error) { if (error) throw error; });
         spawnProcess.stdout.removeAllListeners();
@@ -59,4 +59,4 @@ async function run(){
         process.exit()
     }, 1100 + compilers.cpp);
 }
-run()
+run().then(() => {  })

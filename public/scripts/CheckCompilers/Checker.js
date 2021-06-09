@@ -31,7 +31,7 @@ async function run(Command) {
     else
         await sleep(10000);
     spawnProcess.kill('SIGINT');
-    console.log(Command[0], finish/1000000);
+    console.log(Command[0], finish / 1000000);
 
     // await spawn(Command, [], { shell: false })
     return finish;

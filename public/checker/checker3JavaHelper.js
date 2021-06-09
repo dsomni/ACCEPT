@@ -2,7 +2,6 @@ const fs = require('fs');
 const childProcess = require("child_process");
 const compilers = require('../../config/compilers');
 
-
 childProcess.exec('chcp 65001 | dir');
 
 var path = process.argv[2];
@@ -60,6 +59,6 @@ async function run(){
         spawnProcess.stderr.removeAllListeners();
         spawnProcess.kill('SIGINT');
         process.exit()
-    }, 1100 + + compilers["java"]);
+    }, 1100 + 500 + compilers["java"]);
 }
 run()

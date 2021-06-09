@@ -62,7 +62,6 @@ async function popQueue() {
     quiz.markModified("lessons");
     await quiz.save();
   }
-  console.log(object.command)
   fs.mkdirSync(path.normalize(__dirname + '/public/processes/' + object.login + "_" + object.id));
   fs.writeFileSync(path.normalize('public/processes/' + object.login + "_" + object.id + "/programText.txt"), object.programText, "utf-8");
   childProcess.exec(object.command);

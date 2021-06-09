@@ -4,7 +4,7 @@
   "description": "test system for school programming lessons",
   "main": "server.js",
   "scripts": {
-    "start": "NODE_ENV=production node server",
+    "start": "set NODE_ENV=production && node server",
     "dev": "nodemon server",
     "mongo": "sudo systemctl start mongod.service",
     "configurate": "public\\checker\\pythonCompiler\\python.exe public\\scripts\\CreateConfigs.py",
@@ -31,6 +31,7 @@
     "express-flash": "0.0.2",
     "express-session": "^1.17.1",
     "fuse.js": "^6.4.6",
+    "is-running": "^2.1.0",
     "method-override": "^3.0.0",
     "mongoose": "^5.11.8",
     "morgan": "^1.10.0",

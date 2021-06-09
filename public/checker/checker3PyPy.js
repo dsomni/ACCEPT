@@ -3,6 +3,7 @@ const childProcess = require("child_process");
 const pathConst = require("path");
 const mongoose = require('mongoose');
 const config = require('../../config/configs');
+const checkProcess = require("is-running")
 
 childProcess.exec('chcp 65001 | dir');
 
@@ -65,21 +66,32 @@ async function go(){
         fs.writeFileSync(path + '/output'+i+".txt", tests[i][1], "utf8");
     }
 
+    let pids = [];
     fs.writeFileSync(path + '/result.txt', "");
     for(let i = 0; i < tests.length; i++){
         if (i % max(1, Math.trunc(config.maxThreadsTests - 0.7 * countProcesses())) == 0) {
             await sleep(1000);
         }
 
-        childProcess.exec('node' + ' ' +
+        pids.push(childProcess.exec('node' + ' ' +
         __dirname + '/checker3PyPyHelper.js' + ' ' +
         path + ' ' +
         fileName + ' ' +
-        i);
+        i).pid);
 
     }
-    setTimeout(()=>{
-        process.exit()
-    },2000)
+    setInterval(() => {
+        let i = 0;
+        while (i < pids.length) {
+            if (!checkProcess(pids[i])) {
+                pids.splice(i, 1);
+            } else {
+                i++;
+            }
+        }
+        if (pids.length == 0) {
+            process.exit()
+        }
+    }, 500);
 }
 go();
