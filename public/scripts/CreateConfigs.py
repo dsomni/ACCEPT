@@ -41,6 +41,7 @@ config = {
     'PathToDeleteUsersList': "PATH", # Path to deleteUsers.xlsx file
     'PathToTeachersList': "PATH", # Path to teachers.xlsx file
     "sessionLiveTime": 45*60,
+    "logsLigeTime": 14, #days
     'port': "3000", # server port
     'secret': "secret",
     'FolderLifeTime': 0.7 * 60 * 1000, # milliseconds
@@ -75,6 +76,7 @@ config = {
 port = input("Port(number): ")
 sessionLiveTime = input("Session Live Time(seconds): ")
 FolderLifeTime = input("FolderLifeTime: ")
+logsLifeTime = input("LogsLifeTime(days): ")
 maxThreadsTests = input("maxThreadsTests: ")
 maxThreadsTasks = input("maxThreadsTasks: ")
 secret = input("secret: ")
@@ -114,6 +116,8 @@ if (sessionLiveTime):
     config["sessionLiveTime"] = int(eval(sessionLiveTime))
 if (FolderLifeTime):
     config["FolderLifeTime"] = int(eval(FolderLifeTime))
+if (logsLifeTime):
+    config["logsLifeTime"] = int(eval(logsLifeTime))
 if (maxThreadsTests):
     config["maxThreadsTests"] = int(eval(maxThreadsTests))
 if (maxThreadsTasks):

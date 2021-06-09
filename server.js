@@ -159,6 +159,12 @@ app.use(morgan(':method   :date[web]   :url   :status', {
   skip: function (req, res) { return (req.url.slice(-4) == ".svg" || req.url.slice(-4) == ".css" || req.url.slice(-3) == ".ng") || (req.user && !req.user.isTeacher) },
   stream: fs.createWriteStream(path.join(__dirname, 'public/logs/' + (new Date(Date.now())).toISOString().split(':').join('_') + '.log'), { flags: 'a' })
 }));
+setInterval(() => {
+  app.use(morgan(':method   :date[web]   :url   :status', {
+    skip: function (req, res) { return (req.url.slice(-4) == ".svg" || req.url.slice(-4) == ".css" || req.url.slice(-3) == ".ng") || (req.user && !req.user.isTeacher) },
+    stream: fs.createWriteStream(path.join(__dirname, 'public/logs/' + (new Date(Date.now())).toISOString().split(':').join('_') + '.log'), { flags: 'a' })
+  }));
+}, 24*60*60*1000)
 app.use(express.urlencoded({ extended: false }));
 app.use('/public', express.static('public')); //where search for static files
 
@@ -207,6 +213,10 @@ childProcess.exec('node ' + path.join(__dirname, '/public/scripts/serverScripts/
 //---------------------------------------------------------------------------------
 // Checking tasks
 childProcess.exec('node ' + path.join(__dirname, '/public/scripts/serverScripts/TaskAutoChecker.js'));
+
+//---------------------------------------------------------------------------------
+// Delete old logs
+childProcess.exec("node " + path.join(__dirname, "/public/scripts/LogChecker/logChecker.js"));
 
 //---------------------------------------------------------------------------------
 // Main Page
@@ -2919,6 +2929,12 @@ setInterval(() => {
 setInterval(() => {
   childProcess.exec('node ' + path.join(__dirname, '/public/scripts/serverScripts/TaskAutoChecker.js'));
 }, 1000 * 60 * 10)
+
+//---------------------------------------------------------------------------------
+// Delete old logs
+setInterval(() => {
+  childProcess.exec("node " + path.join(__dirname, "/public/scripts/LogChecker/logChecker.js"));
+}, 24*60*60*1000);
 
 //---------------------------------------------------------------------------------
 // Queue Manager
