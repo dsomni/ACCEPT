@@ -1,29 +1,29 @@
 module.exports = {
-	PathToUsersList: "PATH",
-	PathToDeleteUsersList: "PATH",
-	PathToTeachersList: "PATH",
-	sessionLiveTime: 2700,
-  logsLifeTime: 12,
+	PathToUsersList: "D:\\Code\\TestSystemPack\\TestSystem\\public\\scripts\\users.xlsx",
+	PathToDeleteUsersList: "D:\\Code\\TestSystemPack\\TestSystem\\public\\scripts\\deleteUsers.xlsx",
+	PathToTeachersList: "D:\\Code\\TestSystemPack\\TestSystem\\public\\scripts\\teachers.xlsx",
+	sessionLiveTime: 45 * 60,
+	logsLifeTime: 12,
 	port: "3000",
 	secret: "secret",
 	FolderLifeTime: 42000.0,
 	maxThreadsTests: 10,
-	maxThreadsTasks: 1,
+	maxThreadsTasks: 5,
 	onPage: {
 		newsMain: 5,
 		newsList: 10,
 		tasks: 25,
 		lessons: 20,
-		tournaments: 20,
-		students: 50,
-		attempts: 25
+		tournaments: 15,
+		students: 30,
+		attempts: 20
 	},
 	mongodbConfigs: {
 		dbName: "db",
 		Host: "localhost:27017",
 		User: {
-			Username: "",
-			Password: ""
+			Username: "username",
+			Password: "password"
 		},
 		CollectionNames: {
 			users: "users",

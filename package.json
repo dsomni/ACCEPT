@@ -6,6 +6,7 @@
   "scripts": {
     "start": "set NODE_ENV=production && node server",
     "dev": "nodemon server",
+    "startDB": "public\\scripts\\temporary\\startdbNPM.bat",
     "mongo": "sudo systemctl start mongod.service",
     "configurate": "public\\checker\\pythonCompiler\\python.exe public\\scripts\\CreateConfigs.py",
     "addUsers": "node public\\scripts\\users\\addUser.js",
