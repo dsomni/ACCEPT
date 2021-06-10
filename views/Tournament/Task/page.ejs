@@ -13,8 +13,8 @@
         <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
         </head>
     <body>
-        <main>
-        <div id="task">
+    <main>
+    <div id="task">
         <H1 id="taskname"><%= problem.title %></H1>
         <div style="text-align: center;">
             <% if(isTeacher){ %> <a id="editref" class="editref" href=<%= "/tournament/task/edit/" + TUR_ID +'/' + problem.identificator %> >[Редактировать]</a>
@@ -78,7 +78,7 @@
                 <button id="submit">Отправить</button>
             </div>
         </form>
-        <p class="countDownTimer" id="countDownTimer" style="left: 5rem; right:auto; top:20px"></p>
+        <p class="countDownTimer" id="countDownTimer"></p>
         <div class="tasksSuccessError" id="linksarea"></div>
     </main>
     </body>
