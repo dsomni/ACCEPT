@@ -4,7 +4,7 @@
   "description": "test system for school programming lessons",
   "main": "server.js",
   "scripts": {
-    "start": "set NODE_ENV=production && node server",
+    "start": "set NODE_ENV=production && supervisor -w config\\configs.js server",
     "dev": "nodemon server",
     "startDB": "public\\scripts\\temporary\\startdbNPM.bat",
     "mongo": "sudo systemctl start mongod.service",

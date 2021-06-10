@@ -48,13 +48,13 @@ config = {
     'maxThreadsTests': 10, #number of test managing simultaneously
     'maxThreadsTasks': 1, #number of tasks managing simultaneously
     'onPage':{
-		'newsMain': 5,
+		'newsMainList': 5,
 		'newsList': 10,#
-		'tasks': 25,#
-		'lessons': 20,#
-		'tournaments': 20,#
-		'students': 50,#
-		'attempts': 25#
+		'tasksList': 25,#
+		'lessonsList': 20,#
+		'tournamentsList': 20,#
+		'studentsList': 50,#
+		'attemptsList': 25#
 	},
     'mongodbConfigs': {
         'dbName': "db", # mongodb data base name
@@ -85,13 +85,13 @@ PathToDeleteUsersList = input("PathToDeleteUsersList: ")
 PathToTeachersList = input("PathToTeachersList: ")
 answer0 = input("Do you want to configure number of elements on pages?(y/n): ")
 if answer0.upper() == "Y":
-    newsMain = input("newsMain: ")
+    newsMain = input("newsMainList: ")
     newsList = input("newsList: ")
-    tasks = input("tasks: ")
-    lessons = input("lessons: ")
-    tournaments = input("tournaments: ")
-    students = input("students: ")
-    attempts = input("attempts: ")
+    tasks = input("tasksList: ")
+    lessons = input("lessonsList: ")
+    tournaments = input("tournamentsList: ")
+    students = input("studentsList: ")
+    attempts = input("attemptsList: ")
 answer1 = input("Do you want to configure DB?(y/n): ")
 if answer1.upper() == "Y":
     dbName = input("dbName: ")
@@ -132,19 +132,19 @@ if (secret):
     config["secret"] = secret
 if answer0.upper() == "Y":
         if (newsMain):
-            config["onPage"]["newsMain"] = int(newsMain)
+            config["onPage"]["newsMainList"] = int(newsMain)
         if (newsList):
             config["onPage"]["newsList"] = int(newsList)
         if (tasks):
-            config["onPage"]["tasks"] = int(tasks)
+            config["onPage"]["tasksList"] = int(tasks)
         if (lessons):
-            config["onPage"]["lessons"] = int(lessons)
+            config["onPage"]["lessonsList"] = int(lessons)
         if (tournaments):
-            config["onPage"]["tournaments"] = int(tournaments)
+            config["onPage"]["tournamentsList"] = int(tournaments)
         if (students):
-            config["onPage"]["students"] = int(students)
+            config["onPage"]["studentsList"] = int(students)
         if (attempts):
-            config["onPage"]["attempts"] = int(attempts)
+            config["onPage"]["attemptsList"] = int(attempts)
 if answer1.upper() == "Y":
     if (dbName):
         config["mongodbConfigs"]["dbName"] = dbName
@@ -172,4 +172,4 @@ if answer1.upper() == "Y":
 f = open("".join(i+'/' for i in __file__.split("/")
                  [:-3])+"config/configs.js", "w+")
 text = str(config)
-f.write("module.exports = "+parser(text))
+f.write("//please, names of fields HAVE TO BE UNIQUE!!!\n" + "module.exports = "+parser(text))
