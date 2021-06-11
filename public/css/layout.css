@@ -150,7 +150,7 @@ header {
   left: 0px;
   background-color: var(--header-color);
   height: 100%;
-  width: 65px;
+  width: 60px;
   z-index: 1;
   overflow-x: hidden;
   overflow-y: scroll;
@@ -161,7 +161,7 @@ header {
 }
 
 header:hover {
-  transition-delay: .75s;
+  transition-delay: 1.25s;
   width: 200px;
   word-wrap: normal;
 }
@@ -188,7 +188,7 @@ header button {
 }
 
 header button img {
-  width: 45px;
+  width: 40px;
   margin-right: 10px;
 }
 
@@ -203,7 +203,7 @@ header input {
 }
 
 #Logo {
-  height: 70px;
+  height: 65px;
   margin-left: 5px;
   margin-top: 5px;
   margin-bottom: 20px;
@@ -567,7 +567,7 @@ header input {
 
 .loginInterface input {
   display: block;
-  width: 60px;
+  width: 55px;
 }
 
 .loginInterface button {
@@ -1075,20 +1075,21 @@ header input {
 }
 
 /* Control Panel depths */
-.depth1{
+
+.depth1 {
   font-size: 25px;
   font-weight: 900;
   margin-bottom: 1rem;
 }
 
-.depth2{
+.depth2 {
   margin-left: 1rem;
   margin-bottom: 1rem;
   font-size: 18px;
   font-weight: 600;
 }
 
-.depth3{
+.depth3 {
   margin-left: 2rem;
   margin-bottom: 1rem;
   font-size: 14px;
@@ -1096,6 +1097,7 @@ header input {
 }
 
 /* Popup container */
+
 .popup {
   position: relative;
   text-align: center;
@@ -1104,6 +1106,7 @@ header input {
 }
 
 /* The actual popup (appears on top) */
+
 .popup .popuptext {
   visibility: hidden;
   width: 160px;
@@ -1120,6 +1123,7 @@ header input {
 }
 
 /* Popup arrow */
+
 .popup .popuptext::after {
   content: "";
   position: absolute;
@@ -1132,6 +1136,7 @@ header input {
 }
 
 /* Toggle this class when clicking on the popup container (hide and show the popup) */
+
 .popup .show {
   visibility: visible;
   -webkit-animation: fadeIn 1s;
@@ -1139,14 +1144,23 @@ header input {
 }
 
 /* Add animation (fade in the popup) */
+
 @-webkit-keyframes fadeIn {
-  from {opacity: 0;}
-  to {opacity: 1;}
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fadeIn {
-  from {opacity: 0;}
-  to {opacity:1 ;}
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .arrow {
