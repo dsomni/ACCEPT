@@ -2397,7 +2397,7 @@ app.post("/quiz/set/time", checkAuthenticated, checkPermission, async (req, res)
 
 //--------------------------------------------------------------------------------------
 // Control panel
-app.get("/service/control/panel", checkAuthenticated, checkPermission, async (req, res) => {
+app.get("/service/panel/configs", checkAuthenticated, checkPermission, async (req, res) => {
   res.render('controlPanel.ejs', {
     login: req.user.login,
     name: req.user.name,
@@ -2407,11 +2407,11 @@ app.get("/service/control/panel", checkAuthenticated, checkPermission, async (re
   })
 });
 
-app.post("/service/control/panel", checkAuthenticated, checkPermission, async (req, res) => {
+app.post("/service/panel/configs", checkAuthenticated, checkPermission, async (req, res) => {
   let newConfigs = config;
   newConfigs = updateConfigs(newConfigs,req.body);
   refactorConfigs.refactor(fs, path.join(__dirname,'/config/configs.js'), newConfigs);
-  res.redirect("/service/control/panel")
+  res.redirect("/service/panel/configs")
 });
 
 // API

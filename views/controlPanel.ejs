@@ -14,7 +14,7 @@
         <main>
             <h1 class="h1">Панель управления</h1>
 
-            <form action='/service/control/panel'  method="POST">
+            <form action='/service/panel/configs'  method="POST">
                 <div class="taskAdderForm" id="configform">
                 </div>
             </form>
@@ -25,15 +25,31 @@
         document.getElementsByTagName('body')[0].removeChild(document.getElementsByTagName('button')[0]);
     </script>
     <script>
+        function hideShow(id){
+            let spn = document.getElementById(id);
+            if(spn.style.display == "none"){
+                spn.style.display = "block";
+            }else{
+                spn.style.display = "none";
+            }
+        }
+
         function construct(obj, depth){
             let txt = "";
             for (key in obj){
-                txt+=`<span class="depth${depth}">${key}</span>\n`;
+                if(depth == 1){
+                    txt += `<span class="depth${depth}" onclick="hideShow('${key}')">${key}</span>\n`;
+                    txt += `<div class="hideable" id="${key}" style="display: none; width:100%;" >\n`;
+                }else{
+                    txt += `<span class="depth${depth}">${key}</span>\n`;
+                    txt += `<div class="hideable" id="${key}" style="width:100%;" >\n`;
+                }
                 if (obj[key] instanceof Object && !(obj[key] instanceof Array)) {
                     txt += construct(obj[key], depth+1)
                 }else{
-                    txt+= `<textarea style="margin-left:${15*depth-1}px" id="${key}" name = "${key}" cols=4 placeholder="">${obj[key]}</textarea>`
+                    txt += `<textarea class="configarea" style="margin-left:${depth-1}rem;  margin-top: -.1rem;" id="${key}" name = "${key}" cols=40  rows=3 placeholder="">${obj[key]}</textarea>`
                 }
+                txt += `</div>\n`
             }
             return txt;
         }

@@ -1078,16 +1078,19 @@ header input {
 .depth1{
   font-size: 25px;
   font-weight: 900;
+  margin-bottom: 1rem;
 }
 
 .depth2{
-  margin-left: 15px;
+  margin-left: 1rem;
+  margin-bottom: 1rem;
   font-size: 18px;
   font-weight: 600;
 }
 
 .depth3{
-  margin-left: 30px;
+  margin-left: 2rem;
+  margin-bottom: 1rem;
   font-size: 14px;
   font-weight: 400;
 }
