@@ -1,1 +1,1 @@
-module.exports = {"cpp":72,"java":990,"pascal":96,"python":87,"pypy":99}
+module.exports = {"cpp":62,"java":971,"pascal":90,"python":82,"pypy":89}

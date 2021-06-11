@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Панель управления</title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,
+              maximum-scale=1.0, minimum-scale=1.0,
+              user-scalable=no, minimal-ui">
+  <meta name="full-screen" content="yes">
+  <style>
+  .rad-label {
+    display: flex;
+    align-items: center;
+    border-radius: 100px;
+    margin: 10px 0;
+    cursor: pointer;
+    transition: .3s;
+  }
+
+  .rad-label:hover,
+  .rad-label:focus-within {
+    background: hsla(0, 0%, 80%, .14);
+  }
+
+  .rad-input {
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+
+  .rad-design {
+    width: 22px;
+    height: 22px;
+    border-radius: 100px;
+
+    background: linear-gradient(to right bottom, rgb(113, 255, 234), hsl(225, 93%, 65%));
+    position: relative;
+  }
+
+  .rad-design::before {
+    content: '';
+
+    display: inline-block;
+    width: inherit;
+    height: inherit;
+    border-radius: inherit;
+
+    background: hsl(0, 0%, 90%);
+    transform: scale(1.1);
+    transition: .3s;
+  }
+
+  .rad-input:checked+.rad-design::before {
+    transform: scale(0);
+  }
+
+  .rad-text {
+    color: hsl(0, 0%, 60%);
+    margin-left: 14px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-size: 18px;
+    font-weight: 900;
+
+    transition: .3s;
+  }
+
+  .rad-input:checked~.rad-text {
+    color: hsl(0, 0%, 40%);
+  }
+  form{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+  }
+  .infos{
+    display: none;
+  }
+  </style>
+</head>
+
+<body>
+  <main>
+    <h1 class="h1">Scripts</h1>
+    <form action='/service/panel/SCRIPTS' method="POST" enctype="multipart/form-data">
+      <div style="background-color: rgba(250, 235, 215, 0.274); padding: 30px; width:40%;">
+
+        <label class="rad-label">
+          <input type="radio" class="rad-input" name="rad" value=1 onclick="reveal(1)" selected>
+          <div class="rad-design"></div>
+          <div class="rad-text">Добавить учеников</div>
+        </label>
+
+        <label class="rad-label">
+          <input type="radio" class="rad-input" name="rad" value=2 onclick="reveal(2)">
+          <div class="rad-design"></div>
+          <div class="rad-text">Добавить учителей</div>
+        </label>
+
+        <label class="rad-label">
+          <input type="radio" class="rad-input" name="rad" value=3 onclick="reveal(3)">
+          <div class="rad-design"></div>
+          <div class="rad-text">Удалить пользователей</div>
+        </label>
+
+        <label class="rad-label">
+          <input type="radio" class="rad-input" name="rad" value=4 onclick="reveal(4)">
+          <div class="rad-design"></div>
+          <div class="rad-text">Авто-настройка чекеров</div>
+        </label>
+
+        <label class="rad-label">
+          <input type="radio" class="rad-input" name="rad" value=5 onclick="reveal(5)">
+          <div class="rad-design"></div>
+          <div class="rad-text">Сгенерировать результаты турнира</div>
+        </label>
+        <button class="SaveChanges" onclick="redir()" style="margin-top: 1rem; position: static; width: 50%;">Run</button>
+      </div>
+      <div style="width:40%; background-color: rgba(250, 235, 215, 0.274); padding: 30px; margin-left: 1rem;">
+        <input type="file" name="file" id="file">
+        <div id="info1" class="infos" style="display:block">
+          <p>Выберете файл .xlsx с данными об учениках, которых нужно добавить</p>
+          <br>
+          <p>Столбцы: Логин | Ф.И.О. | Пароль |	Класс</p>
+        </div>
+        <div id="info2" class="infos">
+          <p>Выберете файл .xlsx с данными об учителях, которых нужно добавить</p>
+          <br>
+          <p>Столбцы: Логин | Ф.И.О. |	Пароль</p>
+        </div>
+        <div id="info3" class="infos">
+          <p>Выберете файл .xlsx с перечнем логинов пользователей для удаления</p>
+          <br>
+          <p>Столбцы: Логин</p>
+        </div>
+        <div id="info4" class="infos">
+          <p>Скрипт проверит компиляторы, что может занять некоторое время (до 5 минут)</p>
+          <p>Тестирование влечёт за собой повышенную нагрузку на сервер</p>
+        </div>
+        <div id="info5" class="infos">
+          <p>Введите ID турнира для генерации таблицы .xlsx с результатами</p>
+          <input type="number" name="tour_id"">
+          <p>ID можно определить по последнему числу в пути к странице турнира</p>
+          <p>/tournament/page/LOGIN/<b>ID</b></p>
+        </div>
+      </div>
+    </form>
+  </div>
+  </main>
+</body>
+<script>
+  function redir() {
+    location.href = '/service/panel/USER/' + (document.getElementById("search").value || "default")
+  }
+</script>
+<script>
+  function reveal(id){
+    for(let i = 1; i < 6; i++){
+      document.getElementById("info"+i).style.display = "none";
+    }
+    document.getElementById("info"+id).style.display = "block";
+    if(id>3){
+      document.getElementById("file").style.display = "none";
+    }else{
+      document.getElementById("file").style.display = "block";
+    }
+  }
+</script>
+</html>

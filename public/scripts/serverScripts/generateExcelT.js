@@ -20,6 +20,7 @@ const User = require('../../../config/models/User');
 
 var identificator = process.argv[2];
 
+var tableName = process.argv[3];
 
 async function run() {
     tournament = await Tournament.findOne({ identificator: identificator });
@@ -33,7 +34,6 @@ async function run() {
             return b.sumscore - a.sumscore
         }
     });
-
 
     let realresults = []
     let user;
@@ -71,11 +71,9 @@ async function run() {
     let ws = wb.addWorksheet(tournament.title);
     let tasks = tournament.tasks;
 
-
     ws.cell(1, 1).string("LOGIN").style({ font: { bold: true } });
     ws.cell(1, 2).string("NAME").style({ font: { bold: true } });
     for (let i = 0; i < tasks.length; i++) {
-        // + " " + tasks[i].title
         ws.cell(1, i + 3).string((i + 1).toString() ).style({ font: { bold: true } });
     }
     ws.cell(1, tasks.length+3).string("SCORE").style({font:{ bold: true }});
@@ -92,14 +90,13 @@ async function run() {
     var rightNow = new Date();
     rightNow = new Date(rightNow.valueOf()+1000*60*60*3); // +3
     var res = rightNow.toISOString().slice(0,10).replace(/-/g,".");
-    wb.write(path.join(__dirname + "/../tables/"+tournament.title + " Results_" + res + ".xlsx"));
-
+    tableName = tableName || `${tournament.title} Results_${res}`;
+    wb.write(path.join(__dirname, `/../../tables/${tableName}.xlsx`));
 
 }
-
 
 run();
 
 setTimeout(() => {
     process.exit();
-}, 1000 * 10)
+}, 1000 * 3)

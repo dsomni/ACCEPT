@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const config = require('../../../config/configs');
 const xlsx = require('node-xlsx').default;
 const bcrypt = require('bcryptjs');
+const fs = require('fs');
 
 //MongoDB connecting
 var connectionString
@@ -24,6 +25,8 @@ mongoose.connection.on('error', (err) => {
 
 mongoose.set('useCreateIndex', true);
 
+var tablePath = process.argv[2];
+
 const User = require('../../../config/models/User');
 
 async function addTeacher (login, password, name){
@@ -40,7 +43,7 @@ async function addTeacher (login, password, name){
 
 async function toDo(){
 
-    const workSheetsFromFile = await xlsx.parse(config.PathToTeachersList);
+    const workSheetsFromFile = await xlsx.parse(tablePath);
 
     var data = workSheetsFromFile[0].data
     var teacher, check;
@@ -58,6 +61,7 @@ async function toDo(){
             await addTeacher(teacher[0], teacher[2], teacher[1])
         }
     }
+    fs.rmSync(tablePath)
 }
 
 toDo().then(() => { console.log("Done"); process.exit() });

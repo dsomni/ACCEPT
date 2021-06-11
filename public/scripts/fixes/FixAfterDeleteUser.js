@@ -63,10 +63,11 @@ async function run() {
     if (permanently) {
         await User.deleteOne({ login: deletedLogin });
     }
+    process.exit();
 }
 
 run()
 
 setTimeout(() => {
     process.exit()
-}, 10000)
+}, 1000)

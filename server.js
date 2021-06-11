@@ -115,6 +115,17 @@ const uploadTests = multer({
   })
 });
 
+const uploadUserTable = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, callback) => {
+      callback(null, './public/userTables');
+    },
+    filename: (req, file, callback) => {
+      callback(null, Date.now() + "." + file.originalname.split('.')[file.originalname.split('.').length - 1]);
+    }
+  })
+});
+
 //---------------------------------------------------------------------------------
 // MongoDB connecting
 let connectionString;
@@ -2397,15 +2408,14 @@ app.post("/quiz/set/time", checkAuthenticated, checkPermission, async (req, res)
 
 //--------------------------------------------------------------------------------------
 // Control panel
-
-//--------------------------------------------------------------------------------------
-// Configs
-
 const CONFIG_TABS = {
   CONFIGS: "CONFIGS",
   USER: "USER",
   SCRIPTS: "SCRIPTS"
 };
+
+//--------------------------------------------------------------------------------------
+// Configs
 
 app.get(`/service/panel/${CONFIG_TABS.CONFIGS}`, checkAuthenticated, checkPermission, async (req, res) => {
   res.render('ControlPanel/editConfigs.ejs', {
@@ -2441,38 +2451,78 @@ app.get(`/service/panel/${CONFIG_TABS.USER}/:login`, checkAuthenticated, checkPe
   })
 });
 
-app.post("/service/panel/:flag", checkAuthenticated, checkPermission, async (req, res) => {
+app.get(`/service/panel/${CONFIG_TABS.SCRIPTS}`, checkAuthenticated, checkPermission, async (req, res) => {
+  res.render('ControlPanel/scripts.ejs', {
+    login: req.user.login,
+    name: req.user.name,
+    title: "Control Panel",
+    isTeacher: req.user.isTeacher,
+    location: `/`
+  })
+});
+
+//--------------------------------------------------------------------------------------
+// Control panel Listener
+app.post("/service/panel/:flag", checkAuthenticated, checkPermission, uploadUserTable.single("file"), async (req, res) => {
   const tab = req.params.flag;
   switch (tab) {
     case CONFIG_TABS.CONFIGS:
       let newConfigs = config;
-      newConfigs = updateObj(newConfigs,req.body);
-      refactorConfigs.refactor(fs, path.join(__dirname,'/config/configs.js'), newConfigs);
-      res.redirect(`/service/panel/${tab}`);
+      newConfigs = updateObj(newConfigs, req.body);
+      refactorConfigs.refactor(fs, path.join(__dirname, '/config/configs.js'), newConfigs);
+      return res.redirect(`/service/panel/${tab}`);
       break;
     case CONFIG_TABS.USER:
-      if(!req.body.delete){
+      if (!req.body.delete) {
         let login = req.body.login;
         let user = await User.findOne({ login: login });
         user.name = req.body.name;
-        user.password = bcrypt.hashSync(req.body.password, 10);
+        user.password = req.body.password.length > 0 ? bcrypt.hashSync(req.body.password, 10) : user.password;
         if (!user.isTeacher) {
           user.grade = req.body.grade.slice(0, req.body.grade.length - 1),
-          user.gradeLetter = req.body.grade[req.body.grade.length - 1].toLowerCase(),
-          user.markModified('grade');
+            user.gradeLetter = req.body.grade[req.body.grade.length - 1].toLowerCase(),
+            user.markModified('grade');
           user.markModified('gradeLetter');
         }
         user.markModified('name');
         user.markModified('password');
         await user.save();
-        if(req.body.clear)
+        if (req.body.clear)
           deleteUser(req.body.login, 0);
       } else {
         deleteUser(req.body.login, 1);
       }
-      res.redirect(`/service/panel/${tab}/default`);
+      return res.redirect(`/service/panel/${tab}/default`);
+      break;
+    case CONFIG_TABS.SCRIPTS:
+      let type = req.body.rad;
+      if (type < 4 && req.file) {
+        let tablePath = path.join(__dirname, "/public/userTables", req.file.filename);
+        configurateUsers(tablePath, type);
+      } else if (type == 4) {
+        childProcess.exec(`node ${path.join(__dirname, "public/scripts/CheckCompilers/Checker.js")}`)
+      } else if (type == 5) {
+        let date = Date.now()
+        let process = childProcess.spawn("node", [path.join(__dirname, "public/scripts/serverScripts/generateExcelT.js"), req.body.tour_id, date]);
+        process.on("close", (code) => {
+          res.redirect(`/download/${date}`);
+        })
+        return
+      }
+      return res.redirect(`/service/panel/${tab}`);
+      break;
+    default:
+      return res.redirect(`/`);
       break;
   }
+});
+
+app.get('/download/:date', function(req, res){
+  const file = path.join(__dirname, `/public/tables/${req.params.date}.xlsx`);
+  res.download(file);
+  setTimeout(() => {
+    fs.rmSync(file);
+  }, 1000);
 });
 
 // API
@@ -2828,6 +2878,16 @@ function updateObj(oldConfigs, bodyConfigs){
     }
   }
   return oldConfigs;
+}
+
+function configurateUsers(filepath, type){
+  if(type == 1){
+    return childProcess.exec(`node ${path.join(__dirname, "/public/scripts/users/addUser.js")} ${filepath}`);
+  }else if(type == 2){
+    return childProcess.exec(`node ${path.join(__dirname, "/public/scripts/users/addTeacher.js")} ${filepath}`);
+  }
+  console.log(`node ${path.join(__dirname, "/public/scripts/users/delUser.js")} ${filepath}`);
+  return childProcess.exec(`node ${path.join(__dirname, "/public/scripts/users/delUser.js")} ${filepath}`);
 }
 
 function fuseSearch(items, key, toSearch, accuracy, params, callback) {

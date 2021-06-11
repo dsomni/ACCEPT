@@ -1,8 +1,5 @@
 //please, names of fields HAVE TO BE UNIQUE!!!
 module.exports = {
-	PathToUsersList: "D:\\Code\\TestSystemPack\\TestSystem\\public\\scripts\\users.xlsx",
-	PathToDeleteUsersList: "D:\\Code\\TestSystemPack\\TestSystem\\public\\scripts\\deleteUsers.xlsx",
-	PathToTeachersList: "D:\\Code\\TestSystemPack\\TestSystem\\public\\scripts\\teachers.xlsx",
 	sessionLiveTime: "2700",
 	logsLifeTime: "12",
 	port: "3000",

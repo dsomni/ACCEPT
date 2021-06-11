@@ -1079,6 +1079,7 @@ header input {
 .depth1 {
   font-size: 25px;
   font-weight: 900;
+  color: #444444;
   margin-bottom: 1rem;
 }
 
@@ -1086,6 +1087,7 @@ header input {
   margin-left: 1rem;
   margin-bottom: 1rem;
   font-size: 18px;
+  color: #222222;
   font-weight: 600;
 }
 
@@ -1093,6 +1095,7 @@ header input {
   margin-left: 2rem;
   margin-bottom: 1rem;
   font-size: 14px;
+  color: #000000;
   font-weight: 600;
 }
 

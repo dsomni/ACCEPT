@@ -37,9 +37,6 @@ def parser(text):
     return fin_text
 
 config = {
-    'PathToUsersList': "PATH", # Path to users.xlsx file
-    'PathToDeleteUsersList': "PATH", # Path to deleteUsers.xlsx file
-    'PathToTeachersList': "PATH", # Path to teachers.xlsx file
     "sessionLiveTime": 45*60,
     "logsLigeTime": 14, #days
     'port': "3000", # server port
@@ -80,9 +77,6 @@ logsLifeTime = input("LogsLifeTime(days): ")
 maxThreadsTests = input("maxThreadsTests: ")
 maxThreadsTasks = input("maxThreadsTasks: ")
 secret = input("secret: ")
-PathToUsersList = input("PathToUsersList: ")
-PathToDeleteUsersList = input("PathToDeleteUsersList: ")
-PathToTeachersList = input("PathToTeachersList: ")
 answer0 = input("Do you want to configure number of elements on pages?(y/n): ")
 if answer0.upper() == "Y":
     newsMain = input("newsMainList: ")
@@ -122,12 +116,6 @@ if (maxThreadsTests):
     config["maxThreadsTests"] = int(eval(maxThreadsTests))
 if (maxThreadsTasks):
     config["maxThreadsTasks"] = int(eval(maxThreadsTasks))
-if (PathToUsersList):
-    config["PathToUsersList"] = PathToUsersList
-if (PathToDeleteUsersList):
-    config["PathToDeleteUsersList"] = PathToDeleteUsersList
-if (PathToTeachersList):
-    config["PathToTeachersList"] = PathToTeachersList
 if (secret):
     config["secret"] = secret
 if answer0.upper() == "Y":
