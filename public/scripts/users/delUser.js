@@ -26,31 +26,19 @@ mongoose.set('useCreateIndex', true);
 
 const User = require('../../../config/models/User');
 
-async function addStudent(login, password, name, grade, gradeLetter, group) {
-    await User.insertMany([{
-        login: login,
-        password: bcrypt.hashSync(password.toString(), 10).toString(),
-        name: name,
-
-        grade: grade,
-        gradeLetter: gradeLetter,
-        group: group,
-        attempts: [],
-        verdicts: [],
-
-        isTeacher: false
-    }]);
-}
 async function toDo() {
 
     const workSheetsFromFile = await xlsx.parse(config.PathToDeleteUsersList);
     var data = workSheetsFromFile[0].data
-    var student, grade, gradeLetter, check;
+    var student;
     for (var i = 1; i < data.length; i++) {
         student = data[i];
         if (student.length == 0)
             break;
-        check = await User.deleteOne({login : student[0]});
+        childProcess.exec(`node ${path.join(__dirname, '../fixes/FixAfterDeleteUser.js')} ${student[0]} ${1}`)
+        setTimeout(() =>
+            console.log(`user ${student[0]} deleted `),
+        500)
     }
 }
 

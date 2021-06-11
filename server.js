@@ -2397,8 +2397,18 @@ app.post("/quiz/set/time", checkAuthenticated, checkPermission, async (req, res)
 
 //--------------------------------------------------------------------------------------
 // Control panel
-app.get("/service/panel/configs", checkAuthenticated, checkPermission, async (req, res) => {
-  res.render('controlPanel.ejs', {
+
+//--------------------------------------------------------------------------------------
+// Configs
+
+const CONFIG_TABS = {
+  CONFIGS: "CONFIGS",
+  USER: "USER",
+  SCRIPTS: "SCRIPTS"
+};
+
+app.get(`/service/panel/${CONFIG_TABS.CONFIGS}`, checkAuthenticated, checkPermission, async (req, res) => {
+  res.render('ControlPanel/editConfigs.ejs', {
     login: req.user.login,
     name: req.user.name,
     title: "Control Panel",
@@ -2407,11 +2417,62 @@ app.get("/service/panel/configs", checkAuthenticated, checkPermission, async (re
   })
 });
 
-app.post("/service/panel/configs", checkAuthenticated, checkPermission, async (req, res) => {
-  let newConfigs = config;
-  newConfigs = updateConfigs(newConfigs,req.body);
-  refactorConfigs.refactor(fs, path.join(__dirname,'/config/configs.js'), newConfigs);
-  res.redirect("/service/panel/configs")
+//--------------------------------------------------------------------------------------
+// User Settings
+app.get(`/service/panel/${CONFIG_TABS.USER}/:login`, checkAuthenticated, checkPermission, async (req, res) => {
+  let user = await User.findOne({ login: req.params.login });
+  if (user){
+    user = {
+      login: user.login,
+      name: user.name,
+      password: "",
+      grade: (user.grade + user.gradeLetter || "12Я").toUpperCase(),
+      delete: false
+    }
+  }
+
+  res.render('ControlPanel/editUser.ejs', {
+    login: req.user.login,
+    name: req.user.name,
+    user,
+    title: "Control Panel",
+    isTeacher: req.user.isTeacher,
+    location: `/`
+  })
+});
+
+app.post("/service/panel/:flag", checkAuthenticated, checkPermission, async (req, res) => {
+  const tab = req.params.flag;
+  switch (tab) {
+    case CONFIG_TABS.CONFIGS:
+      let newConfigs = config;
+      newConfigs = updateObj(newConfigs,req.body);
+      refactorConfigs.refactor(fs, path.join(__dirname,'/config/configs.js'), newConfigs);
+      res.redirect(`/service/panel/${tab}`);
+      break;
+    case CONFIG_TABS.USER:
+      if(!req.body.delete){
+        let login = req.body.login;
+        let user = await User.findOne({ login: login });
+        user.name = req.body.name;
+        user.password = bcrypt.hashSync(req.body.password, 10);
+        if (!user.isTeacher) {
+          user.grade = req.body.grade.slice(0, req.body.grade.length - 1),
+          user.gradeLetter = req.body.grade[req.body.grade.length - 1].toLowerCase(),
+          user.markModified('grade');
+          user.markModified('gradeLetter');
+        }
+        user.markModified('name');
+        user.markModified('password');
+        await user.save();
+        if(req.body.clear)
+          deleteUser(req.body.login, 0);
+      } else {
+        deleteUser(req.body.login, 1);
+      }
+      res.redirect(`/service/panel/${tab}/default`);
+      break;
+  }
 });
 
 // API
@@ -2752,18 +2813,22 @@ app.get('*', (req, res) => {
 })
 
 //---------------------------------------------------------------------------------
+
+function deleteUser(login, permanently=0){
+  childProcess.exec(`node ${path.join(__dirname, '/public/scripts/fixes/FixAfterDeleteUser.js')} ${login} ${permanently}`)
+};
+
 // Functions
-function updateConfigs(oldConfigs, bodyConfigs){
+function updateObj(oldConfigs, bodyConfigs){
   for (key in oldConfigs){
     if (oldConfigs[key] instanceof Object && !(oldConfigs[key] instanceof Array)) {
-      oldConfigs[key] = updateConfigs(oldConfigs[key], bodyConfigs)
+      oldConfigs[key] = updateObj(oldConfigs[key], bodyConfigs)
     }else{
       oldConfigs[key] = bodyConfigs[key];
     }
   }
   return oldConfigs;
 }
-
 
 function fuseSearch(items, key, toSearch, accuracy, params, callback) {
   const fuse = new Fuse(items, { includeScore: true, keys: [key] });
@@ -3010,3 +3075,4 @@ io.on("connection", (socket) => {
     tour.save()
   })
 });
+      
