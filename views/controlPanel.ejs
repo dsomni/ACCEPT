@@ -27,10 +27,15 @@
     <script>
         function hideShow(id){
             let spn = document.getElementById(id);
+            let arrow = document.getElementById("spn"+id).getElementsByTagName("arrow")[0];
             if(spn.style.display == "none"){
                 spn.style.display = "block";
+                arrow.classList.remove("right");
+                arrow.classList.add("down");
             }else{
                 spn.style.display = "none";
+                arrow.classList.remove("down");
+                arrow.classList.add("right");
             }
         }
 
@@ -38,7 +43,7 @@
             let txt = "";
             for (key in obj){
                 if(depth == 1){
-                    txt += `<span class="depth${depth}" onclick="hideShow('${key}')">${key}</span>\n`;
+                    txt += `<span class="depth${depth}" id='spn${key}' onclick="hideShow('${key}')">${key} <arrow class="arrow right"></arrow></span>\n`;
                     txt += `<div class="hideable" id="${key}" style="display: none; width:100%;" >\n`;
                 }else{
                     txt += `<span class="depth${depth}">${key}</span>\n`;

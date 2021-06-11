@@ -1148,3 +1148,22 @@ header input {
   from {opacity: 0;}
   to {opacity:1 ;}
 }
+
+.arrow {
+  border: solid black;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  vertical-align: .2rem;
+  padding: 4px;
+  transition: .5s;
+}
+
+.right {
+  transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+}
+
+.down {
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}
