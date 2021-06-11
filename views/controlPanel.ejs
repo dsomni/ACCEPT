@@ -29,7 +29,7 @@
             let spn = document.getElementById(id);
             let arrow = document.getElementById("spn"+id).getElementsByTagName("arrow")[0];
             if(spn.style.display == "none"){
-                spn.style.display = "block";
+                spn.style.display = "flex";
                 arrow.classList.remove("right");
                 arrow.classList.add("down");
             }else{
@@ -42,17 +42,13 @@
         function construct(obj, depth){
             let txt = "";
             for (key in obj){
-                if(depth == 1){
-                    txt += `<span class="depth${depth}" id='spn${key}' onclick="hideShow('${key}')">${key} <arrow class="arrow right"></arrow></span>\n`;
-                    txt += `<div class="hideable" id="${key}" style="display: none; width:100%;" >\n`;
-                }else{
-                    txt += `<span class="depth${depth}">${key}</span>\n`;
-                    txt += `<div class="hideable" id="${key}" style="width:100%;" >\n`;
-                }
+                txt += `<span class="depth${depth}" id='spn${key}' onclick="hideShow('${key}')">${key} <arrow class="arrow right" style="padding: ${5-depth}px;"></arrow></span>\n`;
+                txt += `<div class="hideable" id="${key}" style="display: none; flex-direction:column; width:100%;" >\n`;
                 if (obj[key] instanceof Object && !(obj[key] instanceof Array)) {
                     txt += construct(obj[key], depth+1)
                 }else{
-                    txt += `<textarea class="configarea" style="margin-left:${depth-1}rem;  margin-top: -.1rem;" id="${key}" name = "${key}" cols=40  rows=3 placeholder="">${obj[key]}</textarea>`
+                    console.log(obj[key].toString().length);
+                    txt += `<textarea class="configarea" style="margin-left:${depth-1}rem;  margin-top: -.1rem; width:${obj[key].toString().length+2}ch" id="${key}" name = "${key}"  rows=1 placeholder="">${obj[key]}</textarea>`
                 }
                 txt += `</div>\n`
             }

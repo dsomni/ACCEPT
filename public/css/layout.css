@@ -1092,7 +1092,7 @@ header input {
   margin-left: 2rem;
   margin-bottom: 1rem;
   font-size: 14px;
-  font-weight: 400;
+  font-weight: 600;
 }
 
 /* Popup container */
@@ -1153,7 +1153,6 @@ header input {
   border: solid black;
   border-width: 0 3px 3px 0;
   display: inline-block;
-  vertical-align: .2rem;
   padding: 4px;
   transition: .5s;
 }
