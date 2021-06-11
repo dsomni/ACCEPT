@@ -10,6 +10,7 @@ const config = require('./config/configs');
 const expressLayouts = require('express-ejs-layouts');
 const childProcess = require("child_process");
 const Adder = require(__dirname + '/public/scripts/Adder.js');
+const refactorConfigs = require(__dirname + '/public/scripts/refactorConfigs.js');
 const Fuse = require('fuse.js');
 const socketIo = require('socket.io');
 const path = require('path');
@@ -22,9 +23,9 @@ const MongoStorage = require("connect-mongo");
 const bodyParser = require("body-parser");
 require("dotenv").config();
 const app = express();
+
 //---------------------------------------------------------------------------------
 // Queue setup
-
 let TestingQueue = []
 
 function pushToQueue(object) {
@@ -164,7 +165,7 @@ setInterval(() => {
     skip: function (req, res) { return (req.url.slice(-4) == ".svg" || req.url.slice(-4) == ".css" || req.url.slice(-3) == ".ng") || (req.user && !req.user.isTeacher) },
     stream: fs.createWriteStream(path.join(__dirname, 'public/logs/' + (new Date(Date.now())).toISOString().split(':').join('_') + '.log'), { flags: 'a' })
   }));
-}, 24*60*60*1000)
+}, 24 * 60 * 60 * 1000)
 app.use(express.urlencoded({ extended: false }));
 app.use('/public', express.static('public')); //where search for static files
 
@@ -227,7 +228,7 @@ app.get('/', (req, res) => {
       name: req.user.name,
       title: "Main Page",
       isTeacher: req.user.isTeacher,
-      news: news ? news.slice(0, config.onPage.newsMain) : [],
+      news: news ? news.slice(0, config.onPage.newsMainList) : [],
       location: undefined
     });
   } else {
@@ -236,7 +237,7 @@ app.get('/', (req, res) => {
       name: "",
       title: "Main Page",
       isTeacher: false,
-      news: news ? news.slice(0, config.onPage.newsMain) : [],
+      news: news ? news.slice(0, config.onPage.newsMainList) : [],
       location: undefined
     });
   };
@@ -402,7 +403,7 @@ app.get('/tasks/:page/:search', checkAuthenticated, checkNletter, async (req, re
     foundTasks = tasks;
     if (SortByNew) foundTasks = foundTasks.reverse();
   }
-  let onPage = config.onPage.tasks;
+  let onPage = config.onPage.tasksList;
   let pageInfo = `${(req.params.page - 1) * onPage + 1} - ${min(req.params.page * onPage, foundTasks.length)} из ${foundTasks.length}`;
   let pages = Math.ceil(foundTasks.length / onPage);
   foundTasks = foundTasks.map(item => item.identificator).slice((req.params.page - 1) * onPage, req.params.page * onPage).join('|');
@@ -563,7 +564,7 @@ app.get('/account/:login/:page/:search', checkAuthenticated, checkValidation, as
       }
     }
 
-    let onPage = config.onPage.attempts;
+    let onPage = config.onPage.attemptsList;
     let page = req.params.page;
     let pages = Math.ceil(foundAttempts.length / onPage);
     let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, foundAttempts.length)} из ${foundAttempts.length}`;
@@ -704,7 +705,7 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, checkNletter, async
     lessons = await Lesson.find({}).exec();
   }
 
-  let onPage = config.onPage.lessons;
+  let onPage = config.onPage.lessonsList;
   let page = req.params.page;
   let pages = Math.ceil(lessons.length / onPage);
   let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, lessons.length)} из ${lessons.length}`;
@@ -852,7 +853,7 @@ app.get('/lessonresults/:id/:page/:search', checkAuthenticated, checkNletter, ch
     //     foundStudents = await User.find({ isTeacher: false }).exec();
     foundStudents.sort((a, b) => { return a.name > b.name });
 
-    let onPage = config.onPage.students;
+    let onPage = config.onPage.studentsList;
     let page = req.params.page;
     let pages = Math.ceil(foundStudents.length / onPage);
     let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, foundStudents.length)} из ${foundStudents.length}`;
@@ -912,7 +913,7 @@ app.get('/students/:page/:search', checkAuthenticated, checkNletter, checkPermis
 
   foundStudents.sort((a, b) => { return a.name > b.name });
 
-  let onPage = config.onPage.students;
+  let onPage = config.onPage.studentsList;
   let page = req.params.page;
   let pages = Math.ceil(foundStudents.length / onPage);
   let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, foundStudents.length)} из ${foundStudents.length}`;
@@ -1148,7 +1149,7 @@ app.get('/tournaments/:login/:page/:search', checkAuthenticated, async (req, res
 
   foundTournaments.sort((a, b) => { return a._id < b._id });
 
-  let onPage = config.onPage.tournaments;
+  let onPage = config.onPage.tournamentsList;
   let page = req.params.page;
   let pages = Math.ceil(foundTournaments.length / onPage);
   let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, foundTournaments.length)} из ${foundTournaments.length}`;
@@ -1558,7 +1559,7 @@ app.get('/tournament/attempts/:tour_id/:page/:toSearch', checkAuthenticated, isM
 
   let tasks = attempts.map(attempt => tournament.tasks.find(task => task.identificator == attempt.TaskID));
 
-  let onPage = config.onPage.attempts;
+  let onPage = config.onPage.attemptsList;
   let page = req.params.page;
   let pages = Math.ceil(attempts.length / onPage);
   let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, attempts.length)} из ${attempts.length}`;
@@ -1893,7 +1894,7 @@ app.get('/tried/:login/:page/:search', checkAuthenticated, checkValidation, asyn
       }
     }
 
-    let onPage = config.onPage.attempts;
+    let onPage = config.onPage.attemptsList;
     let page = req.params.page;
     let pages = Math.ceil(verdicts.length / onPage);
     let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, verdicts.length)} из ${verdicts.length}`;
@@ -1954,7 +1955,7 @@ app.get('/rating/:page', checkAuthenticated, async (req, res) => {
   }
   objs.sort((a, b) => { return b.verdict - a.verdict; });
 
-  let onPage = config.onPage.students;
+  let onPage = config.onPage.studentsList;
   let page = req.params.page;
   let pages = Math.ceil(objs.length / onPage);
   let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, objs.length)} из ${objs.length}`;
@@ -1997,7 +1998,7 @@ app.get('/quizzes/:login/:page/:search', checkAuthenticated, async (req, res) =>
   if (!!toSearch)
     quizzes = fuseSearch(quizzes, "title", toSearch, 0.5, [], (quiz, params) => { return true });
 
-  let onPage = config.onPage.lessons;
+  let onPage = config.onPage.lessonsList;
   let page = req.params.page;
   let pages = Math.ceil(quizzes.length / onPage);
   let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, quizzes.length)} из ${quizzes.length}`;
@@ -2372,7 +2373,7 @@ app.get('/quiz/attempt/:quiz_id/:login/:date', checkAuthenticated, checkValidati
 })
 
 //------------------------------------------------------------------------------------------------
-//Quiz add time
+// Quiz add time
 app.post("/quiz/set/time", checkAuthenticated, checkPermission, async (req, res) => {
   let quiz = await Quiz.findOne({ identificator: req.body.quiz_id });
   let lessonIdx = quiz.lessons.findIndex(item => item.grade.toLowerCase() == req.body.grade.toLowerCase());
@@ -2394,9 +2395,35 @@ app.post("/quiz/set/time", checkAuthenticated, checkPermission, async (req, res)
   res.json({ error: false });
 });
 
+//--------------------------------------------------------------------------------------
+// Control panel
+app.get("/service/control/panel", checkAuthenticated, checkPermission, async (req, res) => {
+  res.render('controlPanel.ejs', {
+    login: req.user.login,
+    name: req.user.name,
+    title: "Control Panel",
+    isTeacher: req.user.isTeacher,
+    location: `/`
+  })
+});
+
+app.post("/service/control/panel", checkAuthenticated, checkPermission, async (req, res) => {
+  let newConfigs = config;
+  newConfigs = updateConfigs(newConfigs,req.body);
+  refactorConfigs.refactor(fs, path.join(__dirname,'/config/configs.js'), newConfigs);
+  res.redirect("/service/control/panel")
+});
+
 // API
-//------------------------------------------------------------------------------------------------API
-//---------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------
+
+// Get configs results
+app.get("/api/get/configs", checkAuthenticated, checkPermission, async (req, res) => {
+  res.json({
+    config
+  });
+});
+
 // Get task results
 app.get("/api/task/get/testresults/:id", checkAuthenticated, async (req, res) => {
   let results = {
@@ -2567,7 +2594,7 @@ app.get("/api/attempts/get/verdicts/:login/:page/:search", checkAuthenticated, a
   let toSearch = a[0] == "default" ? "" : a[0].toUpperCase();
   let types = a[1];
   let attempts = user.attempts;
-  let onPage = config.onPage.attempts;
+  let onPage = config.onPage.attemptsList;
   let foundAttempts = [];
   let foundTasks = [];
   let tourTask = [];
@@ -2646,7 +2673,7 @@ app.get("/api/quiz/get/results/:id/:grade", checkAuthenticated, async (req, res)
   let lesson = quiz.lessons.find(item => item.grade == grade);
   let results = [];
   let result;
-  for(let i=0 ; i< lesson.results.length;i++){
+  for (let i = 0; i < lesson.results.length; i++) {
     result = lesson.results[i];
     let user = await User.findOne({ login: result.login }).exec();
     result = {
@@ -2677,7 +2704,7 @@ app.get("/api/tournament/get/attempts/:id/:page/:search", checkAuthenticated, as
   if (toReverse)
     attempts = attempts.reverse();
 
-  let onPage = configs.onPage.attempts;
+  let onPage = configs.onPage.attemptsList;
   attempts = attempts.slice((req.params.page - 1) * onPage, max(req.params.page * onPage, attempts.length));
   res.json({
     attempts
@@ -2710,6 +2737,7 @@ app.get('/patrikegg', checkAuthenticated, checkNotPermission, async (req, res) =
 app.get('/beee', checkAuthenticated, checkNotPermission, async (req, res) => {
   res.sendFile(__dirname + '/views/Random/25012021.html')
 })
+
 //---------------------------------------------------------------------------------
 // Log Out
 app.delete('/logout', (req, res) => {
@@ -2725,6 +2753,17 @@ app.get('*', (req, res) => {
 
 //---------------------------------------------------------------------------------
 // Functions
+function updateConfigs(oldConfigs, bodyConfigs){
+  for (key in oldConfigs){
+    if (oldConfigs[key] instanceof Object && !(oldConfigs[key] instanceof Array)) {
+      oldConfigs[key] = updateConfigs(oldConfigs[key], bodyConfigs)
+    }else{
+      oldConfigs[key] = bodyConfigs[key];
+    }
+  }
+  return oldConfigs;
+}
+
 
 function fuseSearch(items, key, toSearch, accuracy, params, callback) {
   const fuse = new Fuse(items, { includeScore: true, keys: [key] });
@@ -2934,7 +2973,7 @@ setInterval(() => {
 // Delete old logs
 setInterval(() => {
   childProcess.exec("node " + path.join(__dirname, "/public/scripts/LogChecker/logChecker.js"));
-}, 24*60*60*1000);
+}, 24 * 60 * 60 * 1000);
 
 //---------------------------------------------------------------------------------
 // Queue Manager

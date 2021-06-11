@@ -1072,7 +1072,27 @@ header input {
   border: 1px solid #e3eef7;
   padding: .125rem 1.5rem;
   transition: all 0.5s ease;
-}/* Popup container */
+}
+
+/* Control Panel depths */
+.depth1{
+  font-size: 25px;
+  font-weight: 900;
+}
+
+.depth2{
+  margin-left: 15px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.depth3{
+  margin-left: 30px;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+/* Popup container */
 .popup {
   position: relative;
   text-align: center;
