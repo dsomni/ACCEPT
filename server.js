@@ -1575,7 +1575,6 @@ app.get("/tournament/disqualAttempt/:tour_id/:AttemptDate", checkAuthenticated, 
   let TaskID = tournament.attempts[idx].TaskID.split('_')[1];
   tournament.attempts.splice(idx, 1);
   let resUserIndx = tournament.results.findIndex(item => item.login == login);
-  console.log(idx, login, resUserIndx);
   if (resUserIndx == -1)
     return res.redirect(`/tournament/attempts/${req.params.tour_id}/1/all&all&all&true`);
   if (score == tournament.results[resUserIndx].tasks[TaskID].score) {
@@ -1672,12 +1671,13 @@ app.get("/registration", async (req, res) => {
 
 app.post("/registration", async (req, res) => {
   let newUser = new User();
-  newUser.setLogin("n-" + req.body.login)
+  newUser.setLogin("n-" + req.body.login);
+  newUser.setName(req.body.name);
   let isValidPassword = newUser.checkAndSetPassword(req.body.password.trim());
   newUser.setFullGrade("0N");
   newUser.setGroup(req.body.email);
   if (!isValidPassword) {
-    res.render('registration.ejs', {
+    res.render('Account/registration.ejs', {
       login: "",
       name: "",
       title: "Registration Page",
@@ -1690,8 +1690,8 @@ app.post("/registration", async (req, res) => {
   }
   if (await UserSchema.exists({login: newUser.login})) {
     let users = await UserSchema.find({});
-    let logins = users.filter(user => user.login.length > 2 && user.login.slice(0, 1)=="n_" ).map(user => user.login);
-    res.render('registration.ejs', {
+    let logins = users.filter(user => user.login.length > 2 && user.login.slice(0, 1)=="n-" ).map(user => user.login);
+    res.render('Account/registration.ejs', {
       login: "",
       name: "",
       title: "Registration Page",
@@ -2841,7 +2841,6 @@ function configurateUsers(filepath, type){
   }else if(type == 2){
     return childProcess.exec(`node ${path.join(__dirname, "/public/scripts/users/addTeacher.js")} ${filepath}`);
   }
-  console.log(`node ${path.join(__dirname, "/public/scripts/users/delUser.js")} ${filepath}`);
   return childProcess.exec(`node ${path.join(__dirname, "/public/scripts/users/delUser.js")} ${filepath}`);
 }
 
@@ -3089,4 +3088,3 @@ io.on("connection", (socket) => {
     tour.save()
   })
 });
-      

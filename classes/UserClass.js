@@ -14,7 +14,6 @@ module.exports = User = class User {
       this.fullgrade = this.grade + this.gradeLetter;
       this.attempts = user.attempts;
       this.verdicts = user.verdicts;
-      this.modified = [];
     } else {
       this.name = "";
       this.login = "";
@@ -22,11 +21,12 @@ module.exports = User = class User {
       this.isTeacher = false;
       this.grade = "";
       this.group = "";
-      this.gradeLetter = user.gradeLetter;
+      this.gradeLetter = "";
       this.fullgrade = "";
       this.attempts = [];
       this.verdicts = [];
     }
+    this.modified = [];
   }
   static async init(login) {
     let user = await UserSchema.findOne({ login: login });
@@ -37,7 +37,6 @@ module.exports = User = class User {
   }
   async save() {
     let user = await UserSchema.findOne({ login: this.login });
-    console.log(user)
     if (user) {
       user.name = this.name;
       user.isTeacher = this.isTeacher;
