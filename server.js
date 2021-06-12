@@ -34,7 +34,7 @@ function pushToQueue(object) {
 
 async function popQueue() {
   let object = TestingQueue.shift();
-  let user = await  UserSchema.findOne({ login: object.login }).exec();
+  let user = await  User.init(object.login);
   if (!user)
     return
   if (object.id[0] != "Q") {
@@ -148,6 +148,8 @@ mongoose.connection.on('error', (err) => {
 
 mongoose.set('useCreateIndex', true);
 
+//---------------------------------------------------------------------------------
+//Schemas
 const UserSchema = require('./config/models/User');
 const TaskSchema = require('./config/models/Task');
 const NewsSchema = require('./config/models/News');
@@ -156,7 +158,11 @@ const TournamentSchema = require('./config/models/Tournament');
 const QuizSchema = require('./config/models/Quiz');
 
 //---------------------------------------------------------------------------------
+// Classes
+const User = require('./classes/UserClass');
 
+//---------------------------------------------------------------------------------
+//Passport Setup
 const initializePassport = require('./config/passport');
 const configs = require('./config/configs');
 initializePassport(
@@ -543,10 +549,10 @@ app.post('/task/delete/:id', checkAuthenticated, checkNletter, checkPermission, 
 // Account Page
 app.get('/account/:login/:page/:search', checkAuthenticated, checkValidation, async (req, res) => {
   let user;
-  if (req.user.login == req.params.login) {
-    user = req.user;
+  if (!req.user.isTeacher) {
+    user = new User(req.user);
   } else {
-    user = await  UserSchema.findOne({ login: req.params.login }).exec();
+    user = await User.init(req.params.login);
   }
 
   if (user) {
@@ -611,23 +617,14 @@ app.post('/account/:login/:page/:search', checkAuthenticated, checkValidation, a
 // Attempt Page
 app.get('/attempt/:login/:date', checkAuthenticated, checkValidation, async (req, res) => {
   let user;
-  if (req.user.login == req.params.login) {
-    user = req.user;
+  if (!req.user.isTeacher) {
+    user = new User(req.user);
   } else {
-    user = await  UserSchema.findOne({ login: req.params.login }).exec();
+    user = await User.init(req.params.login);
   }
 
   if (user) {
-
-    let attempts = user.attempts;
-    let attempt;
-
-    for (let i = 0; i < attempts.length; i++) {
-      if (attempts[i].date == req.params.date) {
-        attempt = attempts[i];
-        break;
-      }
-    }
+    let attempt = user.getAttempt(req.params.date);
 
     if (attempt) {
       res.render('Account/attempt.ejs', {
@@ -687,14 +684,14 @@ app.post('/addlesson', checkAuthenticated, checkNletter, checkPermission, async 
 app.get('/lessons/:login/:page/:search', checkAuthenticated, checkNletter, async (req, res) => {
 
   let user;
-  if (req.user.login == req.params.login || !req.user.isTeacher) {
-    user = req.user;
+  if (!req.user.isTeacher) {
+    user = new User(req.user);
 
   } else {
-    user = await  UserSchema.findOne({ login: req.params.login }).exec();
+    user = await User.init(req.params.login);
   }
 
-  let teachers = await  UserSchema.find({ isTeacher: true });
+  let teachers = await UserSchema.find({ isTeacher: true });
   teachers = teachers.map(item => item.name);
   let lessons;
   let a = req.params.search.split('&');
@@ -753,10 +750,10 @@ app.post('/lessons/:login/:page/:search', checkAuthenticated, checkNletter, asyn
 app.get('/lesson/:login/:id', checkAuthenticated, checkNletter, isLessonAvailable, async (req, res) => {
 
   let user;
-  if (req.user.login == req.params.login) {
-    user = req.user;
+  if (!req.user.isTeacher) {
+    user = new User(req.user);
   } else {
-    user = await  UserSchema.findOne({ login: req.params.login }).exec();
+    user = await User.init(req.params.login);
   }
 
   lesson = await LessonSchema.findOne({ identificator: req.params.id }).exec();
@@ -793,19 +790,17 @@ app.post('/deletelesson/:id', checkAuthenticated, checkNletter, checkPermission,
 app.get('/editlesson/:id', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
   let lesson = await LessonSchema.findOne({ identificator: req.params.id }).exec();
   lesson.tasks = lesson.tasks.map(item => parseInt(item.split('_')[1]) + 1);
-  let user = req.user;
   res.render('Lesson/edit.ejs', {
-    login: user.login,
+    login: req.user.login,
     name: req.user.name,
     title: "Edit Lesson",
     isTeacher: req.user.isTeacher,
     lesson: lesson,
-    location: `/lesson/${user.login}/${req.params.id}`
+    location: `/lesson/${req.user.login}/${req.params.id}`
   });
 });
 
 app.post('/editlesson/:id', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
-  let user = req.user;
   let body = req.body;
   let lesson = await LessonSchema.findOne({ identificator: req.params.id }).exec()
 
@@ -824,7 +819,7 @@ app.post('/editlesson/:id', checkAuthenticated, checkNletter, checkPermission, a
 
   await lesson.save();
 
-  res.redirect(`/lesson/${user.login}/${req.params.id}`);
+  res.redirect(`/lesson/${req.user.login}/${req.params.id}`);
 });
 
 //---------------------------------------------------------------------------------
@@ -835,7 +830,6 @@ app.get('/lessonresults/:id/:page/:search', checkAuthenticated, checkNletter, ch
   if (!lesson) {
     res.redirect("/lessons/" + req.params.login + "/1/default&all&all")
   } else {
-    let results = [];
     let foundStudents;
     let students;
 
@@ -860,8 +854,6 @@ app.get('/lessonresults/:id/:page/:search', checkAuthenticated, checkNletter, ch
         foundStudents = students;
       }
     }
-    // if(foundStudents.length == 0)
-    //     foundStudents = await  UserSchema.find({ isTeacher: false }).exec();
     foundStudents.sort((a, b) => { return a.name > b.name });
 
     let onPage = config.onPage.studentsList;
@@ -898,8 +890,7 @@ app.post('/lessonresults/:id/:page/:search', checkAuthenticated, checkNletter, c
 
 //---------------------------------------------------------------------------------
 // Students List Page
-app.get('/students/:page/:search', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
-  let user = req.user;
+app.get('/students/:page/:search', checkAuthenticated, checkPermission, async (req, res) => {
   let students;
 
   let a = req.params.search.split('&');
@@ -930,7 +921,7 @@ app.get('/students/:page/:search', checkAuthenticated, checkNletter, checkPermis
   let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, foundStudents.length)} из ${foundStudents.length}`;
 
   res.render('students.ejs', {
-    login: user.login,
+    login: req.user.login,
     name: req.user.name,
     title: "Students List",
     isTeacher: req.user.isTeacher,
@@ -944,32 +935,31 @@ app.get('/students/:page/:search', checkAuthenticated, checkNletter, checkPermis
   })
 })
 
-app.post('/students/:page/:search', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
+app.post('/students/:page/:search', checkAuthenticated, checkPermission, async (req, res) => {
   let toSearch = req.body.searcharea;
   if (!toSearch) toSearch = "default";
   toSearch += '&' + req.body.GradeSelector +
     '&' + (req.body.gradeLetter || "all") +
     '&' + (req.body.Group || "all")
-  let keys = Object.keys(req.body)
-  let student;
-  for (let i = 0; i < keys.length; i++) {
-    if (keys[i].slice(0, 6) == "login:") {
-      student = await  UserSchema.findOne({ login: keys[i].slice(6) }).exec()
-      if (student.group != req.body[keys[i]]) {
-        student.group = req.body[keys[i]]
-        await student.save()
-      }
-    }
-  }
+  // let keys = Object.keys(req.body);
+  // let student;
+  // for (let i = 0; i < keys.length; i++) {
+  //   if (keys[i].slice(0, 6) == "login:") {
+  //     student = await  UserSchema.findOne({ login: keys[i].slice(6) }).exec()
+  //     if (student.group != req.body[keys[i]]) {
+  //       student.group = req.body[keys[i]]
+  //       await student.save()
+  //     }
+  //   }
+  // }
   res.redirect('/students/' + req.params.page.toString() + '/' + toSearch)
 })
 
 //---------------------------------------------------------------------------------
 // Add News Page
-app.get('/addnews', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
-  let user = req.user;
+app.get('/addnews', checkAuthenticated, checkPermission, async (req, res) => {
   res.render('News/add.ejs', {
-    login: user.login,
+    login: req.user.login,
     name: req.user.name,
     title: "Add News",
     isTeacher: req.user.isTeacher,
@@ -978,12 +968,11 @@ app.get('/addnews', checkAuthenticated, checkNletter, checkPermission, async (re
 });
 
 app.post('/addnews', checkAuthenticated, checkNletter, checkPermission, uploadImage.single('image'), async (req, res) => {
-  let user = req.user;
   let body = req.body;
   let filename = "";
   if (req.file) filename = req.file.filename
 
-  let new_news = await Adder.addNews(NewsSchema, body.title, body.description, body.text, filename, user.name);
+  await Adder.addNews(NewsSchema, body.title, body.description, body.text, filename, req.user.name);
   load();
   res.redirect("/")
 });
@@ -1003,9 +992,8 @@ app.post('/deletenews/:id', checkAuthenticated, checkNletter, checkPermission, a
 // Edit News Pages
 app.get('/editnews/:id', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
   one_news = news.find(item => item._id == req.params.id)
-  let user = req.user;
   res.render('News/edit.ejs', {
-    login: user.login,
+    login: req.user.login,
     name: req.user.name,
     title: "Edit News",
     isTeacher: req.user.isTeacher,
@@ -1062,9 +1050,8 @@ app.get("/news/:id", (req, res) => {
 //---------------------------------------------------------------------------------
 // Add Tournament Page
 app.get('/tournament/add', checkAuthenticated, checkPermission, async (req, res) => {
-  let user = req.user;
   res.render('Tournament/Global/add.ejs', {
-    login: user.login,
+    login: req.user.login,
     name: req.user.name,
     title: "Add Tournament",
     isTeacher: req.user.isTeacher,
@@ -1073,10 +1060,9 @@ app.get('/tournament/add', checkAuthenticated, checkPermission, async (req, res)
 })
 
 app.post('/tournament/add', checkAuthenticated, checkPermission, async (req, res) => {
-  let user = req.user;
   let body = req.body;
   let tasks = [];
-  let mods = [user.login].concat(body.mods.split(' '));
+  let mods = [req.user.login].concat(body.mods.split(' '));
   let frozeAfter = body.frozeAfter ? body.frozeAfter : body.whenEnds;
 
   let emtpy_tournament = await TournamentSchema.findOne({ title: "" }).exec();
@@ -1084,7 +1070,7 @@ app.post('/tournament/add', checkAuthenticated, checkPermission, async (req, res
     emtpy_tournament.title = body.title;
     emtpy_tournament.description = body.description;
     emtpy_tournament.tasks = body.tasks;
-    emtpy_tournament.author = user.name;
+    emtpy_tournament.author = req.user.name;
     emtpy_tournament.whenStarts = body.whenStarts.replace('T', ' ');
     emtpy_tournament.whenEnds = body.whenEnds.replace('T', ' ');
     emtpy_tournament.frozeAfter = frozeAfter.replace('T', ' ');
@@ -1111,7 +1097,7 @@ app.post('/tournament/add', checkAuthenticated, checkPermission, async (req, res
     emtpy_tournament.save();
   } else {
     await Adder.addTournament(TournamentSchema, body.title, body.description,
-      tasks, user.name, body.whenStarts.replace('T', ' '),
+      tasks, req.user.name, body.whenStarts.replace('T', ' '),
       body.whenEnds.replace('T', ' '), frozeAfter.replace('T', ' '), mods, body.allowRegAfterStart == "on",
       body.allOrNothing == "1", body.penalty * 1000);
   }
@@ -1124,10 +1110,10 @@ app.post('/tournament/add', checkAuthenticated, checkPermission, async (req, res
 app.get('/tournaments/:login/:page/:search', checkAuthenticated, async (req, res) => {
 
   let user;
-  if (req.user.login == req.params.login || !req.user.isTeacher) {
-    user = req.user;
+  if (!req.user.isTeacher) {
+    user = new User(req.user);
   } else {
-    user = await  UserSchema.findOne({ login: req.params.login }).exec();
+    user = await User.init(req.params.login);
   }
   let results = [];
   let foundTournaments;
@@ -1201,9 +1187,8 @@ app.post('/tournaments/:login/:page/:search', checkAuthenticated, async (req, re
 // Edit Tournament Page
 app.get('/tournament/edit/:tour_id', checkAuthenticated, isModerator, async (req, res) => {
   let tournament = await TournamentSchema.findOne({ identificator: req.params.tour_id }).exec();
-  let user = req.user;
   res.render('Tournament/Global/edit.ejs', {
-    login: user.login,
+    login: req.user.login,
     name: req.user.name,
     title: "Edit Tournament",
     isTeacher: req.user.isTeacher,
@@ -1272,10 +1257,9 @@ app.get('/regTournament/:tour_id', checkAuthenticated, async (req, res) => {
 //---------------------------------------------------------------------------------
 // Add Task to Tournament Page
 app.get('/tournament/task/add/:tour_id', checkAuthenticated, isModerator, async (req, res) => {
-  let user = req.user;
   let tournament = await TournamentSchema.findOne({ identificator: req.params.tour_id }).exec()
   res.render('Tournament/Task/add.ejs', {
-    login: user.login,
+    login: req.user.login,
     name: req.user.name,
     title: "Add Task",
     tournament: tournament,
@@ -1388,10 +1372,10 @@ app.post('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTourname
 // Tournament Page
 app.get('/tournament/page/:login/:id', checkAuthenticated, checkTournamentValidation, async (req, res) => {
   let user;
-  if (req.user.login == req.params.login) {
-    user = req.user;
+  if (!req.user.isTeacher) {
+    user = new User(req.user);
   } else {
-    user = await  UserSchema.findOne({ login: req.params.login }).exec();
+    user = await User.init(req.params.login);
   }
 
   let tournament = await TournamentSchema.findOne({ identificator: req.params.id }).exec();
@@ -1400,15 +1384,8 @@ app.get('/tournament/page/:login/:id', checkAuthenticated, checkTournamentValida
   } else {
     let tasks = tournament.tasks;
     let verdicts = [];
-    let verdict;
     for (let i = 0; i < tournament.tasks.length; i++) {
-      verdict = user.verdicts.find(item => item.taskID == tournament.tasks[i].identificator)
-      if (!verdict) {
-        verdict = "-"
-      } else {
-        verdict = verdict.result
-      }
-      verdicts.push(verdict)
+      verdicts.push(user.getVerdict(tournament.tasks[i].identificator))
     }
     let registered = false;
     if (!(tournament.mods.find(item => item == req.user.login) || tournament.isEnded || tournament.isBegan && tournament.results.find(item => item.login == req.params.login))) {
@@ -1511,28 +1488,16 @@ app.post('/tournament/task/edit/:tour_id/:id', checkAuthenticated, isModerator, 
 // Tournament results page
 app.get('/tournament/results/:tour_id/', checkAuthenticated, async (req, res) => {
   let tournament = await TournamentSchema.findOne({ identificator: req.params.tour_id });
-  let baza;
-  if (tournament.isFrozen && !tournament.isEnded && !tournament.mods.includes(req.user.login)) {
-    baza = tournament.frozenResults;
-  } else {
-    baza = tournament.results;
-  }
   let results = [];
   if (tournament) {
-    for (let i = 0; i < baza.length; i++) {
-      let user = await  UserSchema.findOne({ login: baza[i].login })
-      if (user)
-        results.push([baza[i], user.isTeacher]);
-    }
     res.render('Tournament/Global/results.ejs', {
       login: req.user.login,
       name: req.user.name,
       title: "Tournament Results",
       isTeacher: req.user.isTeacher,
       ID: req.params.tour_id,
-      tournament: tournament,
-      results: results,
-      isModerator: tournament.mods.includes(req.user.login),
+      tournamentTitle: tournament.title,
+      isEnded: tournament.isEnded,
       location: `/tournament/page/${req.user.login}/${req.params.tour_id}`
     });
   } else {
@@ -1674,9 +1639,9 @@ app.get('/about', checkAuthenticated, async (req, res) => {
 //---------------------------------------------------------------------------------
 // Edit Group
 app.post('/editgroup/:login/:page/:search', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
-  let student = await  UserSchema.findOne({ login: req.params.login })
+  let student = await User.init(req.params.login);
   if (req.body.groupEditor) {
-    student.group = req.body.groupEditor;
+    student.setGroup(req.body.groupEditor)
     await student.save()
   }
   res.redirect('/students' + '/' + req.params.page + '/' + req.params.search);
@@ -1686,7 +1651,7 @@ app.post('/editgroup/:login/:page/:search', checkAuthenticated, checkNletter, ch
 // Registration Page
 app.get("/registration", async (req, res) => {
   let logins = [];
-  let users = await  UserSchema.find();
+  let users = await UserSchema.find({});
   for (let i = 0; i < users.length; i++) {
     let login = users[i].login;
     if (login.length >= 2 && login[0] == "n" && login[1] == "_") {
@@ -1706,27 +1671,26 @@ app.get("/registration", async (req, res) => {
 });
 
 app.post("/registration", async (req, res) => {
-  let new_user = {
-    login: "n-" + req.body.login,
-    password: req.body.password,
-    name: req.body.name,
-    isTeacher: false,
-
-    grade: 0,
-    gradeLetter: "N",
-    group: req.body.email
-  };
-  let user = await  UserSchema.findOne({ login: new_user.login }).exec();
-  if (user) {
-    let logins = [];
-    let users = await  UserSchema.find();
-    for (let i = 0; i < users.length; i++) {
-      let login = users[i].login;
-      if (login.length >= 2 && login[0] == "n" && login[1] == "_") {
-        login = login.slice(2);
-      }
-      logins.push(login);
-    }
+  let newUser = new User();
+  newUser.setLogin("n-" + req.body.login)
+  let isValidPassword = newUser.checkAndSetPassword(req.body.password.trim());
+  newUser.setFullGrade("0N");
+  newUser.setGroup(req.body.email);
+  if (!isValidPassword) {
+    res.render('registration.ejs', {
+      login: "",
+      name: "",
+      title: "Registration Page",
+      msg: "Неверный пароль",
+      logins: [],
+      isTeacher: false,
+      location: undefined
+    });
+    return;
+  }
+  if (await UserSchema.exists({login: newUser.login})) {
+    let users = await UserSchema.find({});
+    let logins = users.filter(user => user.login.length > 2 && user.login.slice(0, 1)=="n_" ).map(user => user.login);
     res.render('registration.ejs', {
       login: "",
       name: "",
@@ -1738,8 +1702,7 @@ app.post("/registration", async (req, res) => {
     });
     return;
   }
-  new_user.password = bcrypt.hashSync(new_user.password, 10);
-  await  UserSchema.insertMany([new_user]);
+  await newUser.save();
   res.redirect("/");
 });
 
@@ -1756,32 +1719,26 @@ app.get("/EditAccount", checkAuthenticated, async (req, res) => {
     location: req.header('Referer')
   };
 
-  res.render('Accout/edit.ejs', rendered)
+  res.render('Accout/edit.ejs', rendered);
 });
 
 app.post("/EditAccount", checkAuthenticated, async (req, res) => {
-  let user = await  UserSchema.findOne({ login: req.user.login });
-  if (req.body.password.length < 5 && req.body.password.trim().length != 0) {
+  let user = await User.init(req.user.login);
+  if (user.checkAndSetPassword(password.trim())) {
     return res.render('Account/edit.ejs', {
       login: req.user.login,
       name: req.user.name,
       title: "Edit Account Page",
       isTeacher: req.user.isTeacher,
       user: req.user,
-      msg: "Пароль должен содержать как минимум 5 символов!",
+      msg: "Пароль должен быть длиннее 5 символов и не содержать пробелов",
       location: undefined
     });
   }
   if (req.user.login.slice(0, 2) == "n-") {
-    user.name = req.body.name;
-    user.group = req.body.email;
+    user.setName(req.body.name);
+    user.setGroup(req.body.group);
   }
-  if (req.body.password.trim().length != 0) {
-    user.password = bcrypt.hashSync(req.body.password, 10);
-  }
-  user.markModified("name");
-  user.markModified("group");
-  user.markModified("password");
   await user.save();
   res.redirect("/");
 });
@@ -1802,8 +1759,8 @@ app.get("/report", checkAuthenticated, async (req, res) => {
 
 app.post("/report", checkAuthenticated, async (req, res) => {
   if (req.body.report) {
-    let sign = "\n" + req.user.name + "\n" + req.user.login
-    let info = transporter.sendMail({
+    let sign = `\n${req.user.name} ${(req.user.grade + req.user.gradeLetter).toUpperCase()}\n${req.user.login}`;
+    transporter.sendMail({
       from: '"ACCEPT report collector" <accept.report@gmail.com>', // sender address
       to: "pro100pro10010@gmail.com", // list of receivers
       subject: req.body.type_selector, // Subject line
@@ -1845,10 +1802,10 @@ app.get("/newslist/:page", async (req, res) => {
 // Tried Page
 app.get('/tried/:login/:page/:search', checkAuthenticated, checkValidation, async (req, res) => {
   let user;
-  if (req.user.login == req.params.login) {
-    user = req.user;
+  if (!req.user.isTeacher) {
+    user = new User(req.user);
   } else {
-    user = await  UserSchema.findOne({ login: req.params.login }).exec();
+    user = await User.init(req.params.login);
   }
 
   if (user) {
@@ -1875,9 +1832,8 @@ app.get('/tried/:login/:page/:search', checkAuthenticated, checkValidation, asyn
         foundVerdicts.push(verdicts[i]);
       }
     }
-    req.user.verdicts = foundVerdicts;
-    req.user.markModified("verdicts");
-    await req.user.save();
+    user.setVerdicts(foundVerdicts);
+    await user.save();
 
     const fuse = new Fuse(foundTasks, {
       includeScore: true,
@@ -1947,7 +1903,7 @@ app.get('/rating/:page', checkAuthenticated, async (req, res) => {
 
   let objs = [];
   let user, count, obj;
-  let users = await  UserSchema.find({ isTeacher: false });
+  let users = await UserSchema.find({ isTeacher: false });
   for (let i = 0; i < users.length; i++) {
     user = users[i];
     obj = {
@@ -1993,9 +1949,9 @@ app.get('/quizzes/:login/:page/:search', checkAuthenticated, async (req, res) =>
   let toSearch = req.params.search.toLowerCase() == "default" ? "" : req.params.search.toLowerCase();
   let u_login = req.user.login;
   let u_name = req.user.name;
-  let user = req.user;
+  let user = new User(req.user);
   if (req.user.isTeacher) {
-    user = await  UserSchema.findOne({ login: req.params.login });
+    user = await User.init(req.params.login);
     if (user) {
       u_login = user.login;
       u_name = user.name;
@@ -2041,7 +1997,7 @@ app.post('/quizzes/:login/:page/:search', checkAuthenticated, async (req, res) =
 // Quiz page
 app.get("/quiz/page/:login/:quiz_id", checkAuthenticated, checkGrade, async (req, res) => {
   let quiz = await QuizSchema.findOne({ identificator: req.params.quiz_id }).exec();
-  let student = await  UserSchema.findOne({ login: req.params.login }).exec();
+  let student = await User.init(req.params.login);
 
   res.render('Quiz/Global/Page.ejs', {
     title: "Quiz page",
@@ -2138,10 +2094,9 @@ app.post("/quiz/start/:id", checkAuthenticated, checkPermission, async (req, res
 //---------------------------------------------------------------------------------
 // Add Task to Quiz Page
 app.get('/quiz/task/add/:quiz_id', checkAuthenticated, checkPermission, async (req, res) => {
-  let user = req.user;
   res.render('Quiz/Task/add.ejs', {
     ID: req.params.quiz_id,
-    login: user.login,
+    login: req.user.login,
     name: req.user.name,
     title: "Add Task",
     isTeacher: req.user.isTeacher,
@@ -2281,7 +2236,6 @@ app.get('/quiz/task/page/:quiz_id/:id', checkAuthenticated, checkGrade, async (r
   let ids = quiz.tasks.map(item => item.identificator).join("|");
   let grade = req.user.isTeacher ? "teacher" : req.user.grade + req.user.gradeLetter.toLowerCase();
   let lesson = quiz.lessons.find(item => item.grade.toLowerCase() == grade.toLowerCase());
-  let whenEnds = lesson.whenEnds;
   task = quiz.tasks.find(item => item.identificator == req.params.id);
   if (!task) {
     return res.redirect('/quiz/page/' + req.user.login + '/' + req.params.quiz_id);
@@ -2354,10 +2308,10 @@ app.post("/quiz/results/:quiz_id/:grade", checkAuthenticated, checkPermission, a
 // Attempt Page
 app.get('/quiz/attempt/:quiz_id/:login/:date', checkAuthenticated, checkValidation, async (req, res) => {
   let user;
-  if (req.user.login == req.params.login || !req.user.isTeacher) {
-    user = req.user;
+  if (!req.user.isTeacher) {
+    user = new User(req.user);
   } else {
-    user = await  UserSchema.findOne({ login: req.params.login }).exec();
+    user = await User.init(req.params.login);
   }
   let grade = user.isTeacher ? "teacher" : user.grade + user.gradeLetter;
   let quiz = await QuizSchema.findOne({ identificator: req.params.quiz_id }).exec();
@@ -2430,7 +2384,7 @@ app.get(`/service/panel/${CONFIG_TABS.CONFIGS}`, checkAuthenticated, checkPermis
 //--------------------------------------------------------------------------------------
 // User Settings
 app.get(`/service/panel/${CONFIG_TABS.USER}/:login`, checkAuthenticated, checkPermission, async (req, res) => {
-  let user = await  UserSchema.findOne({ login: req.params.login });
+  let user = await User.init(req.params.login);
   if (user){
     user = {
       login: user.login,
@@ -2475,18 +2429,23 @@ app.post("/service/panel/:flag", checkAuthenticated, checkPermission, uploadUser
     case CONFIG_TABS.USER:
       if (!req.body.delete) {
         let login = req.body.login;
-        let user = await  UserSchema.findOne({ login: login });
-        user.name = req.body.name;
-        user.password = req.body.password.length > 0 ? bcrypt.hashSync(req.body.password, 10) : user.password;
-        if (!user.isTeacher) {
-          user.grade = req.body.grade.slice(0, req.body.grade.length - 1),
-            user.gradeLetter = req.body.grade[req.body.grade.length - 1].toLowerCase(),
-            user.markModified('grade');
-          user.markModified('gradeLetter');
+        let user
+        if (!UserSchema.exists({ login: login })) {
+          user = new User();
+          user.login = login;
+        } else
+          user = await User.init(login);
+        let canSave = true;
+        user.setName(req.body.name);
+        if (req.body.password.trim().length != 0)
+          canSave = user.checkAndSetPassword(req.body.password.trim());
+        user.setGrade(req.body.grade.slice(0, req.body.grade.length - 1));
+        user.setGradeLetter(req.body.grade[req.body.grade.length - 1].toLowerCase());
+        if (canSave) {
+          await user.save();
+        } else {
+          return res.redirect(`/service/panel/${tab}/${login}`);
         }
-        user.markModified('name');
-        user.markModified('password');
-        await user.save();
         if (req.body.clear)
           deleteUser(req.body.login, 0);
       } else {
@@ -2499,9 +2458,9 @@ app.post("/service/panel/:flag", checkAuthenticated, checkPermission, uploadUser
       if (type < 4 && req.file) {
         let tablePath = path.join(__dirname, "/public/userTables", req.file.filename);
         configurateUsers(tablePath, type);
-      } else if (type == 4) {
+      } else if (type == 4)
         childProcess.exec(`node ${path.join(__dirname, "public/scripts/CheckCompilers/Checker.js")}`)
-      } else if (type == 5) {
+      else if (type == 5) {
         let date = Date.now()
         let process = childProcess.spawn("node", [path.join(__dirname, "public/scripts/serverScripts/generateExcelT.js"), req.body.tour_id, date]);
         process.on("close", (code) => {
@@ -2553,9 +2512,8 @@ app.get("/api/task/get/testresults/:id", checkAuthenticated, async (req, res) =>
     let lesson = quiz.lessons.find(item => item.grade.toLowerCase() == grade.toLowerCase());
     attempts = lesson.attempts;
     results.whenEnds = lesson.whenEnds;
-  } else {
+  } else
     attempts = req.user.attempts;
-  }
   let isInQueue = TestingQueue.findIndex(item => (item.id == req.params.id && item.login == req.user.login));
   try {
     fs.statSync(path.join(__dirname, '/public/processes/' + req.user.login + '_' + req.params.id));
@@ -2587,11 +2545,11 @@ app.get("/api/task/get/testverdicts/:login/:ids", checkAuthenticated, async (req
   let ids = req.params.ids.split("|");
   let tasks = [];
   let task, tournament, quiz, lesson;
-  let user = await  UserSchema.findOne({ login: req.params.login });
+  let user = await  User.init(req.params.login);
   for (let i = 0; i < ids.length; i++) {
-    if (ids[i].split('_')[0] == '0') {
+    if (ids[i].split('_')[0] == '0')
       task = await TaskSchema.findOne({ identificator: ids[i] }).exec();
-    } else if (ids[i][0] != "Q") {
+    else if (ids[i][0] != "Q") {
       tournament = await TournamentSchema.findOne({ identificator: parseInt(ids[i].split('_')[0]) }).exec();
       task = tournament.tasks.find(item => item.identificator == ids[i]);
     } else {
@@ -2607,6 +2565,7 @@ app.get("/api/task/get/testverdicts/:login/:ids", checkAuthenticated, async (req
   let grade;
   for (let i = 0; i < ids.length; i++) {
     id = ids[i];
+
     if (id[0] == "Q") {
       grade = user.grade + user.gradeLetter;
       if (user.isTeacher)
@@ -2622,13 +2581,9 @@ app.get("/api/task/get/testverdicts/:login/:ids", checkAuthenticated, async (req
           break;
       };
     } else {
-      verdict = user.verdicts.find(item => item.taskID == id)
-      if (verdict) {
-        verdict = verdict.result
-      } else {
-        verdict = "-"
-      }
+      verdict = user.getVerdict(id);
     }
+
     isInQueue = TestingQueue.findIndex(item => (item.id == id && item.login == user.login));
     try {
       fs.statSync(path.join(__dirname, '/public/processes/' + user.login + '_' + id));
@@ -2661,6 +2616,7 @@ app.get("/api/task/get/testverdicts/:login/:ids", checkAuthenticated, async (req
 app.get("/api/cringe/get/verdicts/:ids/:flag", checkAuthenticated, async (req, res) => {
   let ids = req.params.ids.split("|");
   let flag = req.params.flag;
+  let user = new User(req.user);
   let objects = [];
   let verdicts = [];
   for (let i = 0; i < ids.length; i++) {
@@ -2678,7 +2634,7 @@ app.get("/api/cringe/get/verdicts/:ids/:flag", checkAuthenticated, async (req, r
       tasks = tasks.map(item => item.identificator)
     solved = 0;
     for (let i = 0; i < tasks.length; i++) {
-      verdict = req.user.verdicts.find(item => item.taskID == tasks[i]);
+      verdict = user.getVerdict(tasks[i]);
       if (verdict && verdict.result == "OK") {
         solved += 1;
       }
@@ -2695,9 +2651,9 @@ app.get("/api/cringe/get/verdicts/:ids/:flag", checkAuthenticated, async (req, r
 //---------------------------------------------------------------------------------
 // Get attempt results
 app.get("/api/attempts/get/verdicts/:login/:page/:search", checkAuthenticated, async (req, res) => {
-  let user = await  UserSchema.findOne({ login: req.params.login }).exec();
+  let user = await  User.init(req.params.login);
   if (!user || !req.user.isTeacher)
-    user = req.user;
+    user = User(req.user);
   let tasks = await TaskSchema.find({}).exec();
   let tournaments = await TournamentSchema.find({}).exec();
   let page = req.params.page;
@@ -2741,15 +2697,14 @@ app.get("/api/lessons/get/verdicts/:id/:logins", checkAuthenticated, async (req,
   let verdicts = [];
   let results = [];
   for (let i = 0; i < logins.length; i++) {
-    users.push(UserSchema.findOne({ login: logins[i] }).exec());
+    users.push(User.init(logins[i]));
   }
   users = await Promise.all(users);
 
   for (let i = 0; i < users.length; i++) {
-    verdicts = users[i].verdicts;
     solved = 0;
     for (let i = 0; i < tasks.length; i++) {
-      verdict = verdicts.find(item => item.taskID == tasks[i]);
+      verdict = user.getVerdict(tasks[i]);
       if (verdict && verdict.result == "OK") {
         solved += 1;
       }
@@ -2786,7 +2741,7 @@ app.get("/api/quiz/get/results/:id/:grade", checkAuthenticated, async (req, res)
   let result;
   for (let i = 0; i < lesson.results.length; i++) {
     result = lesson.results[i];
-    let user = await  UserSchema.findOne({ login: result.login }).exec();
+    let user = await User.init(result.login);
     result = {
       name: user.name,
       login: result.login,
@@ -2939,12 +2894,11 @@ function checkTournamentValidation(req, res, next) {
 async function checkGrade(req, res, next) {
   if (req.user.isTeacher)
     return next()
-  user = await  UserSchema.findOne({ login: req.params.login ? req.params.login : req.user.login });
+  user = await User.init(req.params.login ? req.params.login : req.user.login);
   if (!user)
     return res.redirect(`/quizzes/${req.user.login}/1/default`);
   let quiz = await QuizSchema.findOne({ identificator: req.params.quiz_id });
-  let grade = user.isTeacher ? "teacher" : user.grade + user.gradeLetter;
-  let lesson = quiz.lessons.find(lesson => !lesson.isEnded && lesson.grade.toLowerCase() == grade.toLowerCase());
+  let lesson = quiz.lessons.find(lesson => !lesson.isEnded && lesson.grade.toLowerCase() == user.fullgrade);
   if (lesson)
     return next()
   return res.redirect(`/quizzes/${req.user.login}/1/default`);

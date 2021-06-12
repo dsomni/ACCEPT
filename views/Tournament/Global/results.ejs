@@ -14,19 +14,19 @@
         </head>
     <body>
         <main>
-            <h1>Результаты турнира <%= tournament.title %></h1>
+            <h1>Результаты турнира <%= tournamentTitle %></h1>
             <table class='taskslist noPages' id="table"></table>
         </main>
     <script>
         let min = (a, b) => {if(a>b)return b;return a;};
         let prevTable="";
         function update(first) {
-            if(first || <%= !tournament.isEnded %>)
-                fetch("/api/tournament/get/results/<%= tournament.identificator %>").then(response=>response.json()).then(response => {
+            if(first || <%= !isEnded %>)
+                fetch("/api/tournament/get/results/<%= ID %>").then(response=>response.json()).then(response => {
                     let text = "<tr>\n<th>LOGIN</th>\n";
                     let results = response;
                     for (let i = 0; i < results[0].tasks.length; i++) {
-                        text+=`<th><a class="tlrefs" href="/tournament/task/page/<%= tournament.identificator %>/<%= tournament.identificator %>_${i}">${i+1}</a></th>`;
+                        text+=`<th><a class="tlrefs" href="/tournament/task/page/<%= ID %>/<%= ID %>_${i}">${i+1}</a></th>`;
                     }
                     text+="\n<th>Счёт</th>\n<th>Время</th>\n";
                     results.sort((a, b) => {
