@@ -34,7 +34,7 @@ function pushToQueue(object) {
 
 async function popQueue() {
   let object = TestingQueue.shift();
-  let user = await User.findOne({ login: object.login }).exec();
+  let user = await  UserSchema.findOne({ login: object.login }).exec();
   if (!user)
     return
   if (object.id[0] != "Q") {
@@ -47,7 +47,7 @@ async function popQueue() {
   } else {
     let quiz_id = object.id.split("_")[0];
     quiz_id = quiz_id.slice(1, quiz_id.length);
-    let quiz = await Quiz.findOne({ identificator: quiz_id }).exec();
+    let quiz = await QuizSchema.findOne({ identificator: quiz_id }).exec();
     let grade = user.isTeacher ? "teacher" : user.grade + user.gradeLetter;
     let lesson = quiz.lessons.find(item => item.grade.toLowerCase() == grade.toLowerCase());
     lesson.attempts.unshift({
@@ -148,12 +148,12 @@ mongoose.connection.on('error', (err) => {
 
 mongoose.set('useCreateIndex', true);
 
-const User = require('./config/models/User');
-const Task = require('./config/models/Task');
-const News = require('./config/models/News');
-const Lesson = require('./config/models/Lesson');
-const Tournament = require('./config/models/Tournament');
-const Quiz = require('./config/models/Quiz');
+const UserSchema = require('./config/models/User');
+const TaskSchema = require('./config/models/Task');
+const NewsSchema = require('./config/models/News');
+const LessonSchema = require('./config/models/Lesson');
+const TournamentSchema = require('./config/models/Tournament');
+const QuizSchema = require('./config/models/Quiz');
 
 //---------------------------------------------------------------------------------
 
@@ -161,7 +161,7 @@ const initializePassport = require('./config/passport');
 const configs = require('./config/configs');
 initializePassport(
   passport,
-  User
+  UserSchema
 );
 
 //---------------------------------------------------------------------------------
@@ -209,7 +209,7 @@ childProcess.exec('chcp 65001 | dir');
 // Loading from DB
 let news;
 async function load() {
-  news = await News.find({}).exec();
+  news = await NewsSchema.find({}).exec();
   news.reverse();
 }
 load();
@@ -263,7 +263,7 @@ app.post('/', passport.authenticate('local', {
 //---------------------------------------------------------------------------------
 // Task Page
 app.get('/task/page/:id', checkAuthenticated, checkNletter, async (req, res) => {
-  let problem = await Task.findOne({ identificator: req.params.id }).exec();
+  let problem = await TaskSchema.findOne({ identificator: req.params.id }).exec();
   if (!problem) {
     return res.redirect("/tasks/1/default&all&all&false&all")
   }
@@ -369,7 +369,7 @@ app.post('/task/add', checkAuthenticated, checkNletter, checkPermission, uploadT
     }
   }
 
-  await Adder.addTask(Task, body.title.trim(), body.statement.trim(), body.input.trim(), body.output.trim(), examples, tests, body.topic.trim(), body.grade, hint, user.name);
+  await Adder.addTask(TaskSchema, body.title.trim(), body.statement.trim(), body.input.trim(), body.output.trim(), examples, tests, body.topic.trim(), body.grade, hint, user.name);
 
   res.redirect(`/tasks/1/default&all&all&false&all`)
 })
@@ -378,7 +378,7 @@ app.post('/task/add', checkAuthenticated, checkNletter, checkPermission, uploadT
 // Tasks List Page
 app.get('/tasks/:page/:search', checkAuthenticated, checkNletter, async (req, res) => {
   let user = req.user;
-  let teachers = await User.find({ isTeacher: true });
+  let teachers = await  UserSchema.find({ isTeacher: true });
   teachers = teachers.map(item => item.name);
   let foundTasks = [];
   let a = req.params.search.split('&');
@@ -393,7 +393,7 @@ app.get('/tasks/:page/:search', checkAuthenticated, checkNletter, async (req, re
     let properties = {}
     if (SearchGrade != "all") properties.grade = SearchGrade;
     if (author != "all") properties.author = author.replace("%20", ' ');
-    tasks = await Task.find(properties).exec();
+    tasks = await TaskSchema.find(properties).exec();
 
     foundTasks = fuseSearch(tasks, "title", toSearch, 0.5, [SearchTopic], (task, params) => {
       return (task.topic.split(" ").join("").trim().toUpperCase() == params[0] || params[0] == "ALL")
@@ -401,7 +401,7 @@ app.get('/tasks/:page/:search', checkAuthenticated, checkNletter, async (req, re
 
     if (SortByNew) foundTasks = foundTasks.reverse();
   } else {
-    tasks = await Task.find({}).exec();
+    tasks = await TaskSchema.find({}).exec();
   }
   let topics = [];
 
@@ -446,7 +446,7 @@ app.post('/tasks/:page/:search', checkAuthenticated, checkNletter, async (req, r
 //---------------------------------------------------------------------------------
 // Edit Task Page
 app.get('/task/edit/:id', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
-  let problem = await Task.findOne({ identificator: req.params.id }).exec()
+  let problem = await TaskSchema.findOne({ identificator: req.params.id }).exec()
   let user = req.user;
   res.render('Task/edit.ejs', {
     login: user.login,
@@ -460,7 +460,7 @@ app.get('/task/edit/:id', checkAuthenticated, checkNletter, checkPermission, asy
 
 app.post('/task/edit/:id', checkAuthenticated, checkNletter, checkPermission, uploadTests.single('file'), async (req, res) => {
   let body = req.body;
-  let problem = await Task.findOne({ identificator: req.params.id }).exec();
+  let problem = await TaskSchema.findOne({ identificator: req.params.id }).exec();
 
   let examples = [];
   let exI, exO;
@@ -546,12 +546,12 @@ app.get('/account/:login/:page/:search', checkAuthenticated, checkValidation, as
   if (req.user.login == req.params.login) {
     user = req.user;
   } else {
-    user = await User.findOne({ login: req.params.login }).exec();
+    user = await  UserSchema.findOne({ login: req.params.login }).exec();
   }
 
   if (user) {
-    let tasks = await Task.find({}).exec();
-    let tournaments = await Tournament.find({}).exec();
+    let tasks = await TaskSchema.find({}).exec();
+    let tournaments = await TournamentSchema.find({}).exec();
     let attempts = user.attempts;
     let foundAttempts = [];
 
@@ -614,7 +614,7 @@ app.get('/attempt/:login/:date', checkAuthenticated, checkValidation, async (req
   if (req.user.login == req.params.login) {
     user = req.user;
   } else {
-    user = await User.findOne({ login: req.params.login }).exec();
+    user = await  UserSchema.findOne({ login: req.params.login }).exec();
   }
 
   if (user) {
@@ -673,11 +673,11 @@ app.post('/addlesson', checkAuthenticated, checkNletter, checkPermission, async 
   let tasksToAdd = [];
   let tasks = body.tasks.split(' ').map(item => '0_' + (parseInt(item) - 1));
   for (let i = 0; i < tasks.length; i++) {
-    task = await Task.findOne({ identificator: tasks[i] }).exec();
+    task = await TaskSchema.findOne({ identificator: tasks[i] }).exec();
     if (task)
       tasksToAdd.push(tasks[i]);
   }
-  await Adder.addLesson(Lesson, body.grade, body.title, body.description, tasksToAdd, user.name);
+  await Adder.addLesson(LessonSchema, body.grade, body.title, body.description, tasksToAdd, user.name);
 
   res.redirect('/addlesson');
 });
@@ -691,10 +691,10 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, checkNletter, async
     user = req.user;
 
   } else {
-    user = await User.findOne({ login: req.params.login }).exec();
+    user = await  UserSchema.findOne({ login: req.params.login }).exec();
   }
 
-  let teachers = await User.find({ isTeacher: true });
+  let teachers = await  UserSchema.find({ isTeacher: true });
   teachers = teachers.map(item => item.name);
   let lessons;
   let a = req.params.search.split('&');
@@ -706,14 +706,14 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, checkNletter, async
     let properties = {}
     if (author != "all") properties.author = author;
     if (SearchGrade != "all" || !user.isTeacher) properties.grade = user.isTeacher ? SearchGrade : user.grade;
-    lessons = (await Lesson.find(properties).exec());
+    lessons = (await LessonSchema.find(properties).exec());
 
     lessons = fuseSearch(lessons, "title", toSearch, 0.5, [], (item, params) => { return true });
     if (SortByNew) {
       lessons = lessons.reverse();
     }
   } else {
-    lessons = await Lesson.find({}).exec();
+    lessons = await LessonSchema.find({}).exec();
   }
 
   let onPage = config.onPage.lessonsList;
@@ -756,10 +756,10 @@ app.get('/lesson/:login/:id', checkAuthenticated, checkNletter, isLessonAvailabl
   if (req.user.login == req.params.login) {
     user = req.user;
   } else {
-    user = await User.findOne({ login: req.params.login }).exec();
+    user = await  UserSchema.findOne({ login: req.params.login }).exec();
   }
 
-  lesson = await Lesson.findOne({ identificator: req.params.id }).exec();
+  lesson = await LessonSchema.findOne({ identificator: req.params.id }).exec();
   let ids = lesson.tasks.join("|");
   if (!lesson) {
     res.redirect("/lessons/" + req.params.login + "/1/default&all&true&all")
@@ -791,7 +791,7 @@ app.post('/deletelesson/:id', checkAuthenticated, checkNletter, checkPermission,
 //---------------------------------------------------------------------------------
 // Edit Lesson Page
 app.get('/editlesson/:id', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
-  let lesson = await Lesson.findOne({ identificator: req.params.id }).exec();
+  let lesson = await LessonSchema.findOne({ identificator: req.params.id }).exec();
   lesson.tasks = lesson.tasks.map(item => parseInt(item.split('_')[1]) + 1);
   let user = req.user;
   res.render('Lesson/edit.ejs', {
@@ -807,7 +807,7 @@ app.get('/editlesson/:id', checkAuthenticated, checkNletter, checkPermission, as
 app.post('/editlesson/:id', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
   let user = req.user;
   let body = req.body;
-  let lesson = await Lesson.findOne({ identificator: req.params.id }).exec()
+  let lesson = await LessonSchema.findOne({ identificator: req.params.id }).exec()
 
   lesson.title = body.title;
   lesson.description = body.description;
@@ -815,7 +815,7 @@ app.post('/editlesson/:id', checkAuthenticated, checkNletter, checkPermission, a
   let tasks = body.tasks.split(' ').map(item => '0_' + (parseInt(item) - 1));
   lesson.tasks = [];
   for (let i = 0; i < tasks.length; i++) {
-    task = await Task.findOne({ identificator: tasks[i] }).exec();
+    task = await TaskSchema.findOne({ identificator: tasks[i] }).exec();
     if (task)
       lesson.tasks.push(tasks[i]);
   }
@@ -830,7 +830,7 @@ app.post('/editlesson/:id', checkAuthenticated, checkNletter, checkPermission, a
 //---------------------------------------------------------------------------------
 // Lesson Results Page
 app.get('/lessonresults/:id/:page/:search', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
-  lesson = await Lesson.findOne({ identificator: req.params.id }).exec();
+  lesson = await LessonSchema.findOne({ identificator: req.params.id }).exec();
 
   if (!lesson) {
     res.redirect("/lessons/" + req.params.login + "/1/default&all&all")
@@ -843,9 +843,9 @@ app.get('/lessonresults/:id/:page/:search', checkAuthenticated, checkNletter, ch
     if (a[1].toLowerCase() != "default") {
       let SearchGrade = a[1] == "all" ? '' : a[1];
       if (SearchGrade != "") {
-        students = await User.find({ grade: SearchGrade, isTeacher: false }).exec();
+        students = await  UserSchema.find({ grade: SearchGrade, isTeacher: false }).exec();
       } else {
-        students = await User.find({ isTeacher: false }).exec();
+        students = await  UserSchema.find({ isTeacher: false }).exec();
       }
       if (a[0] != "default" || a[2] != "all" || a[3] != "all") {
         let SearchLetter = a[2] == "all" ? '' : a[2].toUpperCase();
@@ -861,7 +861,7 @@ app.get('/lessonresults/:id/:page/:search', checkAuthenticated, checkNletter, ch
       }
     }
     // if(foundStudents.length == 0)
-    //     foundStudents = await User.find({ isTeacher: false }).exec();
+    //     foundStudents = await  UserSchema.find({ isTeacher: false }).exec();
     foundStudents.sort((a, b) => { return a.name > b.name });
 
     let onPage = config.onPage.studentsList;
@@ -906,9 +906,9 @@ app.get('/students/:page/:search', checkAuthenticated, checkNletter, checkPermis
   let SearchGrade = a[1] == "all" ? '' : a[1];
   let foundStudents
   if (SearchGrade != "") {
-    students = await User.find({ grade: SearchGrade, isTeacher: false }).exec();
+    students = await  UserSchema.find({ grade: SearchGrade, isTeacher: false }).exec();
   } else {
-    students = await User.find({ isTeacher: false }).exec();
+    students = await  UserSchema.find({ isTeacher: false }).exec();
   }
   if (a[0] != "default" || a[2] != "all" || a[3] != "all") {
     let toSearch = a[0] == "default" ? '' : a[0];
@@ -954,7 +954,7 @@ app.post('/students/:page/:search', checkAuthenticated, checkNletter, checkPermi
   let student;
   for (let i = 0; i < keys.length; i++) {
     if (keys[i].slice(0, 6) == "login:") {
-      student = await User.findOne({ login: keys[i].slice(6) }).exec()
+      student = await  UserSchema.findOne({ login: keys[i].slice(6) }).exec()
       if (student.group != req.body[keys[i]]) {
         student.group = req.body[keys[i]]
         await student.save()
@@ -983,7 +983,7 @@ app.post('/addnews', checkAuthenticated, checkNletter, checkPermission, uploadIm
   let filename = "";
   if (req.file) filename = req.file.filename
 
-  let new_news = await Adder.addNews(News, body.title, body.description, body.text, filename, user.name);
+  let new_news = await Adder.addNews(NewsSchema, body.title, body.description, body.text, filename, user.name);
   load();
   res.redirect("/")
 });
@@ -991,7 +991,7 @@ app.post('/addnews', checkAuthenticated, checkNletter, checkPermission, uploadIm
 //---------------------------------------------------------------------------------
 // Delete News
 app.post('/deletenews/:id', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
-  await News.findByIdAndDelete(req.params.id);
+  await NewsSchema.findByIdAndDelete(req.params.id);
   let filename = news[news.findIndex(item => item._id == req.params.id)].imageName;
   filepath = path.join(__dirname, "./public/media/newsImages/" + filename)
   childProcess.exec('del /q \"' + filepath + '\"');
@@ -1016,7 +1016,7 @@ app.get('/editnews/:id', checkAuthenticated, checkNletter, checkPermission, asyn
 
 app.post('/editnews/:id', checkAuthenticated, checkNletter, checkPermission, uploadImage.single('image'), async (req, res) => {
   let body = req.body;
-  let newsDB = await News.findById(req.params.id).exec()
+  let newsDB = await NewsSchema.findById(req.params.id).exec()
 
   newsDB.title = body.title;
   newsDB.text = body.text;
@@ -1079,7 +1079,7 @@ app.post('/tournament/add', checkAuthenticated, checkPermission, async (req, res
   let mods = [user.login].concat(body.mods.split(' '));
   let frozeAfter = body.frozeAfter ? body.frozeAfter : body.whenEnds;
 
-  let emtpy_tournament = await Tournament.findOne({ title: "" }).exec();
+  let emtpy_tournament = await TournamentSchema.findOne({ title: "" }).exec();
   if (emtpy_tournament) {
     emtpy_tournament.title = body.title;
     emtpy_tournament.description = body.description;
@@ -1110,7 +1110,7 @@ app.post('/tournament/add', checkAuthenticated, checkPermission, async (req, res
     emtpy_tournament.markModified('tasks');
     emtpy_tournament.save();
   } else {
-    await Adder.addTournament(Tournament, body.title, body.description,
+    await Adder.addTournament(TournamentSchema, body.title, body.description,
       tasks, user.name, body.whenStarts.replace('T', ' '),
       body.whenEnds.replace('T', ' '), frozeAfter.replace('T', ' '), mods, body.allowRegAfterStart == "on",
       body.allOrNothing == "1", body.penalty * 1000);
@@ -1127,11 +1127,11 @@ app.get('/tournaments/:login/:page/:search', checkAuthenticated, async (req, res
   if (req.user.login == req.params.login || !req.user.isTeacher) {
     user = req.user;
   } else {
-    user = await User.findOne({ login: req.params.login }).exec();
+    user = await  UserSchema.findOne({ login: req.params.login }).exec();
   }
   let results = [];
   let foundTournaments;
-  let tournaments = (await Tournament.find({}).exec()).slice(1).filter(item => item.title != "");
+  let tournaments = (await TournamentSchema.find({}).exec()).slice(1).filter(item => item.title != "");
   let a = req.params.search.split('&');
   if (a[0].toLowerCase() != "default" || a[1] != "all") {
     let toSearch = a[0] == "default" ? '' : a[0].toUpperCase();
@@ -1200,7 +1200,7 @@ app.post('/tournaments/:login/:page/:search', checkAuthenticated, async (req, re
 //---------------------------------------------------------------------------------
 // Edit Tournament Page
 app.get('/tournament/edit/:tour_id', checkAuthenticated, isModerator, async (req, res) => {
-  let tournament = await Tournament.findOne({ identificator: req.params.tour_id }).exec();
+  let tournament = await TournamentSchema.findOne({ identificator: req.params.tour_id }).exec();
   let user = req.user;
   res.render('Tournament/Global/edit.ejs', {
     login: user.login,
@@ -1214,7 +1214,7 @@ app.get('/tournament/edit/:tour_id', checkAuthenticated, isModerator, async (req
 
 app.post('/tournament/edit/:tour_id', checkAuthenticated, isModerator, async (req, res) => {
   let body = req.body;
-  let tournament = await Tournament.findOne({ identificator: req.params.tour_id }).exec()
+  let tournament = await TournamentSchema.findOne({ identificator: req.params.tour_id }).exec()
 
   tournament.title = body.title;
   tournament.description = body.description;
@@ -1235,7 +1235,7 @@ app.post('/tournament/edit/:tour_id', checkAuthenticated, isModerator, async (re
 //---------------------------------------------------------------------------------
 // Delete Tournament Page
 app.post('/deletetournament/:tour_id', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
-  let tournament = await Tournament.findOne({ identificator: req.params.tour_id }).exec();
+  let tournament = await TournamentSchema.findOne({ identificator: req.params.tour_id }).exec();
   tournament.title = "";
   tournament.save();
   childProcess.exec("node " + path.join(__dirname, "/public/scripts/fixes/FixAfterDeleteTournament.js") + " " + req.params.tour_id)
@@ -1245,7 +1245,7 @@ app.post('/deletetournament/:tour_id', checkAuthenticated, checkNletter, checkPe
 //---------------------------------------------------------------------------------
 //Register to tournament
 app.get('/regTournament/:tour_id', checkAuthenticated, async (req, res) => {
-  let tournament = await Tournament.findOne({ identificator: req.params.tour_id }).exec()
+  let tournament = await TournamentSchema.findOne({ identificator: req.params.tour_id }).exec()
   if ((!tournament.isBegan || tournament.allowRegAfterStart) && !req.user.isTeacher) {
     let newRes = {
       login: req.user.login,
@@ -1273,7 +1273,7 @@ app.get('/regTournament/:tour_id', checkAuthenticated, async (req, res) => {
 // Add Task to Tournament Page
 app.get('/tournament/task/add/:tour_id', checkAuthenticated, isModerator, async (req, res) => {
   let user = req.user;
-  let tournament = await Tournament.findOne({ identificator: req.params.tour_id }).exec()
+  let tournament = await TournamentSchema.findOne({ identificator: req.params.tour_id }).exec()
   res.render('Tournament/Task/add.ejs', {
     login: user.login,
     name: req.user.name,
@@ -1325,7 +1325,7 @@ app.post('/tournament/task/add/:tour_id', checkAuthenticated, isModerator, uploa
       tests.push([tI.trim(), tO.trim()]);
     }
   }
-  await Adder.addTaskToTournament(Tournament, req.params.tour_id, body.title.trim(), body.statement.trim(), body.input.trim(), body.output.trim(), examples, tests);
+  await Adder.addTaskToTournament(TournamentSchema, req.params.tour_id, body.title.trim(), body.statement.trim(), body.input.trim(), body.output.trim(), examples, tests);
 
   res.redirect('/tournament/task/add/' + req.params.tour_id);
 });
@@ -1343,7 +1343,7 @@ app.post('/tournament/task/delete/:tour_id/:id', checkAuthenticated, isModerator
 // Tournament Task Page
 app.get('/tournament/task/page/:tour_id/:id', checkAuthenticated, checkTournamentPermission, async (req, res) => {
   let tour_id = req.params.tour_id
-  let tournament = await Tournament.findOne({ identificator: tour_id }).exec();
+  let tournament = await TournamentSchema.findOne({ identificator: tour_id }).exec();
   let ids = tournament.tasks.map(item => item.identificator).join("|");
   let whenEnds = tournament.whenEnds;
   let isBegan = tournament.isBegan;
@@ -1391,10 +1391,10 @@ app.get('/tournament/page/:login/:id', checkAuthenticated, checkTournamentValida
   if (req.user.login == req.params.login) {
     user = req.user;
   } else {
-    user = await User.findOne({ login: req.params.login }).exec();
+    user = await  UserSchema.findOne({ login: req.params.login }).exec();
   }
 
-  let tournament = await Tournament.findOne({ identificator: req.params.id }).exec();
+  let tournament = await TournamentSchema.findOne({ identificator: req.params.id }).exec();
   if (!tournament || tournament.title == "") {
     res.redirect("/tournaments/" + req.params.login + "/1/default&all&all")
   } else {
@@ -1437,7 +1437,7 @@ app.get('/tournament/page/:login/:id', checkAuthenticated, checkTournamentValida
 //---------------------------------------------------------------------------------
 // Edit tournament task
 app.get('/tournament/task/edit/:tour_id/:id', checkAuthenticated, isModerator, async (req, res) => {
-  let tournament = await Tournament.findOne({ identificator: req.params.tour_id });
+  let tournament = await TournamentSchema.findOne({ identificator: req.params.tour_id });
   let task = tournament.tasks.find(item => item.identificator == req.params.id);
   res.render('Tournament/Task/edit.ejs', {
     login: req.user.login,
@@ -1452,7 +1452,7 @@ app.get('/tournament/task/edit/:tour_id/:id', checkAuthenticated, isModerator, a
 
 app.post('/tournament/task/edit/:tour_id/:id', checkAuthenticated, isModerator, uploadTests.single('file'), async (req, res) => {
   let body = req.body;
-  let tournament = await Tournament.findOne({ identificator: req.params.tour_id });
+  let tournament = await TournamentSchema.findOne({ identificator: req.params.tour_id });
   let problem = tournament.tasks.find(item => item.identificator == req.params.id);
 
   let examples = [];
@@ -1510,7 +1510,7 @@ app.post('/tournament/task/edit/:tour_id/:id', checkAuthenticated, isModerator, 
 //---------------------------------------------------------------------------------
 // Tournament results page
 app.get('/tournament/results/:tour_id/', checkAuthenticated, async (req, res) => {
-  let tournament = await Tournament.findOne({ identificator: req.params.tour_id });
+  let tournament = await TournamentSchema.findOne({ identificator: req.params.tour_id });
   let baza;
   if (tournament.isFrozen && !tournament.isEnded && !tournament.mods.includes(req.user.login)) {
     baza = tournament.frozenResults;
@@ -1520,7 +1520,7 @@ app.get('/tournament/results/:tour_id/', checkAuthenticated, async (req, res) =>
   let results = [];
   if (tournament) {
     for (let i = 0; i < baza.length; i++) {
-      let user = await User.findOne({ login: baza[i].login })
+      let user = await  UserSchema.findOne({ login: baza[i].login })
       if (user)
         results.push([baza[i], user.isTeacher]);
     }
@@ -1551,7 +1551,7 @@ app.get('/tournament/attempts/:tour_id/:page/:toSearch', checkAuthenticated, isM
   let needLogin = a[0] != "all";
   let bynew = a[3] == "true";
 
-  let tournament = await Tournament.findOne({ identificator: req.params.tour_id }).exec();
+  let tournament = await TournamentSchema.findOne({ identificator: req.params.tour_id }).exec();
   let attempts = tournament.attempts;
 
   //search
@@ -1603,7 +1603,7 @@ app.post('/tournament/attempts/:tour_id/:page/:toSearch', checkAuthenticated, is
 // Tournament disqualification
 app.get("/tournament/disqualAttempt/:tour_id/:AttemptDate", checkAuthenticated, isModerator, async (req, res) => {
   let AttemptDate = req.params.AttemptDate;
-  let tournament = await Tournament.findOne({ identificator: req.params.tour_id }).exec();
+  let tournament = await TournamentSchema.findOne({ identificator: req.params.tour_id }).exec();
   let idx = tournament.attempts.findIndex(item => item.AttemptDate == AttemptDate);
   let login = tournament.attempts[idx].login;
   let score = tournament.attempts[idx].score;
@@ -1645,7 +1645,7 @@ app.get("/tournament/disqualAttempt/:tour_id/:AttemptDate", checkAuthenticated, 
 
 app.get("/tournament/disqualUser/:tour_id/:login", checkAuthenticated, isModerator, async (req, res) => {
   let login = req.params.login;
-  let tournament = await Tournament.findOne({ identificator: req.params.tour_id }).exec();
+  let tournament = await TournamentSchema.findOne({ identificator: req.params.tour_id }).exec();
   tournament.results.splice(tournament.results.findIndex(item => item.login == login), 1);
   tournament.frozenResults.splice(tournament.frozenResults.findIndex(item => item.login == login), 1);
   tournament.attempts = tournament.attempts.filter(item => item.login != login);
@@ -1674,7 +1674,7 @@ app.get('/about', checkAuthenticated, async (req, res) => {
 //---------------------------------------------------------------------------------
 // Edit Group
 app.post('/editgroup/:login/:page/:search', checkAuthenticated, checkNletter, checkPermission, async (req, res) => {
-  let student = await User.findOne({ login: req.params.login })
+  let student = await  UserSchema.findOne({ login: req.params.login })
   if (req.body.groupEditor) {
     student.group = req.body.groupEditor;
     await student.save()
@@ -1686,7 +1686,7 @@ app.post('/editgroup/:login/:page/:search', checkAuthenticated, checkNletter, ch
 // Registration Page
 app.get("/registration", async (req, res) => {
   let logins = [];
-  let users = await User.find();
+  let users = await  UserSchema.find();
   for (let i = 0; i < users.length; i++) {
     let login = users[i].login;
     if (login.length >= 2 && login[0] == "n" && login[1] == "_") {
@@ -1716,10 +1716,10 @@ app.post("/registration", async (req, res) => {
     gradeLetter: "N",
     group: req.body.email
   };
-  let user = await User.findOne({ login: new_user.login }).exec();
+  let user = await  UserSchema.findOne({ login: new_user.login }).exec();
   if (user) {
     let logins = [];
-    let users = await User.find();
+    let users = await  UserSchema.find();
     for (let i = 0; i < users.length; i++) {
       let login = users[i].login;
       if (login.length >= 2 && login[0] == "n" && login[1] == "_") {
@@ -1739,7 +1739,7 @@ app.post("/registration", async (req, res) => {
     return;
   }
   new_user.password = bcrypt.hashSync(new_user.password, 10);
-  await User.insertMany([new_user]);
+  await  UserSchema.insertMany([new_user]);
   res.redirect("/");
 });
 
@@ -1760,7 +1760,7 @@ app.get("/EditAccount", checkAuthenticated, async (req, res) => {
 });
 
 app.post("/EditAccount", checkAuthenticated, async (req, res) => {
-  let user = await User.findOne({ login: req.user.login });
+  let user = await  UserSchema.findOne({ login: req.user.login });
   if (req.body.password.length < 5 && req.body.password.trim().length != 0) {
     return res.render('Account/edit.ejs', {
       login: req.user.login,
@@ -1817,7 +1817,7 @@ app.post("/report", checkAuthenticated, async (req, res) => {
 // News List Page
 app.get("/newslist/:page", async (req, res) => {
 
-  newslist = await News.find({}).exec();
+  newslist = await NewsSchema.find({}).exec();
   newslist.reverse();
 
   let onPage = config.onPage.newsList;
@@ -1848,12 +1848,12 @@ app.get('/tried/:login/:page/:search', checkAuthenticated, checkValidation, asyn
   if (req.user.login == req.params.login) {
     user = req.user;
   } else {
-    user = await User.findOne({ login: req.params.login }).exec();
+    user = await  UserSchema.findOne({ login: req.params.login }).exec();
   }
 
   if (user) {
-    let tasks = await Task.find({}).exec();
-    let tournaments = await Tournament.find({}).exec();
+    let tasks = await TaskSchema.find({}).exec();
+    let tournaments = await TournamentSchema.find({}).exec();
     let verdicts = user.verdicts;
     let foundTasks = [];
     let foundVerdicts = []
@@ -1947,7 +1947,7 @@ app.get('/rating/:page', checkAuthenticated, async (req, res) => {
 
   let objs = [];
   let user, count, obj;
-  let users = await User.find({ isTeacher: false });
+  let users = await  UserSchema.find({ isTeacher: false });
   for (let i = 0; i < users.length; i++) {
     user = users[i];
     obj = {
@@ -1995,14 +1995,14 @@ app.get('/quizzes/:login/:page/:search', checkAuthenticated, async (req, res) =>
   let u_name = req.user.name;
   let user = req.user;
   if (req.user.isTeacher) {
-    user = await User.findOne({ login: req.params.login });
+    user = await  UserSchema.findOne({ login: req.params.login });
     if (user) {
       u_login = user.login;
       u_name = user.name;
     }
   }
 
-  let quizzes = await Quiz.find().exec();
+  let quizzes = await QuizSchema.find().exec();
   if (!user.isTeacher) {
     quizzes = quizzes.filter(item => item.lessons.find(lesson => !lesson.isEnded && lesson.grade.toLowerCase() == user.grade + user.gradeLetter.toLowerCase()));
   }
@@ -2040,8 +2040,8 @@ app.post('/quizzes/:login/:page/:search', checkAuthenticated, async (req, res) =
 //---------------------------------------------------------------------------------
 // Quiz page
 app.get("/quiz/page/:login/:quiz_id", checkAuthenticated, checkGrade, async (req, res) => {
-  let quiz = await Quiz.findOne({ identificator: req.params.quiz_id }).exec();
-  let student = await User.findOne({ login: req.params.login }).exec();
+  let quiz = await QuizSchema.findOne({ identificator: req.params.quiz_id }).exec();
+  let student = await  UserSchema.findOne({ login: req.params.login }).exec();
 
   res.render('Quiz/Global/Page.ejs', {
     title: "Quiz page",
@@ -2071,7 +2071,7 @@ app.get("/quiz/add", checkAuthenticated, checkPermission, async (req, res) => {
 });
 
 app.post("/quiz/add", checkAuthenticated, checkPermission, async (req, res) => {
-  Adder.AddQuizTemplate(Quiz, req.body.title, req.body.description, req.body.duration, req.user.name);
+  Adder.AddQuizTemplate(QuizSchema, req.body.title, req.body.description, req.body.duration, req.user.name);
 
   res.redirect("/quiz/add");
 });
@@ -2079,7 +2079,7 @@ app.post("/quiz/add", checkAuthenticated, checkPermission, async (req, res) => {
 //---------------------------------------------------------------------------------
 // Add quiz page
 app.get("/quiz/edit/:id", checkAuthenticated, checkPermission, async (req, res) => {
-  let quiz = await Quiz.findOne({ identificator: req.params.id }).exec();
+  let quiz = await QuizSchema.findOne({ identificator: req.params.id }).exec();
   quiz = {
     title: quiz.title,
     description: quiz.description,
@@ -2098,7 +2098,7 @@ app.get("/quiz/edit/:id", checkAuthenticated, checkPermission, async (req, res) 
 });
 
 app.post("/quiz/edit/:id", checkAuthenticated, checkPermission, async (req, res) => {
-  let quiz = await Quiz.findOne({ identificator: req.params.id }).exec();
+  let quiz = await QuizSchema.findOne({ identificator: req.params.id }).exec();
   quiz.description = req.body.description;
   quiz.title = req.body.title;
   quiz.duration = req.body.duration;
@@ -2130,7 +2130,7 @@ app.post("/quiz/start/:id", checkAuthenticated, checkPermission, async (req, res
   grade = parseInt(grade.slice(0, grade.length - 1));
   if (letter > "я" || letter < 'а' || !grade || grade > 11 || grade < 1)
     return res.redirect(`/quiz/page/${req.user.login}/${req.params.id}`);
-  Adder.AddQuiz(Quiz, req.body.grade, req.user.name, req.params.id);
+  Adder.AddQuiz(QuizSchema, req.body.grade, req.user.name, req.params.id);
 
   res.redirect(`/quiz/page/${req.user.login}/${req.params.id}`);
 });
@@ -2190,7 +2190,7 @@ app.post('/quiz/task/add/:quiz_id', checkAuthenticated, checkPermission, uploadT
       tests.push([tI.trim(), tO.trim()]);
     }
   }
-  await Adder.addTaskToQuiz(Quiz, req.params.quiz_id, body.title.trim(), req.user.name, body.statement.trim(), body.input.trim(), body.output.trim(), examples, tests);
+  await Adder.addTaskToQuiz(QuizSchema, req.params.quiz_id, body.title.trim(), req.user.name, body.statement.trim(), body.input.trim(), body.output.trim(), examples, tests);
 
   res.redirect('/quiz/task/add/' + req.params.quiz_id);
 });
@@ -2198,7 +2198,7 @@ app.post('/quiz/task/add/:quiz_id', checkAuthenticated, checkPermission, uploadT
 //---------------------------------------------------------------------------------
 // Edit Quiz task
 app.get('/quiz/task/edit/:quiz_id/:id', checkAuthenticated, checkPermission, async (req, res) => {
-  let quiz = await Quiz.findOne({ identificator: req.params.quiz_id });
+  let quiz = await QuizSchema.findOne({ identificator: req.params.quiz_id });
   let task = quiz.tasks.find(item => item.identificator == req.params.id);
   quiz = {
     hasActiveLesson: quiz.hasActiveLesson,
@@ -2218,7 +2218,7 @@ app.get('/quiz/task/edit/:quiz_id/:id', checkAuthenticated, checkPermission, asy
 
 app.post('/quiz/task/edit/:quiz_id/:id', checkAuthenticated, checkPermission, uploadTests.single('file'), async (req, res) => {
   let body = req.body;
-  let quiz = await Quiz.findOne({ identificator: req.params.quiz_id });
+  let quiz = await QuizSchema.findOne({ identificator: req.params.quiz_id });
   let problem = quiz.tasks.find(item => item.identificator == req.params.id);
 
   let examples = [];
@@ -2277,7 +2277,7 @@ app.post('/quiz/task/edit/:quiz_id/:id', checkAuthenticated, checkPermission, up
 // Quiz Task Page
 app.get('/quiz/task/page/:quiz_id/:id', checkAuthenticated, checkGrade, async (req, res) => {
   let quiz_id = req.params.quiz_id
-  let quiz = await Quiz.findOne({ identificator: quiz_id }).exec();
+  let quiz = await QuizSchema.findOne({ identificator: quiz_id }).exec();
   let ids = quiz.tasks.map(item => item.identificator).join("|");
   let grade = req.user.isTeacher ? "teacher" : req.user.grade + req.user.gradeLetter.toLowerCase();
   let lesson = quiz.lessons.find(item => item.grade.toLowerCase() == grade.toLowerCase());
@@ -2325,7 +2325,7 @@ app.post('/quiz/task/page/:quiz_id/:id', checkAuthenticated, checkGrade, uploadC
 //---------------------------------------------------------------------------------
 // quiz results page
 app.get('/quiz/results/:quiz_id/:grade', checkAuthenticated, checkPermission, async (req, res) => {
-  let quiz = await Quiz.findOne({ identificator: req.params.quiz_id });
+  let quiz = await QuizSchema.findOne({ identificator: req.params.quiz_id });
   if (!quiz)
     return res.redirect("/")
   let lesson = quiz.lessons.find(lesson => lesson.grade.toLowerCase() == req.params.grade.toLowerCase());
@@ -2357,10 +2357,10 @@ app.get('/quiz/attempt/:quiz_id/:login/:date', checkAuthenticated, checkValidati
   if (req.user.login == req.params.login || !req.user.isTeacher) {
     user = req.user;
   } else {
-    user = await User.findOne({ login: req.params.login }).exec();
+    user = await  UserSchema.findOne({ login: req.params.login }).exec();
   }
   let grade = user.isTeacher ? "teacher" : user.grade + user.gradeLetter;
-  let quiz = await Quiz.findOne({ identificator: req.params.quiz_id }).exec();
+  let quiz = await QuizSchema.findOne({ identificator: req.params.quiz_id }).exec();
   let lesson = quiz.lessons.find(item => item.grade.toLowerCase() == grade.toLowerCase());
   let attempt = lesson.attempts.find(item => item.date == req.params.date);
 
@@ -2386,7 +2386,7 @@ app.get('/quiz/attempt/:quiz_id/:login/:date', checkAuthenticated, checkValidati
 //------------------------------------------------------------------------------------------------
 // Quiz add time
 app.post("/quiz/set/time", checkAuthenticated, checkPermission, async (req, res) => {
-  let quiz = await Quiz.findOne({ identificator: req.body.quiz_id });
+  let quiz = await QuizSchema.findOne({ identificator: req.body.quiz_id });
   let lessonIdx = quiz.lessons.findIndex(item => item.grade.toLowerCase() == req.body.grade.toLowerCase());
   let lesson = quiz.lessons[lessonIdx];
   if (!lesson.isEnded) {
@@ -2430,7 +2430,7 @@ app.get(`/service/panel/${CONFIG_TABS.CONFIGS}`, checkAuthenticated, checkPermis
 //--------------------------------------------------------------------------------------
 // User Settings
 app.get(`/service/panel/${CONFIG_TABS.USER}/:login`, checkAuthenticated, checkPermission, async (req, res) => {
-  let user = await User.findOne({ login: req.params.login });
+  let user = await  UserSchema.findOne({ login: req.params.login });
   if (user){
     user = {
       login: user.login,
@@ -2475,7 +2475,7 @@ app.post("/service/panel/:flag", checkAuthenticated, checkPermission, uploadUser
     case CONFIG_TABS.USER:
       if (!req.body.delete) {
         let login = req.body.login;
-        let user = await User.findOne({ login: login });
+        let user = await  UserSchema.findOne({ login: login });
         user.name = req.body.name;
         user.password = req.body.password.length > 0 ? bcrypt.hashSync(req.body.password, 10) : user.password;
         if (!user.isTeacher) {
@@ -2546,7 +2546,7 @@ app.get("/api/task/get/testresults/:id", checkAuthenticated, async (req, res) =>
   }
   let attempts;
   if (req.params.id[0] == "Q") {
-    let quiz = await Quiz.findOne({ identificator: req.params.id.split("_")[0].slice(1) });
+    let quiz = await QuizSchema.findOne({ identificator: req.params.id.split("_")[0].slice(1) });
     let grade = req.user.grade + req.user.gradeLetter;
     if (req.user.isTeacher)
       grade = "teacher";
@@ -2587,15 +2587,15 @@ app.get("/api/task/get/testverdicts/:login/:ids", checkAuthenticated, async (req
   let ids = req.params.ids.split("|");
   let tasks = [];
   let task, tournament, quiz, lesson;
-  let user = await User.findOne({ login: req.params.login });
+  let user = await  UserSchema.findOne({ login: req.params.login });
   for (let i = 0; i < ids.length; i++) {
     if (ids[i].split('_')[0] == '0') {
-      task = await Task.findOne({ identificator: ids[i] }).exec();
+      task = await TaskSchema.findOne({ identificator: ids[i] }).exec();
     } else if (ids[i][0] != "Q") {
-      tournament = await Tournament.findOne({ identificator: parseInt(ids[i].split('_')[0]) }).exec();
+      tournament = await TournamentSchema.findOne({ identificator: parseInt(ids[i].split('_')[0]) }).exec();
       task = tournament.tasks.find(item => item.identificator == ids[i]);
     } else {
-      quiz = await Quiz.findOne({ identificator: parseInt(ids[i].split("_")[0].slice(1)) }).exec();
+      quiz = await QuizSchema.findOne({ identificator: parseInt(ids[i].split("_")[0].slice(1)) }).exec();
       task = quiz.tasks.find(item => item.identificator == ids[i]);
     }
     tasks.push(task);
@@ -2611,7 +2611,7 @@ app.get("/api/task/get/testverdicts/:login/:ids", checkAuthenticated, async (req
       grade = user.grade + user.gradeLetter;
       if (user.isTeacher)
         grade = "teacher";
-      quiz = await Quiz.findOne({ identificator: parseInt(id.split("_")[0].slice(1)) }).exec();
+      quiz = await QuizSchema.findOne({ identificator: parseInt(id.split("_")[0].slice(1)) }).exec();
       lesson = quiz.lessons.find(item => item.grade.toLowerCase() == grade.toLowerCase());
       verdict = "-";
       let items = lesson.attempts.filter(item => (item.TaskID == id && item.login == user.login)).reverse();
@@ -2665,9 +2665,9 @@ app.get("/api/cringe/get/verdicts/:ids/:flag", checkAuthenticated, async (req, r
   let verdicts = [];
   for (let i = 0; i < ids.length; i++) {
     if (flag != "lessons")
-      objects.push(Tournament.findOne({ identificator: parseInt(ids[i]) }))
+      objects.push(TournamentSchema.findOne({ identificator: parseInt(ids[i]) }))
     else
-      objects.push(Lesson.findOne({ identificator: ids[i] }).exec());
+      objects.push(LessonSchema.findOne({ identificator: ids[i] }).exec());
   }
   objects = await Promise.all(objects);
 
@@ -2695,11 +2695,11 @@ app.get("/api/cringe/get/verdicts/:ids/:flag", checkAuthenticated, async (req, r
 //---------------------------------------------------------------------------------
 // Get attempt results
 app.get("/api/attempts/get/verdicts/:login/:page/:search", checkAuthenticated, async (req, res) => {
-  let user = await User.findOne({ login: req.params.login }).exec();
+  let user = await  UserSchema.findOne({ login: req.params.login }).exec();
   if (!user || !req.user.isTeacher)
     user = req.user;
-  let tasks = await Task.find({}).exec();
-  let tournaments = await Tournament.find({}).exec();
+  let tasks = await TaskSchema.find({}).exec();
+  let tournaments = await TournamentSchema.find({}).exec();
   let page = req.params.page;
   let a = req.params.search.split('&amp;');
   let toSearch = a[0] == "default" ? "" : a[0].toUpperCase();
@@ -2736,12 +2736,12 @@ app.get("/api/lessons/get/verdicts/:id/:logins", checkAuthenticated, async (req,
   if (!req.user.isTeacher)
     return res.json({});
   let logins = req.params.logins.split("|");
-  let tasks = (await Lesson.findOne({ identificator: req.params.id }).exec()).tasks;
+  let tasks = (await LessonSchema.findOne({ identificator: req.params.id }).exec()).tasks;
   let users = [];
   let verdicts = [];
   let results = [];
   for (let i = 0; i < logins.length; i++) {
-    users.push(User.findOne({ login: logins[i] }).exec());
+    users.push(UserSchema.findOne({ login: logins[i] }).exec());
   }
   users = await Promise.all(users);
 
@@ -2766,7 +2766,7 @@ app.get("/api/lessons/get/verdicts/:id/:logins", checkAuthenticated, async (req,
 // Get tournament results
 app.get("/api/tournament/get/results/:id", checkAuthenticated, async (req, res) => {
   let id = req.params.id;
-  let tournament = await Tournament.findOne({ identificator: id }).exec();
+  let tournament = await TournamentSchema.findOne({ identificator: id }).exec();
   let results = tournament.results
   if (tournament.isFrozen && !tournament.isEnded)
     results = tournament.frozenResults;
@@ -2778,7 +2778,7 @@ app.get("/api/tournament/get/results/:id", checkAuthenticated, async (req, res) 
 app.get("/api/quiz/get/results/:id/:grade", checkAuthenticated, async (req, res) => {
   let id = req.params.id;
   let grade = req.params.grade;
-  let quiz = await Quiz.findOne({ identificator: id }).exec();
+  let quiz = await QuizSchema.findOne({ identificator: id }).exec();
   if (!quiz)
     return res.redirect("/");
   let lesson = quiz.lessons.find(item => item.grade == grade);
@@ -2786,7 +2786,7 @@ app.get("/api/quiz/get/results/:id/:grade", checkAuthenticated, async (req, res)
   let result;
   for (let i = 0; i < lesson.results.length; i++) {
     result = lesson.results[i];
-    let user = await User.findOne({ login: result.login }).exec();
+    let user = await  UserSchema.findOne({ login: result.login }).exec();
     result = {
       name: user.name,
       login: result.login,
@@ -2801,7 +2801,7 @@ app.get("/api/quiz/get/results/:id/:grade", checkAuthenticated, async (req, res)
 //---------------------------------------------------------------------------------
 // Get tournament attempts results
 app.get("/api/tournament/get/attempts/:id/:page/:search", checkAuthenticated, async (req, res) => {
-  let tournament = await Tournament.findOne({ identificator: req.params.id }).exec();
+  let tournament = await TournamentSchema.findOne({ identificator: req.params.id }).exec();
   let a = req.params.search.split('&amp;');
   let login = a[0].toLowerCase();
   let taskID = a[1];
@@ -2824,7 +2824,7 @@ app.get("/api/tournament/get/attempts/:id/:page/:search", checkAuthenticated, as
 
 //--------------------------------------------------------------------------------------
 app.get("/api/quiz/get/time/:quiz_id/:grade", checkAuthenticated, async (req, res) => {
-  let quiz = await Quiz.findOne({ identificator: req.params.quiz_id });
+  let quiz = await QuizSchema.findOne({ identificator: req.params.quiz_id });
   let lesson = quiz.lessons.find(lesson => lesson.grade.toLowerCase() == req.params.grade.toLowerCase());
   if (!lesson)
     return res.json({ error: true });
@@ -2939,10 +2939,10 @@ function checkTournamentValidation(req, res, next) {
 async function checkGrade(req, res, next) {
   if (req.user.isTeacher)
     return next()
-  user = await User.findOne({ login: req.params.login ? req.params.login : req.user.login });
+  user = await  UserSchema.findOne({ login: req.params.login ? req.params.login : req.user.login });
   if (!user)
     return res.redirect(`/quizzes/${req.user.login}/1/default`);
-  let quiz = await Quiz.findOne({ identificator: req.params.quiz_id });
+  let quiz = await QuizSchema.findOne({ identificator: req.params.quiz_id });
   let grade = user.isTeacher ? "teacher" : user.grade + user.gradeLetter;
   let lesson = quiz.lessons.find(lesson => !lesson.isEnded && lesson.grade.toLowerCase() == grade.toLowerCase());
   if (lesson)
@@ -2952,7 +2952,7 @@ async function checkGrade(req, res, next) {
 
 async function checkTournamentPermission(req, res, next) {
   let tour_id = req.params.tour_id;
-  let tournament = await Tournament.findOne({ identificator: tour_id }).exec();
+  let tournament = await TournamentSchema.findOne({ identificator: tour_id }).exec();
   let isBegan = tournament.isBegan;
 
   if (tournament.mods.find(item => item == req.user.login) || tournament.isEnded || (isBegan && tournament.results.find(item => item.login == req.user.login))) {
@@ -2964,7 +2964,7 @@ async function checkTournamentPermission(req, res, next) {
 async function isModerator(req, res, next) {
   let tour_id = req.params.tour_id;
   let login = req.user.login;
-  let tournament = await Tournament.findOne({ identificator: tour_id }).exec();
+  let tournament = await TournamentSchema.findOne({ identificator: tour_id }).exec();
 
   if (tournament.mods.find(item => item == login)) {
     return next();
@@ -2973,7 +2973,7 @@ async function isModerator(req, res, next) {
 }
 
 async function isLessonAvailable(req, res, next) {
-  lesson = await Lesson.findOne({ identificator: req.params.id }).exec();
+  lesson = await LessonSchema.findOne({ identificator: req.params.id }).exec();
   if (req.user.isTeacher || (req.user.grade == lesson.grade)) {
     return next()
   }
@@ -3125,12 +3125,12 @@ let io = socketIo(server);
 let tour;
 io.on("connection", (socket) => {
   socket.on('new user', async (obj) => {
-    tour = await Tournament.findOne({ identificator: obj.id }).exec();
+    tour = await TournamentSchema.findOne({ identificator: obj.id }).exec();
     tour.messages.forEach(item => socket.emit("chat message", item));
   })
   socket.on("chat message", async (obj) => {
     io.emit('chat message', obj.data);
-    tour = await Tournament.findOne({ identificator: obj.id }).exec();
+    tour = await TournamentSchema.findOne({ identificator: obj.id }).exec();
     tour.messages.push(obj.data);
     tour.save()
   })
