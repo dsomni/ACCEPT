@@ -64,17 +64,6 @@ module.exports = User = class User {
         attempts: this.attempts,
         verdicts: this.verdicts,
       }])
-      console.log({
-        login: this.login,
-        name: this.name,
-        password: this.password,
-        grade: this.grade,
-        gradeLetter: this.gradeLetter,
-        group: this.group,
-        isTeacher: this.isTeacher,
-        attempts: this.attempts,
-        verdicts: this.verdicts,
-      })
     }
     return this;
   }
@@ -104,7 +93,6 @@ module.exports = User = class User {
   }
   setGroup(group) {
     this.group = group;
-    console.log(group)
     this.modified.push("group");
   }
   checkAndSetPassword(password, skipChek = false) {
