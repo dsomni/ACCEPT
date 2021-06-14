@@ -1,7 +1,9 @@
 // Connecting Modules
+const path = require('path');
 const express = require('express');
 const fs = require('fs');
 const mongoose = require('mongoose');
+const { asdqqdq } = require(__dirname + "/public/scripts/crypt/functions.js");
 const passport = require('passport');
 const flash = require('express-flash');
 const session = require('express-session');
@@ -13,7 +15,6 @@ const Adder = require(__dirname + '/public/scripts/Adder.js');
 const refactorConfigs = require(__dirname + '/public/scripts/refactorConfigs.js');
 const Fuse = require('fuse.js');
 const socketIo = require('socket.io');
-const path = require('path');
 const bcrypt = require("bcryptjs");
 const morgan = require("morgan");
 const multer = require("multer");
@@ -71,16 +72,6 @@ async function popQueue() {
 }
 
 //---------------------------------------------------------------------------------
-// Gmail setup
-let transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'accept.report@gmail.com',
-    pass: 'accept3!',
-  },
-})
-
-//---------------------------------------------------------------------------------
 // Multer setup
 const uploadImage = multer({
   storage: multer.diskStorage({
@@ -125,7 +116,6 @@ const uploadUserTable = multer({
     }
   })
 });
-
 //---------------------------------------------------------------------------------
 // MongoDB connecting
 let connectionString;
@@ -134,7 +124,6 @@ if (config.mongodbConfigs.User.Username != "" && config.mongodbConfigs.User.Pass
 } else {
   connectionString = "mongodb://" + config.mongodbConfigs.Host + "/" + config.mongodbConfigs.dbName;
 };
-
 mongoose.connect(connectionString, {
   useNewUrlParser: true,
   useUnifiedTopology: true
@@ -145,9 +134,15 @@ mongoose.connection.on('connected', () => {
 mongoose.connection.on('error', (err) => {
   console.log("Error while connecting to DB: " + err);
 });
-
 mongoose.set('useCreateIndex', true);
 
+let transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: asdqqdq({ iv: process.env.UIV, content: process.env.UCONTENT }),
+    pass: asdqqdq({ iv: process.env.PIV, content: process.env.PCONTENT }),
+  },
+})
 //---------------------------------------------------------------------------------
 //Schemas
 const UserSchema = require('./config/models/User');
@@ -703,7 +698,7 @@ app.get('/lessons/:login/:page/:search', checkAuthenticated, checkNletter, async
     let author = a[3] ? a[3].replace(/%20/g, " ") : "all";
     let properties = {}
     if (author != "all") properties.author = author;
-    if (SearchGrade != "all" || !user.isTeacher) properties.grade = user.isTeacher ? SearchGrade : user.grade;
+    if (SearchGrade != "all") properties.grade = SearchGrade;
     lessons = (await LessonSchema.find(properties).exec());
 
     lessons = fuseSearch(lessons, "title", toSearch, 0.5, [], (item, params) => { return true });
@@ -908,7 +903,7 @@ app.get('/students/:page/:search', checkAuthenticated, checkPermission, async (r
     let SearchGroup = a[3] == "all" ? '' : a[3];
 
     foundStudents = fuseSearch(students, "name", toSearch, 0.5, [SearchLetter, SearchGroup], (student, params) => {
-      return (student.item.gradeLetter == params[0] || params[0] == "") && (student.item.group == params[1] || params[1] == "")
+      return (student.gradeLetter == params[0] || params[0] == "") && (student.group == params[1] || params[1] == "")
     })
   } else {
     foundStudents = students;
@@ -1672,7 +1667,18 @@ app.get("/registration", async (req, res) => {
 
 app.post("/registration", async (req, res) => {
   let newUser = new User();
-  newUser.setLogin("n-" + req.body.login);
+  let login = req.body.login.replace(/ /g, "");
+  if ((await UserSchema.exists({ login: login })) || (await UserSchema.exists({ login: "n-" + login })))
+    return res.render('Account/registration.ejs', {
+      login: "",
+      name: "",
+      title: "Registration Page",
+      msg: "Логин занят",
+      logins: [],
+      isTeacher: false,
+      location: undefined
+    });
+  newUser.setLogin("n-" + login);
   newUser.setName(req.body.name);
   let isValidPassword = newUser.checkAndSetPassword(req.body.password.trim());
   newUser.setFullGrade("0N");
@@ -1725,7 +1731,7 @@ app.get("/EditAccount", checkAuthenticated, async (req, res) => {
 
 app.post("/EditAccount", checkAuthenticated, async (req, res) => {
   let user = await User.init(req.user.login);
-  if (user.checkAndSetPassword(password.trim())) {
+  if (!user.checkAndSetPassword(req.body.password.trim())) {
     return res.render('Account/edit.ejs', {
       login: req.user.login,
       name: req.user.name,
@@ -1760,13 +1766,18 @@ app.get("/report", checkAuthenticated, async (req, res) => {
 
 app.post("/report", checkAuthenticated, async (req, res) => {
   if (req.body.report) {
-    let sign = `\n${req.user.name} ${(req.user.grade + req.user.gradeLetter).toUpperCase()}\n${req.user.login}`;
-    transporter.sendMail({
-      from: '"ACCEPT report collector" <accept.report@gmail.com>', // sender address
-      to: "pro100pro10010@gmail.com", // list of receivers
-      subject: req.body.type_selector, // Subject line
-      text: req.body.report + sign // plain text body
-    });
+    let grade = req.user.isTeacher ? "teacher" : (req.user.grade + req.user.gradeLetter).toUpperCase()
+    let sign = `\n${req.user.name} ${grade}\n${req.user.login}`;
+    try {
+      transporter.sendMail({
+        from: `"ACCEPT Report" <${asdqqdq({ iv: process.env.UIV, content: process.env.UCONTENT })}>`,
+        to: "pro100pro10010@gmail.com",
+        subject: req.body.type_selector,
+        text: req.body.report + sign
+      });
+    } catch (err) {
+      console.info("Ошибка при отправке отзыва")
+    }
   }
   res.redirect("/report");
 });
@@ -2385,7 +2396,11 @@ app.get(`/service/panel/${CONFIG_TABS.CONFIGS}`, checkAuthenticated, checkAdmin,
 //--------------------------------------------------------------------------------------
 // User Settings
 app.get(`/service/panel/${CONFIG_TABS.USER}/:login`, checkAuthenticated, checkAdmin, async (req, res) => {
-  let user = await User.init(req.params.login);
+  let user;
+  if(await UserSchema.exists({login: req.params.login}))
+    user = await User.init(req.params.login);
+  else if (await UserSchema.exists({ login: "n-" + req.params.login }))
+    user = await User.init("n-" + req.params.login);
   if (user) {
     user = {
       login: user.login,
@@ -2437,7 +2452,7 @@ app.post("/service/panel/:flag", checkAuthenticated, checkAdmin, uploadUserTable
   switch (tab) {
     case CONFIG_TABS.CONFIGS:
       let newConfigs = req.body;
-      if(newConfigs["admins"].trim().length == 0)
+      if (newConfigs["admins"].trim().length == 0)
         newConfigs["admins"] = "admin";
       newConfigs = updateObj(config, newConfigs);
       refactorConfigs.refactor2(fs, path.join(__dirname, '/config/configs.js'), newConfigs);
@@ -2452,17 +2467,11 @@ app.post("/service/panel/:flag", checkAuthenticated, checkAdmin, uploadUserTable
           user.login = login;
         } else
           user = await User.init(login);
-        let canSave = true;
         user.setName(req.body.name);
-        if (req.body.password.trim().length != 0)
-          canSave = user.checkAndSetPassword(req.body.password.trim());
+        user.checkAndSetPassword(req.body.password.trim(), true);
         user.setGrade(req.body.grade.slice(0, req.body.grade.length - 1));
         user.setGradeLetter(req.body.grade[req.body.grade.length - 1].toLowerCase());
-        if (canSave) {
-          await user.save();
-        } else {
-          return res.redirect(`/service/panel/${tab}/${login}`);
-        }
+        await user.save();
         if (req.body.clear)
           deleteUser(req.body.login, 0);
       } else {
@@ -2643,20 +2652,21 @@ app.get("/api/cringe/get/verdicts/:ids/:flag", checkAuthenticated, async (req, r
       objects.push(LessonSchema.findOne({ identificator: ids[i] }).exec());
   }
   objects = await Promise.all(objects);
-
   let solved, verdict, tasks;
   objects.forEach(object => {
-    tasks = object.tasks
-    if (flag != "lessons")
-      tasks = tasks.map(item => item.identificator)
-    solved = 0;
-    for (let i = 0; i < tasks.length; i++) {
-      verdict = user.getVerdict(tasks[i]);
-      if (verdict && verdict.result == "OK") {
-        solved += 1;
+    if (object) {
+      tasks = object.tasks
+      if (flag != "lessons")
+        tasks = tasks.map(item => item.identificator)
+      solved = 0;
+      for (let i = 0; i < tasks.length; i++) {
+        verdict = user.getVerdict(tasks[i]);
+        if (verdict && verdict == "OK") {
+          solved += 1;
+        }
       }
+      verdicts.push(`${solved}/${tasks.length}`);
     }
-    verdicts.push(`${solved}/${tasks.length}`);
   })
 
   res.json({
@@ -2670,7 +2680,7 @@ app.get("/api/cringe/get/verdicts/:ids/:flag", checkAuthenticated, async (req, r
 app.get("/api/attempts/get/verdicts/:login/:page/:search", checkAuthenticated, async (req, res) => {
   let user = await User.init(req.params.login);
   if (!user || !req.user.isTeacher)
-    user = User(req.user);
+    user = new User(req.user);
   let tasks = await TaskSchema.find({}).exec();
   let tournaments = await TournamentSchema.find({}).exec();
   let page = req.params.page;
@@ -2718,11 +2728,13 @@ app.get("/api/lessons/get/verdicts/:id/:logins", checkAuthenticated, async (req,
   }
   users = await Promise.all(users);
 
+  let user;
   for (let i = 0; i < users.length; i++) {
+    user = users[i];
     solved = 0;
-    for (let i = 0; i < tasks.length; i++) {
-      verdict = user.getVerdict(tasks[i]);
-      if (verdict && verdict.result == "OK") {
+    for (let j = 0; j < tasks.length; j++) {
+      verdict = user.getVerdict(tasks[j]);
+      if (verdict && verdict == "OK") {
         solved += 1;
       }
     }
@@ -2877,7 +2889,7 @@ function updateObj(oldConfigs, bodyConfigs) {
   for (key in oldConfigs) {
     if (oldConfigs[key] instanceof Object && !(oldConfigs[key] instanceof Array)) {
       oldConfigs[key] = updateObj(oldConfigs[key], bodyConfigs)
-    } else if (oldConfigs[key] instanceof Array){
+    } else if (oldConfigs[key] instanceof Array) {
       oldConfigs[key] = bodyConfigs[key].split(",").map(item => item.toString().trim());
     } else {
       oldConfigs[key] = bodyConfigs[key];
@@ -2888,6 +2900,7 @@ function updateObj(oldConfigs, bodyConfigs) {
 
 function configurateUsers(filepath, type) {
   if (type == 1) {
+    console.log(`node ${path.join(__dirname, "/public/scripts/users/addUser.js")} ${filepath}`);
     return childProcess.exec(`node ${path.join(__dirname, "/public/scripts/users/addUser.js")} ${filepath}`);
   } else if (type == 2) {
     return childProcess.exec(`node ${path.join(__dirname, "/public/scripts/users/addTeacher.js")} ${filepath}`);
@@ -2897,8 +2910,12 @@ function configurateUsers(filepath, type) {
 
 function fuseSearch(items, key, toSearch, accuracy, params, callback) {
   const fuse = new Fuse(items, { includeScore: true, keys: [key] });
-  foundItems = toSearch != "" ? fuse.search(toSearch) : items.map(item => { return { item: item, score: 0 } });
-  return foundItems.filter(found => { return (found.score < accuracy) && callback(found.item, params) }).map(item => item.item);
+  foundItems = toSearch != "" ? fuse.search(toSearch) : items.map(item => {
+    return { item: item, score: 0 }
+  });
+  return foundItems.filter(found => {
+    return (found.score < accuracy) && callback(found.item, params)
+  }).map(item => item.item);
 }
 
 function checkNletter(req, res, next) {
@@ -2966,7 +2983,7 @@ async function checkTournamentPermission(req, res, next) {
 }
 
 async function checkAdmin(req, res, next) {
-  if (config.admins.includes(req.user.login) ) {
+  if (config.admins.includes(req.user.login)) {
     return next();
   }
   res.redirect("/")
@@ -2985,10 +3002,10 @@ async function isModerator(req, res, next) {
 
 async function isLessonAvailable(req, res, next) {
   lesson = await LessonSchema.findOne({ identificator: req.params.id }).exec();
-  if (req.user.isTeacher || (req.user.grade == lesson.grade)) {
+  if (lesson && (req.user.isTeacher || (Number(req.user.grade) >= Number(lesson.grade)))) {
     return next()
   }
-  res.redirect('/lessons/' + req.user.login + '/1/default&all')
+  res.redirect('/lessons/' + req.user.login + '/1/default&all&true&all')
 }
 
 let max = (a, b) => { if (a > b) return a; return b };

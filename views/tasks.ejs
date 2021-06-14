@@ -39,7 +39,17 @@
                 <select name="Author">
                     <option value="all" selected>Все авторы</option>
                     <% for(var i=0; i < teachers.length; i++) { %>
-                        <option value=<%=teachers[i].replace(/ /g, "%20" ) %> ><%= teachers[i] %>
+                        <%
+                        let authorArray1 = teachers[i].split(' ');
+                        let author1 = authorArray1[0];
+                        for(let i = 1; i < authorArray1.length; i++){
+                            if(authorArray1[i].length!=0){
+                                author1 += ' '+ authorArray1[i][0]+'.';
+                            }
+                        }
+                        teacher = author1
+                        %>
+                        <option value=<%=teachers[i].replace(/ /g, "%20" ) %> ><%= teacher %>
                         </option>
                         <% } %>
                 </select>

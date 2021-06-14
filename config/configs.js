@@ -5,7 +5,7 @@ module.exports = {
 	"port": "3000",
 	"secret": "secret",
 	"FolderLifeTime": "42000",
-	"maxThreadsTests": "10",
+	"maxThreadsTests": "1",
 	"maxThreadsTasks": "5",
 	"onPage": {
 		"newsMainList": "5",

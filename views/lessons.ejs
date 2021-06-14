@@ -22,14 +22,12 @@
 
             <form class="SearchUI" action= <%= '/lessons/'+ u_login +'/1/default' %>  method="POST">
                 <input name = "searcharea" rows=1 placeholder="Поиск урока"></input>
-                <% if(isTeacher){ %>
                     <select name="GradeSelector" id = "GradeSelector">
                         <option value="all" selected>Все</option>
                         <% for(var i = 1; i < 12; i++) { %>
-                        <option value=<%= i %> ><%= i %></option>
+                            <option value=<%= i %> ><%= i %></option>
                         <% } %>
                     </select>
-                <% } %>
                 <select name="SortByNew">
                     <option value="false" >Сначала старые</option>
                     <option value="true" selected>Сначала новые</option>
@@ -37,7 +35,17 @@
                 <select name="Author">
                     <option value="all" selected>Все авторы</option>
                     <% for(var i=0; i < teachers.length; i++) { %>
-                        <option value=<%= teachers[i].replace(/ /g, "%20") %> ><%= teachers[i] %></option>
+                        <%
+                        let authorArray1 = teachers[i].split(' ');
+                        let author1 = authorArray1[0];
+                        for(let i = 1; i < authorArray1.length; i++){
+                            if(authorArray1[i].length!=0){
+                                author1 += ' '+ authorArray1[i][0]+'.';
+                            }
+                        }
+                        teacher = author1
+                        %>
+                        <option value=<%= teachers[i].replace(/ /g, "%20") %> ><%= teacher %></option>
                     <% } %>
                 </select>
                 <button id="submitsearch">Найти</button>

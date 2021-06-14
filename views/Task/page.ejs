@@ -110,8 +110,10 @@
                 if (response.status == "testing") {
                     inputarea.readOnly = true;
                     inputarea.placeholder = "";
+                    document.getElementById("languageSelector").style.visibility = "hidden";
                 } else {
-                    inputarea.readOnly = false;
+                    document.getElementById("languageSelector").style.visibility = "visible";
+                                        inputarea.readOnly = false;
                     inputarea.placeholder = "Place code here";
                 }
                 if(prevTable != text){
@@ -154,7 +156,7 @@
         }
         drop.ondrop = (evt)=>{
             fileInput.files = evt.dataTransfer.files;
-            drop.value = fileInput.files[0].name;
+            drop.value = "\n\n\tВыбранный файл: " + fileInput.files[0].name;
             drop.readOnly = true;
             evt.preventDefault();
         }

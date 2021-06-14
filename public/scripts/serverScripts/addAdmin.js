@@ -29,7 +29,8 @@ var tablePath = process.argv[2];
 
 const User = require('../../../config/models/User');
 
-async function addStudent (login, password, name, grade, gradeLetter, group){
+async function addTeacher(login, password, name, grade, gradeLetter, group) {
+  if(!(await User.exists({login: "admin"}))){
     await User.insertMany([{
         login: login,
         password: bcrypt.hashSync(password.toString(), 10).toString(),
@@ -41,36 +42,9 @@ async function addStudent (login, password, name, grade, gradeLetter, group){
         attempts: [],
         verdicts: [],
 
-        isTeacher : false
+        isTeacher : true
     }]);
-}
-async function toDo(){
-
-    const workSheetsFromFile = await xlsx.parse(tablePath);
-    var data = workSheetsFromFile[0].data;
-    var student, grade, gradeLetter, check;
-    for(var i = 1; i < data.length; i++){
-        student = data[i];
-        if(student.length==0)
-            break;
-        check = await User.findOne({login:student[0]})
-        grade = student[3].slice(0,student[3].length-1);
-        gradeLetter = student[3][student[3].length-1];
-        if(check){
-            check.password = bcrypt.hashSync(student[2].toString(), 10).toString()
-            check.name = student[1]
-            check.grade = grade
-            check.gradeLetter = gradeLetter.toLowerCase()
-            if(!check.group){
-                check.group = 1;
-            }
-            await check.save()
-        } else {
-            console.log(student[0], student[2], student[1], grade, gradeLetter);
-            await addStudent(student[0], student[2], student[1], grade, gradeLetter.toLowerCase(), 1)
-        }
-    }
-    fs.rmSync(tablePath)
+  }
 }
 
-toDo().then(() => { console.log("Done"); process.exit() });
+addTeacher("admin", "admin", "admin", 0, "a", 0).then(() => { console.log("Done"); process.exit() });

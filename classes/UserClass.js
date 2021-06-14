@@ -12,8 +12,8 @@ module.exports = User = class User {
       if(!this.isTeacher){
         this.group = user.group;
         this.gradeLetter = user.gradeLetter.toLowerCase();
+        this.fullgrade = this.grade + this.gradeLetter;
       }
-      this.fullgrade = this.grade + this.gradeLetter;
       this.attempts = user.attempts;
       this.verdicts = user.verdicts;
     } else {
@@ -42,11 +42,14 @@ module.exports = User = class User {
     if (user) {
       user.name = this.name;
       user.isTeacher = this.isTeacher;
-      user.grade = this.grade;
-      user.gradeLetter = this.gradeLetter;
+      if (!this.isTeacher) {
+        user.grade = Number(this.grade);
+        user.gradeLetter = this.gradeLetter;
+      }
       user.attempts = this.attempts;
       user.verdicts = this.verdicts;
       user.group = this.group;
+      user.password = this.password;
       user.markModified(this.modified);
       await user.save();
     } else {
@@ -61,6 +64,17 @@ module.exports = User = class User {
         attempts: this.attempts,
         verdicts: this.verdicts,
       }])
+      console.log({
+        login: this.login,
+        name: this.name,
+        password: this.password,
+        grade: this.grade,
+        gradeLetter: this.gradeLetter,
+        group: this.group,
+        isTeacher: this.isTeacher,
+        attempts: this.attempts,
+        verdicts: this.verdicts,
+      })
     }
     return this;
   }
@@ -90,10 +104,11 @@ module.exports = User = class User {
   }
   setGroup(group) {
     this.group = group;
+    console.log(group)
     this.modified.push("group");
   }
-  checkAndSetPassword(password) {
-    if (password.length != 0 && password.length>5 && !password.includes(" ")) {
+  checkAndSetPassword(password, skipChek = false) {
+    if (skipChek || (password.length != 0 && password.length >= 5 && !password.includes(" "))) {
       this.password = bcrypt.hashSync(password, 10);
       this.modified.push("password");
       return true
@@ -118,7 +133,7 @@ module.exports = User = class User {
   }
   setGradeLetter(gradeLetter) {
     if (!this.isTeacher) {
-      this.grade = gradeLetter;
+      this.gradeLetter = gradeLetter;
       this.fullGrade = this.grade + this.gradeLetter;
       this.modified.push("gradeLetter");
     }
