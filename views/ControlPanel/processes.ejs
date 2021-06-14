@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Панель управления</title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,
+              maximum-scale=1.0, minimum-scale=1.0,
+              user-scalable=no, minimal-ui">
+  <meta name="full-screen" content="yes">
+  <style>
+    #CoolDiv{
+        width: 45%
+    }
+    .coolTable {
+        overflow-y: scroll;
+        max-height: 60vh;
+        font-size: 1rem;
+        width: 100%;
+    }
+    .coolTable::-webkit-scrollbar-track{
+        display:none;
+    }
+    .coolTable dt, .coolTable dd {
+        height: 2.5rem;
+        line-height: 2.5rem;
+        padding: 0 0.625em 0 0.875em;
+        color: #4C565C;
+        box-sizing: border-box;
+    }
+    dt {
+        width: 40%;
+        float: left;
+        clear: right;
+        background: #D3E6DD;
+        font-weight: bold;
+        font-size: .8rem;
+    }
+    dd {
+        width: 60%;
+        float: right;
+        margin-left: 0;
+        margin-bottom: .3125em;
+        border: 1px solid #BECFC7;
+        border-left: none;
+        background: #ffffff7c;
+    }
+    .twoTables {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <h1 class="h1">Processes</h1>
+      <div class="twoTables">
+        <div id="CoolDiv">
+            <h2 class="h2">In Queue</h2>
+            <dl class="coolTable" id="queue"></dl>
+        </div>
+        <div id="CoolDiv">
+            <h2 class="h2">Testing</h2>
+            <dl class="coolTable" id="processes"></dl>
+        </div>
+    </div>
+  </main>
+</body>
+<script>
+    let prevTableQueue="";
+    function updateQueue() {
+        fetch("/api/get/queue").then(response => response.json()).then(response => {
+            let text = "";
+            let queue = response.queue;
+            if(queue.length == 0){
+                text = "<dt>-</dt><dd><b>Очередь пуста</b></dd>";
+            }else{
+                for(let i = 0; i<queue.length; i++){
+                    let date = getDate(queue[i].sendAt);
+                    let description = getDescription(queue[i])
+                    text+=`<dt>${date}</dt>\n<dd>${description}</dd>`;
+                }
+            }
+            if(text != prevTableQueue){
+                document.getElementById("queue").innerHTML = text;
+            }
+        }).catch(err => console.log(err));
+    }
+    updateQueue();
+    setInterval(() => {
+        updateQueue();
+    }, 3000);
+</script>
+<script>
+    let prevTableProcesses="";
+    function updateProcesses() {
+        fetch("/api/get/processes/").then(response => response.json()).then(response => {
+            let text = "";
+            let processes = response.processes;
+            let description = "";
+            if (processes.length == 0) {
+                text = "<dt>-</dt><dd><b>Тестируемых задач нет</b></dd>";
+            } else {
+                for (let i = 0; i < processes.length; i++) {
+                    let date = getDate(processes[i].sendAt);
+                    let description = getDescription(processes[i]);
+                    text += `<dt>${date}</dt>\n<dd>${description}</dd>`;
+                }
+            }
+            if(text != prevTableProcesses){
+                document.getElementById("processes").innerHTML = text;
+            }
+        }).catch(err => console.log(err));
+    }
+    updateProcesses();
+    setInterval(() => {
+        updateProcesses();
+    }, 3000);
+</script>
+<script>
+    function getDate(dateMS){
+        let options = {
+                year: 'numeric', month: 'numeric', day: 'numeric', hour: "numeric", minute:"numeric", second:"numeric"
+            };
+        return new Date(Number.parseInt(dateMS)).toLocaleDateString("ru", options).replace(",", "");
+    }
+
+    function getDescription(text){
+        let tour_id = text.id.split("_")[0];
+        let task_id = text.id.split("_")[1];
+        let description;
+        if(tour_id[0]=="Q"){
+            let quiz_id = tour_id.slice(1);
+            description = `Контрольная #${Number.parseInt(quiz_id) + 1} Задача #${Number.parseInt(task_id) + 1} <b>Логин</b> ${text.login}</dd>`;
+        }else if(tour_id == "0"){
+            description = `Задача #${Number.parseInt(task_id) + 1} <b>Логин</b> ${text.login}</dd>`;
+        }else{
+            description = `Турнир #${Number.parseInt(tour_id) + 1} Задача #${Number.parseInt(task_id) + 1} <b>Логин</b> ${text.login}</dd>`;
+        }
+        return description;
+    }
+</script>
+</html>

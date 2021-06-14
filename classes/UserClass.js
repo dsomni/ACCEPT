@@ -9,8 +9,10 @@ module.exports = User = class User {
       this.password = user.password;
       this.isTeacher = user.isTeacher;
       this.grade = user.grade;
-      this.group = user.group;
-      this.gradeLetter = user.gradeLetter.toLowerCase();
+      if(!this.isTeacher){
+        this.group = user.group;
+        this.gradeLetter = user.gradeLetter.toLowerCase();
+      }
       this.fullgrade = this.grade + this.gradeLetter;
       this.attempts = user.attempts;
       this.verdicts = user.verdicts;

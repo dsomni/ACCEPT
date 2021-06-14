@@ -6,7 +6,7 @@
         <meta charset="utf-8">
         <meta name="viewport"
               content="width=device-width, initial-scale=1.0,
-              maximum-scale=1.0, minimum-scale=1.0,
+              maximum-scale=1.0, minimum-scale=1.0,W
               user-scalable=no, minimal-ui">
         <meta name="full-screen" content="yes">
         </head>
@@ -14,9 +14,8 @@
         <main>
             <h1 class="h1">Configs</h1>
 
-            <form action='/service/panel/CONFIGS'  method="POST">
-                <div class="taskAdderForm" id="configform">
-                </div>
+            <form action='/service/panel/CONFIGS'  method="POST" style="width: 60ch;">
+                <div id="configform" style="background-color: rgba(250, 235, 215, 0.274); width:100%; display:flex; flex-direction: column;"></div>
             </form>
         </main>
     </body>
@@ -38,15 +37,14 @@
         function construct(obj, depth){
             let txt = "";
             for (key in obj){
-                txt += `<span class="depth${depth}" id='spn${key}' onclick="hideShow('${key}')">${key} <arrow class="arrow right" style="padding: ${5-depth}px;"></arrow></span>\n`;
+                txt += `<div style="margin-top: 1rem; margin-left: 1rem;"><span class="depth${depth}" id='spn${key}' onclick="hideShow('${key}')">${key} <arrow class="arrow right" style="padding: ${5-depth}px;"></arrow></span>\n`;
                 txt += `<div class="hideable" id="${key}" style="display: none; flex-direction:column; width:100%;" >\n`;
                 if (obj[key] instanceof Object && !(obj[key] instanceof Array)) {
                     txt += construct(obj[key], depth+1)
                 }else{
-                    console.log(obj[key].toString().length);
-                    txt += `<textarea class="configarea" style="margin-left:${depth-1}rem;  margin-top: -.1rem; margin-bottom: .5rem; width:${obj[key].toString().length+2}ch" id="${key}" name = "${key}"  rows=1 placeholder="">${obj[key]}</textarea>`
+                    txt += `<textarea class="configarea" style="margin-left:${depth-1}rem; width:calc(${obj[key].toString().length}ch + 20px)" id="${key}" name = "${key}"  rows=1 placeholder="">${obj[key]}</textarea>`
                 }
-                txt += `</div>\n`
+                txt += `</div></div>\n`
             }
             return txt;
         }

@@ -44,6 +44,7 @@ config = {
     'FolderLifeTime': 0.7 * 60 * 1000, # milliseconds
     'maxThreadsTests': 10, #number of test managing simultaneously
     'maxThreadsTasks': 1, #number of tasks managing simultaneously
+    "admins":["admin"],
     'onPage':{
 		'newsMainList': 5,
 		'newsList': 10,#
@@ -76,6 +77,7 @@ FolderLifeTime = input("FolderLifeTime: ")
 logsLifeTime = input("LogsLifeTime(days): ")
 maxThreadsTests = input("maxThreadsTests: ")
 maxThreadsTasks = input("maxThreadsTasks: ")
+admins = list(input("admins: ").split())
 secret = input("secret: ")
 answer0 = input("Do you want to configure number of elements on pages?(y/n): ")
 if answer0.upper() == "Y":
@@ -116,6 +118,9 @@ if (maxThreadsTests):
     config["maxThreadsTests"] = int(eval(maxThreadsTests))
 if (maxThreadsTasks):
     config["maxThreadsTasks"] = int(eval(maxThreadsTasks))
+if(admins.length != 0){
+    config["admins"] = admins
+}
 if (secret):
     config["secret"] = secret
 if answer0.upper() == "Y":

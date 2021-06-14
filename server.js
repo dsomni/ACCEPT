@@ -34,7 +34,7 @@ function pushToQueue(object) {
 
 async function popQueue() {
   let object = TestingQueue.shift();
-  let user = await  User.init(object.login);
+  let user = await User.init(object.login);
   if (!user)
     return
   if (object.id[0] != "Q") {
@@ -165,6 +165,7 @@ const User = require('./classes/UserClass');
 //Passport Setup
 const initializePassport = require('./config/passport');
 const configs = require('./config/configs');
+const { time } = require('console');
 initializePassport(
   passport,
   UserSchema
@@ -384,7 +385,7 @@ app.post('/task/add', checkAuthenticated, checkNletter, checkPermission, uploadT
 // Tasks List Page
 app.get('/tasks/:page/:search', checkAuthenticated, checkNletter, async (req, res) => {
   let user = req.user;
-  let teachers = await  UserSchema.find({ isTeacher: true });
+  let teachers = await UserSchema.find({ isTeacher: true });
   teachers = teachers.map(item => item.name);
   let foundTasks = [];
   let a = req.params.search.split('&');
@@ -837,9 +838,9 @@ app.get('/lessonresults/:id/:page/:search', checkAuthenticated, checkNletter, ch
     if (a[1].toLowerCase() != "default") {
       let SearchGrade = a[1] == "all" ? '' : a[1];
       if (SearchGrade != "") {
-        students = await  UserSchema.find({ grade: SearchGrade, isTeacher: false }).exec();
+        students = await UserSchema.find({ grade: SearchGrade, isTeacher: false }).exec();
       } else {
-        students = await  UserSchema.find({ isTeacher: false }).exec();
+        students = await UserSchema.find({ isTeacher: false }).exec();
       }
       if (a[0] != "default" || a[2] != "all" || a[3] != "all") {
         let SearchLetter = a[2] == "all" ? '' : a[2].toUpperCase();
@@ -897,9 +898,9 @@ app.get('/students/:page/:search', checkAuthenticated, checkPermission, async (r
   let SearchGrade = a[1] == "all" ? '' : a[1];
   let foundStudents
   if (SearchGrade != "") {
-    students = await  UserSchema.find({ grade: SearchGrade, isTeacher: false }).exec();
+    students = await UserSchema.find({ grade: SearchGrade, isTeacher: false }).exec();
   } else {
-    students = await  UserSchema.find({ isTeacher: false }).exec();
+    students = await UserSchema.find({ isTeacher: false }).exec();
   }
   if (a[0] != "default" || a[2] != "all" || a[3] != "all") {
     let toSearch = a[0] == "default" ? '' : a[0];
@@ -1688,9 +1689,9 @@ app.post("/registration", async (req, res) => {
     });
     return;
   }
-  if (await UserSchema.exists({login: newUser.login})) {
+  if (await UserSchema.exists({ login: newUser.login })) {
     let users = await UserSchema.find({});
-    let logins = users.filter(user => user.login.length > 2 && user.login.slice(0, 1)=="n-" ).map(user => user.login);
+    let logins = users.filter(user => user.login.length > 2 && user.login.slice(0, 1) == "n-").map(user => user.login);
     res.render('Account/registration.ejs', {
       login: "",
       name: "",
@@ -1719,7 +1720,7 @@ app.get("/EditAccount", checkAuthenticated, async (req, res) => {
     location: req.header('Referer')
   };
 
-  res.render('Accout/edit.ejs', rendered);
+  res.render('Account/edit.ejs', rendered);
 });
 
 app.post("/EditAccount", checkAuthenticated, async (req, res) => {
@@ -2365,13 +2366,13 @@ app.post("/quiz/set/time", checkAuthenticated, checkPermission, async (req, res)
 const CONFIG_TABS = {
   CONFIGS: "CONFIGS",
   USER: "USER",
-  SCRIPTS: "SCRIPTS"
+  SCRIPTS: "SCRIPTS",
+  PROCESSES: "PROCESSES"
 };
 
 //--------------------------------------------------------------------------------------
 // Configs
-
-app.get(`/service/panel/${CONFIG_TABS.CONFIGS}`, checkAuthenticated, checkPermission, async (req, res) => {
+app.get(`/service/panel/${CONFIG_TABS.CONFIGS}`, checkAuthenticated, checkAdmin, async (req, res) => {
   res.render('ControlPanel/editConfigs.ejs', {
     login: req.user.login,
     name: req.user.name,
@@ -2383,9 +2384,9 @@ app.get(`/service/panel/${CONFIG_TABS.CONFIGS}`, checkAuthenticated, checkPermis
 
 //--------------------------------------------------------------------------------------
 // User Settings
-app.get(`/service/panel/${CONFIG_TABS.USER}/:login`, checkAuthenticated, checkPermission, async (req, res) => {
+app.get(`/service/panel/${CONFIG_TABS.USER}/:login`, checkAuthenticated, checkAdmin, async (req, res) => {
   let user = await User.init(req.params.login);
-  if (user){
+  if (user) {
     user = {
       login: user.login,
       name: user.name,
@@ -2405,7 +2406,9 @@ app.get(`/service/panel/${CONFIG_TABS.USER}/:login`, checkAuthenticated, checkPe
   })
 });
 
-app.get(`/service/panel/${CONFIG_TABS.SCRIPTS}`, checkAuthenticated, checkPermission, async (req, res) => {
+//--------------------------------------------------------------------------------------
+// Scripts
+app.get(`/service/panel/${CONFIG_TABS.SCRIPTS}`, checkAuthenticated, checkAdmin, async (req, res) => {
   res.render('ControlPanel/scripts.ejs', {
     login: req.user.login,
     name: req.user.name,
@@ -2416,14 +2419,28 @@ app.get(`/service/panel/${CONFIG_TABS.SCRIPTS}`, checkAuthenticated, checkPermis
 });
 
 //--------------------------------------------------------------------------------------
+// Processes
+app.get(`/service/panel/${CONFIG_TABS.PROCESSES}`, checkAuthenticated, checkAdmin, async (req, res) => {
+  res.render('ControlPanel/processes.ejs', {
+    login: req.user.login,
+    name: req.user.name,
+    title: "Control Panel",
+    isTeacher: req.user.isTeacher,
+    location: `/`
+  })
+});
+
+//--------------------------------------------------------------------------------------
 // Control panel Listener
-app.post("/service/panel/:flag", checkAuthenticated, checkPermission, uploadUserTable.single("file"), async (req, res) => {
+app.post("/service/panel/:flag", checkAuthenticated, checkAdmin, uploadUserTable.single("file"), async (req, res) => {
   const tab = req.params.flag;
   switch (tab) {
     case CONFIG_TABS.CONFIGS:
-      let newConfigs = config;
-      newConfigs = updateObj(newConfigs, req.body);
-      refactorConfigs.refactor(fs, path.join(__dirname, '/config/configs.js'), newConfigs);
+      let newConfigs = req.body;
+      if(newConfigs["admins"].trim().length == 0)
+        newConfigs["admins"] = "admin";
+      newConfigs = updateObj(config, newConfigs);
+      refactorConfigs.refactor2(fs, path.join(__dirname, '/config/configs.js'), newConfigs);
       return res.redirect(`/service/panel/${tab}`);
       break;
     case CONFIG_TABS.USER:
@@ -2476,7 +2493,7 @@ app.post("/service/panel/:flag", checkAuthenticated, checkPermission, uploadUser
   }
 });
 
-app.get('/download/:date', function(req, res){
+app.get('/download/:date', function (req, res) {
   const file = path.join(__dirname, `/public/tables/${req.params.date}.xlsx`);
   res.download(file);
   setTimeout(() => {
@@ -2488,7 +2505,7 @@ app.get('/download/:date', function(req, res){
 //------------------------------------------------------------------------------------------------
 
 // Get configs results
-app.get("/api/get/configs", checkAuthenticated, checkPermission, async (req, res) => {
+app.get("/api/get/configs", checkAuthenticated, checkAdmin, async (req, res) => {
   res.json({
     config
   });
@@ -2545,7 +2562,7 @@ app.get("/api/task/get/testverdicts/:login/:ids", checkAuthenticated, async (req
   let ids = req.params.ids.split("|");
   let tasks = [];
   let task, tournament, quiz, lesson;
-  let user = await  User.init(req.params.login);
+  let user = await User.init(req.params.login);
   for (let i = 0; i < ids.length; i++) {
     if (ids[i].split('_')[0] == '0')
       task = await TaskSchema.findOne({ identificator: ids[i] }).exec();
@@ -2651,7 +2668,7 @@ app.get("/api/cringe/get/verdicts/:ids/:flag", checkAuthenticated, async (req, r
 //---------------------------------------------------------------------------------
 // Get attempt results
 app.get("/api/attempts/get/verdicts/:login/:page/:search", checkAuthenticated, async (req, res) => {
-  let user = await  User.init(req.params.login);
+  let user = await User.init(req.params.login);
   if (!user || !req.user.isTeacher)
     user = User(req.user);
   let tasks = await TaskSchema.find({}).exec();
@@ -2786,6 +2803,38 @@ app.get("/api/quiz/get/time/:quiz_id/:grade", checkAuthenticated, async (req, re
   return res.json({ error: false, whenEnds: lesson.whenEnds });
 });
 
+app.get("/api/get/queue", checkAuthenticated, checkAdmin, (req, res) => {
+  res.json({
+    queue: TestingQueue
+  });
+});
+
+app.get("/api/get/processes", checkAuthenticated, checkAdmin, async (req, res) => {
+  let processesPath = path.normalize(__dirname + "/public/processes");
+  let objs = [];
+  let files = await fs.readdirSync(processesPath);
+  for (let i = 0; i < files.length; i++) {
+    let filename = files[i];
+    let folderPath = path.normalize(processesPath + '/' + filename);
+    let info = filename.split('_')
+    let login = info[0];
+    let id = info[1] + "_" + info[2];
+    let time;
+    let st = fs.statSync(folderPath);
+    objs.push({
+      login: login,
+      id: id,
+      sendAt: st.birthtimeMs,
+    });
+  }
+  objs.sort((a, b) => {
+    return Number(a.sendAt) - Number(b.sendAt)
+  });
+  res.json({
+    processes: objs
+  });
+});
+
 //---------------------------------------------------------------------------------
 // ??? toDo
 app.get('/egg1', checkAuthenticated, checkNotPermission, async (req, res) => {
@@ -2819,26 +2868,28 @@ app.get('*', (req, res) => {
 
 //---------------------------------------------------------------------------------
 
-function deleteUser(login, permanently=0){
+function deleteUser(login, permanently = 0) {
   childProcess.exec(`node ${path.join(__dirname, '/public/scripts/fixes/FixAfterDeleteUser.js')} ${login} ${permanently}`)
 };
 
 // Functions
-function updateObj(oldConfigs, bodyConfigs){
-  for (key in oldConfigs){
+function updateObj(oldConfigs, bodyConfigs) {
+  for (key in oldConfigs) {
     if (oldConfigs[key] instanceof Object && !(oldConfigs[key] instanceof Array)) {
       oldConfigs[key] = updateObj(oldConfigs[key], bodyConfigs)
-    }else{
+    } else if (oldConfigs[key] instanceof Array){
+      oldConfigs[key] = bodyConfigs[key].split(",").map(item => item.toString().trim());
+    } else {
       oldConfigs[key] = bodyConfigs[key];
     }
   }
   return oldConfigs;
 }
 
-function configurateUsers(filepath, type){
-  if(type == 1){
+function configurateUsers(filepath, type) {
+  if (type == 1) {
     return childProcess.exec(`node ${path.join(__dirname, "/public/scripts/users/addUser.js")} ${filepath}`);
-  }else if(type == 2){
+  } else if (type == 2) {
     return childProcess.exec(`node ${path.join(__dirname, "/public/scripts/users/addTeacher.js")} ${filepath}`);
   }
   return childProcess.exec(`node ${path.join(__dirname, "/public/scripts/users/delUser.js")} ${filepath}`);
@@ -2912,6 +2963,13 @@ async function checkTournamentPermission(req, res, next) {
     return next();
   }
   res.redirect('/tournament/page/' + req.user.login + '/' + tour_id);
+}
+
+async function checkAdmin(req, res, next) {
+  if (config.admins.includes(req.user.login) ) {
+    return next();
+  }
+  res.redirect("/")
 }
 
 async function isModerator(req, res, next) {

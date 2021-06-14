@@ -48,3 +48,7 @@ exports.refactor = function(fs, configsPath, newConfig){
     }
     fs.writeFileSync(configsPath, "//please, names of fields HAVE TO BE UNIQUE!!!\n"+"module.exports = " + fin_text);
 }
+
+exports.refactor2  = function (fs, configsPath, json) {
+    fs.writeFileSync(configsPath, "//please, names of fields HAVE TO BE UNIQUE!!!\n"+"module.exports = " +  JSON.stringify(json, null, "\t"));
+}

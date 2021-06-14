@@ -24,6 +24,7 @@ var isBusy = false;
 
 async function check() {
   if (!isBusy) {
+    console.log(config.FolderLifeTime)
     isBusy = true;
 
     let processesPath = path.normalize(__dirname + "/../../processes");

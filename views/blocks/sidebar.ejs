@@ -17,7 +17,9 @@
                 <button onClick=<%='location.href=\"/tournaments/' + login + "/1/default&all&all" + "\"" %>> <img src="/public/media/tournament.svg">Турниры</button>
                 <% } %>
             <button onClick='location.href="/report"'><img src="/public/media/report.svg">Обратная связь</button>
+            <% if(isTeacher){ %>
             <button onClick='location.href="/service/panel/CONFIGS"'><img src="/public/media/settings.svg">Разработчикам</button>
+            <% } %>
             <button onClick='location.href="/about"'><img src="/public/media/information.svg">О проекте</button>
 
             <%if (title.slice(0,4)=="Egg2"){  %>
