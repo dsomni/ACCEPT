@@ -137,80 +137,6 @@ input:checked+.slider:before {
 
 /*-----------------------------------------------------------------------------*/
 
-/*Header*/
-
-header::-webkit-scrollbar {
-  width: 2px;
-}
-
-header {
-  position: fixed;
-  top: 0px;
-  bottom: 0px;
-  left: 0px;
-  background-color: var(--header-color);
-  height: 100%;
-  width: 60px;
-  z-index: 1;
-  overflow-x: hidden;
-  overflow-y: scroll;
-  scrollbar-width: thin;
-  box-shadow: 0px 2px #00000012;
-  transition: ease-in-out .4s;
-  transition-delay: 0s;
-}
-
-header:hover {
-  transition-delay: 1.25s;
-  width: 200px;
-  word-wrap: normal;
-}
-
-header:hover input {
-  width: 80px;
-}
-
-header button {
-  display: flex;
-  align-items: center;
-  background-color: transparent;
-  transition: all 300ms ease;
-  font-size: 12pt;
-  font-variant-caps: small-caps;
-  font-weight: bold;
-  border: none;
-  outline: none;
-  margin-top: 10px;
-  margin-left: 5px;
-  letter-spacing: 0.5px;
-  color: #0099ff;
-  cursor: pointer;
-}
-
-header button img {
-  width: 40px;
-  margin-right: 10px;
-}
-
-header button:hover {
-  transform: scale(1.1);
-}
-
-header input {
-  border: none;
-  outline: none;
-  margin-bottom: 10px;
-}
-
-#Logo {
-  height: 65px;
-  margin-left: 5px;
-  margin-top: 5px;
-  margin-bottom: 20px;
-}
-
-/*-----------------------------------------------------------------------------*/
-
 /*-----------------------------------------------------------------------------*/
 
 /*-----------------------------------------------------------------------------*/
@@ -543,35 +469,133 @@ header input {
 
 /*Header*/
 
+/*-----------------------------------------------------------------------------*/
+
+/*Header*/
+
+header::-webkit-scrollbar {
+  width: 2px;
+}
+
+header {
+  position: fixed;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  background-color: var(--header-color);
+  height: 100%;
+  width: 60px;
+  z-index: 1;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  scrollbar-width: thin;
+  box-shadow: 0px 2px #00000012;
+  transition: ease-in-out .4s;
+  transition-delay: 0s;
+}
+
+header:hover {
+  transition-delay: 0.8s;
+  width: 200px;
+  word-wrap: normal;
+}
+
+header:hover input {
+  width: 80px;
+}
+
+header input {
+  border: none;
+  outline: none;
+  margin-bottom: 10px;
+}
+
+#Logo {
+  height: 65px;
+  margin-left: 5px;
+  margin-top: 5px;
+  margin-bottom: 20px;
+}
+
 #outer {
   width: 100%;
-  min-height: 750px;
-  height: 100%;
+  min-height: 800px;
+  height: 97%;
   position: relative;
 }
 
-.navigationButtons {
-  position: absolute;
-  top: 0px;
+.navigationRefs {
+  display: flex;
+  flex-direction: column;
   margin-top: 20px;
   white-space: nowrap;
+  font-variant-caps: small-caps;
+}
+
+.nav {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0px 8px 8px;
+  text-decoration: none;
+  color: #0099ff;
+  font-size: 12pt;
+  font-weight: bolder;
+}
+
+.nav:hover img {
+  transition: all 300ms ease;
+  transform: scale(1.1);
+}
+
+.nav:hover {
+  transition: all 300ms ease;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 1.1rem;
+  color: #75b5ff;
+}
+
+.icons {
+  height: 42px;
+  width: 42px;
 }
 
 .loginInterface {
   position: absolute;
   bottom: 0px;
   margin-bottom: 10px;
-  margin-left: 10px;
   white-space: nowrap;
 }
 
-.loginInterface input {
-  display: block;
-  width: 55px;
+.loginInterface button:hover {
+  transform: scale(1.1);
+  color: #75b5ff;
 }
 
 .loginInterface button {
-  margin-left: -5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: transparent;
+  transition: all 300ms ease;
+  font-size: 12pt;
+  font-variant-caps: small-caps;
+  font-weight: bold;
+  border: none;
+  outline: none;
+  margin-top: 10px;
+  letter-spacing: 0.5px;
+  color: #0099ff;
+  cursor: pointer;
+}
+
+.loginInterface input {
+  margin-left: 4px;
+  display: block;
+  width: 55px;
 }
 
 .login {
