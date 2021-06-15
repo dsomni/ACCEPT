@@ -5,13 +5,13 @@ module.exports = {
 	"port": "3000",
 	"secret": "secret",
 	"FolderLifeTime": "42000",
-	"maxThreadsTests": "1",
+	"maxThreadsTests": "5",
 	"maxThreadsTasks": "5",
 	"onPage": {
 		"newsMainList": "5",
 		"newsList": "10",
 		"tasksList": "25",
-		"lessonsList": "20",
+		"lessonsList": "10",
 		"tournamentsList": "15",
 		"studentsList": "30",
 		"attemptsList": "20"

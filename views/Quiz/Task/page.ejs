@@ -80,7 +80,7 @@
             </div>
         </form>
         <% if(!isTeacher){ %>
-            <p class="countDownTimer" id="countDownTimer" style="left: 5rem; right:auto; top:20px"></p>
+            <p class="countDownTimer" id="countDownTimer" style="position:fixed; left: 22%; right:auto; top:20px"></p>
         <% } %>
         <div class="tasksSuccessError" id="linksarea"></div>
     </main>
@@ -134,9 +134,11 @@
                 if(response.status == "testing"){
                     inputarea.readOnly = true;
                     inputarea.placeholder = "";
+                    document.getElementById("languageSelector").style.visibility = "hidden";
                 }else{
+                    document.getElementById("languageSelector").style.visibility = "visible";
                     inputarea.readOnly = false;
-                    inputarea.placeholder = "Place code here";
+                    inputarea.placeholder = "Place code or drop file here";
                 }
                 if(prevTable != text){
                     resultsarea.innerHTML = text;
@@ -209,7 +211,7 @@
         }
         drop.ondrop = (evt) => {
             fileInput.files = evt.dataTransfer.files;
-            drop.value = fileInput.files[0].name;
+            drop.value = "\n\n\tВыбранный файл: " + fileInput.files[0].name;
             drop.readOnly = true;
             evt.preventDefault();
         }

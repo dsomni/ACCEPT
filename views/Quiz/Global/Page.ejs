@@ -50,16 +50,18 @@
             <a class="EditButtons" href=<%="/quiz/task/add/" + quiz.identificator %> >Добавить задачу</a><% } %>
             <% } %>
         <br>
-        <a class="EditButtons" href=<%="/quiz/results/" + quiz.identificator + "/teacher" %> style="background-color: lightgreen; padding: 1rem;" >Панель управления</a>
+        <% if (isTeacher) { %>
+          <a class="EditButtons" href=<%="/quiz/results/" + quiz.identificator + "/teacher" %> style="background-color: lightgreen; padding: 1rem;" >Панель управления</a>
+        <% } %>
       </div>
       <h4 class="h4">Автор: <%= quiz.author %>&nbsp;&nbsp;&nbsp;&nbsp;Длительность: <%= quiz.duration %> минут</h4>
       <div style="margin-left: 20px;" id="statement"><%= quiz.description %></div>
     </div>
     <div id="table"></div>
     <% if(!isTeacher){ %>
-      <p class="countDownTimer" id="countDownTimer" style="left: 5rem; right:auto; top:20px"></p>
+      <p class="countDownTimer" id="countDownTimer" style="position:fixed; left: 22%; right:auto; top:20px"></p>
     <% } %>
-    <div id="times" style="position: fixed;top: .2rem; right: .2rem;"></div>
+    <div id="times" style="position: fixed;bottom: .2rem; right: 14rem;"></div>
   </main>
 </body>
 <script>
@@ -95,7 +97,7 @@
       update(ids);
   }, 5000);
 </script>
-<% if( isTeacher && quiz.hasActiveLesson ){ %>
+<% if( !isTeacher ){ %>
   <script>
     function getTime(){
       fetch("/api/quiz/get/time/<%= quiz.identificator %>/<%= grade %>").then(response=>response.json()).then(response => {
@@ -130,11 +132,14 @@
       }
     }, 1000);
   </script>
+  <% } %>
+  <% if( isTeacher && quiz.hasActiveLesson ){ %>
   <script>
     async function updateWhenEnds(grades){
       let text = ""
       for(let i = 0; i<grades.length; i++){
         let response = await fetch(`/api/quiz/get/time/<%= quiz.identificator %>/${grades[i].toLowerCase()}`).then(response=>response.json());
+        console.log(response)
         if(!response.error){
           text+=`<p class="countDownTimer whenEnds" id="countDownTimer"><a class="tlrefs" href="/quiz/results/<%= login %>/${grades[i]}"><b>${grades[i].toUpperCase()}</b></a> --- ${response.whenEnds}</p>`;
         }

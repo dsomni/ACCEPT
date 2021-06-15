@@ -47,7 +47,7 @@ async function run() {
             break;
         lesson = quiz.lessons[lessonIdx];
         lesson.attempts = lesson.attempts.filter(item => item.login != deletedLogin);
-        lesson.results = lesson.attempts.filter(item => item.login != deletedLogin);
+        lesson.results = lesson.results.filter(item => item.login != deletedLogin);
 
         quiz.lessons[lessonIdx] = lesson;
         quiz.markModified("lessons");

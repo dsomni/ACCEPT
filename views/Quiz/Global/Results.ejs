@@ -15,7 +15,7 @@
 
 <body>
   <main>
-    <h1><%= (grade == "teacher" ? `Посылки учителей урока \"${quiz.title}\"` : `Результаты урока \"${quiz.title}\" класса ${grade.toUpperCase()}`) %></h1>
+    <h1 class="h1"><%= (grade == "teacher" ? `Посылки учителей урока \"${quiz.title}\"` : `Результаты урока \"${quiz.title}\" класса ${grade.toUpperCase()}`) %></h1>
     <div style="display: flex; flex-direction: row; gap:5px; margin-left: 120px;">
       <form action="/quiz/results/<%= quiz.identificator %>/<%= grade %>" method="post">
         <select name="gradeSelector" id = "gradeSelector">
@@ -47,7 +47,7 @@
     </div>
     <table class='taskslist noPages' id="table"></table>
     <% if(!(grade=="teacher")){ %>
-      <p class="countDownTimer" id="countDownTimer" style="left: auto; right:1rem; top:20px"></p>
+      <p class="countDownTimer" id="countDownTimer" style="left: auto; right:1rem;"></p>
     <% } %>
   </main>
   <script>
@@ -58,7 +58,8 @@
         fetch("/api/quiz/get/results/<%= quiz.identificator %>/<%= lesson.grade %>").then(response => response.json()).then(response => {
           let text = "<tr>\n<th>LOGIN</th><th>Имя</th>\n";
           let results = response;
-          for (let i = 0; i < results[0].tasks.length; i++) {
+          if(results.length == 0) return;
+          for (let i = 0; i < <%= quiz.tasks.length %>; i++) {
             text += `<th><a class="tlrefs" href="/quiz/task/page/<%= quiz.identificator %>/Q<%= quiz.identificator %>_${i}">${i + 1}</a></th>`;
           }
           text += "\n<th>Счёт</th>\n";
@@ -75,16 +76,20 @@
             if (result) {
               text += `<td><a class="tlrefs" href="/account/${result.login}/1/default&all">${result.login}</a></td>\n`;
               text += `<td>${result.name}</td>\n`;
-              for (let j = 0; j < result.tasks.length; j++) {
-                task = result.tasks[j];
-                links = "";
-                task.attempts.reverse().forEach(attempt => {
-                  if (attempt.score == "100")
-                    links += `<a href="/quiz/attempt/<%= quiz.identificator %>/${result.login}/${attempt.date}" class="success">100</a>`;
-                  else
-                    links += `<a href="/quiz/attempt/<%= quiz.identificator %>/${result.login}/${attempt.date}" class="error">${attempt.score}</a>`;
-                });
-                text += `<td class="hasDropDown"><div class="resulttext">${task.score}(${task.tries})</div><div class = "dropdown-content">${links}</div></td>`
+              for (let j = 0; j < <%= quiz.tasks.length %>; j++) {
+                if(result.tasks.length > j){
+                  task = result.tasks[j];
+                  links = "";
+                  task.attempts.reverse().forEach(attempt => {
+                    if (attempt.score == "100")
+                      links += `<a href="/quiz/attempt/<%= quiz.identificator %>/${result.login}/${attempt.date}" class="success">100</a>`;
+                    else
+                      links += `<a href="/quiz/attempt/<%= quiz.identificator %>/${result.login}/${attempt.date}" class="error">${attempt.score}</a>`;
+                  });
+                  text += `<td class="hasDropDown"><div class="resulttext">${task.score}(${task.tries})</div><div class = "dropdown-content">${links}</div></td>`
+              }else{
+                text += `<td class="hasDropDown"><div class="resulttext">0(0)</div></td>`;
+              }
               }
               text += `<td>${result.sumscore}</td>\n`;
             }
@@ -109,30 +114,36 @@
     let comfirmButton = document.getElementById("comfirmButton");
     let cancelButton = document.getElementById("cancelButton");
     let timeInput = document.getElementById("time");
-    showButton.addEventListener("click", () => {
+    if(showButton){
+      showButton.addEventListener("click", () => {
       addTime.showModal();
     });
-    cancelButton.addEventListener("click", () => {
-      addTime.close();
-    });
-    comfirmButton.addEventListener("click", () => {
-      let time = timeInput.value*60*1000;
-      addTime.close();
-      fetch("/quiz/set/time", {
-        method: "POST",
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        mode: "cors",
-        credentials: "same-origin",
-        body: JSON.stringify({
-          quiz_id : "<%= quiz.identificator  %>",
-          grade: "<%= grade %>",
-          time
+    }
+    if(cancelButton){
+      cancelButton.addEventListener("click", () => {
+        addTime.close();
+      });
+    }
+    if(comfirmButton){
+      comfirmButton.addEventListener("click", () => {
+        let time = timeInput.value*60*1000;
+        addTime.close();
+        fetch("/quiz/set/time", {
+          method: "POST",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          mode: "cors",
+          credentials: "same-origin",
+          body: JSON.stringify({
+            quiz_id : "<%= quiz.identificator  %>",
+            grade: "<%= grade %>",
+            time
+          })
         })
-      })
-    });
+      });
+    }
 </script>
 <script>
   let quiz_id = "<%= quiz.identificator %>";
@@ -150,32 +161,38 @@
   let comfirmDropButton = document.getElementById("comfirmDropButton");
   let cancelDropButton = document.getElementById("cancelDropButton");
 
-  showDropButton.addEventListener("click", () => {
-    dropTime.showModal();
-  });
-  cancelDropButton.addEventListener("click", () => {
-    dropTime.close();
-  });
-  comfirmDropButton.addEventListener("click", ()=>{
-    getTime().then(whenEnds =>{
-      let time = Date.now()- whenEnds;
+  if(showDropButton){
+    showDropButton.addEventListener("click", () => {
+      dropTime.showModal();
+    });
+  }
+  if(cancelDropButton){
+    cancelDropButton.addEventListener("click", () => {
       dropTime.close();
-      fetch("/quiz/set/time", {
-          method: "POST",
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          mode: "cors",
-          credentials: "same-origin",
-          body: JSON.stringify({
-            quiz_id : "<%= quiz.identificator  %>",
-            grade: "<%= grade %>",
-            time
-          })
+    });
+  }
+  if(comfirmDropButton){
+    comfirmDropButton.addEventListener("click", ()=>{
+      getTime().then(whenEnds =>{
+        let time = Date.now()- whenEnds;
+        dropTime.close();
+        fetch("/quiz/set/time", {
+            method: "POST",
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            mode: "cors",
+            credentials: "same-origin",
+            body: JSON.stringify({
+              quiz_id : "<%= quiz.identificator  %>",
+              grade: "<%= grade %>",
+              time
+            })
+        });
       });
     });
-  });
+  }
 </script>
 <% if(!(grade == "teacher")){ %>
   <script>
