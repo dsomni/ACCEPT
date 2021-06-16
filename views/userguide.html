@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Справка</title>
+  <style>
+    * {
+      --main-bg-color: #87ceeb;
+      --sidebar-width: 30ch;
+
+    }
+
+    sidebar {
+      padding: 1rem;
+      position: fixed;
+      top: 0px;
+      left: 0px;
+      bottom: 0px;
+      width: var(--sidebar-width);
+      display: flex;
+      flex-direction: column;
+    }
+
+    main{
+      position: fixed;
+      overflow-y: scroll;
+      top: 0px;
+      left: var(--sidebar-width);
+      right: 0px;
+      bottom: 0px;
+      background-color: var(--main-bg-color);
+      padding-left: 3rem;
+      padding-top: 2rem;
+    }
+    .navbar{
+      overflow: hidden;
+      text-decoration: none;
+      font-size: 1.2rem;
+      color: black;
+    }
+    .navbar:hover{
+      text-decoration: underline black;
+    }
+    .left-1{
+      padding-left: 1rem;
+    }
+    .left-2{
+      padding-left: 3rem;
+    }
+    .left-3{
+      padding-left: 5rem;
+    }
+    .navleft-1{
+      padding-left: 0px;
+      font-size: 1.3rem;
+    }
+    .navleft-2{
+      padding-left: 1ch;
+      font-size: .9rem;
+    }
+    .navleft-3{
+      padding-left: 2ch;
+      font-size: .5rem;
+    }
+    .content p{
+      padding-left: 2rem;
+      padding-right: 5rem;
+    }
+  </style>
+</head>
+<body>
+  <sidebar>
+    <a href="#1_News" class="navbar navleft-1">1. Новости</a>
+      <a href="#1.1_AddNews" class="navbar navleft-2">1.1 Добавление новости</a>
+      <a href="#1.2_EditNews" class="navbar navleft-2">1.2 Изменение новости</a>
+      <a href="#1.3_PageNews" class="navbar navleft-2">1.3 Страница новости</a>
+      <a href="#1.4_DeleteNews" class="navbar navleft-2">1.4 Удаление новости</a>
+    <a href="#2_Tasks" class="navbar navleft-1">2. Задачи</a>
+      <a href="#1.1_AddTasks" class="navbar navleft-2">2.1 Добавление задачи</a>
+      <a href="#1.2_EditTasks" class="navbar navleft-2">2.2 Изменение задачи</a>
+      <a href="#1.3_PageTasks" class="navbar navleft-2">2.3 Страница задачи</a>
+      <a href="#1.4_DeleteTasks" class="navbar navleft-2">2.4 Удаление задачи</a>
+    <a href="#3_Lessons" class="navbar navleft-1">3. Уроки</a>
+      <a href="#1.1_AddLessons" class="navbar navleft-2">3.1 Добавление урока</a>
+      <a href="#1.2_EditLessons" class="navbar navleft-2">3.2 Изменение урока</a>
+      <a href="#1.3_PageLessons" class="navbar navleft-2">3.3 Страница урока</a>
+      <a href="#1.4_DeleteLessons" class="navbar navleft-2">3.4 Удаление урока</a>
+    <a href="#4_Tournaments" class="navbar navleft-1">4. Турниры</a>
+      <a href="#1.1_AddTournaments" class="navbar navleft-2">4.1 Добавление турнира</a>
+      <a href="#1.2_EditTournaments" class="navbar navleft-2">4.2 Изменение турнира</a>
+      <a href="#1.3_PageTournaments" class="navbar navleft-2">4.3 Страница турнира</a>
+      <a href="#1.4_DeleteTournaments" class="navbar navleft-2">4.4 Удаление турнира</a>
+    <a href="#5_Account" class="navbar navleft-1">5. Аккаунт</a>
+      <a href="#1.1_AddAccount" class="navbar navleft-2">5.1 Добавление новости</a>
+      <a href="#1.2_EditAccount" class="navbar navleft-2">5.2 Изменение новости</a>
+      <a href="#1.3_PageAccount" class="navbar navleft-2">5.3 Страница новости</a>
+      <a href="#1.4_DeleteAccount" class="navbar navleft-2">5.4 Удаление новости</a>
+    <a href="#6_AdminPanel" class="navbar navleft-1">6. Панель управления</a>
+      <a href="#1.1_AddPanel" class="navbar navleft-2">6.1 Добавление новости</a>
+      <a href="#1.2_EditPanel" class="navbar navleft-2">6.2 Изменение новости</a>
+      <a href="#1.3_PagePanel" class="navbar navleft-2">6.3 Страница новости</a>
+      <a href="#1.4_DeletePanel" class="navbar navleft-2">6.4 Удаление новости</a>
+  </sidebar>
+  <main>
+    <h1 id="1_News">1. Новости</h1>
+      <h2 class="left-2" id="1.1_AddNews">1.1 Добавление новости</h2>
+        <div class="content left-2">
+          <p>Cras ultricies ligula sed magna dictum porta. Vivamus suscipit tortor eget felis porttitor volutpat. Donec sollicitudin molestie malesuada. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a.</p>
+        </div>
+      <h2 class="left-2" id="1.2_EditNews">1.2 Изменение новости</h2>
+        <div class="content left-2">
+          <p>Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Curabitur aliquet quam id dui posuere blandit. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        </div>
+      <h2 class="left-2" id="1.3_PageNews">1.3 Страница новости</h2>
+        <div class="content left-2">
+          <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vivamus suscipit tortor eget felis porttitor volutpat. Proin eget tortor risus. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Proin eget tortor risus. Sed porttitor lectus nibh. Donec sollicitudin molestie malesuada. Donec sollicitudin molestie malesuada.</p>
+        </div>
+      <h2 class="left-2" id="1.4_DeleteNews">1.4 Удаление новости</h2>
+        <div class="content left-2">
+          <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Cras ultricies ligula sed magna dictum porta. Proin eget tortor risus. Proin eget tortor risus. Donec sollicitudin molestie malesuada. Sed porttitor lectus nibh. Curabitur aliquet quam id dui posuere blandit. Donec sollicitudin molestie malesuada. Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus. Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Donec sollicitudin molestie malesuada.</p>
+        </div>
+    <h1 id="2_Tasks">2. Задачи</h1>
+      <h2 class="left-2" id="1.1_AddTasks">1.1 Добавление задачи</h2>
+        <div class="content left-2">
+          <p>Cras ultricies ligula sed magna dictum porta. Vivamus suscipit tortor eget felis porttitor volutpat. Donec sollicitudin molestie malesuada. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a.</p>
+        </div>
+      <h2 class="left-2" id="1.2_EditTasks">1.2 Изменение задачи</h2>
+        <div class="content left-2">
+          <p>Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Curabitur aliquet quam id dui posuere blandit. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        </div>
+      <h2 class="left-2" id="1.3_PageTasks">1.3 Страница задачи</h2>
+        <div class="content left-2">
+          <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vivamus suscipit tortor eget felis porttitor volutpat. Proin eget tortor risus. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Proin eget tortor risus. Sed porttitor lectus nibh. Donec sollicitudin molestie malesuada. Donec sollicitudin molestie malesuada.</p>
+        </div>
+      <h2 class="left-2" id="1.4_DeleteTasks">1.4 Удаление задачи</h2>
+        <div class="content left-2">
+          <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Cras ultricies ligula sed magna dictum porta. Proin eget tortor risus. Proin eget tortor risus. Donec sollicitudin molestie malesuada. Sed porttitor lectus nibh. Curabitur aliquet quam id dui posuere blandit. Donec sollicitudin molestie malesuada. Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus. Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Donec sollicitudin molestie malesuada.</p>
+        </div>
+    <h1 id="3_Lessons">3. Уроки</h1>
+      <h2 class="left-2" id="1.1_AddLessons">1.1 Добавление урока</h2>
+        <div class="content left-2">
+          <p>Cras ultricies ligula sed magna dictum porta. Vivamus suscipit tortor eget felis porttitor volutpat. Donec sollicitudin molestie malesuada. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a.</p>
+        </div>
+      <h2 class="left-2" id="1.2_EditLessons">1.2 Изменение урока</h2>
+        <div class="content left-2">
+          <p>Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Curabitur aliquet quam id dui posuere blandit. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        </div>
+      <h2 class="left-2" id="1.3_PageLessons">1.3 Страница урока</h2>
+        <div class="content left-2">
+          <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vivamus suscipit tortor eget felis porttitor volutpat. Proin eget tortor risus. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Proin eget tortor risus. Sed porttitor lectus nibh. Donec sollicitudin molestie malesuada. Donec sollicitudin molestie malesuada.</p>
+        </div>
+      <h2 class="left-2" id="1.4_DeleteLessons">1.4 Удаление урока</h2>
+        <div class="content left-2">
+          <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Cras ultricies ligula sed magna dictum porta. Proin eget tortor risus. Proin eget tortor risus. Donec sollicitudin molestie malesuada. Sed porttitor lectus nibh. Curabitur aliquet quam id dui posuere blandit. Donec sollicitudin molestie malesuada. Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus. Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Donec sollicitudin molestie malesuada.</p>
+        </div>
+    <h1 id="4_Tournaments">4. Турниры</h1>
+      <h2 class="left-2" id="1.1_AddTournaments">1.1 Добавление турнира</h2>
+        <div class="content left-2">
+          <p>Cras ultricies ligula sed magna dictum porta. Vivamus suscipit tortor eget felis porttitor volutpat. Donec sollicitudin molestie malesuada. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a.</p>
+        </div>
+      <h2 class="left-2" id="1.2_EditTournaments">1.2 Изменение турнира</h2>
+        <div class="content left-2">
+          <p>Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Curabitur aliquet quam id dui posuere blandit. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        </div>
+      <h2 class="left-2" id="1.3_PageTournaments">1.3 Страница турнира</h2>
+        <div class="content left-2">
+          <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vivamus suscipit tortor eget felis porttitor volutpat. Proin eget tortor risus. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Proin eget tortor risus. Sed porttitor lectus nibh. Donec sollicitudin molestie malesuada. Donec sollicitudin molestie malesuada.</p>
+        </div>
+      <h2 class="left-2" id="1.4_DeleteTournaments">1.4 Удаление турнира</h2>
+        <div class="content left-2">
+          <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Cras ultricies ligula sed magna dictum porta. Proin eget tortor risus. Proin eget tortor risus. Donec sollicitudin molestie malesuada. Sed porttitor lectus nibh. Curabitur aliquet quam id dui posuere blandit. Donec sollicitudin molestie malesuada. Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus. Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Donec sollicitudin molestie malesuada.</p>
+        </div>
+    <h1 id="5_Account">5. Аккаунт</h1>
+      <h2 class="left-2" id="1.1_AddAccount">1.1 Добавление новости</h2>
+        <div class="content left-2">
+          <p>Cras ultricies ligula sed magna dictum porta. Vivamus suscipit tortor eget felis porttitor volutpat. Donec sollicitudin molestie malesuada. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a.</p>
+        </div>
+      <h2 class="left-2" id="1.2_EditAccount">1.2 Изменение новости</h2>
+        <div class="content left-2">
+          <p>Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Curabitur aliquet quam id dui posuere blandit. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        </div>
+      <h2 class="left-2" id="1.3_PageAccount">1.3 Страница новости</h2>
+        <div class="content left-2">
+          <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vivamus suscipit tortor eget felis porttitor volutpat. Proin eget tortor risus. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Proin eget tortor risus. Sed porttitor lectus nibh. Donec sollicitudin molestie malesuada. Donec sollicitudin molestie malesuada.</p>
+        </div>
+      <h2 class="left-2" id="1.4_DeleteAccount">1.4 Удаление новости</h2>
+        <div class="content left-2">
+          <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Cras ultricies ligula sed magna dictum porta. Proin eget tortor risus. Proin eget tortor risus. Donec sollicitudin molestie malesuada. Sed porttitor lectus nibh. Curabitur aliquet quam id dui posuere blandit. Donec sollicitudin molestie malesuada. Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus. Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Donec sollicitudin molestie malesuada.</p>
+        </div>
+    <h1 id="6_Account">6. Панель управления</h1>
+      <h2 class="left-2" id="1.1_AddAccount">1.1 Добавление новости</h2>
+        <div class="content left-2">
+          <p>Cras ultricies ligula sed magna dictum porta. Vivamus suscipit tortor eget felis porttitor volutpat. Donec sollicitudin molestie malesuada. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a.</p>
+        </div>
+      <h2 class="left-2" id="1.2_EditAccount">1.2 Изменение новости</h2>
+        <div class="content left-2">
+          <p>Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Curabitur aliquet quam id dui posuere blandit. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        </div>
+      <h2 class="left-2" id="1.3_PageAccount">1.3 Страница новости</h2>
+        <div class="content left-2">
+          <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vivamus suscipit tortor eget felis porttitor volutpat. Proin eget tortor risus. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Proin eget tortor risus. Sed porttitor lectus nibh. Donec sollicitudin molestie malesuada. Donec sollicitudin molestie malesuada.</p>
+        </div>
+      <h2 class="left-2" id="1.4_DeleteAccount">1.4 Удаление новости</h2>
+        <div class="content left-2">
+          <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Cras ultricies ligula sed magna dictum porta. Proin eget tortor risus. Proin eget tortor risus. Donec sollicitudin molestie malesuada. Sed porttitor lectus nibh. Curabitur aliquet quam id dui posuere blandit. Donec sollicitudin molestie malesuada. Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus. Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Donec sollicitudin molestie malesuada.</p>
+        </div>
+  </main>
+</body>
+</html>
