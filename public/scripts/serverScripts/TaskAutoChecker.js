@@ -105,7 +105,7 @@ async function check() {
             });
           }
         });
-      } else if (tournament_id[0]!="Q") {
+      } else if (tournament_id[0] != "Q") {
         let tournament = await Tournament.findOne({ identificator: tournament_id }).exec();
 
         let task = tournament.tasks.find(item => item.identificator == full_id);
@@ -154,12 +154,14 @@ async function check() {
                   if (score != 100 && tournament.allOrNothing) {
                     score = 0;
                   }
-                  tournament.attempts.push({
-                    login: user.login,
-                    AttemptDate: obj.date,
-                    TaskID: full_id,
-                    score
-                  });
+                  if (!tournament.isEnded) {
+                    tournament.attempts.push({
+                      login: user.login,
+                      AttemptDate: obj.date,
+                      TaskID: full_id,
+                      score
+                    });
+                  }
 
                   // tournament results update
                   let user_result_idx = tournament.results.findIndex(item => item.login == user.login.toString());
@@ -201,7 +203,7 @@ async function check() {
             });
           }
         });
-      }else{
+      } else {
         let quiz_id = tournament_id.slice(1);
         let quiz = await Quiz.findOne({ identificator: quiz_id }).exec();
         let grade = user.isTeacher ? 'teacher' : user.grade + user.gradeLetter;
@@ -224,7 +226,7 @@ async function check() {
                   })
                   let score = getScore(result);
 
-                  idx = max(0 ,lesson.attempts.findIndex(item => item.TaskID == full_id));
+                  idx = max(0, lesson.attempts.findIndex(item => item.TaskID == full_id));
                   let obj = lesson.attempts[idx];
                   obj.result = result;
                   obj.score = score;
@@ -250,7 +252,7 @@ async function check() {
                       })
                     }
                   }
-                  if ((!lesson.isEnded || user.isTeacher)  && lesson_result_idx != -1 && lesson.results[lesson_result_idx].tasks[task_id].score != 100) {
+                  if ((!lesson.isEnded || user.isTeacher) && lesson_result_idx != -1 && lesson.results[lesson_result_idx].tasks[task_id].score != 100) {
                     lesson.results[lesson_result_idx].tasks[task_id].tries += 1;
                     lesson.results[lesson_result_idx].tasks[task_id].attempts.push({ date: obj.date, score });
                     if (lesson.results[lesson_result_idx].tasks[task_id].score < score) {

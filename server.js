@@ -43,8 +43,15 @@ async function popQueue() {
       taskID: object.id, date: object.sendAt,
       programText: object.programText, result: [], language: object.language
     });
-    user.markModified("attempts");
-    await user.save();
+    try{
+      user.markModified("attempts");
+      await user.save();
+    }catch(err){
+      user = await User.init(object.login);
+      user.markModified("attempts");
+      await user.save();
+    }
+
   } else {
     let quiz_id = object.id.split("_")[0];
     quiz_id = quiz_id.slice(1, quiz_id.length);
@@ -1058,7 +1065,7 @@ app.get('/tournament/add', checkAuthenticated, checkPermission, async (req, res)
     name: req.user.name,
     title: "Add Tournament",
     isTeacher: req.user.isTeacher,
-    location: `/tournaments/${user.login}/1/default&all&all`
+    location: `/tournaments/${req.user.login}/1/default&all&all`
   })
 })
 
@@ -1542,6 +1549,7 @@ app.get('/tournament/attempts/:tour_id/:page/:toSearch', checkAuthenticated, isM
   let page = req.params.page;
   let pages = Math.ceil(attempts.length / onPage);
   let pageInfo = `${(page - 1) * onPage + 1} - ${min(page * onPage, attempts.length)} из ${attempts.length}`;
+  attempts = attempts.slice((page - 1) * onPage, min(page * onPage, attempts.length));
 
   res.render('Tournament/Global/attempts.ejs', {
     login: req.user.login,
@@ -1573,13 +1581,21 @@ app.get("/tournament/disqualAttempt/:tour_id/:AttemptDate", checkAuthenticated, 
   let AttemptDate = req.params.AttemptDate;
   let tournament = await TournamentSchema.findOne({ identificator: req.params.tour_id }).exec();
   let idx = tournament.attempts.findIndex(item => item.AttemptDate == AttemptDate);
+  if(idx==-1){
+    return res.redirect(`/tournament/attempts/${req.params.tour_id}/1/all&all&all&true`);
+  };
   let login = tournament.attempts[idx].login;
   let score = tournament.attempts[idx].score;
   let TaskID = tournament.attempts[idx].TaskID.split('_')[1];
   tournament.attempts.splice(idx, 1);
   let resUserIndx = tournament.results.findIndex(item => item.login == login);
-  if (resUserIndx == -1)
+  if (resUserIndx == -1){
     return res.redirect(`/tournament/attempts/${req.params.tour_id}/1/all&all&all&true`);
+  }
+  let resultAttemptIdx = tournament.results[resUserIndx].tasks[TaskID].attempts.findIndex(item => item.date == AttemptDate);
+  if(resultAttemptIdx!=-1){
+    tournament.results[resUserIndx].tasks[TaskID].attempts.splice(resultAttemptIdx, 1);
+  }
   if (score == tournament.results[resUserIndx].tasks[TaskID].score) {
     let mx = -1;
     let mx_ind;
@@ -1595,6 +1611,15 @@ app.get("/tournament/disqualAttempt/:tour_id/:AttemptDate", checkAuthenticated, 
 
       tournament.results[resUserIndx].tasks[TaskID].dtime = (tournament.attempts[mx_ind].AttemptDate - Date.parse(tournament.whenStarts));
       tournament.results[resUserIndx].tasks[TaskID].score = tournament.attempts[mx_ind].score;
+
+      let currentAttempt = tournament.attempts[mx_ind];
+      let currIndex = tournament.results[resUserIndx].tasks[TaskID].attempts.findIndex(item => item.date == currentAttempt.date);
+      if (currIndex == -1) {
+        tournament.results[resUserIndx].tasks[TaskID].attempts.push({
+          date: currentAttempt.AttemptDate,
+          score: currentAttempt.score
+        })
+      }
     } else {
       tournament.results[resUserIndx].sumscore -= score;
       tournament.results[resUserIndx].sumtime -= tournament.results[resUserIndx].tasks[TaskID].dtime;
@@ -1607,7 +1632,7 @@ app.get("/tournament/disqualAttempt/:tour_id/:AttemptDate", checkAuthenticated, 
   tournament.markModified("results");
 
   await tournament.save()
-  res.redirect(`/tournament/attempts/${req.params.tour_id}/1/all&all&all&true`)
+  res.redirect(`/tournament/attempts/${req.params.tour_id}/1/all&all&all&true`);
 });
 
 app.get("/tournament/disqualUser/:tour_id/:login", checkAuthenticated, isModerator, async (req, res) => {
@@ -2762,7 +2787,7 @@ app.get("/api/tournament/get/results/:id", checkAuthenticated, async (req, res) 
   let id = req.params.id;
   let tournament = await TournamentSchema.findOne({ identificator: id }).exec();
   let results = tournament.results
-  if (tournament.isFrozen && !tournament.isEnded)
+  if (!req.user.isTeacher && tournament.isFrozen && !tournament.isEnded)
     results = tournament.frozenResults;
   res.json(results);
 });
@@ -2812,7 +2837,8 @@ app.get("/api/tournament/get/attempts/:id/:page/:search", checkAuthenticated, as
     attempts = attempts.reverse();
 
   let onPage = configs.onPage.attemptsList;
-  attempts = attempts.slice((req.params.page - 1) * onPage, max(req.params.page * onPage, attempts.length));
+  attempts = attempts.slice((req.params.page - 1) * onPage, min(req.params.page * onPage, attempts.length));
+
   res.json({
     attempts
   });

@@ -14,7 +14,7 @@
         </head>
     <body>
         <main>
-            <h1 class="h1">Личный кабинет <%= n_name %> <a href="/EditAccount" class="editref">[изменить данные]</a></h1>
+            <h1 class="h1">Личный кабинет <%= n_name %> <% if(u_login == login){ %><a href="/EditAccount" class="editref">[изменить данные]</a> <% } %> </h1>
             <div class="student_info">
                 <%  let role = "Ученик";
                     if(user.isTeacher) role = "Учитель";

@@ -960,7 +960,7 @@ header input {
   height: 88%;
   padding-bottom: 30%;
   background-color: rgb(192, 229, 241);
-  overflow: scroll;
+  overflow-y: scroll;
 }
 
 .statement h5 {

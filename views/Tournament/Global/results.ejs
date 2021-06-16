@@ -54,7 +54,11 @@
                                     else
                                         links+=`<a href="/attempt/${result.login}/${attempt.date}" class="error">${attempt.score}</a>`;
                                 });
-                                text+=`<td class="hasDropDown""><div class="resulttext">${task.score}(${task.tries})</div><div class = "dropdown-content">${links}</div></td>`
+                                text+=`<td class="hasDropDown""><div class="resulttext">${task.score}(${task.tries})</div>`
+                                if(<%= isTeacher %>){
+                                    text+=`<div class = "dropdown-content">${links}</div>`
+                                }
+                                text+='</td>';
                             }
                             text+=`<td>${result.sumscore}</td>\n<td>${result.sumtime}</td>\n`;
                         }

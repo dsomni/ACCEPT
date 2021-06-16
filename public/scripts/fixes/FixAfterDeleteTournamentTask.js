@@ -21,7 +21,7 @@ var TourId = process.argv[2];
 async function run() {
     let tournament = await Tournament.findOne({ identificator: TourId });
 
-    let deleted = tournament.tasks.findIndex(Element => Element.taskID == deletedTask)
+    let deleted = tournament.tasks.findIndex(Element => Element.identificator == deletedTask)
     tournament.tasks.splice(deleted, 1);
     for (let i = 0; i < tournament.tasks.length; i++) {
         if (parseInt(tournament.tasks[i].identificator.split('_')[1]) > parseInt(deletedTask.split('_')[1]))
@@ -42,7 +42,7 @@ async function run() {
             deleted = attempts.findIndex(Element => Element.taskID == deletedTask)
         }
         for (let j = 0; j < attempts.length; j++) {
-            if (attempts[j].taskID.split('_')[1] > deletedTask.split('_')[1]) {
+            if (parseInt(attempts[j].taskID.split('_')[1]) > parseInt(deletedTask.split('_')[1])) {
                 attempts[j].taskID = attempts[j].taskID.split('_')[0] + '_' + (parseInt(attempts[j].taskID.split('_')[1]) - 1);
             }
         }

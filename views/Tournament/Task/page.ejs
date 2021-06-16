@@ -65,7 +65,7 @@
                         <img src="\public\media\TopLeft.svg">
                         <img src="\public\media\TopRight.svg">
                     </div>
-                    <textarea class="taskarea" id="code" name = "code" placeholder="Place code here" style="font-family: 'Source Code Pro', monospace;"></textarea>
+                    <textarea class="taskarea" id="code" name = "code" placeholder="Place code or drop file here" style="font-family: 'Source Code Pro', monospace;"></textarea>
                     <input name="file" id="dragdrop" type="file" style="display: none;" accept=".pas, .java, .cpp, .py">
                     <div class="taskarea"  id="result" name="result"></div>
                     <div class="imgsbottom">
@@ -131,9 +131,11 @@
                 if(response.status == "testing"){
                     inputarea.readOnly = true;
                     inputarea.placeholder = "";
+                    document.getElementById("languageSelector").style.visibility = "hidden";
                 }else{
+                    document.getElementById("languageSelector").style.visibility = "visible";
                     inputarea.readOnly = false;
-                    inputarea.placeholder = "Place code here";
+                    inputarea.placeholder = "Place code or drop file here";
                 }
                 if (prevTable != text) {
                     resultsarea.innerHTML = text;
