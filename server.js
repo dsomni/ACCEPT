@@ -15,7 +15,6 @@ const Adder = require(__dirname + '/public/scripts/Adder.js');
 const refactorConfigs = require(__dirname + '/public/scripts/refactorConfigs.js');
 const Fuse = require('fuse.js');
 const socketIo = require('socket.io');
-const bcrypt = require("bcryptjs");
 const morgan = require("morgan");
 const multer = require("multer");
 const StreamZip = require('node-stream-zip');
@@ -2412,6 +2411,7 @@ app.post("/quiz/set/time", checkAuthenticated, checkPermission, async (req, res)
 const CONFIG_TABS = {
   CONFIGS: "CONFIGS",
   USER: "USER",
+  TEACHER: "TEACHER",
   SCRIPTS: "SCRIPTS",
   PROCESSES: "PROCESSES"
 };
@@ -2496,7 +2496,7 @@ app.post("/service/panel/:flag", checkAuthenticated, checkAdmin, uploadUserTable
     case CONFIG_TABS.USER:
       if (!req.body.delete) {
         let login = req.body.login;
-        let user
+        let user;
         if (!UserSchema.exists({ login: login })) {
           user = new User();
           user.login = login;
@@ -2531,6 +2531,15 @@ app.post("/service/panel/:flag", checkAuthenticated, checkAdmin, uploadUserTable
       }
       return res.redirect(`/service/panel/${tab}`);
       break;
+    case CONFIG_TABS.TEACHER:
+      let login = req.body.login.replace(" ", "")
+      let hasUser = await UserSchema.exists({ login: login });
+      hasUser = hasUser || await UserSchema.exists({ login: "n-"+login });
+      if (hasUser)
+        return res.redirect(`/service/panel/${CONFIG_TABS.USER}/default`);
+      await Adder.addTeacher(UserSchema, login, req.body.password, req.body.name);
+      return res.redirect(`/service/panel/${CONFIG_TABS.USER}/default`);
+      break
     default:
       return res.redirect(`/`);
       break;

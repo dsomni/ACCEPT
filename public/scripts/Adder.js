@@ -1,6 +1,6 @@
+const bcrypt = require("bcryptjs");
 
-
-exports.addLesson = async function (Lesson, grade, title, description, tasks, author){
+exports.addLesson = async function (Lesson, grade, title, description, tasks, author) {
     var number = await Lesson.estimatedDocumentCount().exec()
     let lesson = {
         grade,
@@ -138,4 +138,16 @@ exports.addTaskToQuiz = async function (Quiz, quiz_id, title, author, statement,
     });
     quiz.markModified("tasks");
     await quiz.save();
+}
+
+exports.addTeacher = async function (User, login, password, name) {
+    await User.insertMany([{
+        login: login,
+        password: bcrypt.hashSync(password.toString(), 10).toString(),
+        name: name,
+
+        attempts: [],
+        verdicts: [],
+        isTeacher: true
+    }]);
 }
