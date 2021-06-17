@@ -16,7 +16,7 @@
                 <% } %>
             <a class="nav" href='/report'><img class="icons" src="/public/media/report.svg">Обратная связь</a>
             <% if(isTeacher){ %>
-                <button onclick="hideShow()" class="navbutton"><img class="icons" src="/public/media/students.svg">Учителям</button>
+                <button onclick="hideShow()" class="navbutton"><img class="icons" src="/public/media/teacher.svg">Учителям</button>
                 <div id="hideable" style="display: none; background-color: #dddddd; padding-left: 4px;">
                     <a class="nav" href='/students/1/default&all&all&all'><img class="icons" src="/public/media/students.svg">Ученики</a>
                     <a class="nav" href='/service/panel/CONFIGS'><img class="icons" src="/public/media/settings.svg">Разработчикам</a>
@@ -37,9 +37,9 @@
                     <form action="/" method="POST">
                         <input type="login" name="login" placeholder="Логин" required>
                         <input type="password" name="password" placeholder="Пароль" required>
-                        <button type="submit">Войти</button>
+                        <button class="loginInterfaceButton" type="submit">Войти</button>
                     </form>
-                    <button onclick='location.href="/registration"' >Регистрация</button>
+                    <button class="loginInterfaceButton" onclick='location.href="/registration"' >Регистрация</button>
                 </div>
             <% } else { %>
                 <% if(name.indexOf(" ")!=-1){%>
@@ -47,10 +47,14 @@
                     <% var strname = arrname[0]+" "%>
                     <% for(let i=1;i<arrname.length;i++){strname+=arrname[i][0]+". "}%>
                 <%} else{var strname = name} %>
-                <a class="nav" href=<%= `/account/${login}/1/default&all` %>><img class="icons" src="/public/media/account.svg"><%= strname %></a>
+                <% if(isTeacher){ %>
+                    <a class="nav" href=<%= `/account/${login}/1/default&all` %>><img class="icons" src="/public/media/accountTeacher.svg"><%= strname %></a>
+                <% } else{ %>
+                    <a class="nav" href=<%= `/account/${login}/1/default&all` %>><img class="icons" src="/public/media/account.svg"><%= strname %></a>
+                <% } %>
 
                 <form action = '/logout?_method=DELETE' method = 'POST'>
-                    <button type = 'submit'><img class="icons" src="/public/media/logout.svg">Выйти</button>
+                    <button class="loginInterfaceButton" type = 'submit'><img class="icons" src="/public/media/logout.svg">Выйти</button>
                 </form>
             <% } %>
         </div>

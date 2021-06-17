@@ -474,7 +474,7 @@ input:checked+.slider:before {
 /*Header*/
 
 header::-webkit-scrollbar {
-  width: 2px;
+  display: none;
 }
 
 header {
@@ -519,10 +519,11 @@ header input {
 
 #outer {
   width: 100%;
-  min-height: 850px;
-  max-height: 100vh;
-  /* height: 97%; */
+  height: 100%;
   position: relative;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  min-height: 850px;
 }
 
 .navigationRefs {
@@ -567,17 +568,16 @@ header input {
 .loginInterface {
   position: absolute;
   bottom: 0px;
-  margin-top: max(5rem, 100%);
-  margin-bottom: 10px;
   white-space: nowrap;
+  margin-top: 40px;
 }
 
-.loginInterface button:hover {
+.loginInterfaceButton:hover {
   transform: scale(1.1);
   color: #75b5ff;
 }
 
-.loginInterface button {
+.loginInterfaceButton{
   display: flex;
   align-items: center;
   gap: 10px;
@@ -589,9 +589,13 @@ header input {
   border: none;
   outline: none;
   margin-top: 10px;
+  margin-bottom: 10px;
   letter-spacing: 0.5px;
   color: #0099ff;
   cursor: pointer;
+  white-space: nowrap;
+  width: auto;
+  padding-left: 8px;
 }
 
 .loginInterface input {
