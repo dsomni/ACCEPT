@@ -523,7 +523,7 @@ header input {
   position: relative;
   overflow-y: scroll;
   overflow-x: hidden;
-  min-height: 850px;
+  min-height: 750px;
 }
 
 .navigationRefs {

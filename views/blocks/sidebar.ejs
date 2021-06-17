@@ -16,8 +16,8 @@
                 <% } %>
             <a class="nav" href='/report'><img class="icons" src="/public/media/report.svg">Обратная связь</a>
             <% if(isTeacher){ %>
-                <button onclick="hideShow()" class="navbutton"><img class="icons" src="/public/media/teacher.svg">Учителям</button>
-                <div id="hideable" style="display: none; background-color: #dddddd; padding-left: 4px;">
+                <button onclick="hideShow()" class="navbutton"><img class="icons" src="/public/media/teacher.svg">Учителям<arrow id="toTeacherArrow"" class="arrow right" style="padding: 1px; border: solid #1d84fa; border-width: 0 2px 2px 0; height: 4px; width:4px;"></arrow></button>
+                <div id="hideable" style="display: none; padding-left: 4px;">
                     <a class="nav" href='/students/1/default&all&all&all'><img class="icons" src="/public/media/students.svg">Ученики</a>
                     <a class="nav" href='/service/panel/CONFIGS'><img class="icons" src="/public/media/settings.svg">Разработчикам</a>
                     <a class="nav" href='/help'><img class="icons" src="/public/media/help.svg">Справка</a>
@@ -64,11 +64,21 @@
     <button style="position: absolute; top: 0px; left: 65px; background-color: transparent; background-repeat:no-repeat; border: none;" onClick=<%= `location.href="${location}"` %> ><img style=" width: 40px;" src="/public/media/back.svg"></button>
 <% } %>
 <script>
+    let drop = document.getElementById("hideable");
+    let arrow = document.getElementById("toTeacherArrow");
+    let outer = document.getElementById("outer");
+    outer.style.minHeight = "750px";
     function hideShow(){
-        let drop = document.getElementById("hideable");
-        if(drop.style.display == "block")
+        if(drop.style.display == "block"){
             drop.style.display = "none";
-        else
+            arrow.classList.remove("down");
+            arrow.classList.add("right");
+            outer.style.minHeight = "750px";
+        }else{
             drop.style.display = "block";
+            arrow.classList.remove("right");
+            arrow.classList.add("down");
+            outer.style.minHeight = "850px";
+        }
     }
 </script>
