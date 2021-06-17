@@ -10,16 +10,19 @@
                 <a class="nav" href=<%=`/lessons/${login}/1/default&all&true&all`%>><img class="icons" src="/public/media/lesson.svg">Уроки</a>
                 <a class="nav" href=<%=`/tournaments/${login}/1/default&all&all`%>><img class="icons" src="/public/media/tournament.svg">Турниры</a>
                 <a class="nav" href='/rating/1'><img class="icons" src="/public/media/rating.svg">Рейтинг</a>
-                <%if (isTeacher){ %>
-                    <a class="nav" href='/students/1/default&all&all&all'><img class="icons" src="/public/media/students.svg">Ученики</a>
-                <% } %>
             <% }else{ %>
                 <a class="nav" href='/'><img class="icons" src="/public/media/main.svg">Главная</a>
                 <a class="nav" href=<%=`/tournaments/${login}/1/default&all&all`%>><img class="icons" src="/public/media/tournament.svg">Турниры</a>
                 <% } %>
             <a class="nav" href='/report'><img class="icons" src="/public/media/report.svg">Обратная связь</a>
             <% if(isTeacher){ %>
-                <a class="nav" href='/service/panel/CONFIGS'><img class="icons" src="/public/media/settings.svg">Разработчикам</a>
+                <span style="width: unset;">
+                    <button class="loginInterfaceButton" onclick="hideShowToTeacher()"><img class="icons" src="/public/media/teacher.svg">Учителям<arrow id="toTeacherArrow"" class="arrow right" style="padding: 1px; border: solid #1d84fa; border-width: 0 2px 2px 0; height: 4px; width:4px;"></arrow></button>
+                    <span id="toTeacher" style="display: none;">
+                        <a class="nav" href='/students/1/default&all&all&all' style="margin-top: 0; margin-left: 8px;"><img class="icons" src="/public/media/students.svg">Ученики</a>
+                        <a class="nav" href='/service/panel/CONFIGS'><img class="icons" src="/public/media/settings.svg">Разработчикам</a>
+                    </span>
+                </span>
             <% } %>
             <a class="nav" href='/about'><img class="icons" src="/public/media/information.svg">О проекте</a>
 
@@ -35,9 +38,9 @@
                     <form action="/" method="POST">
                         <input type="login" name="login" placeholder="Логин" required>
                         <input type="password" name="password" placeholder="Пароль" required>
-                        <button type="submit">Войти</button>
+                        <button class="loginInterfaceButton" type="submit">Войти</button>
                     </form>
-                    <button onclick='location.href="/registration"' >Регистрация</button>
+                    <button class="loginInterfaceButton" onclick='location.href="/registration"' >Регистрация</button>
                 </div>
             <% } else { %>
                 <% if(name.indexOf(" ")!=-1){%>
@@ -45,10 +48,14 @@
                     <% var strname = arrname[0]+" "%>
                     <% for(let i=1;i<arrname.length;i++){strname+=arrname[i][0]+". "}%>
                 <%} else{var strname = name} %>
-                <a class="nav" href=<%= `/account/${login}/1/default&all` %>><img class="icons" src="/public/media/account.svg"><%= strname %></a>
+                <% if(isTeacher){ %>
+                    <a class="nav" href=<%= `/account/${login}/1/default&all` %>><img class="icons" src="/public/media/accountTeacher.svg"><%= strname %></a>
+                <% } else{ %>
+                    <a class="nav" href=<%= `/account/${login}/1/default&all` %>><img class="icons" src="/public/media/account.svg"><%= strname %></a>
+                <% } %>
 
                 <form action = '/logout?_method=DELETE' method = 'POST'>
-                    <button type = 'submit'><img class="icons" src="/public/media/logout.svg">Выйти</button>
+                    <button class="loginInterfaceButton" type = 'submit'><img class="icons" src="/public/media/logout.svg">Выйти</button>
                 </form>
             <% } %>
         </div>
@@ -57,3 +64,23 @@
 <% if (location){ %>
     <button style="position: absolute; top: 0px; left: 65px; background-color: transparent; background-repeat:no-repeat; border: none;" onClick=<%= `location.href="${location}"` %> ><img style=" width: 40px;" src="/public/media/back.svg"></button>
 <% } %>
+<script>
+    let spn = document.getElementById("toTeacher");
+    let arrow = document.getElementById("toTeacherArrow");
+    let outer = document.getElementById("outer");
+    outer.style.minHeight="750px";
+    function hideShowToTeacher(){
+        if(spn.style.display == "none"){
+            spn.style.display = "block";
+            arrow.classList.remove("right");
+            arrow.classList.add("down");
+            outer.style.minHeight="850px";
+        }else{
+            spn.style.display = "none";
+            arrow.classList.remove("down");
+            arrow.classList.add("right");
+            outer.style.minHeight="750px";
+        }
+    }
+
+</script>
