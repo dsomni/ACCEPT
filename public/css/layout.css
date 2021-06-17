@@ -519,8 +519,9 @@ header input {
 
 #outer {
   width: 100%;
-  min-height: 800px;
-  height: 97%;
+  min-height: 850px;
+  max-height: 100vh;
+  /* height: 97%; */
   position: relative;
 }
 
@@ -566,6 +567,7 @@ header input {
 .loginInterface {
   position: absolute;
   bottom: 0px;
+  margin-top: max(5rem, 100%);
   margin-bottom: 10px;
   white-space: nowrap;
 }
@@ -1206,4 +1208,27 @@ header input {
 .down {
   transform: rotate(45deg);
   -webkit-transform: rotate(45deg);
+}
+
+.navbutton:hover {
+  transform: scale(1.1);
+  color: #75b5ff;
+}
+
+.navbutton{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: transparent;
+  transition: all 300ms ease;
+  font-size: 12pt;
+  font-variant-caps: small-caps;
+  font-weight: bold;
+  border: none;
+  outline: none;
+  margin-left: 3px;
+  margin-top: 0px;
+  letter-spacing: 0.5px;
+  color: #0099ff;
+  cursor: pointer;
 }

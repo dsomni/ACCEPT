@@ -2886,6 +2886,12 @@ app.get("/api/get/processes", checkAuthenticated, checkAdmin, async (req, res) =
 });
 
 //---------------------------------------------------------------------------------
+// Help page
+app.get("/help", checkAuthenticated, checkPermission, (req, res) => {
+  res.sendFile(__dirname + "/views/help.html")
+})
+
+//---------------------------------------------------------------------------------
 // ??? toDo
 app.get('/egg1', checkAuthenticated, checkNotPermission, async (req, res) => {
   res.sendFile(__dirname + '/views/Random/20122020.html')

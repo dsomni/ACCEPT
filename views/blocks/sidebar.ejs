@@ -7,21 +7,23 @@
             <%  if(login.slice(0, 2) != "n-"){  %>
                 <a class="nav" href='/'><img class="icons" src="/public/media/main.svg">Главная</a>
                 <a class="nav" href='/tasks/1/default&all&all&false&all'><img class="icons" src="/public/media/task.svg">Задачи</a>
-                <a class="nav" href=<%=`/lessons/${login}/1/default&all&true&all`%>><img class="icons" src="/public/media/lesson.svg">Уроки</a>
-                <a class="nav" href=<%=`/tournaments/${login}/1/default&all&all`%>><img class="icons" src="/public/media/tournament.svg">Турниры</a>
+                <a class="nav" href=<%=`/lessons/${login}/1/default&all&true&all`%> ><img class="icons" src="/public/media/lesson.svg">Уроки</a>
+                <a class="nav" href=<%=`/tournaments/${login}/1/default&all&all`%> ><img class="icons" src="/public/media/tournament.svg">Турниры</a>
                 <a class="nav" href='/rating/1'><img class="icons" src="/public/media/rating.svg">Рейтинг</a>
-                <%if (isTeacher){ %>
-                    <a class="nav" href='/students/1/default&all&all&all'><img class="icons" src="/public/media/students.svg">Ученики</a>
-                <% } %>
             <% }else{ %>
                 <a class="nav" href='/'><img class="icons" src="/public/media/main.svg">Главная</a>
-                <a class="nav" href=<%=`/tournaments/${login}/1/default&all&all`%>><img class="icons" src="/public/media/tournament.svg">Турниры</a>
+                <a class="nav" href=<%=`/tournaments/${login}/1/default&all&all`%> ><img class="icons" src="/public/media/tournament.svg">Турниры</a>
                 <% } %>
             <a class="nav" href='/report'><img class="icons" src="/public/media/report.svg">Обратная связь</a>
             <% if(isTeacher){ %>
-                <a class="nav" href='/service/panel/CONFIGS'><img class="icons" src="/public/media/settings.svg">Разработчикам</a>
+                <button onclick="hideShow()" class="navbutton"><img class="icons" src="/public/media/students.svg">Учителям</button>
+                <div id="hideable" style="display: none; background-color: #dddddd; padding-left: 4px;">
+                    <a class="nav" href='/students/1/default&all&all&all'><img class="icons" src="/public/media/students.svg">Ученики</a>
+                    <a class="nav" href='/service/panel/CONFIGS'><img class="icons" src="/public/media/settings.svg">Разработчикам</a>
+                    <a class="nav" href='/help'><img class="icons" src="/public/media/help.svg">Справка</a>
+                </div>
             <% } %>
-            <a class="nav" href='/about'><img class="icons" src="/public/media/information.svg">О проекте</a>
+            <a class="nav" href='/about' id="navLast"><img class="icons" src="/public/media/information.svg">О проекте</a>
 
             <%if (title.slice(0,4)=="Egg2"){  %>
                 <button>Maze by Melaveetha & Dsomni</button>
@@ -57,3 +59,12 @@
 <% if (location){ %>
     <button style="position: absolute; top: 0px; left: 65px; background-color: transparent; background-repeat:no-repeat; border: none;" onClick=<%= `location.href="${location}"` %> ><img style=" width: 40px;" src="/public/media/back.svg"></button>
 <% } %>
+<script>
+    function hideShow(){
+        let drop = document.getElementById("hideable");
+        if(drop.style.display == "block")
+            drop.style.display = "none";
+        else
+            drop.style.display = "block";
+    }
+</script>
