@@ -484,7 +484,7 @@ header {
   left: 0px;
   background-color: var(--header-color);
   height: 100%;
-  width: 60px;
+  width: 64px;
   z-index: 1;
   overflow-x: hidden;
   overflow-y: scroll;
@@ -523,7 +523,7 @@ header input {
   position: relative;
   overflow-y: scroll;
   overflow-x: hidden;
-  min-height: 750px;
+  min-height: 800px;
 }
 
 .navigationRefs {
@@ -561,8 +561,8 @@ header input {
 }
 
 .icons {
-  height: 42px;
-  width: 42px;
+  height: 48px;
+  width: 48px;
 }
 
 .loginInterface {

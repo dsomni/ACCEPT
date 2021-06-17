@@ -17,10 +17,10 @@
             <a class="nav" href='/report'><img class="icons" src="/public/media/report.svg">Обратная связь</a>
             <% if(isTeacher){ %>
                 <button onclick="hideShow()" class="navbutton"><img class="icons" src="/public/media/teacher.svg">Учителям<arrow id="toTeacherArrow"" class="arrow right" style="padding: 1px; border: solid #1d84fa; border-width: 0 2px 2px 0; height: 4px; width:4px;"></arrow></button>
-                <div id="hideable" style="display: none; padding-left: 4px;">
+                <div id="hideable" style="display: none;">
                     <a class="nav" href='/students/1/default&all&all&all'><img class="icons" src="/public/media/students.svg">Ученики</a>
                     <a class="nav" href='/service/panel/CONFIGS'><img class="icons" src="/public/media/settings.svg">Разработчикам</a>
-                    <a class="nav" href='/help'><img class="icons" src="/public/media/help.svg">Справка</a>
+                    <a class="nav" href='/help' style="margin-bottom: 0px;"><img class="icons" src="/public/media/help.svg">Справка</a>
                 </div>
             <% } %>
             <a class="nav" href='/about' id="navLast"><img class="icons" src="/public/media/information.svg">О проекте</a>
@@ -33,14 +33,14 @@
         </div>
         <div class = 'loginInterface'>
             <% if (!name){ %>
-                <div style="display: flex; justify-content: flex-end; flex-direction: row; align-items: flex-end; margin-left:5px;">
+                <span style="display: flex; justify-content: flex-end; flex-direction: row; align-items: flex-end;">
                     <form action="/" method="POST">
                         <input type="login" name="login" placeholder="Логин" required>
                         <input type="password" name="password" placeholder="Пароль" required>
                         <button class="loginInterfaceButton" type="submit">Войти</button>
                     </form>
                     <button class="loginInterfaceButton" onclick='location.href="/registration"' >Регистрация</button>
-                </div>
+                </span>
             <% } else { %>
                 <% if(name.indexOf(" ")!=-1){%>
                     <% var arrname = name.split(" ")%>
@@ -67,18 +67,19 @@
     let drop = document.getElementById("hideable");
     let arrow = document.getElementById("toTeacherArrow");
     let outer = document.getElementById("outer");
-    outer.style.minHeight = "750px";
+    if(<%= !name %>)
+        outer.style.minHeight = "0";
     function hideShow(){
         if(drop.style.display == "block"){
             drop.style.display = "none";
             arrow.classList.remove("down");
             arrow.classList.add("right");
-            outer.style.minHeight = "750px";
+            outer.style.minHeight = "800px";
         }else{
             drop.style.display = "block";
             arrow.classList.remove("right");
             arrow.classList.add("down");
-            outer.style.minHeight = "850px";
+            outer.style.minHeight = "950px";
         }
     }
 </script>
