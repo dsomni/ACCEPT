@@ -2897,7 +2897,7 @@ app.get("/api/get/processes", checkAuthenticated, checkAdmin, async (req, res) =
 //---------------------------------------------------------------------------------
 // Help page
 app.get("/help", checkAuthenticated, checkPermission, (req, res) => {
-  res.sendFile(__dirname + "/views/help.html")
+  res.sendFile(__dirname + "/views/Help/help.html")
 })
 
 //---------------------------------------------------------------------------------

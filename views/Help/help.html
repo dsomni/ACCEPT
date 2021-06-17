@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="shortcut icon" href="../public/media/LogoSep.svg" />
+  <link rel="shortcut icon" href="../../public/media/LogoSep.svg" />
   <title>Справка</title>
   <style>
     * {
@@ -79,7 +79,7 @@
     }
 
     .navleft-1 {
-      padding-top: 0.5rem;
+      margin-top: 0.5rem;
       padding-left: 0px;
       font-size: 1.4rem;
     }
@@ -95,6 +95,7 @@
     }
 
     .content p {
+      text-indent: 1.3rem;
       padding-left: 2rem;
       padding-right: 5rem;
       font-size: 1.3rem;
@@ -103,8 +104,8 @@
     .anchor:target::before {
       content: "";
       display: block;
-      height: 20vh;
-      margin: -20vh 0 0;
+      height: 10vh;
+      margin: -10vh 0 0;
     }
 
     .Acronim-container {
@@ -116,38 +117,56 @@
     .Acronim {
       width: 50%;
     }
+    sup{
+      font-size: .8rem;
+    }
+    .context{
+      text-decoration: none;
+      color: rgb(0, 0, 192);
+      font-weight: bold;
+    }
+    .context:visited{
+      text-decoration: none;
+      color: rgb(0, 0, 192);
+      font-weight: bold;
+    }
+    .contextAnchor:target::before{
+      content: "";
+      display: block;
+      height: 60vh;
+      margin: -60vh 0 0;
+    }
 
   </style>
 </head>
 
 <body>
   <sidebar>
-    <img src="../public/media/Logo.svg" style="margin: 1rem; margin-bottom: 2rem;" alt="ACCEPT" height="75px">
-    <a href="#1_News" class="navbar navleft-1">1. Новости</a>
-      <a href="#1.1_AddNews" class="navbar navleft-2">1.1 Добавление новости</a>
-      <a href="#1.2_EditNews" class="navbar navleft-2">1.2 Изменение новости</a>
-      <a href="#1.3_PageNews" class="navbar navleft-2">1.3 Страница новости</a>
-      <a href="#1.4_DeleteNews" class="navbar navleft-2">1.4 Удаление новости</a>
-    <a href="#2_Tasks" class="navbar navleft-1">2. Задачи</a>
-      <a href="#1.1_AddTasks" class="navbar navleft-2">2.1 Добавление задачи</a>
-      <a href="#1.2_EditTasks" class="navbar navleft-2">2.2 Изменение задачи</a>
-      <a href="#1.3_PageTasks" class="navbar navleft-2">2.3 Страница задачи</a>
-      <a href="#1.4_DeleteTasks" class="navbar navleft-2">2.4 Удаление задачи</a>
-    <a href="#3_Lessons" class="navbar navleft-1">3. Уроки</a>
-      <a href="#1.1_AddLessons" class="navbar navleft-2">3.1 Добавление урока</a>
-      <a href="#1.2_EditLessons" class="navbar navleft-2">3.2 Изменение урока</a>
-      <a href="#1.3_PageLessons" class="navbar navleft-2">3.3 Страница урока</a>
-      <a href="#1.4_DeleteLessons" class="navbar navleft-2">3.4 Удаление урока</a>
-    <a href="#4_Tournaments" class="navbar navleft-1">4. Турниры</a>
-      <a href="#1.1_AddTournaments" class="navbar navleft-2">4.1 Добавление турнира</a>
-      <a href="#1.2_EditTournaments" class="navbar navleft-2">4.2 Изменение турнира</a>
-      <a href="#1.3_PageTournaments" class="navbar navleft-2">4.3 Страница турнира</a>
-      <a href="#1.4_DeleteTournaments" class="navbar navleft-2">4.4 Удаление турнира</a>
-    <a href="#5_Account" class="navbar navleft-1">5. Аккаунт</a>
-      <a href="#1.1_AddAccount" class="navbar navleft-2">5.1 Добавление новости</a>
-      <a href="#1.2_EditAccount" class="navbar navleft-2">5.2 Изменение новости</a>
-      <a href="#1.3_PageAccount" class="navbar navleft-2">5.3 Страница новости</a>
-      <a href="#1.4_DeleteAccount" class="navbar navleft-2">5.4 Удаление новости</a>
+    <img src="../../public/media/Logo.svg" style="margin: 1rem; margin-bottom: 2rem;" alt="ACCEPT" height="75px">
+    <a href="#1_Beginning" class="navbar navleft-1">1. Начало работы</a>
+    <a href="#2_News" class="navbar navleft-1">2. Главная страница</a>
+      <a href="#2.1_PageNews" class="navbar navleft-2">2.1 Страница новости</a>
+      <a href="#2.2_AddNews" class="navbar navleft-2">2.3 Добавление и редактирование новости</a>
+    <a href="#3_Tasks" class="navbar navleft-1">3. Задачи</a>
+      <a href="#3.1_AddTasks" class="navbar navleft-2">3.1 Добавление задачи</a>
+      <a href="#3.2_EditTasks" class="navbar navleft-2">3.2 Изменение задачи</a>
+      <a href="#3.3_PageTasks" class="navbar navleft-2">3.3 Страница задачи</a>
+      <a href="#3.4_DeleteTasks" class="navbar navleft-2">3.4 Удаление задачи</a>
+    <a href="#4_Lessons" class="navbar navleft-1">4. Уроки</a>
+      <a href="#4.1_AddLessons" class="navbar navleft-2">4.1 Добавление урока</a>
+      <a href="#4.2_EditLessons" class="navbar navleft-2">4.2 Изменение урока</a>
+      <a href="#4.3_PageLessons" class="navbar navleft-2">4.3 Страница урока</a>
+      <a href="#4.4_DeleteLessons" class="navbar navleft-2">4.4 Удаление урока</a>
+    <a href="#5_Tournaments" class="navbar navleft-1">5. Турниры</a>
+      <a href="#5.1_AddTournaments" class="navbar navleft-2">5.1 Добавление турнира</a>
+      <a href="#5.2_EditTournaments" class="navbar navleft-2">5.2 Изменение турнира</a>
+      <a href="#5.3_PageTournaments" class="navbar navleft-2">5.3 Страница турнира</a>
+      <a href="#5.4_DeleteTournaments" class="navbar navleft-2">5.4 Удаление турнира</a>
+    <a href="#6_Account" class="navbar navleft-1">6. Аккаунт</a>
+      <a href="#6.1_AddAccount" class="navbar navleft-2">6.1 Добавление новости</a>
+      <a href="#6.2_EditAccount" class="navbar navleft-2">6.2 Изменение новости</a>
+      <a href="#6.3_PageAccount" class="navbar navleft-2">6.3 Страница новости</a>
+      <a href="#6.4_DeleteAccount" class="navbar navleft-2">6.4 Удаление новости</a>
   </sidebar>
   <main>
 
@@ -155,8 +174,55 @@
       <img class="Acronim" src="../public/media/AboutProject.svg">
     </div>
 
-    <h1 class="anchor" id="1_News">1. Новости</h1>
-    <h2 class="left-2 anchor" id="1.1_AddNews">1.1 Добавление новости</h2>
+    <h1 class="anchor" id="0_News">Условные обозначения</h1>
+      <p id="configuratable" class="contextAnchor"><b>[#]</b> - значение можно изменить в системных настройках</p>
+      <p id="editable" class="contextAnchor"><b>[+]</b> - редактируемое значение</p>
+    <h1 class="anchor" id="2_News">2. Главная страница</h1>
+    <div class="content left-1">
+      <p>На главной странице распологаются несколько<sup><a class="context" href="#configuratable" title="onPage/newsMainList">[#]</a></sup> новостей
+        в сокращённом виде: загловок новости<sup><a class="context" href="#editable" title="onPage/newsList">[+]</a></sup>,
+        краткое описание<sup><a class="context" href="#editable" title="onPage/newsList">[+]</a></sup>
+        и дата создания.
+        Снизу располагается кнопка "Перейти ко всем новостям", которая перенаправляет на страницу со всеми новостями в том же сокращённом виде.
+        В нижней части страницы со всеми новостями, находится меню навигации по страницам, которое формируется автоматически в зависимости от
+        количества новостей на странице<sup><a class="context" href="#configuratable" title="onPage/newsList">[#]</a></sup> и их общего количества.
+      </p>
+      <p>
+        Чтобы раскрыть содержимое новости, щёлкните по её названию.
+      </p>
+      <p>
+        Чтобы <b>добавить</b> новость, клите на ссылку "Добавить новость" на любой из упомянутых страниц. Интерфейс добавления новости
+        идентичен интерфейс редактирования, который будет рассмотрен ниже.
+      </p>
+    </div>
+    <h2 class="left-2 anchor" id="2.1_PageNews">2.1 Страница новости</h2>
+    <div class="content left-2">
+      <p>Новость стостоит из (сверху вниз): изображения<sup><a class="context" href="#editable" title="onPage/newsList">[+]</a></sup>,
+      названия<sup><a class="context" href="#editable" title="onPage/newsList">[+]</a></sup>, панели управления, автора, даты и времени создания,
+      содержимого<sup><a class="context" href="#editable" title="onPage/newsList">[+]</a></sup>.
+    </p>
+    <p>
+      Для перехода к <b>редактированию</b> нажмите на кнопку [редактировать] в панели управления.
+      Аналогично нажмите на кнопку [удалить] для <b>удаления</b>.
+    </p>
+    </div>
+    <h2 class="left-2 anchor" id="2.3_AddNews">2.3 Добавление и редактирование новости</h2>
+    <div class="content left-2">
+      <p>Меню добавления (редактирования) содержит следующие поля:</p>
+      <p>
+        &emsp;1. <b>Заголовок</b><br>
+        &emsp;&emsp;2. <b>Описание</b>: краткое описание новости, которое будет отображено на главной странице<br>
+        &emsp;&emsp;3. <b>Текст новости</b> в HTML формате. Это означает, что можно использовать html теги, css стили и javascript скрипты.<br><br>
+        <span style="display: flex; flex-direction: row; justify-content: center; align-items: center; gap:15px;">
+          <img src="../public/media/helpImages/news1.jpg" style="max-width:35%" /> <span style="text-indent: 0px;"> >>>>> </span> <img src="../public/media/helpImages/news2.jpg" style="max-height:20%; max-width: 45%;"/>
+        </span><br>
+        &emsp;&emsp;4. <b>Изображение</b>. Является опционлаьным полем, будет отображено в самом верху новости. Для вставки изображений внутри новости,
+        рекомендуем использовать тег img <br>
+      </p>
+
+    </div>
+    <h1 class="anchor" id="3_Tasks">3. Задачи</h1>
+    <h2 class="left-2 anchor" id="3.1_AddTasks">3.1 Добавление задачи</h2>
     <div class="content left-2">
       <p>Cras ultricies ligula sed magna dictum porta. Vivamus suscipit tortor eget felis porttitor volutpat. Donec
         sollicitudin molestie malesuada. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Mauris blandit
@@ -164,14 +230,14 @@
         posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Mauris
         blandit aliquet elit, eget tincidunt nibh pulvinar a.</p>
     </div>
-    <h2 class="left-2 anchor" id="1.2_EditNews">1.2 Изменение новости</h2>
+    <h2 class="left-2 anchor" id="3.2_EditTasks">3.2 Изменение задачи</h2>
     <div class="content left-2">
       <p>Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Curabitur non nulla sit amet nisl tempus
         convallis quis ac lectus. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Curabitur aliquet
         quam id dui posuere blandit. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Lorem ipsum
         dolor sit amet, consectetur adipiscing elit.</p>
     </div>
-    <h2 class="left-2 anchor" id="1.3_PageNews">1.3 Страница новости</h2>
+    <h2 class="left-2 anchor" id="3.3_PageTasks">3.3 Страница задачи</h2>
     <div class="content left-2">
       <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vivamus suscipit tortor eget felis porttitor
         volutpat. Proin eget tortor risus. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vestibulum ante
@@ -179,7 +245,7 @@
         aliquam vel, ullamcorper sit amet ligula. Proin eget tortor risus. Sed porttitor lectus nibh. Donec sollicitudin
         molestie malesuada. Donec sollicitudin molestie malesuada.</p>
     </div>
-    <h2 class="left-2 anchor" id="1.4_DeleteNews">1.4 Удаление новости</h2>
+    <h2 class="left-2 anchor" id="3.4_DeleteTasks">3.4 Удаление задачи</h2>
     <div class="content left-2">
       <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Cras ultricies ligula sed magna dictum porta.
         Proin eget tortor risus. Proin eget tortor risus. Donec sollicitudin molestie malesuada. Sed porttitor lectus
@@ -188,8 +254,8 @@
         magna justo, lacinia eget consectetur sed, convallis at tellus. Curabitur arcu erat, accumsan id imperdiet et,
         porttitor at sem. Donec sollicitudin molestie malesuada.</p>
     </div>
-    <h1 class="anchor" id="2_Tasks">2. Задачи</h1>
-    <h2 class="left-2 anchor" id="1.1_AddTasks">1.1 Добавление задачи</h2>
+    <h1 class="anchor" id="4_Lessons">4. Уроки</h1>
+    <h2 class="left-2 anchor" id="4.1_AddLessons">4.1 Добавление урока</h2>
     <div class="content left-2">
       <p>Cras ultricies ligula sed magna dictum porta. Vivamus suscipit tortor eget felis porttitor volutpat. Donec
         sollicitudin molestie malesuada. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Mauris blandit
@@ -197,14 +263,14 @@
         posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Mauris
         blandit aliquet elit, eget tincidunt nibh pulvinar a.</p>
     </div>
-    <h2 class="left-2 anchor" id="1.2_EditTasks">1.2 Изменение задачи</h2>
+    <h2 class="left-2 anchor" id="4.2_EditLessons">4.2 Изменение урока</h2>
     <div class="content left-2">
       <p>Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Curabitur non nulla sit amet nisl tempus
         convallis quis ac lectus. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Curabitur aliquet
         quam id dui posuere blandit. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Lorem ipsum
         dolor sit amet, consectetur adipiscing elit.</p>
     </div>
-    <h2 class="left-2 anchor" id="1.3_PageTasks">1.3 Страница задачи</h2>
+    <h2 class="left-2 anchor" id="4.3_PageLessons">4.3 Страница урока</h2>
     <div class="content left-2">
       <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vivamus suscipit tortor eget felis porttitor
         volutpat. Proin eget tortor risus. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vestibulum ante
@@ -212,7 +278,7 @@
         aliquam vel, ullamcorper sit amet ligula. Proin eget tortor risus. Sed porttitor lectus nibh. Donec sollicitudin
         molestie malesuada. Donec sollicitudin molestie malesuada.</p>
     </div>
-    <h2 class="left-2 anchor" id="1.4_DeleteTasks">1.4 Удаление задачи</h2>
+    <h2 class="left-2 anchor" id="4.4_DeleteLessons">4.4 Удаление урока</h2>
     <div class="content left-2">
       <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Cras ultricies ligula sed magna dictum porta.
         Proin eget tortor risus. Proin eget tortor risus. Donec sollicitudin molestie malesuada. Sed porttitor lectus
@@ -221,8 +287,8 @@
         magna justo, lacinia eget consectetur sed, convallis at tellus. Curabitur arcu erat, accumsan id imperdiet et,
         porttitor at sem. Donec sollicitudin molestie malesuada.</p>
     </div>
-    <h1 class="anchor" id="3_Lessons">3. Уроки</h1>
-    <h2 class="left-2 anchor" id="1.1_AddLessons">1.1 Добавление урока</h2>
+    <h1 class="anchor" id="5_Tournaments">5. Турниры</h1>
+    <h2 class="left-2 anchor" id="5.1_AddTournaments">5.1 Добавление турнира</h2>
     <div class="content left-2">
       <p>Cras ultricies ligula sed magna dictum porta. Vivamus suscipit tortor eget felis porttitor volutpat. Donec
         sollicitudin molestie malesuada. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Mauris blandit
@@ -230,14 +296,14 @@
         posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Mauris
         blandit aliquet elit, eget tincidunt nibh pulvinar a.</p>
     </div>
-    <h2 class="left-2 anchor" id="1.2_EditLessons">1.2 Изменение урока</h2>
+    <h2 class="left-2 anchor" id="5.2_EditTournaments">5.2 Изменение турнира</h2>
     <div class="content left-2">
       <p>Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Curabitur non nulla sit amet nisl tempus
         convallis quis ac lectus. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Curabitur aliquet
         quam id dui posuere blandit. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Lorem ipsum
         dolor sit amet, consectetur adipiscing elit.</p>
     </div>
-    <h2 class="left-2 anchor" id="1.3_PageLessons">1.3 Страница урока</h2>
+    <h2 class="left-2 anchor" id="5.3_PageTournaments">5.3 Страница турнира</h2>
     <div class="content left-2">
       <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vivamus suscipit tortor eget felis porttitor
         volutpat. Proin eget tortor risus. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vestibulum ante
@@ -245,7 +311,7 @@
         aliquam vel, ullamcorper sit amet ligula. Proin eget tortor risus. Sed porttitor lectus nibh. Donec sollicitudin
         molestie malesuada. Donec sollicitudin molestie malesuada.</p>
     </div>
-    <h2 class="left-2 anchor" id="1.4_DeleteLessons">1.4 Удаление урока</h2>
+    <h2 class="left-2 anchor" id="5.4_DeleteTournaments">5.4 Удаление турнира</h2>
     <div class="content left-2">
       <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Cras ultricies ligula sed magna dictum porta.
         Proin eget tortor risus. Proin eget tortor risus. Donec sollicitudin molestie malesuada. Sed porttitor lectus
@@ -254,8 +320,8 @@
         magna justo, lacinia eget consectetur sed, convallis at tellus. Curabitur arcu erat, accumsan id imperdiet et,
         porttitor at sem. Donec sollicitudin molestie malesuada.</p>
     </div>
-    <h1 class="anchor" id="4_Tournaments">4. Турниры</h1>
-    <h2 class="left-2 anchor" id="1.1_AddTournaments">1.1 Добавление турнира</h2>
+    <h1 class="anchor" id="6_Account">6. Аккаунт</h1>
+    <h2 class="left-2 anchor" id="6.1_AddAccount">6.1 Добавление новости</h2>
     <div class="content left-2">
       <p>Cras ultricies ligula sed magna dictum porta. Vivamus suscipit tortor eget felis porttitor volutpat. Donec
         sollicitudin molestie malesuada. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Mauris blandit
@@ -263,14 +329,14 @@
         posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Mauris
         blandit aliquet elit, eget tincidunt nibh pulvinar a.</p>
     </div>
-    <h2 class="left-2 anchor" id="1.2_EditTournaments">1.2 Изменение турнира</h2>
+    <h2 class="left-2 anchor" id="6.2_EditAccount">6.2 Изменение новости</h2>
     <div class="content left-2">
       <p>Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Curabitur non nulla sit amet nisl tempus
         convallis quis ac lectus. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Curabitur aliquet
         quam id dui posuere blandit. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Lorem ipsum
         dolor sit amet, consectetur adipiscing elit.</p>
     </div>
-    <h2 class="left-2 anchor" id="1.3_PageTournaments">1.3 Страница турнира</h2>
+    <h2 class="left-2 anchor" id="6.3_PageAccount">6.3 Страница новости</h2>
     <div class="content left-2">
       <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vivamus suscipit tortor eget felis porttitor
         volutpat. Proin eget tortor risus. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vestibulum ante
@@ -278,40 +344,7 @@
         aliquam vel, ullamcorper sit amet ligula. Proin eget tortor risus. Sed porttitor lectus nibh. Donec sollicitudin
         molestie malesuada. Donec sollicitudin molestie malesuada.</p>
     </div>
-    <h2 class="left-2 anchor" id="1.4_DeleteTournaments">1.4 Удаление турнира</h2>
-    <div class="content left-2">
-      <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Cras ultricies ligula sed magna dictum porta.
-        Proin eget tortor risus. Proin eget tortor risus. Donec sollicitudin molestie malesuada. Sed porttitor lectus
-        nibh. Curabitur aliquet quam id dui posuere blandit. Donec sollicitudin molestie malesuada. Curabitur arcu erat,
-        accumsan id imperdiet et, porttitor at sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-        magna justo, lacinia eget consectetur sed, convallis at tellus. Curabitur arcu erat, accumsan id imperdiet et,
-        porttitor at sem. Donec sollicitudin molestie malesuada.</p>
-    </div>
-    <h1 class="anchor" id="5_Account">5. Аккаунт</h1>
-    <h2 class="left-2 anchor" id="1.1_AddAccount">1.1 Добавление новости</h2>
-    <div class="content left-2">
-      <p>Cras ultricies ligula sed magna dictum porta. Vivamus suscipit tortor eget felis porttitor volutpat. Donec
-        sollicitudin molestie malesuada. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Mauris blandit
-        aliquet elit, eget tincidunt nibh pulvinar a. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices
-        posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Mauris
-        blandit aliquet elit, eget tincidunt nibh pulvinar a.</p>
-    </div>
-    <h2 class="left-2 anchor" id="1.2_EditAccount">1.2 Изменение новости</h2>
-    <div class="content left-2">
-      <p>Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Curabitur non nulla sit amet nisl tempus
-        convallis quis ac lectus. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Curabitur aliquet
-        quam id dui posuere blandit. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Lorem ipsum
-        dolor sit amet, consectetur adipiscing elit.</p>
-    </div>
-    <h2 class="left-2 anchor" id="1.3_PageAccount">1.3 Страница новости</h2>
-    <div class="content left-2">
-      <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vivamus suscipit tortor eget felis porttitor
-        volutpat. Proin eget tortor risus. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vestibulum ante
-        ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet
-        aliquam vel, ullamcorper sit amet ligula. Proin eget tortor risus. Sed porttitor lectus nibh. Donec sollicitudin
-        molestie malesuada. Donec sollicitudin molestie malesuada.</p>
-    </div>
-    <h2 class="left-2 anchor" id="1.4_DeleteAccount">1.4 Удаление новости</h2>
+    <h2 class="left-2 anchor" id="6.4_DeleteAccount">6.4 Удаление новости</h2>
     <div class="content left-2">
       <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Cras ultricies ligula sed magna dictum porta.
         Proin eget tortor risus. Proin eget tortor risus. Donec sollicitudin molestie malesuada. Sed porttitor lectus
