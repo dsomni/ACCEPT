@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
+    <link rel="shortcut icon" href="../../public/media/LogoSep.svg" />
     <head>
-        <title>Панель управления</title>
+        <title>Руководство Администратора</title>
 
         <meta charset="utf-8">
         <meta name="viewport"
@@ -11,27 +12,67 @@
         <meta name="full-screen" content="yes">
       </head>
       <style>
+        body{
+          background-color: #87ceeb;
+        }
+        ol li {
+          list-style-type: none;
+          counter-increment: item;
+          min-width: 75ch;
+          padding-bottom: 10px;
+        }
+
+        ol li:before {
+          content: counter(item);
+          margin-right: 5px;
+          font-size: 80%;
+          background-color: #0066ec;
+          color: #87ceeb;
+          font-weight: bold;
+          padding: 3px 8px;
+          border-radius: 3px;
+        }
+
         .left-1{
           padding-left: 1rem;
         }
         main{
           margin-bottom: 5rem;
         }
+        z{
+          padding: 5px;
+          color: white;
+          background-color: #250b3a;
+          font-size: 0.9rem;
+          white-space: nowrap;
+        }
+
       </style>
     <body>
         <main>
           <h1 class="h1">Быстрый старт</h1>
-
-          <li>
-            <lo>11</lo>
-          </li>
+          <div class="left-1">
+            Требуемый софт: MongoDB и NodeJS.<br>
+            Операционная система: Windows.
+          </div>
+          <ol>
+            <li>Распакуйте архив с системой в отдельную папку или склонируйте репозитрой командой <z>git clone https://github.com/dsomni/TestSystem.git</z></li>
+            <li>Создайте пустую папку (НЕ в папке с системой!) "data" и в ней ещё одну - "db". Здесь будет храниться база данных.</li>
+            <li>Создайте пустую папку "data" и в ней ещё одну - "db". Здесь будет храниться база данных.</li>
+            <li>Перейдите в папку с системой. Вызовите команду <z>npm i</z> или <z>npm install</z> и дождиесь установки модулей</li>
+            <li>Вызовите команду <z>npm run configurate</z>. Настройте чекер, отвечая на вопросы (подробная информация представлена ниже). На вопрос "Path to DB folder: ",
+            укажите полный путь к папке из пункта 2</li>
+            <li>Перед запуском системы, убедитесь, что база данных запущена. Или используйте <z>npm run startDB</z></li>
+            <li>Для запуска системы используйте команду <z>npm run start</z></li>
+          </ol>
 
           <h1 class="h1">Руководство администратора</h1>
           <div class="left-1">
             <h2 class="h2">Конфигурация</h2>
+            Изменение этих настроек влечёт автоматический перезапуск сервера
             <div class="left-1">
-              <b>sessionLiveTime</b> - промежуток времени(в минутах) после которого пользователь будет разлогинен <br>
-              <b>logsLifeTime</b> - промежуток времени(в днях) после которого будут автоматически удаляться логи (public/logs) <br>
+              <b>sessionLiveTime</b> - промежуток времени (в минутах) после которого пользователь будет разлогинен <br>
+              <b>logsLifeTime</b> - промежуток времени (в днях) после которого будут автоматически удаляться логи (public/logs) <br>
               <b>port</b> - порт на котором будет работать сервер <br>
               <b>secret</b> - набор символов для кодирования информации <br>
               <b>FolderLifeTime</b> - время жизни процесса при достижении которого папка будет автоматически удалена <br>

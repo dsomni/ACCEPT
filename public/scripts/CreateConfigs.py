@@ -71,6 +71,13 @@ config = {
                           }
     },
 }
+
+pathToDBFolder = input("Path to DB folder: ")
+
+f = open("./temporary/startdbNPM.bat", "w")
+f.write('"C:\\Program Files\\MongoDB\\Server\\4.4\\bin\\mongod.exe"  --dbpath="..\\data\\db"')
+f.close()
+
 port = input("Port(number): ")
 sessionLiveTime = input("Session Live Time(seconds): ")
 FolderLifeTime = input("FolderLifeTime: ")

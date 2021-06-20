@@ -2484,13 +2484,7 @@ app.get(`/service/panel/${CONFIG_TABS.PROCESSES}`, checkAuthenticated, checkAdmi
 //--------------------------------------------------------------------------------------
 // Guide
 app.get(`/service/panel/${CONFIG_TABS.GUIDE}`, checkAuthenticated, checkAdmin, async (req, res) => {
-  res.render('ControlPanel/guide.ejs', {
-    login: req.user.login,
-    name: req.user.name,
-    title: "Control Panel",
-    isTeacher: req.user.isTeacher,
-    location: `/`
-  })
+  res.sendFile(path.join(__dirname, 'views/ControlPanel/guide.html'));
 });
 
 //--------------------------------------------------------------------------------------
