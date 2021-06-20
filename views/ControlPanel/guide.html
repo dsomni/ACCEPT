@@ -24,6 +24,7 @@
         }
         li{
           padding-bottom: 10px;
+          line-height: 1.5rem;
         }
 
         ol > li:before {
@@ -41,12 +42,7 @@
         .left-1{
           padding-left: 1rem;
         }
-        main{
-          margin-left: auto;
-          margin-right: auto;
-          width: 60%;
-          margin-bottom: 5rem;
-        }
+
         z{
           padding: 5px;
           color: white;
@@ -55,26 +51,188 @@
           white-space: nowrap;
         }
 
+        a{
+          text-decoration: none;
+          color: #0023ec;
+        }
+        a:active{
+          text-decoration: none;
+          color: #0023ec;
+        }
+
       </style>
-    <body>
+  <style>
+    * {
+      --main-bg-color: #9dd7ef;
+      --sidebar-width: 30ch;
+
+    }
+
+    sidebar {
+      padding: 1rem;
+      position: fixed;
+      top: 0px;
+      left: 0px;
+      bottom: 0px;
+      width: var(--sidebar-width);
+      display: flex;
+      flex-direction: column;
+      background-color: azure;
+      overflow-y: scroll;
+      overflow-x: hidden;
+    }
+    sidebar::-webkit-scrollbar{
+      display: none;
+    }
+    main {
+      position: fixed;
+      overflow-y: scroll;
+      top: 0px;
+      left: var(--sidebar-width);
+      right: 0px;
+      bottom: 0px;
+      background-color: var(--main-bg-color);
+      text-align: justify;
+      padding-left: 7.5rem;
+      padding-right: 5rem;
+      padding-top: 2rem;
+      font-size: 1.1rem;
+      padding-bottom: 5rem;
+    }
+
+    .navbar {
+      text-decoration: none;
+      font-size: 1.2rem;
+      color: hsl(0, 0%, 28%);
+      padding: 2px;
+    }
+
+    .current-link {
+      /* color: rgb(54, 0, 0); */
+      color: black;
+      font-weight: 900;
+      background-color: rgba(0, 0, 0, 0.1);
+      padding: 2px;
+    }
+
+    .navbar:hover {
+      transform: scale(1.05);
+      font-weight: bold;
+    }
+
+    .left-1 {
+      padding-left: 1rem;
+    }
+
+    .left-2 {
+      padding-left: 3rem;
+    }
+
+    .left-3 {
+      padding-left: 5rem;
+    }
+
+    .navleft-1 {
+      margin-top: 0.5rem;
+      padding-left: 0px;
+      font-size: 1.4rem;
+    }
+
+    .navleft-2 {
+      padding-left: 1ch;
+      font-size: 1.1rem;
+    }
+
+    .navleft-3 {
+      padding-left: 2ch;
+      font-size: .7rem;
+    }
+
+    .content p {
+      text-indent: 1.3rem;
+      padding-left: 2rem;
+      padding-right: 5rem;
+      font-size: 1.3rem;
+    }
+
+    .anchor:target::before {
+      content: "";
+      display: block;
+      height: 10vh;
+      margin: -10vh 0 0;
+    }
+
+    .Acronim-container {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .Acronim {
+      width: 50%;
+    }
+    sup{
+      font-size: .8rem;
+    }
+    .context{
+      text-decoration: none;
+      color: rgb(0, 0, 192);
+      font-weight: bold;
+    }
+    .context:visited{
+      text-decoration: none;
+      color: rgb(0, 0, 192);
+      font-weight: bold;
+    }
+    .contextAnchor:target::before{
+      content: "";
+      display: block;
+      height: 60vh;
+      margin: -60vh 0 0;
+    }
+
+  </style>
+
+<body>
+  <sidebar>
+    <img src="../../public/media/Logo.svg" style="margin: 1rem; margin-bottom: 2rem;" alt="ACCEPT" height="75px">
+    <a href="#QuickStart" class="navbar navleft-1">Быстрый старт</a>
+    <a href="#Guide" class="navbar navleft-1">Руководство</a>
+      <a href="#Configuration" class="navbar navleft-2">Конфигурация</a>
+      <a href="#EditUser" class="navbar navleft-2">Редактор пользователя</a>
+      <a href="#Scripts" class="navbar navleft-2">Скрипты</a>
+      <a href="#Processes" class="navbar navleft-2">Процессы</a>
+    <a href="#Structure" class="navbar navleft-1">Структура проекта</a>
+      <a href="#Root" class="navbar navleft-2">Корневая папка</a>
+      <a href="#Public" class="navbar navleft-2">Папка public</a>
+    <a href="#Subprograms" class="navbar navleft-1">Системные подпрограммы</a>
+    <a href="#FAQ" class="navbar navleft-1">FAQ</a>
+    <a href="#References" class="navbar navleft-1">Полезные ссылки</a>
+  </sidebar>
+
+
+
         <main>
-          <h1 class="h1">Быстрый старт</h1>
+          <div class="Acronim-container">
+            <img class="Acronim"  src="../../public/media/AboutProject.svg">
+          </div>
+          <h1 class="h1" class="anchor" id="QuickStart">Быстрый старт</h1>
           <div class="left-1">
             Требуемый софт: MongoDB и NodeJS.<br>
             Операционная система: Windows.
           </div>
           <ol>
-            <li>Распакуйте архив с системой в отдельную папку или склонируйте репозитрой командой <z>git clone https://github.com/dsomni/TestSystem.git</z></li>
+            <li>Распакуйте архив с системой в отдельную папку или клонируйте репозиторий командой <z>git clone https://github.com/dsomni/TestSystem.git</z></li>
+            <li>Внимательно проверьте наличие всех папок, указанных в разделе "Структура проекта". Отсутствие некоторых из них могут спровоцировать критические ошибки. </li>
             <li>Создайте пустую папку (НЕ в папке с системой!) "data" и в ней ещё одну - "db". Здесь будет храниться база данных.</li>
-            <li>Создайте пустую папку "data" и в ней ещё одну - "db". Здесь будет храниться база данных.</li>
             <li>Установка компиляторов
               <ul>
-                <li>Установите интерпритаторы <a href="https://www.python.org/downloads/windows/">Python3</a> и <a href="https://www.pypy.org/download.html">Pypy</a> папки public/checker/pythonCompiler и public/checker/pypyCompiler соответственно</li>
-                <li>Установите компилятор <a href="http://pascalabc.net/ssyilki-dlya-skachivaniya">PascalABC</a>(необходима консольная версия) в папку public/checker/pascalCompiler</li>
-                <li>Так же установите в систему компиляторы c++ и java доступные по ссылкам: <a href = "http://www.equation.com/servlet/equation.cmd?fa=fortran">C++</a> и <a href = "https://www.oracle.com/java/technologies/javase-jdk16-downloads.html">Java</a>(перед установкой java удалите все старые версии)</li>
+                <li>Установите интерпретаторы <a href="https://www.python.org/downloads/windows/">Python3</a> и <a href="https://www.pypy.org/download.html">Pypy</a> папки public/checker/pythonCompiler и public/checker/pypyCompiler соответственно</li>
+                <li>Установите компилятор <a href="http://pascalabc.net/ssyilki-dlya-skachivaniya">PascalABC</a> (необходима консольная версия) в папку public/checker/pascalCompiler</li>
+                <li>Так же установите в систему компиляторы c++ и java доступные по ссылкам: <a href = "http://www.equation.com/servlet/equation.cmd?fa=fortran">C++</a> и <a href = "https://www.oracle.com/java/technologies/javase-jdk16-downloads.html">Java</a> (перед установкой java удалите все старые версии)</li>
               </ul>
             </li>
-            <li>Перейдите в папку с системой. Вызовите команду <z>npm i</z> или <z>npm install</z> и дождиесь установки модулей</li>
+            <li>Перейдите в папку с системой. Вызовите команду <z>npm i</z> или <z>npm install</z> и дождитесь установки модулей</li>
             <li>Оставаясь в этой же папке запустите команду <z>npm run addAdmin</z> которая добавит пользователя с логином и паролем admin, который имеет доступ к панели управления</li>
             <li>Вызовите команду <z>npm run configurate</z>. Настройте чекер, отвечая на вопросы (подробная информация представлена ниже). На вопрос "Path to DB folder: ",
             укажите полный путь к папке из пункта 2</li>
@@ -82,9 +240,9 @@
             <li>Для запуска системы используйте команду <z>npm run start</z></li>
           </ol>
 
-          <h1 class="h1">Руководство администратора</h1>
+          <h1 class="h1" class="anchor" id="Guide">Руководство администратора</h1>
           <div class="left-1">
-            <h2 class="h2">Конфигурация</h2>
+            <h2 class="h2" class="anchor" id="Configuration">Конфигурация</h2>
             Изменение этих настроек влечёт автоматический перезапуск сервера
             <div class="left-1">
               <b>sessionLiveTime</b> - промежуток времени (в минутах) после которого пользователь будет разлогинен <br>
@@ -96,7 +254,7 @@
               <b>maxThreadsTasks</b> - максимальное число задач, которые могут быть запущены параллельно <br>
               <b>onPage</b> - настройки отображаемых на одной странице <br>
               <div class="left-1">
-                <b>newsMainList</b> - новостей (главная старница) <br>
+                <b>newsMainList</b> - новостей (главная страница) <br>
                 <b>newsList</b> - новостей,(страница новостей) <br>
                 <b>tasksList</b> - задач (список задач) <br>
                 <b>lessonsList</b> - уроков (список уроков) <br>
@@ -125,7 +283,7 @@
               </div>
               <b>admins</b> - список пользователей, которые будут иметь доступ к этой панели (логины указывать через запятую) <br>
             </div>
-            <h2 class="h2">Редактор пользователя</h2>
+            <h2 class="h2" class="anchor" id="EditUser">Редактор пользователя</h2>
             <div class="left-1">
               <h3 class="h3">Настройка пользователя</h3>
               <div class="left-1">
@@ -139,7 +297,7 @@
                 В случае если учитель был добавлен так же не будет никакого сообщения :( <br>
               </div>
             </div>
-            <h2 class="h2">Скрипты</h2>
+            <h2 class="h2" class="anchor" id="Scripts">Скрипты</h2>
             <div class="left-1">
               <h3 class="h3">Добавить учеников</h3>
               <div class="left-1">
@@ -167,24 +325,25 @@
                 Требуется указать ID турнира; Для получения точного ID следует взглянуть на url ведущему на страницу турнира ".../tournament/page/LOGIN/<b>ID</b>"/ <br>
               </div>
             </div>
-            <h2 class="h2">Процессы</h2>
+            <h2 class="h2" class="anchor" id="Processes">Процессы</h2>
             <div class="left-1">
               На этой странице отображаются очередь тестирования и тестируемые в данный момент посылки.
             </div>
           </div>
-          <h1 class="h1">Структура проекта</h1>
+          <h1 class="h1"  class="anchor" id="Structure">Структура проекта</h1>
           <div class="left-1">
-            <h2 class="h2">Корневая папка</h2>
+            <h2 class="h2"class="anchor" id="Root">Корневая папка</h2>
             <div class="left-1">
-              <p>Корневая папка содержит файлы: server.js, package.json, package-lock.json; и папки: classes, config, public, views, node_modules(если отсутствует то появится после выполнения команды <z>npm i</z> в ходе установки).</p>
+              <p>Корневая папка содержит файлы: server.js, package.json, package-lock.json; и папки: classes, config, public, views, node_modules
+                 (если отсутствует то появится после выполнения команды <z>npm i</z> в ходе установки).</p>
               <h3 class="h3">Файл server.js</h3>
               <p>Содержит основной серверный код</p>
               <h3 class="h3">Файл package.json</h3>
-              <p>Содержит основную информацию о проекте и скрипты(необходим для nodejs)</p>
+              <p>Содержит основную информацию о проекте и скрипты (необходим для nodejs)</p>
               <h3 class="h3">Файл package-lock.json</h3>
               <p>Файл создаваемый nodejs, отражает структуру проекта с точки зрения зависимостей</p>
               <h3 class="h3">Папка classes</h3>
-              <p>Содержит класс User(класс который отображает пользователя программно)</p>
+              <p>Содержит класс User (класс который отображает пользователя программно)</p>
               <h3 class="h3">Папка config</h3>
               <p>Папка в которой хранятся настройки сервера и модели базы данных</p>
               <h3 class="h3">Папка public</h3>
@@ -194,47 +353,119 @@
               <h3 class="h3">Папка node_modules</h3>
               <p>Папка создаваемая nodejs, хранящая зависимости проекта</p>
             </div>
-            <h2 class="h2">Папка public</h2>
+            <h2 class="h2"  class="anchor" id="Public">Папка public</h2>
             <div class="left-1">
               <h3 class="h3">Папка checker</h3>
-              <p>Содержит в себе компиляторы, интерпритаторы и скрипты отвечающие за их запуск</p>
+              <p>Содержит в себе компиляторы, интерпретаторы и скрипты отвечающие за их запуск</p>
               <h3 class="h3">Папка codes</h3>
               <p>Папка в которую временно сохраняются файлы программ загруженные пользователем</p>
               <h3 class="h3">Папка css</h3>
               <p>В этой папке лежат css файлы которые отвечают за стили страниц</p>
               <h3 class="h3">Папка logs</h3>
-              <p>Содержит логи сервера(в основном запросы учителей)</p>
+              <p>Содержит логи сервера (в основном запросы учителей)</p>
               <h3 class="h3">Папка media</h3>
-              <p>содержит изображения используемые на страницах и в боковой панели</p>
+              <p>Содержит изображения используемые на страницах и в боковой панели</p>
               <h3 class="h3">Папка processes</h3>
               <p>При отправке пользователем задачи именно в этой папке происходят все процессы связанные с компиляцией и тестированием задачи.</p>
               <p>В случае если задача у пользователя не отправляется следует в первую очередь проверять эту папку на наличие папки с названием *_LOGIN_TASKID , где LOGIN - логин пользователя, а TASKID - идентификатор задачи, и в случае наличия таковой её следует удалить</p>
               <h3 class="h3">Папка scripts</h3>
-              <p>В этой папке хранятся все подпрограммы необходимые серверу</p>
+              <p>В этой папке хранятся все подпрограммы необходимые серверу. Их использование будет описано ниже</p>
               <h3 class="h3">Папка tables</h3>
-              <p>В эту папку будут сохраняться таблицы с результатами турниров</p>
+              <p>В эту папку будут автоматически сохраняться таблицы с результатами турниров после завершения последних</p>
               <h3 class="h3">Папка tests</h3>
               <p>В этой папке хранятся папки и файлы с тестами отправленные учителями, через некоторое время после создания они будут удалены</p>
               <h3 class="h3">Папка userTables</h3>
               <p>В этой папке временно хранятся таблицы с пользователями загруженные через панель управления</p>
             </div>
           </div>
-          <h1 class="h1">FAQ</h1>
+
+          <h1 class="h1"  class="anchor" id="Subprograms">Системные подпрограммы</h1>
+          <div style="line-height: 1.6rem;">
+            Если случилось так, что определённый скрипт, запускаемый из Панели управления, работает некорректно, то самое время
+            брать дело в свои руки и со всех ног мчаться в папку <z>public/scripts/</z> и запускать скрипты вручную, прямо как хакер из фильмов 80х.
+            Ниже представлен перечень папок и скриптов, с описание и, если таковое имеется, соответствием со скриптами из Панели управления.
+            Все скрипты запускаются из их папки командой <z>node *ИмяСкриптаСРасширением* *ПараметрыЧерезПробел* </z>, например <z>node FixAfterDeleteLesson.js 1*</z>.
+            Подчеркнём, что скрипты из этой папки вы запускаете на свой страх и риск и шанс того, что всё рухнет, как СССР в 91, очень высок.
+          </div>
+          <div class="left-1">
+            <h2 class="h2">archived</h2>
+            <p>Старые и неактуальные скрипты. Лучше не использовать самостоятельно, без консультации разработчиков</p>
+            <h2 class="h2">CheckCompilers</h2>
+            <p>Вызов <z>node Checker.js</z> эквивалентен вызову <z>npm run configurate</z> из корня проекта</p>
+            <h2 class="h2">crypt</h2>
+            <p>Ради всего святого, не трогайте эту папку</p>
+            <h2 class="h2">fixes</h2>
+            <p>Содержит скрипты, автоматически выполняемые после определённых действий (преимущественно удалений)</p>
+            <div class="left-1">
+              <p>Следующие скрипты имеют, мягко говоря, говорящие названия. Так что мы приведём только список принимаемых аргументов.
+                ID можно узнать из командной строки, выше есть подробный пример с турнирами при генерации таблицы результатов.
+                Напоминаем, что скрипты выполняются АВТОМАТИЧЕСКИ и запускать их вручную, кроме нескольких ситуаций, НЕ НАДО!
+              </p>
+              <h3 class="h3">FixAfterDeleteLesson.js</h3>
+              <p>Принимает ID урока </p>
+              <h3 class="h3">FixAfterDeleteQuiz.js</h3>
+              <p>Принимает ID контрольного урока </p>
+              <h3 class="h3">FixAfterDeleteQuizTask.js</h3>
+              <p>Принимает ID контрольного урока и задачи в нём</p>
+              <h3 class="h3">FixAfterDeleteTask.js</h3>
+              <p>Принимает ID задачи из списка задач</p>
+              <h3 class="h3">FixAfterDeleteTournament.js</h3>
+              <p>Принимает ID турнира</p>
+              <h3 class="h3">FixAfterDeleteTournamentTask.js</h3>
+              <p>Вам правда не понятно, что он принимает?</p>
+              <h3 class="h3">FixAfterDeleteUser.js</h3>
+              <p>Принимает логин пользователя и флаг: 1 - удаляет пользователя, 0 - чистит его посылки</p>
+            </div>
+            <h2 class="h2">LogChecker</h2>
+            <p>Содержит скрипт, выполняющий периодическое удаление логов (запущен по умолчанию при старте сервера)</p>
+            <h2 class="h2">random</h2>
+            <p>Одна из трёх вещей, наравне с Армией и Флотом, на которых держится Россия</p>
+            <h2 class="h2">repairDB</h2>
+            <p>Содержит актуальные скрипты для актуализации базы данных. Содержимое папки может меняться. Если она не пуста, свяжитесь с разработчиками для консультации.</p>
+            <h2 class="h2">serverScripts</h2>
+            <p>Содержит скрипты, Обеспечивающие работу "подкапотной" части системы</p>
+            <div class="left-1">
+              <h3 class="h3">addAdmin.js</h3>
+              <p> Эквивалентен команде <z>npm run addAdmin</z> </p>
+              <h3 class="h3">generateExcelTable.js</h3>
+              <p> Эквивалентен вызову скрипта "Сгенерировать таблицу результатов турнира" из Панели управления.
+                Принимает на вход ID турнира.
+                Автоматически запускается по завершении турнира. Все таблиц находятся в public/tables.
+              </p>
+              <h3 class="h3">Qchecker.js</h3>
+              <p>Отвечает за работу таймеров контрольных уроков. Запущен по умолчанию при старте сервера.</p>
+              <h3 class="h3">TaskAutoChecker.js</h3>
+              <p>Отвечает за тестирование задач. Запущен по умолчанию при старте сервера.</p>
+              <h3 class="h3">Tchecker.js</h3>
+              <p>Отвечает за работу турнирных таймеров. Запущен по умолчанию при старте сервера.</p>
+            </div>
+            <h2 class="h2">temporary</h2>
+            <p>.bat скрипты, созданные в целях отладки с говорящими названиями</p>
+            <h2 class="h2">users</h2>
+            <p>Скрипты, отвечающие за работу с пользователями</p>
+            <div class="left-1">
+              <h3 class="h3">addTeacher.js</h3>
+              <p> Эквивалентен скрипту "Добавить учителей" из Панели управления. Принимает на вход путь к .xlsx таблице в указанном выше формате.</p>
+              <h3 class="h3">addUser.js</h3>
+              <p> Эквивалентен скрипту "Добавить учеников" из Панели управления. Принимает на вход путь к .xlsx таблице в указанном выше формате.</p>
+              <h3 class="h3">delUser.js</h3>
+              <p> Эквивалентен скрипту "Удалить пользователей" из Панели управления. Принимает на вход путь к .xlsx таблице в указанном выше формате.</p>
+          </div>
+
+          <h1 class="h1" class="anchor" id="FAQ">FAQ</h1>
           <div class="left-1">
             <h2 class="h2">MongoDB не запускается после установки, что делать?</h2>
             <p>Попробуйте установить заново от имени администратора. Так же перезагрузка компьютера может решить проблему.</p>
             <h2 class="h2">Команда "npm install"не работает, что делать?</h2>
             <p>Скорее всего, у вас отключен обмен пакетами с сетью, что блокирует скачивание необходимых компонентов.</p>
             <h2 class="h2">Сервер не запускается, что делать?</h2>
-            <p>Прочитайте ошику в консоли: скорее всего, вы где-то ошиблись с путём. Можете написать разработчикам с приложением скриншота ошибки</p>
+            <p>Прочитайте ошибку в консоли: скорее всего, вы где-то ошиблись с путём. Можете написать разработчикам с приложением скриншота ошибки</p>
             <h2 class="h2">Ошибка при компиляции кода, что делать?</h2>
             <p>Попробуйте скачать компилятор с официального сайта и переустановить его.</p>
-            <h2 class="h2">Случайно изменил логин ученика/учителя в users.xlsx/teachers.xlsx, что делать?</h2>
-            <p>Зайдите в MongoDB Compass и явно удалите пользователя.</p>
-            <h2 class="h2">Ошибки с отображением данных учеников/учитилей, что делать?</h2>
+            <h2 class="h2">Ошибки с отображением данных учеников/учителей, что делать?</h2>
             <p>Проверьте, что логины в таблице уникальны и не содержат пробелов и кириллицы.</p>
           </div>
-          <h1 class="h1">Полезные ссылки</h1>
+          <h1 class="h1"  class="anchor" id="References">Полезные ссылки</h1>
           <div class="left-1">
             <ul>
               <li><a href="https://nodejs.org/docs/latest-v13.x/api/">Документация MongoDB</a></li>
@@ -244,4 +475,24 @@
           </div>
         </main>
     </body>
+
+    <script>
+
+      function clearClasses() {
+        let a = document.getElementsByClassName("current-link");
+        for(let i = 0; i < a.length; i++){
+          a[i].classList.remove("current-link");
+        }
+      }
+
+      function selectLink(address) {
+        clearClasses();
+        address.classList.add("current-link");
+      }
+
+      let links = document.getElementsByClassName("navbar");
+      for(let i = 0; i < links.length; i++){
+        links[i].addEventListener("click", () => selectLink(links[i]));
+      }
+    </script>
 </html>

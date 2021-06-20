@@ -1,6 +1,6 @@
 {
   "name": "accept",
-  "version": "1.2.3",
+  "version": "3.0.1",
   "description": "test system for school programming lessons",
   "main": "server.js",
   "scripts": {
@@ -9,9 +9,6 @@
     "startDB": "public\\scripts\\temporary\\startdbNPM.bat",
     "mongo": "sudo systemctl start mongod.service",
     "configurate": "public\\checker\\pythonCompiler\\python.exe public\\scripts\\CreateConfigs.py",
-    "addUsers": "node public\\scripts\\users\\addUser.js",
-    "addTeachers": "node public\\scripts\\users\\addTeacher.js",
-    "deleteUsers": "node public\\scripts\\users\\delUser.js",
     "fix": "node public\\scripts\\FixDBv3.js",
     "configureCompilers": "node public\\scripts\\CheckCompilers\\Checker.js",
     "addAdmin": "node public\\scripts\\serverScripts\\addAdmin.js"
