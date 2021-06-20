@@ -9,7 +9,6 @@ public/logs/*.log
 public/processes/*
 !public/processes/.gitignore
 public/media/newsImages/*
-public/media/codeFiles/*
 *.pyc
 public/checker/pascalCompiler
 public/checker/pypyCompiler
