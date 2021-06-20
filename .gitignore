@@ -7,6 +7,7 @@ public/tables/*.xlsx
 config/configs.js
 public/logs/*.log
 public/processes/*
+!public/processes/.gitignore
 public/media/newsImages/*
 public/media/codeFiles/*
 *.pyc
