@@ -19,7 +19,7 @@
             <% var Completedate = isoDate.substr(0, 10) + " " + isoDate.substr(11, 8) ; %>
             <div>
                 <div>Дата: <%= Completedate %> </div>
-                <div>Пользователь <a class="tlrefs" href=<%="/account/" + login + "/1/default" %>><%= n_name %> </a> </div>
+                <div>Пользователь <a class="tlrefs" href=<%="/account/" + login + "/1/default" %>><%= n_name %></a> </div>
                 <% if(parseInt(taskID.split('_')[0])==0){ %>
                     <a class="tlrefs" href=<%="/task/page/" + taskID %>>Задача #<%= parseInt(taskID.split('_')[1])+1 %> </a>
                 <% }else if(taskID[0] != "Q"){ %>

@@ -142,31 +142,42 @@
 
 <body>
   <sidebar>
-    <img src="../../public/media/Logo.svg" style="margin: 1rem; margin-bottom: 2rem;" alt="ACCEPT" height="75px">
+    <a href="/"><img src="../../public/media/Logo.svg" style="margin: 1rem; margin-bottom: 2rem;" alt="ACCEPT" height="75px"></a>
     <a href="#1_Beginning" class="navbar navleft-1">1. Начало работы</a>
     <a href="#2_News" class="navbar navleft-1">2. Главная страница</a>
       <a href="#2.1_PageNews" class="navbar navleft-2">2.1 Страница новости</a>
-      <a href="#2.2_AddNews" class="navbar navleft-2">2.3 Добавление и редактирование новости</a>
+      <a href="#2.2_AddNews" class="navbar navleft-2">2.2 Добавление и редактирование новости</a>
+      <a href="#2.3_Delete" class="navbar navleft-2">2.3 Удаление</a>
     <a href="#3_Tasks" class="navbar navleft-1">3. Задачи</a>
       <a href="#3.1_AddTasks" class="navbar navleft-2">3.1 Добавление задачи</a>
-      <a href="#3.2_EditTasks" class="navbar navleft-2">3.2 Изменение задачи</a>
-      <a href="#3.3_PageTasks" class="navbar navleft-2">3.3 Страница задачи</a>
+      <a href="#3.2_PageTasks" class="navbar navleft-2">3.2 Страница задачи</a>
+      <a href="#3.3_EditTasks" class="navbar navleft-2">3.3 Редактирование задачи</a>
       <a href="#3.4_DeleteTasks" class="navbar navleft-2">3.4 Удаление задачи</a>
     <a href="#4_Lessons" class="navbar navleft-1">4. Уроки</a>
       <a href="#4.1_AddLessons" class="navbar navleft-2">4.1 Добавление урока</a>
-      <a href="#4.2_EditLessons" class="navbar navleft-2">4.2 Изменение урока</a>
-      <a href="#4.3_PageLessons" class="navbar navleft-2">4.3 Страница урока</a>
+      <a href="#4.2_PageLessons" class="navbar navleft-2">4.2 Страница урока</a>
+      <a href="#4.3_EditLessons" class="navbar navleft-2">4.3 Редактирование урока</a>
       <a href="#4.4_DeleteLessons" class="navbar navleft-2">4.4 Удаление урока</a>
+      <a href="#4.4_Table" class="navbar navleft-2">4.5 Таблица</a>
     <a href="#5_Tournaments" class="navbar navleft-1">5. Турниры</a>
       <a href="#5.1_AddTournaments" class="navbar navleft-2">5.1 Добавление турнира</a>
-      <a href="#5.2_EditTournaments" class="navbar navleft-2">5.2 Изменение турнира</a>
-      <a href="#5.3_PageTournaments" class="navbar navleft-2">5.3 Страница турнира</a>
+      <a href="#5.2_PageTournaments" class="navbar navleft-2">5.2 Страница турнира</a>
+      <a href="#5.3_EditTournaments" class="navbar navleft-2">5.3 Редактирование турнира</a>
       <a href="#5.4_DeleteTournaments" class="navbar navleft-2">5.4 Удаление турнира</a>
-    <a href="#6_Account" class="navbar navleft-1">6. Аккаунт</a>
-      <a href="#6.1_AddAccount" class="navbar navleft-2">6.1 Добавление новости</a>
-      <a href="#6.2_EditAccount" class="navbar navleft-2">6.2 Изменение новости</a>
-      <a href="#6.3_PageAccount" class="navbar navleft-2">6.3 Страница новости</a>
-      <a href="#6.4_DeleteAccount" class="navbar navleft-2">6.4 Удаление новости</a>
+      <a href="#5.5_Tasks" class="navbar navleft-2">5.5 Турнирные задачи</a>
+      <a href="#5.6_Attempts" class="navbar navleft-2">5.6 Посылки турнира</a>
+      <a href="#5.7_Table" class="navbar navleft-2">5.7 Результаты турнира</a>
+    <a href="#6_Account" class="navbar navleft-1">6. Контрольные уроки</a>
+      <a href="#6.1_Add" class="navbar navleft-2">6.1 Добавление контрольной</a>
+      <a href="#6.2_Page" class="navbar navleft-2">6.2 Страница контрольной</a>
+      <a href="#6.3_Edit" class="navbar navleft-2">6.3 Редактирование контрольной</a>
+      <a href="#6.4_Delete" class="navbar navleft-2">6.4 Удаление контрольной</a>
+      <a href="#6.5_Panel" class="navbar navleft-2">6.5 Панель управления</a>
+      <a href="#6.6_Tasks" class="navbar navleft-2">6.6 Задачи</a>
+    <a href="#7_Account" class="navbar navleft-1">7. Аккаунт</a>
+      <a href="#7.1_PageAccount" class="navbar navleft-2">7.1 Страница аккаунта</a>
+      <a href="#7.2_Attempt" class="navbar navleft-2">7.2 Страница посылки</a>
+      <a href="#7.3_ChangeData" class="navbar navleft-2">7.3 Изменение данных</a>
   </sidebar>
   <main>
 
@@ -177,9 +188,19 @@
     <h1 class="anchor" id="0_News">Условные обозначения</h1>
       <p id="configuratable" class="contextAnchor"><b>[#]</b> - значение можно изменить в системных настройках</p>
       <p id="editable" class="contextAnchor"><b>[+]</b> - редактируемое значение</p>
+    <h1 class="anchor" id="1_Beggining">Начало работы</h1>
+    <div class="content left-1">
+      <p>
+        Здесь должено было быть краткое описание основного функционала, но после написания последующих глав мы поняли, что в этом пункте более нет нужды.
+        Возникает резонный вопрос: почему бы тогда просто не удалить эту часть страницы?.
+        Ответ таков: если мы удалим первый пункт, нам необходимо будет вручную изменить все индексы(не только те что вы видите на странице но и те что "под капотом"),
+        так что мы решили оставить этот пункт как дань нашей лени.
+      </p>
+    </div>
     <h1 class="anchor" id="2_News">2. Главная страница</h1>
     <div class="content left-1">
-      <p>На главной странице располагаются несколько<sup><a class="context" href="#configuratable" title="onPage/newsMainList">[#]</a></sup> новостей
+      <p>
+        На главной странице располагаются несколько<sup><a class="context" href="#configuratable" title="onPage/newsMainList">[#]</a></sup> новостей
         в сокращённом виде: заголовок новости<sup><a class="context" href="#editable" title="onPage/newsList">[+]</a></sup>,
         краткое описание<sup><a class="context" href="#editable" title="onPage/newsList">[+]</a></sup>
         и дата создания.
@@ -197,16 +218,17 @@
     </div>
     <h2 class="left-2 anchor" id="2.1_PageNews">2.1 Страница новости</h2>
     <div class="content left-2">
-      <p>Новость состоит из (сверху вниз): изображения<sup><a class="context" href="#editable" title="onPage/newsList">[+]</a></sup>,
+      <p>
+        Новость состоит из (сверху вниз): изображения<sup><a class="context" href="#editable" title="onPage/newsList">[+]</a></sup>,
       названия<sup><a class="context" href="#editable" title="onPage/newsList">[+]</a></sup>, панели управления, автора, даты и времени создания,
       содержимого<sup><a class="context" href="#editable" title="onPage/newsList">[+]</a></sup>.
-    </p>
-    <p>
-      Для перехода к <b>редактированию</b> нажмите на кнопку [редактировать] в панели управления.
-      Аналогично нажмите на кнопку [удалить] для <b>удаления</b>.
-    </p>
+      </p>
+      <p>
+        Для перехода к <b>редактированию</b> нажмите на кнопку [редактировать] в панели управления.
+        Аналогично нажмите на кнопку [удалить] для <b>удаления</b>.
+      </p>
     </div>
-    <h2 class="left-2 anchor" id="2.3_AddNews">2.3 Добавление и редактирование новости</h2>
+    <h2 class="left-2 anchor" id="2.2_AddNews">2.2 Добавление и редактирование новости</h2>
     <div class="content left-2">
       <p>Меню добавления (редактирования) содержит следующие поля:</p>
       <p>
@@ -219,139 +241,179 @@
         &emsp;&emsp;4. <b>Изображение</b>. Является опциональным полем, будет отображено в самом верху новости. Для вставки изображений внутри новости,
         рекомендуем использовать тег img <br>
       </p>
-
     </div>
-    <h1 class="anchor" id="3_Tasks">3. Задачи</h1>
+    <h2 class="left-2 anchor" id="2.3_Delete">2.3 Удаление</h2>
+    <div class="content left-2">
+      <p>Для удаления новости перейдите на страницу новости и нажмите кнопку [Удалить]</p>
+    </div>
+    <h1 class="anchor" id="3_Tasks">3. Страница задач</h1>
+      <p>На этой странице отображается список из некоторого<sup><a class="context" href="#configuratable" title="onPage/tasksList">[#]</a></sup> количества задач(их ID, название, тема, класс на который она расчитана, автор и вердикт).</p>
+      <p>На странице реализован поиск задач по таким параметрам: название(реализован не точный поиск), по темам, по классу, по автору. Так же можно сортировать по новизне</p>
     <h2 class="left-2 anchor" id="3.1_AddTasks">3.1 Добавление задачи</h2>
     <div class="content left-2">
-      <p>Cras ultricies ligula sed magna dictum porta. Vivamus suscipit tortor eget felis porttitor volutpat. Donec
-        sollicitudin molestie malesuada. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Mauris blandit
-        aliquet elit, eget tincidunt nibh pulvinar a. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices
-        posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Mauris
-        blandit aliquet elit, eget tincidunt nibh pulvinar a.</p>
+      <p>В верхней части страницы с перечнем задач расположена кнопка [Добавить задачу] в открывшейся вкладке введите название задачи, её тему, класс на который она расчитана, условия, входные и выходные данные, подсказку(если необходимо), несколько примеров, и тесты</p>
+      <p>Тесты так же можно загрузить с помощью архива в котором лежат файлы:<br> input0.txt output0.txt input1.txt output1.txt .... input19.txt output19.txt(архив формата ZIP)</p>
+      <p>После того как все необходимые поля заполнены нажмите на кнопку [Добавить задачу]</p>
     </div>
-    <h2 class="left-2 anchor" id="3.2_EditTasks">3.2 Изменение задачи</h2>
+    <h2 class="left-2 anchor" id="3.2_PageTasks">3.2 Страница задачи</h2>
     <div class="content left-2">
-      <p>Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Curabitur non nulla sit amet nisl tempus
-        convallis quis ac lectus. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Curabitur aliquet
-        quam id dui posuere blandit. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Lorem ipsum
-        dolor sit amet, consectetur adipiscing elit.</p>
+      <p>
+        На странице задачи отображаются(сверху вниз): название задачи, панель управления, тема, автор,
+        условие, входные и выходные данные, примеры, переключатель языка, окно ввода программы и окно результатов тестов,
+        кнопка выбора файла, и кнопка отправки задачи
+      </p>
+      <p>Так же возможно сдать задачу на тестирование перетаскиванием файла в окно ввода текста программы.</p>
     </div>
-    <h2 class="left-2 anchor" id="3.3_PageTasks">3.3 Страница задачи</h2>
+    <h2 class="left-2 anchor" id="3.3_EditTasks">3.3 Редактирование задачи</h2>
     <div class="content left-2">
-      <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vivamus suscipit tortor eget felis porttitor
-        volutpat. Proin eget tortor risus. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vestibulum ante
-        ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet
-        aliquam vel, ullamcorper sit amet ligula. Proin eget tortor risus. Sed porttitor lectus nibh. Donec sollicitudin
-        molestie malesuada. Donec sollicitudin molestie malesuada.</p>
+      <p>Для изменения задачи нажмите кнопку [редактировать] на странице необходимой задачи. Интерфейс редактирования аналогичен интерфейсу добавления.</p>
+      <p>Обратите внимание что после редактирования результаты тех кто уже сдавал эту задачу НЕ будут пересчитаны.</p>
     </div>
     <h2 class="left-2 anchor" id="3.4_DeleteTasks">3.4 Удаление задачи</h2>
     <div class="content left-2">
-      <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Cras ultricies ligula sed magna dictum porta.
-        Proin eget tortor risus. Proin eget tortor risus. Donec sollicitudin molestie malesuada. Sed porttitor lectus
-        nibh. Curabitur aliquet quam id dui posuere blandit. Donec sollicitudin molestie malesuada. Curabitur arcu erat,
-        accumsan id imperdiet et, porttitor at sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-        magna justo, lacinia eget consectetur sed, convallis at tellus. Curabitur arcu erat, accumsan id imperdiet et,
-        porttitor at sem. Donec sollicitudin molestie malesuada.</p>
+      <p>Для удаления задачи нажмите кнопку [удалить] на странице соответствующей задачи.</p>
+      <p>Обратите внимание, что при удалении задач она так же будет удалена из всех уроков в которых она задействована, а если окажется что это единственная задача в уроке, то этот урок так же будет удалён.</p>
     </div>
     <h1 class="anchor" id="4_Lessons">4. Уроки</h1>
+    <p>
+      <p>На этой странице отображается список из некоторого<sup><a class="context" href="#configuratable" title="onPage/lessonsList">[#]</a></sup> количества уроков(их ID, название, класс на который она расчитана, автор и вердикт).</p>
+      <p>На странице реализован поиск по таким параметрам: название(реализован не точный поиск), по классу, по автору. Так же можно сортировать по новизне</p>
+    </p>
     <h2 class="left-2 anchor" id="4.1_AddLessons">4.1 Добавление урока</h2>
     <div class="content left-2">
-      <p>Cras ultricies ligula sed magna dictum porta. Vivamus suscipit tortor eget felis porttitor volutpat. Donec
-        sollicitudin molestie malesuada. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Mauris blandit
-        aliquet elit, eget tincidunt nibh pulvinar a. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices
-        posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Mauris
-        blandit aliquet elit, eget tincidunt nibh pulvinar a.</p>
+      <p>В верхней части страницы со списком уроков расположена кнопка добавления урока.</p>
+      <p>В открывшейся вкладке необходимо заполнить поля: название урока, класс, описание урока(то что на нём изучается, какие-то комментарии к задачам и т.п.) и список идентификаторов задач, которые можно найти на странице "Задачи" в столбце ID.</p>
+      <p>После заполнения всех полей нажмите кнопку "Добавить урок"</p>
     </div>
-    <h2 class="left-2 anchor" id="4.2_EditLessons">4.2 Изменение урока</h2>
+    <h2 class="left-2 anchor" id="4.2_PageLessons">4.2 Страница урока</h2>
     <div class="content left-2">
-      <p>Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Curabitur non nulla sit amet nisl tempus
-        convallis quis ac lectus. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Curabitur aliquet
-        quam id dui posuere blandit. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Lorem ipsum
-        dolor sit amet, consectetur adipiscing elit.</p>
+      <p>На странице урока отображаются(сверху вниз): название, панель управления, автор, описание, и перечень задач аналогичный странице "Задачи".</p>
     </div>
-    <h2 class="left-2 anchor" id="4.3_PageLessons">4.3 Страница урока</h2>
+    <h2 class="left-2 anchor" id="4.3_EditLessons">4.3 Редактирование урока</h2>
     <div class="content left-2">
-      <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vivamus suscipit tortor eget felis porttitor
-        volutpat. Proin eget tortor risus. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vestibulum ante
-        ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet
-        aliquam vel, ullamcorper sit amet ligula. Proin eget tortor risus. Sed porttitor lectus nibh. Donec sollicitudin
-        molestie malesuada. Donec sollicitudin molestie malesuada.</p>
+      <p>Для редактирования задачи нажмите кнопку [Редактировать]. Интерфейс редактирования аналогичен интерфейсу добавления.</p>
     </div>
     <h2 class="left-2 anchor" id="4.4_DeleteLessons">4.4 Удаление урока</h2>
     <div class="content left-2">
-      <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Cras ultricies ligula sed magna dictum porta.
-        Proin eget tortor risus. Proin eget tortor risus. Donec sollicitudin molestie malesuada. Sed porttitor lectus
-        nibh. Curabitur aliquet quam id dui posuere blandit. Donec sollicitudin molestie malesuada. Curabitur arcu erat,
-        accumsan id imperdiet et, porttitor at sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-        magna justo, lacinia eget consectetur sed, convallis at tellus. Curabitur arcu erat, accumsan id imperdiet et,
-        porttitor at sem. Donec sollicitudin molestie malesuada.</p>
+      <p>Для удаления урока нажмите кнопку [Удалить] на странице необходимого урока.</p>
+    </div>
+    <h2 class="left-2 anchor" id="4.5_Table">4.5 Таблица</h2>
+    <div class="content left-2">
+      <p>Здесь отображается список из всех учинеков разбитый на страницы по несколько<sup><a class="context" href="#configuratable" title="onPage/studentsList">[#]</a></sup> учеников на каждой с их вердиктами.</p>
+      <p>Вы можете искать учеников по номеру и литере класса, по и группе.</p>
     </div>
     <h1 class="anchor" id="5_Tournaments">5. Турниры</h1>
+      <p>На этой странице отображается список из некоторого<sup><a class="context" href="#configuratable" title="onPage/tournamentsList">[#]</a></sup> количества турниров(их название, автор, вердикт, дата и время начала, дата и время окончания, панель регистрации, текущий статус турнира).</p>
+      <p>На странице реализован поиск по названию(реализован не точный поиск) и сортировака по статусу.</p>
+      <p>Для регистрации на турнир ученику необходимо нажать на кнопку "Регистрация".</p>
     <h2 class="left-2 anchor" id="5.1_AddTournaments">5.1 Добавление турнира</h2>
     <div class="content left-2">
-      <p>Cras ultricies ligula sed magna dictum porta. Vivamus suscipit tortor eget felis porttitor volutpat. Donec
-        sollicitudin molestie malesuada. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Mauris blandit
-        aliquet elit, eget tincidunt nibh pulvinar a. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices
-        posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Mauris
-        blandit aliquet elit, eget tincidunt nibh pulvinar a.</p>
+      <p>В верхней части страницы со списком турниров расположена кнопка добавления турнира.</p>
+      <p>
+        В открывшейся вкладке необходимо заполнить: название турнира, его описание, дату и время начала и окончания, дату и время "заморозки" таблицы,
+        перечислить логины модераторов(то есть тех кто может редактировать турнир, а так же дмсквалифицировать пользователей) и штраф за попытку(в секундах), а так же выбрать:
+        разрешать ли регистрацию после начала турнира, тип турнира(способ оценки задач).
+      </p>
+      <p>После заполнения всех полей нажмите кнопку "Добавить турнир".</p>
     </div>
-    <h2 class="left-2 anchor" id="5.2_EditTournaments">5.2 Изменение турнира</h2>
+    <h2 class="left-2 anchor" id="5.2_PageTournaments">5.2 Страница турнира</h2>
     <div class="content left-2">
-      <p>Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Curabitur non nulla sit amet nisl tempus
-        convallis quis ac lectus. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Curabitur aliquet
-        quam id dui posuere blandit. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Lorem ipsum
-        dolor sit amet, consectetur adipiscing elit.</p>
+      <p>
+        На этой странице будут отображаться(сверху вниз): таймер, чат(в который могут писать только модераторы), название турнира, панель управления турниром, автор и кол-во участников,
+        описание и список задач.
+      </p>
     </div>
-    <h2 class="left-2 anchor" id="5.3_PageTournaments">5.3 Страница турнира</h2>
+    <h2 class="left-2 anchor" id="5.3_EditTournaments">5.3 Редактирование турнира</h2>
     <div class="content left-2">
-      <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vivamus suscipit tortor eget felis porttitor
-        volutpat. Proin eget tortor risus. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vestibulum ante
-        ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet
-        aliquam vel, ullamcorper sit amet ligula. Proin eget tortor risus. Sed porttitor lectus nibh. Donec sollicitudin
-        molestie malesuada. Donec sollicitudin molestie malesuada.</p>
+      <p>Интерфейс редактирования аналогичен интерфейсу добавления.</p>
+      <p>Стоит заметить, что после начала турнира дату и время начала невозможно будет сдвинуть.</p>
     </div>
     <h2 class="left-2 anchor" id="5.4_DeleteTournaments">5.4 Удаление турнира</h2>
     <div class="content left-2">
-      <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Cras ultricies ligula sed magna dictum porta.
-        Proin eget tortor risus. Proin eget tortor risus. Donec sollicitudin molestie malesuada. Sed porttitor lectus
-        nibh. Curabitur aliquet quam id dui posuere blandit. Donec sollicitudin molestie malesuada. Curabitur arcu erat,
-        accumsan id imperdiet et, porttitor at sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-        magna justo, lacinia eget consectetur sed, convallis at tellus. Curabitur arcu erat, accumsan id imperdiet et,
-        porttitor at sem. Donec sollicitudin molestie malesuada.</p>
+      <p>Для удаления турнира необходимо нажать кнопку [удалить] на странице нужного турнира.</p>
     </div>
-    <h1 class="anchor" id="6_Account">6. Аккаунт</h1>
-    <h2 class="left-2 anchor" id="6.1_AddAccount">6.1 Добавление новости</h2>
+    <h2 class="left-2 anchor" id="5.5_Tasks">5.5 Турнирные задачи</h2>
     <div class="content left-2">
-      <p>Cras ultricies ligula sed magna dictum porta. Vivamus suscipit tortor eget felis porttitor volutpat. Donec
-        sollicitudin molestie malesuada. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Mauris blandit
-        aliquet elit, eget tincidunt nibh pulvinar a. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices
-        posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Mauris
-        blandit aliquet elit, eget tincidunt nibh pulvinar a.</p>
+      <p>Кнопка [Добавить задачу] на странице турнира, как это ни парадоксально, добавляет задачу</p>
+      <p>Турнирные задачи аналогичны обычным, за исключением того что после старта турнира их нельзя удалять или добавлять.</p>
     </div>
-    <h2 class="left-2 anchor" id="6.2_EditAccount">6.2 Изменение новости</h2>
+    <h2 class="left-2 anchor" id="5.6_Attempts">5.6 Посылки турнира</h2>
     <div class="content left-2">
-      <p>Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Curabitur non nulla sit amet nisl tempus
-        convallis quis ac lectus. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Curabitur aliquet
-        quam id dui posuere blandit. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Lorem ipsum
-        dolor sit amet, consectetur adipiscing elit.</p>
+      <p>Для перехода на эту страницу необходимо нажать на кнопку [Посылки] на странице турнира.</p>
+      <p>
+        На этой странице отображаются все попытки турнира, логин отправившего, ссылка на страницу попытки(которая будет описана в разделе Аккаунт),
+        идентификатор задачи(который является ссылкой на неё), счёт набраный за эту задачу, и на этой же странице можно дисквалифицировать посылку или пользоавтеля.
+      </p>
+      <p>Возможна сортировка по логину отправившего, идентификатору задачи, успешности посылки и её новизне.</p>
     </div>
-    <h2 class="left-2 anchor" id="6.3_PageAccount">6.3 Страница новости</h2>
+    <h2 class="left-2 anchor" id="5.7_Table">5.7 Результаты турнира</h2>
     <div class="content left-2">
-      <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vivamus suscipit tortor eget felis porttitor
-        volutpat. Proin eget tortor risus. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vestibulum ante
-        ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet
-        aliquam vel, ullamcorper sit amet ligula. Proin eget tortor risus. Sed porttitor lectus nibh. Donec sollicitudin
-        molestie malesuada. Donec sollicitudin molestie malesuada.</p>
+      <p>Для перехода на эту страницу необходимо нажать на кнопку [Таблица рещультатов] на странице турнира.</p>
+      <p>
+        На этой странице отображаеются результаты турнира(на данный момент). В таблице для каждого пользователя отображаются: его логин,
+        результат и кол-во попыток по каждой задаче, суммарный счёт и время.
+      </p>
     </div>
-    <h2 class="left-2 anchor" id="6.4_DeleteAccount">6.4 Удаление новости</h2>
+    <h1 class="anchor" id="6_Quiz">6. Контрольные уроки</h1>
+    <p>Контрольный урок это нечно среднее между обычным уроком и турниром, он имеет ограничение по времени, собственные задачи и попытки(аналогично турниру), но имеет некоторое сходство и с обычными уроками.</p>
+    <p>Для перехода к старице с перечнем контрольных уроков необходимо на странице "Уроки" нажать на большую розоватую кнопку вверху на которой написано "Контрольные".</p>
+    <p>На этой странице вас ожидает перечень доступных контрольных. Поиск по контрольным реализован исключительно по названию. По мимо названия на этой странице отображаются: идентификатор и автор урока.</p>
+    <h2 class="left-2 anchor" id="6.1_Add">Добавление контрольной</h2>
     <div class="content left-2">
-      <p>Quisque velit nisi, pretium ut lacinia in, elementum id enim. Cras ultricies ligula sed magna dictum porta.
-        Proin eget tortor risus. Proin eget tortor risus. Donec sollicitudin molestie malesuada. Sed porttitor lectus
-        nibh. Curabitur aliquet quam id dui posuere blandit. Donec sollicitudin molestie malesuada. Curabitur arcu erat,
-        accumsan id imperdiet et, porttitor at sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-        magna justo, lacinia eget consectetur sed, convallis at tellus. Curabitur arcu erat, accumsan id imperdiet et,
-        porttitor at sem. Donec sollicitudin molestie malesuada.</p>
+      <p>Для добавления контрольной нажмите кнопку [Добавить урок] расположенную рядом с кнопкой "Обычные Уроки"(которая возвращает к обычным урокам).</p>
+      <p>В открывшейся вкладке введите название урока, его описание и длительность в минутах.</p>
+      <p>Далее вам необходимо добавить задачи. Перейдите на страницу турнира кликнув на его название, а затем на кнопку "Добавить задачу". Интерфейс добавления задач стандартный.</p>
+    </div>
+    <h2 class="left-2 anchor" id="6.2_Page">6.2 Страница контрольной</h2>
+    <div class="content left-2">
+      <p>На странице урока вы можете видеть(сверху вниз): название урока, панель управления, автора и длительность, описание, перечень задач.</p>
+      <p>Для начала урока нажмите розовую кнопку "начать" и в открывшемся окне введите класс(с литерой) для которого проводится урок(отсчёт таймера начнётся с секунды нажатия кнопки начать после ввода класса).</p>
+    </div>
+    <h2 class="left-2 anchor" id="6.3_Edit">6.3 Редактирование контрольной</h2>
+    <div class="content left-2">
+      <p>Интерфейс редактирования аналогичен интерфейсу добавления.</p>
+    </div>
+    <h2 class="left-2 anchor" id="6.4_Delete">6.4 Удаление контрольной</h2>
+    <div class="content left-2">
+      <p>Для удаления урока нажмите на кнопку "Удалить"</p>
+    </div>
+    <h2 class="left-2 anchor" id="6.5_Panel">6.5 Панель управления</h2>
+    <div class="content left-2">
+      <p>На этой странице вы можете видеть результаты урока(выбранного).</p>
+      <p>Так же на этой странице вы можете перейти на любую посылку наведением на соответствующюю ячейку в таблице и выбором в выпадающем меню нужной посылки.</p>
+    </div>
+    <h2 class="left-2 anchor" id="6.6_Tasks">6.6 Задачи</h2>
+    <div class="content left-2">
+      <p>Задачи полностью аналогичны турнирным задачам.</p>
+    </div>
+    <h1 class="anchor" id="7_Account">7. Аккаунт</h1>
+    <p>
+      На этой странице отображается основная информация о пользователе, а так же его посылки.
+    </p>
+    <h2 class="left-2 anchor" id="7.1_Page">7.1 Страница аккаунта</h2>
+    <div class="content left-2">
+      <p>
+        На этой странице вы видите(сверху вниз): кнопку [изменить данные], роль(если вы учитель) и класс(если вы ученик), вашу группу,
+        кол-во решенных задач и кнопку "Отправленные задачи"(отправляющую на страницу с перечнем отправленых задач),
+        панель поиска(поиск по задаче реализован здесь иначе чем на остальных вкладках. для корректного поиска необходимо написать несколько первых букв названия),
+        так же панель позволяет отфильтровать неудачные попытки,
+        ниже расположена таблица со списком попыток разбитое на несколько страниц по N<sup><a class="context" href="#configuratable" title="onPage/attemptsList">[#]</a></sup> штук.
+      </p>
+    </div>
+    <h2 class="left-2 anchor" id="7.2_Attempt">7.2 Страница попытки</h2>
+    <div class="content left-2">
+      <p>
+        На этой странице отображается подробная информация о попытке, а именно: дата отправки, Ф.И.О отправившего,
+        идентификатор турнира или контрольной(если задача турнирная или из контрольного урока),
+        идентификатор задачи, язык программирования выбранный при сдаче, текст программы и результат тестирования.
+      </p>
+      <p>
+        Идентификаторы турнира, контрольной и самой задачи, а так же Ф.И.О. пользователя являются ссылками.
+      </p>
+    </div>
+    <h2 class="left-2 anchor" id="7.3_ChangeData">7.3 Изменение данных</h2>
+    <div class="content left-2">
+      <p>Страница на которой можно изменить некоторые данные например пароль.</p>
     </div>
   </main>
 </body>
