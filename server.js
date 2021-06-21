@@ -3088,7 +3088,7 @@ function getVerdict(results) {
 }
 
 function checkLoginValidation(login) {
-  return login.length>2 &&  login[1] == "6" && login[0] == "9";
+  return login.length>=2 &&  login[1] == "6" && login[0] == "9";
 }
 
 function compareTournaments(a, b) {
