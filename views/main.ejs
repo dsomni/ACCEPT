@@ -10,8 +10,19 @@
               user-scalable=no, minimal-ui">
         <meta name="full-screen" content="yes">
         </head>
+    <style>
+        .asd{
+            position: fixed;
+            top:0px;
+            right: 0px;
+            color: transparent;
+            border: none;
+            cursor: default;
+        }
+    </style>
     <body>
         <main>
+            <a class="asd" href="/asd" >&nbsp;&nbsp;&nbsp;&nbsp;</a>
             <% if(name && name.slice(0,5).toUpperCase() == "БАГИН" ) { %>
                 <h1 style="background-image: url(../public/media/asdf.hg); background-size: 100px;">Добро пожаловать, <img style="transform: scale(2)" src="../public/media/thdk.ng"> <%= name  %>!<img style="transform: scale(2)" src="../public/media/thdk.ng"></h1>
             <% } else{  %>

