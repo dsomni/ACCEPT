@@ -31,6 +31,7 @@
     "express-flash": "0.0.2",
     "express-session": "^1.17.1",
     "fuse.js": "^6.4.6",
+    "iconv-lite": "^0.6.2",
     "is-running": "^2.1.0",
     "method-override": "^3.0.0",
     "mongoose": "^5.11.8",

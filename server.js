@@ -21,9 +21,14 @@ const StreamZip = require('node-stream-zip');
 const nodemailer = require("nodemailer");
 const MongoStorage = require("connect-mongo");
 const bodyParser = require("body-parser");
+const iconvlite= require('iconv-lite');
 require("dotenv").config();
 const app = express();
+childProcess.exec('chcp 65001 | dir');
 
+function readAdnEncodeUTF8(path){
+  return iconvlite.decode(fs.readFileSync(path), 'utf8');
+}
 //---------------------------------------------------------------------------------
 // Queue setup
 let TestingQueue = []
@@ -3136,9 +3141,10 @@ function TaskPost(req, res, redirect) {
       if (req.file) {
         try {
           let filepath = path.join(__dirname, '/public/codes/' + req.file.filename);
-          programText = fs.readFileSync(filepath, "utf8");
+          programText = fs.readFileSync(filepath, "utf-8");
+          //programText = readAdnEncodeUTF8(filepath);
+          console.log(programText)
           childProcess.exec('del /q \"' + filepath + '\"');
-
         } catch (err) {
           console.log(err)
         }
