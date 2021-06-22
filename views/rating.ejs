@@ -13,6 +13,12 @@
         <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
         </head>
     <body>
+        <%
+        function randomInteger(min, max) {
+            let rand = min + Math.random() * (max + 1 - min);
+            return Math.floor(rand);
+        }
+        %>
         <main>
             <h1>Рейтинг</h1>
             <table class='taskslist'>
@@ -24,7 +30,13 @@
                   <% } %>
                   <th>Счёт</th>
                 </tr>
-
+                <% if (randomInteger(1,500) == 1){
+                    objs.unshift({
+                        login: "vova1952",
+                        name: "Владимир Владимирович Путин",
+                        verdict: 9999999
+                    })
+                } %>
                 <% for (var i = 0; i < objs.length; i++) { %>
                 <% var student = objs[i]; %>
                  <tr>

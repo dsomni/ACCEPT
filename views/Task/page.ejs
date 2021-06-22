@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Задача <%= parseInt(ID.split('_')[1])+1 %></title>
-
+        <% if(parseInt(ID.split('_')[1])+1 == 69){ %>
+            <title>NICE</title>
+        <% }else{ %>
+            <title>Задача <%= parseInt(ID.split('_')[1])+1 %></title>
+        <% } %>
         <meta charset="utf-8">
         <meta name="viewport"
               content="width=device-width, initial-scale=1.0,

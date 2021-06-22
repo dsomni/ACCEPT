@@ -13,7 +13,16 @@
         <link rel="stylesheet" href="/public/css/layout.css" type="text/css">
         </head>
     <body>
+        <%
+        function randomInteger(min, max) {
+            let rand = min + Math.random() * (max + 1 - min);
+            return Math.floor(rand);
+        }
+        %>
         <main>
+            <% if(randomInteger(1, 200) == 1){ %>
+                <img src="https://imgur.com/WwwRtgR.jpg">
+            <% } %>
             <h1 class="h1">Личный кабинет <%= n_name %> <% if(u_login == login){ %><a href="/EditAccount" class="editref">[изменить данные]</a> <% } %> </h1>
             <div class="student_info">
                 <%  let role = "Ученик";
@@ -21,7 +30,11 @@
                     else if (user.group.includes('@')) role = "Пользователь";%>
                 <p>Роль: <%= role %></p>
                 <% if(role == "Ученик") { %>
-                    <p>Класс: <%= user.grade + user.gradeLetter %></p>
+                    <% if(randomInteger(1,100) == 1){ %>
+                        <p>Класс: <red style="color:red;">рабочий</red></p>
+                    <% }else{%>
+                        <p>Класс: <%= user.grade + user.gradeLetter %></p>
+                    <% } %>
                 <% } %>
                 <% if(user.group && user.group.length<5){ %>
                     <p>Группа: <%= user.group %></p>
