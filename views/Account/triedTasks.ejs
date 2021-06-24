@@ -28,21 +28,21 @@
 
         <table class='microtable' id="table">
             <tr>
-                <th>ID</th>
+                <th>Турнир</th>
                 <th style="min-width: 30vw; padding-left: 3rem;">Задача</th>
                 <th>Вердикт</th>
             </tr>
             <% for(let i=0; i<verdicts.length; i++){%>
                 <tr>
                     <% if(tasks[i].identificator.split('_')[0]=="0"){ %>
-                        <td><a class="tlrefs" href=<%=`/task/page/${tasks[i].identificator}`%> ><%= parseInt(tasks[i].identificator.split("_")[1])+1 %></a></td>
+                        <td>NaN</td>
                         <td style="min-width: 30vw;"><a class="tlrefs" "><a class="tlrefs" href=<%=`/task/page/${tasks[i].identificator}`%> ><%= tasks[i].title %></a></td>
                     <% }else{ %>
                         <%
                         let tourID = tasks[i].identificator.split('_')[0];
                         let taskID = tasks[i].identificator.split('_')[1];
                         %>
-                        <td><a class="tlrefs" href=<%=`/tournament/task/page/${tourID}/${tasks[i].identificator}`%> ><%= parseInt(taskID)+1 %></a> <a class="tlrefs" href=<%=`/tournament/page/${u_login}/${tourID}`%> ><%=tourID%></a></td>
+                        <td><a class="tlrefs" href=<%=`/tournament/page/${u_login}/${tourID}`%> ><%=tourID%></a></td>
                         <td style="min-width: 30vw;"><a class="tlrefs" "><a class="tlrefs" href=<%=`/tournament/task/page/${tourID}/${tasks[i].identificator}`%> ><%= tasks[i].title %></a></td>
                     <% } %>
                     <td><%= verdicts[i].result %></td>
