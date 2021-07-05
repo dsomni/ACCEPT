@@ -22,8 +22,8 @@ var permanently = Number.parseInt(process.argv[3]);
 async function run() {
 
     let user = await User.findOne({ login: deletedLogin }).exec();
-    // if (!user)
-    //     return;
+    if (!user)
+        return;
 
     let tournaments = await Tournament.find({});
     for (let j = 0; j < tournaments.length; j++) {
@@ -70,4 +70,4 @@ run()
 
 setTimeout(() => {
     process.exit()
-}, 1000)
+}, 10000)
