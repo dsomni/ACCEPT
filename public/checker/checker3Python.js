@@ -8,10 +8,10 @@ const checkProcess = require("is-running")
 childProcess.exec('chcp 65001 | dir');
 
 let connectionString
-if(config.mongodbConfigs.User.Username!="" && config.mongodbConfigs.User.Password!=""){
-    connectionString = "mongodb://"+config.mongodbConfigs.User.Username+":"+config.mongodbConfigs.User.Password+"@"+config.mongodbConfigs.Host+"/"+config.mongodbConfigs.dbName
-}else{
-    connectionString = "mongodb://"+config.mongodbConfigs.Host+"/"+config.mongodbConfigs.dbName
+if (config.mongodbConfigs.User.Username != "" && config.mongodbConfigs.User.Password != "") {
+    connectionString = "mongodb://" + config.mongodbConfigs.User.Username + ":" + config.mongodbConfigs.User.Password + "@" + config.mongodbConfigs.Host + "/" + config.mongodbConfigs.dbName
+} else {
+    connectionString = "mongodb://" + config.mongodbConfigs.Host + "/" + config.mongodbConfigs.dbName
 }
 
 mongoose.connect(connectionString, {
@@ -36,17 +36,37 @@ const Task = require('../../config/models/Task');
 const Tournament = require('../../config/models/Tournament');
 const Quiz = require('../../config/models/Quiz');
 
-async function go(){
+function string2Bin(str) {
+    var result = [];
+    for (var i = 0; i < str.length; i++) {
+        result.push(str.charCodeAt(i).toString(2));
+    }
+    return result;
+}
+
+function bin2String(array) {
+    var result = "";
+    for (var i = 0; i < array.length; i++) {
+        result += String.fromCharCode(parseInt(array[i], 2));
+    }
+    return result;
+}
+
+
+async function go() {
     let path = process.argv[2];
     let fileName = process.argv[3];
     let taskid = process.argv[4];
     let tour_id = process.argv[4].split('_')[0];
 
-    let programText = fs.readFileSync(path+"/programText.txt", "utf8");
-    programText = '# -*- coding: cp1251 -*-' + '\n' + programText
-
-    fs.writeFileSync(path + '/'+fileName +'.py', programText, "utf8");
-
+    let programText = fs.readFileSync(path + "/programText.txt", "utf8");
+    let bytes = string2Bin(programText);
+    if (bytes[0].length > 7) {
+        bytes.shift()
+    }
+    programText = bin2String(bytes)
+    programText = ('# -*- coding: cp1251 -*-' + '\n').toString('utf8') + programText
+    fs.writeFileSync(path + '/' + fileName + '.py', programText, "utf8");
     let task;
 
     if (tour_id[0] == "Q") {
@@ -61,23 +81,23 @@ async function go(){
 
     let tests = task.tests
 
-    for(let i = 0; i<tests.length; i++){
-        fs.writeFileSync(path + '/input'+i+".txt", tests[i][0], "utf8");
-        fs.writeFileSync(path + '/output'+i+".txt", tests[i][1], "utf8");
+    for (let i = 0; i < tests.length; i++) {
+        fs.writeFileSync(path + '/input' + i + ".txt", tests[i][0], "utf8");
+        fs.writeFileSync(path + '/output' + i + ".txt", tests[i][1], "utf8");
     }
 
     fs.writeFileSync(path + '/result.txt', "");
 
     let pids = [];
-    for(let i = 0; i < tests.length; i++){
+    for (let i = 0; i < tests.length; i++) {
         if (i % max(1, Math.trunc(config.maxThreadsTests - 0.7 * countProcesses())) == 0) {
             await sleep(1000);
         }
         pids.push(childProcess.exec('node' + ' ' +
-        __dirname + '/checker3PythonHelper.js' + ' ' +
-        path + ' ' +
-        fileName + ' ' +
-        i).pid);
+            __dirname + '/checker3PythonHelper.js' + ' ' +
+            path + ' ' +
+            fileName + ' ' +
+            i).pid);
 
     }
     setInterval(() => {
