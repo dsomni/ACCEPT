@@ -49,7 +49,7 @@ async function run(){
         process.exit()
     });
 
-    spawnProcess.stdin.write(input);
+    spawnProcess.stdin.write(input+'\n');
     spawnProcess.stdin.end();
 
     setTimeout(() => {

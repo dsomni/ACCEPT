@@ -10,7 +10,6 @@ var fileName = process.argv[3];
 var i = Number(process.argv[4]);
 
 async function run(){
-
     input = fs.readFileSync(pathToFolder + '/input'+i+".txt",'utf8').trim();
     output = fs.readFileSync(pathToFolder + '/output'+i+".txt",'utf8').trim();
 
@@ -21,6 +20,7 @@ async function run(){
     //spawnProcess.stdout.setEncoding('utf8');
 
     spawnProcess.on('error', function (error) {
+        console.log(1)
         fs.appendFileSync(pathToFolder + '/result.txt', "Test #" + (i+1).toString() + "*" + "Wrong Answer" + "*" + "er" +"\n",  function(error){ if(error) throw error;});
         spawnProcess.stdout.removeAllListeners();
         spawnProcess.stderr.removeAllListeners();
@@ -29,9 +29,8 @@ async function run(){
     });
 
     spawnProcess.stdout.on('data', function (data){
-
+        console.log(5)
         pOutput +=data.toString();
-
         if(pOutput.trim()==output){
             result = "Test #" + (i+1).toString() + "*" + "OK" + "*" + "ok" +"\n";
         }else{
@@ -53,7 +52,7 @@ async function run(){
         process.exit()
     });
 
-    spawnProcess.stdin.write(input);
+    spawnProcess.stdin.write(input+'\n');
     spawnProcess.stdin.end();
 
     setTimeout(() => {
