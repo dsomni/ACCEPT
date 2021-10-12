@@ -3109,7 +3109,7 @@ async function isModerator(req, res, next) {
 
 async function isLessonAvailable(req, res, next) {
   lesson = await LessonSchema.findOne({ identificator: req.params.id }).exec();
-  if (lesson && (req.user.isTeacher || (Number(req.user.grade) >= Number(lesson.grade)))) {
+  if (lesson && (req.user.isTeacher || (lesson.grade==0) || (Number(req.user.grade) >= Number(lesson.grade)))) {
     return next()
   }
   res.redirect('/lessons/' + req.user.login + '/1/default&all&true&all')
