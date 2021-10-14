@@ -99,8 +99,8 @@ module.exports = User = class User {
     this.isTeacher = isTeacher;
     this.modified.push("isTeacher");
   }
-  checkAndSetPassword(password, skipChek = false) {
-    if (skipChek || (password.length != 0 && password.length >= 5 && !password.includes(" "))) {
+  checkAndSetPassword(password, skipCheck = false) {
+    if (password.length != 0 && (skipCheck || (password.length >= 5 && !password.includes(" ")))) {
       this.password = bcrypt.hashSync(password, 10);
       this.modified.push("password");
       return true
