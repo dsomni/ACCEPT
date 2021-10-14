@@ -44,7 +44,7 @@ async function run() {
             toDelete.push(lesson.identificator)
         }
         for (let j = 0; j < lesson.tasks.length; j++) {
-            if (lesson.tasks[j].split('_')[1] > deletedTask.split('_')[1]) {
+            if (parseInt(lesson.tasks[j].split('_')[1]) > parseInt(deletedTask.split('_')[1])) {
                 lesson.tasks[j] = lesson.tasks[j].split('_')[0] + '_' + (parseInt(lesson.tasks[j].split('_')[1]) - 1)
             }
         }
@@ -63,7 +63,7 @@ async function run() {
         attempts = attempts.filter(item => item.taskID != deletedTask);
 
         for (let j = 0; j < attempts.length; j++) {
-            if (attempts[j].taskID.split('_')[1] > deletedTask.split('_')[1]) {
+            if (parseInt(attempts[j].taskID.split('_')[1]) > parseInt(deletedTask.split('_')[1])) {
                 attempts[j].taskID = attempts[j].taskID.split('_')[0] + '_' + (parseInt(attempts[j].taskID.split('_')[1]) - 1);
             }
         }
@@ -72,7 +72,7 @@ async function run() {
         verdicts = user.verdicts;
         verdicts = verdicts.filter(item => item.taskID != deletedTask);
         for (let j = 0; j < verdicts.length; j++) {
-            if (verdicts[j].taskID.split('_')[1] > deletedTask.split('_')[1]) {
+            if (parseInt(verdicts[j].taskID.split('_')[1]) > parseInt(deletedTask.split('_')[1])) {
                 verdicts[j].taskID = verdicts[j].taskID.split('_')[0] + '_' + (parseInt(verdicts[j].taskID.split('_')[1]) - 1);;
             }
         }
