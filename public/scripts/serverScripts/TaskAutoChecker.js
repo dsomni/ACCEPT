@@ -99,7 +99,8 @@ async function check() {
 
                   fs.rmdirSync(folderPath, { recursive: true });
                 }
-              } else if (Date.now() - stats.birthtimeMs >= config.FolderLifeTime) {
+              }
+              if (Date.now() - stats.birthtimeMs >= config.FolderLifeTime) {
                 fs.rmdirSync(folderPath, { recursive: true });
               }
             });
@@ -197,7 +198,8 @@ async function check() {
 
                   fs.rmdirSync(folderPath, { recursive: true });
                 }
-              } else if (Date.now() - stats.birthtimeMs >= config.FolderLifeTime) {
+              }
+              if (Date.now() - stats.birthtimeMs >= config.FolderLifeTime) {
                 fs.rmdirSync(path.normalize(folderPath), { recursive: true });
               }
             });
@@ -269,7 +271,8 @@ async function check() {
 
                   fs.rmdirSync(folderPath, { recursive: true });
                 }
-              } else if (Date.now() - stats.birthtimeMs >= config.FolderLifeTime) {
+              }
+              if (Date.now() - stats.birthtimeMs >= config.FolderLifeTime) {
                 fs.rmdirSync(path.normalize(folderPath), { recursive: true });
               }
             });

@@ -4,7 +4,7 @@ module.exports = {
 	"logsLifeTime": "12",
 	"port": "3000",
 	"secret": "secret",
-	"FolderLifeTime": "42000",
+	"FolderLifeTime": "600000",
 	"maxThreadsTests": "5",
 	"maxThreadsTasks": "5",
 	"onPage": {
